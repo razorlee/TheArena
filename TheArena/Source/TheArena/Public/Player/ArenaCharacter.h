@@ -62,7 +62,7 @@ struct FPlayerData
 	/** defaults */
 	FPlayerData()
 	{
-		Health = 1000.0f;
+		Health = 9090.0f;
 		Stamina = 1000.0f;
 		Energy = 0.0f;
 		Shield = 0.0f;
