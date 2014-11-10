@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\TheArena.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{4E39967F-878C-4ADD-B7DC-1AAD75FC8DBA}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\TheArena.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\TheArenaEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Config">
+      <UniqueIdentifier>{D0B5869B-CD31-4D4B-996F-19493A5BCF6D}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\TheArena">
+      <UniqueIdentifier>{F3DF554A-28CA-4965-B55E-221178166E19}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\TheArena\TheArena.Build.cs">
+      <Filter>Source\TheArena</Filter>
+    </None>
+    <Filter Include="Source\TheArena\Private">
+      <UniqueIdentifier>{F264F4E2-4DDC-4EDD-9997-5948C13FE784}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\TheArena\Private\ArenaTypes.cpp">
+      <Filter>Source\TheArena\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\TheArena.cpp">
+      <Filter>Source\TheArena\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\TheArenaGameMode.cpp">
+      <Filter>Source\TheArena\Private</Filter>
+    </ClCompile>
+    <Filter Include="Source\TheArena\Private\AI">
+      <UniqueIdentifier>{CD60C831-8DE0-4D09-95E0-66313072F1A3}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\TheArena\Private\AI\ArenaAI.cpp">
+      <Filter>Source\TheArena\Private\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\AI\ArenaAIController.cpp">
+      <Filter>Source\TheArena\Private\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\AI\BTTask_FindPointNearEnemy.cpp">
+      <Filter>Source\TheArena\Private\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\AI\BTTask_HasLosTo.cpp">
+      <Filter>Source\TheArena\Private\AI</Filter>
+    </ClCompile>
+    <Filter Include="Source\TheArena\Private\Effects">
+      <UniqueIdentifier>{9FD5B513-461A-4876-8757-7470257DC954}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\TheArena\Private\Effects\ArenaImpactEffect.cpp">
+      <Filter>Source\TheArena\Private\Effects</Filter>
+    </ClCompile>
+    <Filter Include="Source\TheArena\Private\Online">
+      <UniqueIdentifier>{23CFFD20-C51F-4F5B-9F95-BF69E8DB60C7}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\TheArena\Private\Online\ArenaGameSession.cpp">
+      <Filter>Source\TheArena\Private\Online</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Online\ArenaGameState.cpp">
+      <Filter>Source\TheArena\Private\Online</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Online\ArenaOnlineGameSettings.cpp">
+      <Filter>Source\TheArena\Private\Online</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Online\ArenaPlayerState.cpp">
+      <Filter>Source\TheArena\Private\Online</Filter>
+    </ClCompile>
+    <Filter Include="Source\TheArena\Private\Player">
+      <UniqueIdentifier>{FC8EBC83-9B2A-4C3D-8BFD-708D63C4DB91}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\TheArena\Private\Player\ArenaCharacter.cpp">
+      <Filter>Source\TheArena\Private\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Player\ArenaLocalPlayer.cpp">
+      <Filter>Source\TheArena\Private\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Player\ArenaPlayerCameraManager.cpp">
+      <Filter>Source\TheArena\Private\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Player\ArenaPlayerController.cpp">
+      <Filter>Source\TheArena\Private\Player</Filter>
+    </ClCompile>
+    <Filter Include="Source\TheArena\Private\Weapons">
+      <UniqueIdentifier>{B344BD87-C778-48D9-8D17-BF81D4A7530B}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\TheArena\Private\Weapons\ArenaDamageType.cpp">
+      <Filter>Source\TheArena\Private\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Weapons\ArenaProjectile.cpp">
+      <Filter>Source\TheArena\Private\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Weapons\ArenaRangedWeapon.cpp">
+      <Filter>Source\TheArena\Private\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Weapons\ArenaRangedWeapon_Instant.cpp">
+      <Filter>Source\TheArena\Private\Weapons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TheArena\Private\Weapons\ArenaRangedWeapon_Projectile.cpp">
+      <Filter>Source\TheArena\Private\Weapons</Filter>
+    </ClCompile>
+    <Filter Include="Source\TheArena\Public">
+      <UniqueIdentifier>{6D1729DB-A977-4191-B184-BEA80B329AA8}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\TheArena\Public\ArenaTypes.h">
+      <Filter>Source\TheArena\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\TheArena.h">
+      <Filter>Source\TheArena\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\TheArenaGameMode.h">
+      <Filter>Source\TheArena\Public</Filter>
+    </ClInclude>
+    <Filter Include="Source\TheArena\Public\AI">
+      <UniqueIdentifier>{14543E88-F042-4B0F-8C64-83807FF32D79}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\TheArena\Public\AI\ArenaAI.h">
+      <Filter>Source\TheArena\Public\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\AI\ArenaAIController.h">
+      <Filter>Source\TheArena\Public\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\AI\BTTask_FindPointNearEnemy.h">
+      <Filter>Source\TheArena\Public\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\AI\BTTask_HasLosTo.h">
+      <Filter>Source\TheArena\Public\AI</Filter>
+    </ClInclude>
+    <Filter Include="Source\TheArena\Public\Effects">
+      <UniqueIdentifier>{0A7ACF99-0426-4CE5-8B10-B8501CFA048F}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\TheArena\Public\Effects\ArenaImpactEffect.h">
+      <Filter>Source\TheArena\Public\Effects</Filter>
+    </ClInclude>
+    <Filter Include="Source\TheArena\Public\Online">
+      <UniqueIdentifier>{F2E77C4A-2600-4D2B-8453-79A9336F1804}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\TheArena\Public\Online\ArenaGameSession.h">
+      <Filter>Source\TheArena\Public\Online</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Online\ArenaGameState.h">
+      <Filter>Source\TheArena\Public\Online</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Online\ArenaOnlineGameSettings.h">
+      <Filter>Source\TheArena\Public\Online</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Online\ArenaPlayerState.h">
+      <Filter>Source\TheArena\Public\Online</Filter>
+    </ClInclude>
+    <Filter Include="Source\TheArena\Public\Player">
+      <UniqueIdentifier>{497B23E9-67D3-46A8-8556-305AAAA68CB4}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\TheArena\Public\Player\ArenaCharacter.h">
+      <Filter>Source\TheArena\Public\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Player\ArenaLocalPlayer.h">
+      <Filter>Source\TheArena\Public\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Player\ArenaPlayerCameraManager.h">
+      <Filter>Source\TheArena\Public\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Player\ArenaPlayerController.h">
+      <Filter>Source\TheArena\Public\Player</Filter>
+    </ClInclude>
+    <Filter Include="Source\TheArena\Public\Weapons">
+      <UniqueIdentifier>{BA127E28-380D-453B-B9AA-3D70B651DB27}</UniqueIdentifier>
+    </Filter>
+    <ClInclude Include="..\..\Source\TheArena\Public\Weapons\ArenaDamageType.h">
+      <Filter>Source\TheArena\Public\Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Weapons\ArenaProjectile.h">
+      <Filter>Source\TheArena\Public\Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Weapons\ArenaRangedWeapon.h">
+      <Filter>Source\TheArena\Public\Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Weapons\ArenaRangedWeapon_Instant.h">
+      <Filter>Source\TheArena\Public\Weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TheArena\Public\Weapons\ArenaRangedWeapon_Projectile.h">
+      <Filter>Source\TheArena\Public\Weapons</Filter>
+    </ClInclude>
+    <Filter Include="Source\TheArena\Resources">
+      <UniqueIdentifier>{FCDA1EEF-5649-4607-B0E4-B439674F5F89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\TheArena\Resources\Windows">
+      <UniqueIdentifier>{BA246B9B-978C-401D-97E8-1D66097BC698}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\TheArena\Resources\Windows\TheArena.ico">
+      <Filter>Source\TheArena\Resources\Windows</Filter>
+    </None>
+    <ResourceCompile Include="..\..\Source\TheArena\Resources\Windows\TheArena.rc">
+      <Filter>Source\TheArena\Resources\Windows</Filter>
+    </ResourceCompile>
+    <None Include="..\..\Source\TheArena\Resources\Windows\Thumbs.db">
+      <Filter>Source\TheArena\Resources\Windows</Filter>
+    </None>
+  </ItemGroup>
+</Project>
