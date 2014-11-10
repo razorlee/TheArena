@@ -33,6 +33,7 @@ AArenaPlayerController::AArenaPlayerController(const class FPostConstructInitial
 	//CheatClass = UArenaCheatManager::StaticClass();
 	bAllowGameActions = true;
 	LastDeathLocation = FVector::ZeroVector;
+	OpenMenu = false;
 
 	if (!HasAnyFlags(RF_ClassDefaultObject))
 	{
@@ -46,6 +47,8 @@ AArenaPlayerController::AArenaPlayerController(const class FPostConstructInitial
 void AArenaPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
+
+	InputComponent->BindAction("InGameMenu", IE_Pressed, this, &AArenaPlayerController::OnToggleInGameMenu);
 
 	// voice chat
 	InputComponent->BindAction("PushToTalk", IE_Pressed, this, &APlayerController::StartTalking);
@@ -198,6 +201,18 @@ void AArenaPlayerController::OnKill()
 	}
 }
 
+void AArenaPlayerController::OnToggleInGameMenu()
+{
+	if (OpenMenu == true)
+	{
+		SetOpenMenu(false);
+	}
+	else
+	{
+		SetOpenMenu(true);
+	}
+}
+
 void AArenaPlayerController::SetInfiniteAmmo(bool bEnable)
 {
 	bInfiniteAmmo = bEnable;
@@ -216,6 +231,11 @@ void AArenaPlayerController::SetHealthRegen(bool bEnable)
 void AArenaPlayerController::SetGodMode(bool bEnable)
 {
 	bGodMode = bEnable;
+}
+
+void AArenaPlayerController::SetOpenMenu(bool bEnable)
+{
+	OpenMenu = bEnable;
 }
 
 void AArenaPlayerController::ClientGameStarted_Implementation()
@@ -506,4 +526,9 @@ bool AArenaPlayerController::HasGodMode() const
 bool AArenaPlayerController::IsGameInputAllowed() const
 {
 	return bAllowGameActions && !bCinematicMode;
+}
+
+bool AArenaPlayerController::GetOpenMenu() const
+{
+	return OpenMenu;
 }

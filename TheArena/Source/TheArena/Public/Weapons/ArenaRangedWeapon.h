@@ -429,6 +429,12 @@ protected:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopReload();
 
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartMelee();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopMelee();
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// Replication & effects

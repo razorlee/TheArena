@@ -191,7 +191,7 @@ void AArenaRangedWeapon::StartFire()
 {
 	if (Role < ROLE_Authority)
 	{
-		//ServerStartFire();
+		ServerStartFire();
 	}
 
 	if (!bWantsToFire)
@@ -205,7 +205,7 @@ void AArenaRangedWeapon::StopFire()
 {
 	if (Role < ROLE_Authority)
 	{
-		//ServerStopFire();
+		ServerStopFire();
 	}
 
 	if (bWantsToFire)
@@ -219,7 +219,7 @@ void AArenaRangedWeapon::StartReload(bool bFromReplication)
 {
 	if (!bFromReplication && Role < ROLE_Authority)
 	{
-		//ServerStartReload();
+		ServerStartReload();
 	}
 
 	if (bFromReplication || CanReload())
@@ -260,7 +260,7 @@ void AArenaRangedWeapon::StartMelee(bool bFromReplication)
 {
 	if (!bFromReplication && Role < ROLE_Authority)
 	{
-		//ServerStartReload();
+		ServerStartMelee();
 	}
 
 	if (bFromReplication || CanMelee())
@@ -340,6 +340,26 @@ void AArenaRangedWeapon::ServerStopReload_Implementation()
 void AArenaRangedWeapon::ClientStartReload_Implementation()
 {
 	StartReload();
+}
+
+bool AArenaRangedWeapon::ServerStartMelee_Validate()
+{
+	return true;
+}
+
+void AArenaRangedWeapon::ServerStartMelee_Implementation()
+{
+	StartMelee();
+}
+
+bool AArenaRangedWeapon::ServerStopMelee_Validate()
+{
+	return true;
+}
+
+void AArenaRangedWeapon::ServerStopMelee_Implementation()
+{
+	StopMelee();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -475,7 +495,7 @@ void AArenaRangedWeapon::HandleFiring()
 		// local client will notify server
 		if (Role < ROLE_Authority)
 		{
-			//ServerHandleFiring();
+			ServerHandleFiring();
 		}
 
 		// reload after firing last round
@@ -551,7 +571,6 @@ void AArenaRangedWeapon::Melee(AActor* ActorToProcess, TArray<AActor*> HitActors
 	if (GameCharacter)
 	{
 		ActorToProcess->TakeDamage(WeaponConfig.MeleeDamage, AttackDamageEvent, Instigator->GetController(), MyPawn->Controller);
-		//ActorToProcess->TakeDamage(GetDamage(), AttackDamageEvent, Instigator->GetController(), Instigator);
 	}
 }
 

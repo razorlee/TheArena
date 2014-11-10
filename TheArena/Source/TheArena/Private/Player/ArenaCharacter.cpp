@@ -122,6 +122,11 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
+	if (this->PlayerConfig.Stamina <= 0)
+	{
+		SetRunning(false, false);
+	}
+
 	if (bDoingMelee)
 	{
 		AttackTrace();
@@ -133,7 +138,7 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 		this->PlayerConfig.Stamina -= SprintCost * DeltaSeconds;
 	}
 
-	else if (!IsRunning() || PlayerConfig.Stamina <= 0)
+	else if (!IsRunning())
 	{
 		SetRunning(false, false);
 	}
@@ -568,12 +573,15 @@ void AArenaCharacter::OnStopMelee()
 
 void AArenaCharacter::OnStartJump()
 {
-	if (PlayerConfig.Stamina > JumpCost)
+	if (!CharacterMovement->IsFalling())
 	{
-		PlayerConfig.Stamina -= JumpCost;
-		SetRunning(false, false);
-		SetCrouched(false, false);
-		bPressedJump = true;
+		if (PlayerConfig.Stamina > JumpCost)
+		{
+			PlayerConfig.Stamina -= JumpCost;
+			SetRunning(false, false);
+			SetCrouched(false, false);
+			bPressedJump = true;
+		}
 	}
 }
 
@@ -818,7 +826,6 @@ void AArenaCharacter::AttackTrace()
 		{
 			//Process the actor to deal damage
 			CurrentWeapon->Melee(OutOverlaps[i].GetActor(), HitActors);
-			//ProcessHitActor(OutOverlaps[i].GetActor());
 		}
 	}
 }
@@ -826,10 +833,6 @@ void AArenaCharacter::AttackTrace()
 float AArenaCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	/*if (MyPC->HasGodMode())
-	{
-		return 0.f;
-	}*/
 
 	if (PlayerConfig.Health <= 0.f)
 	{

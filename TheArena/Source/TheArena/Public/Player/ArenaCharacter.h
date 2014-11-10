@@ -352,7 +352,7 @@ class AArenaCharacter : public ACharacter
 protected:
 
 	/** weapon data */
-	UPROPERTY(EditDefaultsOnly, Category = Resources)
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = Resources)
 	FPlayerData PlayerConfig;
 
 	/** pawn mesh: 3rd person view */
@@ -368,7 +368,7 @@ protected:
 	TArray<TSubclassOf<class AArenaRangedWeapon>> DefaultInventoryClasses;
 
 	/** weapons in inventory */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, Replicated)
 	TArray<class AArenaRangedWeapon*> Inventory;
 
 	/** currently equipped weapon */
@@ -383,15 +383,15 @@ protected:
 	float LastTakeHitTimeTimeout;
 
 	/** current targeting state */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, Replicated)
 	uint8 bIsTargeting : 1;
 
 	/** current running state */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, Replicated)
 	uint8 bWantsToRun : 1;
 
 	/** current crouch state */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, Replicated)
 	uint8 bWantsToCrouch : 1;
 
 	/** current firing state */
@@ -494,6 +494,7 @@ public:
 	void AttackTrace();
 
 	/** list of actors hit by melee */
+	//UPROPERTY(Transient, Replicated)
 	TArray<AActor*> HitActors;
 
 	/** Identifies if pawn is in its dying state */

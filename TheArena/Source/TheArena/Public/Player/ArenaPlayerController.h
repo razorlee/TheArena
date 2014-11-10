@@ -46,6 +46,9 @@ public:
 	// 	UFUNCTION(exec)
 	// 	virtual void Emote(const FString& Msg);
 
+	/** toggle InGameMenu handler */
+	void OnToggleInGameMenu();
+
 	/** set infinite ammo cheat */
 	void SetInfiniteAmmo(bool bEnable);
 
@@ -54,6 +57,9 @@ public:
 
 	/** set health regen cheat */
 	void SetHealthRegen(bool bEnable);
+
+	/** set open menu */
+	void SetOpenMenu(bool bEnable);
 
 	/** set god mode cheat */
 	UFUNCTION(exec)
@@ -76,6 +82,10 @@ public:
 
 	/** Ends and/or destroys game session */
 	void CleanupSessionOnReturnToMenu();
+
+	/** Returns whether the menu is open */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool GetOpenMenu() const;
 
 	/**
 	* Delegate fired when starting an online session has completed (intends to end it, but has to wait for the start to complete first)
@@ -119,6 +129,10 @@ public:
 	// end AArenaPlayerController-specific
 
 protected:
+
+	/** informs the HUD if the menu is open */
+	UPROPERTY(Transient, Replicated)
+	uint8 OpenMenu : 1;
 
 	/** infinite ammo cheat */
 	UPROPERTY(Transient, Replicated)
