@@ -1,0 +1,10 @@
+﻿Build started 11/9/2014 9:27:30 PM.
+     1>Project "C:\Users\jeffd_000\Documents\Unreal Projects\TheArena\Intermediate\ProjectFiles\TheArena.vcxproj" on node 2 (Build target(s)).
+     1>Build:
+         "C:\Program Files\Unreal Engine\4.5\Engine\Build\BatchFiles\Build.bat" TheArenaEditor Win64 Development "C:\Users\jeffd_000\Documents\Unreal Projects\TheArena\TheArena.uproject" -rocket
+         Target is up to date.
+     1>Done Building Project "C:\Users\jeffd_000\Documents\Unreal Projects\TheArena\Intermediate\ProjectFiles\TheArena.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.48
