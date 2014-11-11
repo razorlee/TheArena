@@ -424,8 +424,8 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AArenaCharacter::OnStartJump);
 	InputComponent->BindAction("Jump", IE_Released, this, &AArenaCharacter::OnStopJump);
 
-	InputComponent->BindAction("Crouch", IE_Pressed, this, &AArenaCharacter::OnStartCrouch);
-	InputComponent->BindAction("Crouch", IE_Released, this, &AArenaCharacter::OnStopCrouch);
+	InputComponent->BindAction("Crouch", IE_Pressed, this, &AArenaCharacter::OnStartCrouching);
+	InputComponent->BindAction("Crouch", IE_Released, this, &AArenaCharacter::OnStopCrouching);
 
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AArenaCharacter::OnStartRunning);
 	InputComponent->BindAction("Sprint", IE_Released, this, &AArenaCharacter::OnStopRunning);
@@ -475,23 +475,35 @@ void AArenaCharacter::MoveRight(float Value)
 
 void AArenaCharacter::TurnAtRate(float Rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (MyPC && MyPC->IsGameInputAllowed())
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	}
 }
 
 void AArenaCharacter::LookUpAtRate(float Rate)
 {
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (MyPC && MyPC->IsGameInputAllowed())
+	{
+		// calculate delta for this frame from the rate information
+		AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	}
 }
 
 void AArenaCharacter::OnStartFire()
 {
-	if (IsRunning())
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (MyPC && MyPC->IsGameInputAllowed())
 	{
-		SetRunning(false, false);
+		if (IsRunning())
+		{
+			SetRunning(false, false);
+		}
+		StartWeaponFire();
 	}
-	StartWeaponFire();
 }
 
 void AArenaCharacter::OnStopFire()
@@ -501,12 +513,16 @@ void AArenaCharacter::OnStopFire()
 
 void AArenaCharacter::OnStartTargeting()
 {
-	if (IsRunning())
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (MyPC && MyPC->IsGameInputAllowed())
 	{
-		SetRunning(false, false);
+		if (IsRunning())
+		{
+			SetRunning(false, false);
+		}
+		CharacterMovement->MaxWalkSpeed = TargetingMovementSpeed;
+		SetTargeting(true);
 	}
-	CharacterMovement->MaxWalkSpeed = TargetingMovementSpeed;
-	SetTargeting(true);
 }
 
 void AArenaCharacter::OnStopTargeting()
@@ -590,7 +606,7 @@ void AArenaCharacter::OnStopJump()
 	bPressedJump = false;
 }
 
-void AArenaCharacter::OnStartCrouch()
+void AArenaCharacter::OnStartCrouching()
 {
 	CharacterMovement->MaxWalkSpeed = CrouchedMovementSpeed;
 
@@ -599,7 +615,7 @@ void AArenaCharacter::OnStartCrouch()
 	Crouch();
 }
 
-void AArenaCharacter::OnStopCrouch()
+void AArenaCharacter::OnStopCrouching()
 {
 	CharacterMovement->MaxWalkSpeed = BaseMovementSpeed;
 

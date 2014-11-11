@@ -206,10 +206,12 @@ void AArenaPlayerController::OnToggleInGameMenu()
 	if (OpenMenu == true)
 	{
 		SetOpenMenu(false);
+		bAllowGameActions = true;
 	}
 	else
 	{
 		SetOpenMenu(true);
+		bAllowGameActions = false;
 	}
 }
 
@@ -236,6 +238,11 @@ void AArenaPlayerController::SetGodMode(bool bEnable)
 void AArenaPlayerController::SetOpenMenu(bool bEnable)
 {
 	OpenMenu = bEnable;
+}
+
+void AArenaPlayerController::SetAllowGameActions(bool bEnable)
+{
+	bAllowGameActions = bEnable;
 }
 
 void AArenaPlayerController::ClientGameStarted_Implementation()
@@ -532,3 +539,10 @@ bool AArenaPlayerController::GetOpenMenu() const
 {
 	return OpenMenu;
 }
+
+bool AArenaPlayerController::GetAllowGameActions() const
+{
+	return bAllowGameActions;
+}
+
+

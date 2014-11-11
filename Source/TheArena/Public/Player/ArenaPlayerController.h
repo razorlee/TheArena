@@ -58,12 +58,17 @@ public:
 	/** set health regen cheat */
 	void SetHealthRegen(bool bEnable);
 
-	/** set open menu */
-	void SetOpenMenu(bool bEnable);
-
 	/** set god mode cheat */
 	UFUNCTION(exec)
 	void SetGodMode(bool bEnable);
+
+	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetOpenMenu(bool bEnable);
+
+	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetAllowGameActions(bool bEnable);
 
 	/** get infinite ammo cheat */
 	bool HasInfiniteAmmo() const;
@@ -78,6 +83,7 @@ public:
 	bool HasGodMode() const;
 
 	/** check if gameplay related actions (movement, weapon usage, etc) are allowed right now */
+	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool IsGameInputAllowed() const;
 
 	/** Ends and/or destroys game session */
@@ -86,6 +92,9 @@ public:
 	/** Returns whether the menu is open */
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool GetOpenMenu() const;
+
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool GetAllowGameActions() const;
 
 	/**
 	* Delegate fired when starting an online session has completed (intends to end it, but has to wait for the start to complete first)

@@ -62,7 +62,7 @@ struct FPlayerData
 	/** defaults */
 	FPlayerData()
 	{
-		Health = 9090.0f;
+		Health = 1000.0f;
 		Stamina = 1000.0f;
 		Energy = 0.0f;
 		Shield = 0.0f;
@@ -249,10 +249,10 @@ class AArenaCharacter : public ACharacter
 	void OnStopJump();
 
 	/** player pressed crouch action */
-	void OnStartCrouch();
+	void OnStartCrouching();
 
 	/** player released crouch action */
-	void OnStopCrouch();
+	void OnStopCrouching();
 
 	/** player pressed run action */
 	void OnStartRunning();
