@@ -1,0 +1,18 @@
+﻿Log file open, 11/10/14 16:38:34
+LogInit:Display: Running engine for game: TheArena
+LogInit:Warning: Incompatible or missing module: UE4Editor-TheArena.dll
+LogExit: Preparing to exit.
+LogModuleManager: Shutting down and abandoning module TextureCompressor (12)
+LogModuleManager: Shutting down and abandoning module ShaderCore (11)
+LogModuleManager: Shutting down and abandoning module SlateRHIRenderer (10)
+LogModuleManager: Shutting down and abandoning module OpenGLDrv (9)
+LogModuleManager: Shutting down and abandoning module D3D11RHI (8)
+LogModuleManager: Shutting down and abandoning module Renderer (7)
+LogModuleManager: Shutting down and abandoning module Engine (6)
+LogModuleManager: Shutting down and abandoning module CoreUObject (5)
+LogModuleManager: Shutting down and abandoning module NetworkFile (4)
+LogModuleManager: Shutting down and abandoning module StreamingFile (3)
+LogModuleManager: Shutting down and abandoning module SandboxFile (2)
+LogModuleManager: Shutting down and abandoning module PakFile (1)
+LogExit: Exiting.
+Log file closed, 11/10/14 16:40:11
