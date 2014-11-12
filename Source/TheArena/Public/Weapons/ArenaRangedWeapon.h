@@ -236,28 +236,28 @@ class THEARENA_API AArenaRangedWeapon : public AActor
 	//int32 SecondaryClipIconOffset;
 
 	/** crosshair parts icons (left, top, right, bottom and center) */
-	//UPROPERTY(EditDefaultsOnly, Category = HUD)
-	//FCanvasIcon Crosshair[5];
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon Crosshair[5];
 
 	/** crosshair parts icons when targeting (left, top, right, bottom and center) */
-	//UPROPERTY(EditDefaultsOnly, Category = HUD)
-	//FCanvasIcon AimingCrosshair[5];
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	FCanvasIcon AimingCrosshair[5];
 
 	/** only use red colored center part of aiming crosshair */
-	//UPROPERTY(EditDefaultsOnly, Category = HUD)
-	//bool UseLaserDot;
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	bool UseLaserDot;
 
 	/** false = default crosshair */
-	//UPROPERTY(EditDefaultsOnly, Category = HUD)
-	//bool UseCustomCrosshair;
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	bool UseCustomCrosshair;
 
 	/** false = use custom one if set, otherwise default crosshair */
-	//UPROPERTY(EditDefaultsOnly, Category = HUD)
-	//bool UseCustomAimingCrosshair;
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	bool UseCustomAimingCrosshair;
 
 	/** true - crosshair will not be shown unless aiming with the weapon */
-	//UPROPERTY(EditDefaultsOnly, Category = HUD)
-	//bool bHideCrosshairWhileNotAiming;
+	UPROPERTY(EditDefaultsOnly, Category = HUD)
+	bool bHideCrosshairWhileNotAiming;
 
 	/** check if weapon has infinite ammo (include owner's cheats) */
 	bool HasInfiniteAmmo() const;
