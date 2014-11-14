@@ -90,6 +90,9 @@ class AArenaCharacter : public ACharacter
 	UPROPERTY()
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
+	//UPROPERTY()
+	//TSubobjectPtr<class UTimelineComponent> TimeLine;
+
 	/** Follow camera */
 	UPROPERTY()
 	TSubobjectPtr<class UCameraComponent> FollowCamera;

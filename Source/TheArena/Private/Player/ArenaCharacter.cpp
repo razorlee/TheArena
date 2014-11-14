@@ -637,8 +637,10 @@ void AArenaCharacter::OnStartRunning()
 void AArenaCharacter::OnStopRunning()
 {
 	CharacterMovement->MaxWalkSpeed = BaseMovementSpeed;
-
 	SetRunning(false, false);
+	// move a little bit
+	//TimeLine->SetTimelineLength = 0.5f;
+	//TimeLine->CallFunction = MoveForward(400.0f);
 }
 
 //////////////////////////////////////////////////////////////////////////
