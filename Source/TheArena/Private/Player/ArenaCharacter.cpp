@@ -42,8 +42,8 @@ AArenaCharacter::AArenaCharacter(const class FPostConstructInitializeProperties&
 	// Configure character movement
 	CharacterMovement->MaxWalkSpeed = BaseMovementSpeed;
 	CharacterMovement->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	CharacterMovement->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-	CharacterMovement->JumpZVelocity = 600.f;
+	CharacterMovement->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate  
+	CharacterMovement->JumpZVelocity = 800.f;// 600 original
 	CharacterMovement->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
