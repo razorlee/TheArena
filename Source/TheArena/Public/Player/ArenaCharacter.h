@@ -90,9 +90,6 @@ class AArenaCharacter : public ACharacter
 	UPROPERTY()
 	TSubobjectPtr<class USpringArmComponent> CameraBoom;
 
-	//UPROPERTY()
-	//TSubobjectPtr<class UTimelineComponent> TimeLine;
-
 	/** Follow camera */
 	UPROPERTY()
 	TSubobjectPtr<class UCameraComponent> FollowCamera;
@@ -137,6 +134,10 @@ class AArenaCharacter : public ACharacter
 	/** replaces max movement speed */
 	UPROPERTY(EditDefaultsOnly, Category = "Game|Weapon")
 	float TargetingMovementSpeed;
+
+	/** replaces max movement speed */
+	UPROPERTY(Transient, Replicated)
+	float IdleTime;
 
 	/** get aim offsets */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
@@ -237,13 +238,8 @@ class AArenaCharacter : public ACharacter
 	/** player pressed reload action */
 	void OnReload();
 
-	/** player pressed reload action */
-	//UFUNCTION(BlueprintCallable, Category = "Combat")
+	/** player pressed melee action */
 	void OnMelee();
-
-	/** player pressed reload action */
-	//UFUNCTION(BlueprintCallable, Category = "Combat")
-	void OnStopMelee();
 
 	/** player pressed jump action */
 	void OnStartJump();
@@ -308,9 +304,6 @@ class AArenaCharacter : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = Pawn)
 	bool IsRunning() const;
 
-	//UFUNCTION(BlueprintCallable, Category = Pawn)
-	//bool IsCrouched() const;
-
 	/** get max health */
 	UFUNCTION(BlueprintCallable, Category = Resources)
 	int32 GetMaxHealth() const;
@@ -349,6 +342,10 @@ class AArenaCharacter : public ACharacter
 	/** returns percentage of health when low health effects should start */
 	float GetLowHealthPercentage() const;
 
+	/** get current IdleTime  */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	float GetIdleTime() const;
+
 	/** Update the team color of all player meshes. */
 	void UpdateTeamColorsAllMIDs();
 
@@ -357,10 +354,6 @@ protected:
 	/** weapon data */
 	UPROPERTY(EditDefaultsOnly, Replicated, Category = Resources)
 	FPlayerData PlayerConfig;
-
-	/** pawn mesh: 3rd person view */
-	//UPROPERTY(VisibleDefaultsOnly, Category = Aesthetics)
-	//TSubobjectPtr<USkeletalMeshComponent> Mesh3P;
 
 	/** socket or bone name for attaching weapon mesh */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
@@ -399,9 +392,6 @@ protected:
 
 	/** current firing state */
 	uint8 bWantsToFire : 1;
-
-	/** Should the character be doing damage at the moment? */
-	uint8 bDoingMelee;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY()
@@ -492,14 +482,6 @@ protected:
 
 public:
 
-	/** collision box for melee */
-	UFUNCTION()
-	void AttackTrace();
-
-	/** list of actors hit by melee */
-	//UPROPERTY(Transient, Replicated)
-	TArray<AActor*> HitActors;
-
 	/** Identifies if pawn is in its dying state */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Resources)
 	uint32 bIsDying : 1;
@@ -586,4 +568,7 @@ protected:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetCrouched(bool bNewCrouched, bool bToggle);
 
+	/** reset idle timer on server */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerIdleTimer(const float idleTimer, class AArenaCharacter* client);
 };

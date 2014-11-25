@@ -20,8 +20,8 @@ AArenaRangedWeapon::AArenaRangedWeapon(const class FPostConstructInitializePrope
 	bPendingEquip = false;
 	bIsEquipped = false;
 	bPendingReload = false;
+	bPendingMelee = false;
 	bWantsToFire = false;
-	bWantsToMelee = false;
 	CurrentState = EWeaponState::Idle;
 
 	CurrentAmmo = 0;
@@ -265,7 +265,7 @@ void AArenaRangedWeapon::StartMelee(bool bFromReplication)
 
 	if (bFromReplication || CanMelee())
 	{
-		bWantsToMelee = true;
+		bPendingMelee = true;
 		DetermineWeaponState();
 
 		float AnimDuration = PlayWeaponAnimation(MeleeAnim);
@@ -277,7 +277,7 @@ void AArenaRangedWeapon::StartMelee(bool bFromReplication)
 		GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::StopMelee, AnimDuration, false);
 		if (Role == ROLE_Authority)
 		{
-			//GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::Melee, FMath::Max(0.1f, AnimDuration - 0.1f), false);
+			Melee();
 		}
 
 		if (MyPawn && MyPawn->IsLocallyControlled())
@@ -291,7 +291,7 @@ void AArenaRangedWeapon::StopMelee()
 {
 	if (CurrentState == EWeaponState::Meleeing)
 	{
-		bWantsToMelee = false;
+		bPendingMelee = false;
 		DetermineWeaponState();
 		StopWeaponAnimation(MeleeAnim);
 	}
@@ -383,8 +383,8 @@ bool AArenaRangedWeapon::CanReload() const
 bool AArenaRangedWeapon::CanMelee() const
 {
 	bool bCanMelee = (!MyPawn || MyPawn->CanMelee());
-	bool bStateOKToReload = ((CurrentState == EWeaponState::Idle) || (CurrentState == EWeaponState::Firing));
-	return ((bCanMelee == true) && (bStateOKToReload == true));
+	bool bStateOKToMelee = ((CurrentState == EWeaponState::Idle) || (CurrentState == EWeaponState::Firing));
+	return ((bCanMelee == true) && (bStateOKToMelee == true));
 }
 
 
@@ -556,21 +556,55 @@ void AArenaRangedWeapon::ReloadWeapon()
 	}
 }
 
-void AArenaRangedWeapon::Melee(AActor* ActorToProcess, TArray<AActor*> HitActors)
+void AArenaRangedWeapon::Melee()
 {
-	if (!ActorToProcess || HitActors.Contains(ActorToProcess))
-	{
-		return;
-	}
-	//Add this actor to the array because we are spawning one box per tick and we don't want to hit the same actor twice during the same attack animation
-	HitActors.AddUnique(ActorToProcess);
-	FHitResult AttackHitResult;
-	FDamageEvent AttackDamageEvent;
-	AArenaCharacter* GameCharacter = Cast<AArenaCharacter>(ActorToProcess);
+	//Overlapping actors for each box spawned will be stored here
+	TArray<struct FOverlapResult> OutOverlaps;
+	//The initial rotation of our box is the same as our character rotation
+	FQuat Rotation = Instigator->GetTransform().GetRotation();
+	FVector Start = Instigator->GetTransform().GetLocation() + Rotation.Rotator().Vector() * 100.0f;
 
-	if (GameCharacter)
+	FCollisionShape CollisionHitShape;
+	FCollisionQueryParams CollisionParams;
+	//We do not want to store the instigator character in the array, so ignore it's collision
+	CollisionParams.AddIgnoredActor(Instigator);
+
+	//Set the channels that will respond to the collision
+	FCollisionObjectQueryParams CollisionObjectTypes;
+	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
+	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+
+	//Create the box and get the overlapping actors
+	CollisionHitShape = FCollisionShape::MakeBox(FVector(60.0f, 60.0f, 0.5f));
+	GetWorld()->OverlapMulti(OutOverlaps, Start, Rotation, CollisionHitShape, CollisionParams, CollisionObjectTypes);
+
+	//Process all hit actors
+	for (int i = 0; i < OutOverlaps.Num(); ++i)
 	{
-		ActorToProcess->TakeDamage(WeaponConfig.MeleeDamage, AttackDamageEvent, Instigator->GetController(), MyPawn->Controller);
+		//We process each actor only once per Attack execution
+		if (OutOverlaps[i].GetActor() && !HitActors.Contains(OutOverlaps[i].GetActor()))
+		{
+			//Process the actor to deal damage
+			//CurrentWeapon->Melee(OutOverlaps[i].GetActor(), HitActors);
+			//ServerMeleeAttack(CurrentWeapon, OutOverlaps[i].GetActor(), HitActors);
+
+
+			if (!OutOverlaps[i].GetActor() || HitActors.Contains(OutOverlaps[i].GetActor()))
+			{
+				return;
+			}
+			//Add this actor to the array because we are spawning one box per tick and we don't want to hit the same actor twice during the same attack animation
+			HitActors.AddUnique(OutOverlaps[i].GetActor());
+			FHitResult AttackHitResult;
+			FDamageEvent AttackDamageEvent;
+			AArenaCharacter* GameCharacter = Cast<AArenaCharacter>(OutOverlaps[i].GetActor());
+
+			if (GameCharacter)
+			{
+				OutOverlaps[i].GetActor()->TakeDamage(WeaponConfig.MeleeDamage, AttackDamageEvent, Instigator->GetController(), MyPawn->Controller);
+			}
+		}
 	}
 }
 
@@ -612,7 +646,7 @@ void AArenaRangedWeapon::DetermineWeaponState()
 		{
 			NewState = EWeaponState::Firing;
 		}
-		else if ((bWantsToMelee == true) && (CanMelee() == true))
+		else if ((bPendingMelee == true) && (CanMelee() == true))
 		{
 			NewState = EWeaponState::Meleeing;
 		}
@@ -797,6 +831,18 @@ void AArenaRangedWeapon::OnRep_Reload()
 	}
 }
 
+void AArenaRangedWeapon::OnRep_Melee()
+{
+	if (bPendingMelee)
+	{
+		StartMelee(true);
+	}
+	else
+	{
+		StopMelee();
+	}
+}
+
 void AArenaRangedWeapon::SimulateWeaponFire()
 {
 	if (Role == ROLE_Authority && CurrentState != EWeaponState::Firing)
@@ -897,6 +943,7 @@ void AArenaRangedWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > 
 
 	DOREPLIFETIME_CONDITION(AArenaRangedWeapon, BurstCounter, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AArenaRangedWeapon, bPendingReload, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AArenaRangedWeapon, bPendingMelee, COND_SkipOwner);
 }
 
 USkeletalMeshComponent* AArenaRangedWeapon::GetWeaponMesh() const

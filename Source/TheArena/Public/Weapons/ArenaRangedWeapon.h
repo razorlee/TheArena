@@ -161,13 +161,12 @@ class THEARENA_API AArenaRangedWeapon : public AActor
 	/** [server] performs actual reload */
 	virtual void ReloadWeapon();
 
-	/** [server] performs actual reload */
-	virtual void Melee(AActor* ActorToProcess, TArray<AActor*> HitActors);
+	/** [server] performs actual melee */
+	virtual void Melee();
 
 	/** trigger reload from server */
 	UFUNCTION(reliable, client)
 	void ClientStartReload();
-
 
 	//////////////////////////////////////////////////////////////////////////
 	// Control
@@ -181,6 +180,9 @@ class THEARENA_API AArenaRangedWeapon : public AActor
 	/** check if weapon can be reloaded */
 	bool CanMelee() const;
 
+	/** list of actors hit by melee */
+	UPROPERTY()
+	TArray<AActor*> HitActors;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Reading data
@@ -378,7 +380,8 @@ protected:
 	uint32 bWantsToFire : 1;
 
 	/** is weapon fire active? */
-	uint32 bWantsToMelee : 1;
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_Melee)
+	uint32 bPendingMelee: 1;
 
 	/** is reload animation playing? */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Reload)
@@ -447,6 +450,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_Reload();
+
+	UFUNCTION()
+	void OnRep_Melee();
 
 	/** Called in network play to do the cosmetic fx for firing */
 	virtual void SimulateWeaponFire();

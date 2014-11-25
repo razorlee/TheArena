@@ -69,6 +69,7 @@ void AArenaCharacter::PostInitializeComponents()
 
 	if (Role == ROLE_Authority)
 	{
+		IdleTime = 0.0f;
 		PlayerConfig.Health = GetMaxHealth();
 		PlayerConfig.Stamina = GetMaxStamina();
 		SpawnDefaultInventory();
@@ -127,12 +128,6 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 		SetRunning(false, false);
 	}
 
-	if (bDoingMelee)
-	{
-		AttackTrace();
-		OnStopMelee();
-	}
-
 	if (IsRunning())
 	{
 		this->PlayerConfig.Stamina -= SprintCost * DeltaSeconds;
@@ -162,7 +157,8 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 			LowHealthWarningPlayer->SetVolumeMultiplier(MinVolume + (1.0f - MinVolume) * VolumeMultiplier);
 		}
 	}
-
+	this->IdleTime += DeltaSeconds;
+	ServerIdleTimer(IdleTime, this);
 	CameraUpdate();
 }
 
@@ -448,6 +444,7 @@ void AArenaCharacter::MoveForward(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
+		IdleTime = 0.0f;
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -462,6 +459,7 @@ void AArenaCharacter::MoveRight(float Value)
 {
 	if ((Controller != NULL) && (Value != 0.0f) && (!bWantsToRun))
 	{
+		IdleTime = 0.0f;
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -498,6 +496,7 @@ void AArenaCharacter::OnStartFire()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed())
 	{
+		IdleTime = 0.0f;
 		if (IsRunning())
 		{
 			SetRunning(false, false);
@@ -516,6 +515,7 @@ void AArenaCharacter::OnStartTargeting()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed())
 	{
+		IdleTime = 0.0f;
 		if (IsRunning())
 		{
 			SetRunning(false, false);
@@ -564,6 +564,7 @@ void AArenaCharacter::OnReload()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed())
 	{
+		IdleTime = 0.0f;
 		if (CurrentWeapon)
 		{
 			CurrentWeapon->StartReload();
@@ -576,21 +577,19 @@ void AArenaCharacter::OnMelee()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed())
 	{
-		bDoingMelee = true;
-		CurrentWeapon->StartMelee();
+		IdleTime = 0.0f;
+		if (CurrentWeapon)
+		{
+			CurrentWeapon->StartMelee();
+		}
 	}
-}
-
-void AArenaCharacter::OnStopMelee()
-{
-	bDoingMelee = false;
-	HitActors.Empty();
 }
 
 void AArenaCharacter::OnStartJump()
 {
 	if (!CharacterMovement->IsFalling())
 	{
+		IdleTime = 0.0f;
 		if (PlayerConfig.Stamina > JumpCost)
 		{
 			PlayerConfig.Stamina -= JumpCost;
@@ -609,7 +608,7 @@ void AArenaCharacter::OnStopJump()
 void AArenaCharacter::OnStartCrouching()
 {
 	CharacterMovement->MaxWalkSpeed = CrouchedMovementSpeed;
-
+	IdleTime = 0.0f;
 	SetRunning(false, false);
 	SetCrouched(true, false);
 	Crouch();
@@ -627,6 +626,7 @@ void AArenaCharacter::OnStartRunning()
 {
 	if (!CharacterMovement->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost)
 	{
+		IdleTime = 0.0f;
 		CharacterMovement->MaxWalkSpeed = RunningMovementSpeed;
 
 		StopWeaponFire();
@@ -745,6 +745,11 @@ float AArenaCharacter::GetLowHealthPercentage() const
 	return PlayerConfig.LowHealthPercentage;
 }
 
+float AArenaCharacter::GetIdleTime() const
+{
+	return IdleTime;
+}
+
 void AArenaCharacter::UpdateTeamColorsAllMIDs()
 {
 	for (int32 i = 0; i < MeshMIDs.Num(); ++i)
@@ -813,7 +818,7 @@ void AArenaCharacter::TornOff()
 //////////////////////////////////////////////////////////////////////////
 // Damage & death
 
-void AArenaCharacter::AttackTrace()
+/*void AArenaCharacter::AttackTrace()
 {
 	//Overlapping actors for each box spawned will be stored here
 	TArray<struct FOverlapResult> OutOverlaps;
@@ -844,14 +849,15 @@ void AArenaCharacter::AttackTrace()
 		{
 			//Process the actor to deal damage
 			CurrentWeapon->Melee(OutOverlaps[i].GetActor(), HitActors);
+			ServerMeleeAttack(CurrentWeapon, OutOverlaps[i].GetActor(), HitActors);
 		}
 	}
-}
+}*/
 
 float AArenaCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-
+	IdleTime = 0.0f;
 	if (PlayerConfig.Health <= 0.f)
 	{
 		return 0.f;
@@ -1236,20 +1242,41 @@ bool AArenaCharacter::ServerSetRunning_Validate(bool bNewRunning, bool bToggle)
 	return true;
 }
 
-bool AArenaCharacter::ServerSetCrouched_Validate(bool bNewCrouched, bool bToggle)
-{
-	return true;
-}
-
 void AArenaCharacter::ServerSetRunning_Implementation(bool bNewRunning, bool bToggle)
 {
 	SetRunning(bNewRunning, bToggle);
+}
+
+bool AArenaCharacter::ServerSetCrouched_Validate(bool bNewCrouched, bool bToggle)
+{
+	return true;
 }
 
 void AArenaCharacter::ServerSetCrouched_Implementation(bool bNewCrouched, bool bToggle)
 {
 	SetCrouched(bNewCrouched, bToggle);
 }
+
+/*bool AArenaCharacter::ServerMeleeAttack_Validate(class AArenaRangedWeapon* Weapon, AActor* target, const TArray<AActor*>& HActors)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerMeleeAttack_Implementation(class AArenaRangedWeapon* Weapon, AActor* target, const TArray<AActor*>& HActors)
+{
+	Weapon->Melee(target, HActors);
+}*/
+
+bool AArenaCharacter::ServerIdleTimer_Validate(const float idleTimer, class AArenaCharacter* client)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerIdleTimer_Implementation(const float idleTimer, class AArenaCharacter* client)
+{
+	client->IdleTime = idleTimer;
+}
+
 
 void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
@@ -1262,10 +1289,10 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	DOREPLIFETIME_CONDITION(AArenaCharacter, bIsTargeting, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AArenaCharacter, bWantsToRun, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AArenaCharacter, bWantsToCrouch, COND_SkipOwner);
-
 	DOREPLIFETIME_CONDITION(AArenaCharacter, LastTakeHitInfo, COND_Custom);
 
 	// everyone
+	DOREPLIFETIME(AArenaCharacter, IdleTime);
 	DOREPLIFETIME(AArenaCharacter, CurrentWeapon);
 	DOREPLIFETIME(AArenaCharacter, PlayerConfig);
 }
