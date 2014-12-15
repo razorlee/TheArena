@@ -4,7 +4,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 
 
-AArenaAIController::AArenaAIController(const class FPostConstructInitializeProperties& PCIP)
+AArenaAIController::AArenaAIController(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	BlackboardComp = PCIP.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackBoardComp"));
@@ -27,7 +27,7 @@ void AArenaAIController::Possess(APawn* InPawn)
 		EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
 		NeedAmmoKeyID = BlackboardComp->GetKeyID("NeedAmmo");
 
-		BehaviorComp->StartTree(Bot->BotBehavior);
+		BehaviorComp->StartTree(*Bot->BotBehavior);
 	}
 }
 

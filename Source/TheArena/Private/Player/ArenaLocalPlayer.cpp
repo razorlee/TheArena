@@ -4,7 +4,7 @@
 #include "ArenaLocalPlayer.h"
 
 
-UArenaLocalPlayer::UArenaLocalPlayer(const class FPostConstructInitializeProperties& PCIP)
+UArenaLocalPlayer::UArenaLocalPlayer(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 }

@@ -1,6 +1,6 @@
 #include "TheArena.h"
 
-AArenaImpactEffect::AArenaImpactEffect(const class FPostConstructInitializeProperties& PCIP)
+AArenaImpactEffect::AArenaImpactEffect(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	ImpactLightComponentName = TEXT("ExplosionLight");

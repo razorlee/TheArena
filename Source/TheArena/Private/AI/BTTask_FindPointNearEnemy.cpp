@@ -4,7 +4,7 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-UBTTask_FindPointNearEnemy::UBTTask_FindPointNearEnemy(const class FPostConstructInitializeProperties& PCIP)
+UBTTask_FindPointNearEnemy::UBTTask_FindPointNearEnemy(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 }

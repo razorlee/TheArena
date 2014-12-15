@@ -1,6 +1,6 @@
 #include "TheArena.h"
 
-AArenaRangedWeapon::AArenaRangedWeapon(const class FPostConstructInitializeProperties& PCIP)
+AArenaRangedWeapon::AArenaRangedWeapon(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	Mesh3P = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("WeaponMesh3P"));

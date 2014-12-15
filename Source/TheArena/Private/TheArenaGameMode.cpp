@@ -2,7 +2,7 @@
 
 #include "TheArena.h"
 
-ATheArenaGameMode::ATheArenaGameMode(const class FPostConstructInitializeProperties& PCIP)
+ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnOb(TEXT("/Game/Blueprints/Pawns/ArenaCharacter"));
@@ -427,8 +427,8 @@ bool ATheArenaGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AControl
 			ACharacter* OtherPawn = Cast<ACharacter>(*It);
 			if (OtherPawn && OtherPawn != MyPawn)
 			{
-				const float CombinedHeight = (MyPawn->CapsuleComponent->GetScaledCapsuleHalfHeight() + OtherPawn->CapsuleComponent->GetScaledCapsuleHalfHeight()) * 2.0f;
-				const float CombinedRadius = MyPawn->CapsuleComponent->GetScaledCapsuleRadius() + OtherPawn->CapsuleComponent->GetScaledCapsuleRadius();
+				const float CombinedHeight = (MyPawn->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + OtherPawn->GetCapsuleComponent()->GetScaledCapsuleHalfHeight()) * 2.0f;
+				const float CombinedRadius = MyPawn->GetCapsuleComponent()->GetScaledCapsuleRadius() + OtherPawn->GetCapsuleComponent()->GetScaledCapsuleRadius();
 				const FVector OtherLocation = OtherPawn->GetActorLocation();
 
 				// check if player start overlaps this pawn

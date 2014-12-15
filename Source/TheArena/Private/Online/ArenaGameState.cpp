@@ -4,7 +4,7 @@
 #include "ArenaGameState.h"
 
 
-AArenaGameState::AArenaGameState(const class FPostConstructInitializeProperties& PCIP)
+AArenaGameState::AArenaGameState(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	NumTeams = 0;

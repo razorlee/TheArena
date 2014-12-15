@@ -2,7 +2,7 @@
 
 #include "TheArena.h"
 
-AArenaAI::AArenaAI(const class FPostConstructInitializeProperties& PCIP)
+AArenaAI::AArenaAI(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	AIControllerClass = AArenaAIController::StaticClass();

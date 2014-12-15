@@ -1,6 +1,6 @@
 #include "TheArena.h"
 
-AArenaPlayerCameraManager::AArenaPlayerCameraManager(const class FPostConstructInitializeProperties& PCIP)
+AArenaPlayerCameraManager::AArenaPlayerCameraManager(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 

@@ -27,7 +27,7 @@ static const int32 GoodScoreCount = 10;
 static const int32 GreatScoreCount = 15;
 
 
-AArenaPlayerController::AArenaPlayerController(const class FPostConstructInitializeProperties& PCIP) : Super(PCIP)
+AArenaPlayerController::AArenaPlayerController(const class FObjectInitializer& PCIP) : Super(PCIP)
 {
 	PlayerCameraManagerClass = AArenaPlayerCameraManager::StaticClass();
 	//CheatClass = UArenaCheatManager::StaticClass();

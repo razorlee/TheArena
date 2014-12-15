@@ -1,6 +1,6 @@
 #include "TheArena.h"
 
-AArenaRangedWeapon_Instant::AArenaRangedWeapon_Instant(const class FPostConstructInitializeProperties& PCIP)
+AArenaRangedWeapon_Instant::AArenaRangedWeapon_Instant(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	CurrentFiringSpread = 0.0f;

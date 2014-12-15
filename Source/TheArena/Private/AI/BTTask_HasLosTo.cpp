@@ -5,7 +5,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Vector.h"
 
-UBTTask_HasLosTo::UBTTask_HasLosTo(const class FPostConstructInitializeProperties& PCIP)
+UBTTask_HasLosTo::UBTTask_HasLosTo(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	NodeName = "Has LOS To";

@@ -1,6 +1,6 @@
 #include "TheArena.h"
 
-AArenaRangedWeapon_Projectile::AArenaRangedWeapon_Projectile(const class FPostConstructInitializeProperties& PCIP)
+AArenaRangedWeapon_Projectile::AArenaRangedWeapon_Projectile(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	CurrentFiringSpread = 0.0f;

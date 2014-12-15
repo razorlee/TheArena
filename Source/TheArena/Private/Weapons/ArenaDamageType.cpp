@@ -1,7 +1,7 @@
 #include "TheArena.h"
 #include "ArenaDamageType.h"
 
-UArenaDamageType::UArenaDamageType(const class FPostConstructInitializeProperties& PCIP)
+UArenaDamageType::UArenaDamageType(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 

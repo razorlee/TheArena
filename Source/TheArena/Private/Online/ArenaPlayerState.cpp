@@ -4,7 +4,7 @@
 #include "ArenaPlayerState.h"
 
 
-AArenaPlayerState::AArenaPlayerState(const class FPostConstructInitializeProperties& PCIP)
+AArenaPlayerState::AArenaPlayerState(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	TeamNumber = 0;

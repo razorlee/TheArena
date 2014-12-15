@@ -1,6 +1,6 @@
 #include "TheArena.h"
 
-AArenaProjectile::AArenaProjectile(const class FPostConstructInitializeProperties& PCIP)
+AArenaProjectile::AArenaProjectile(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	CollisionComp = PCIP.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereComp"));

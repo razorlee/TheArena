@@ -5,7 +5,7 @@
 //////////////////////////////////////////////////////////////////////////
 // AArenaCharacter
 
-AArenaCharacter::AArenaCharacter(const class FPostConstructInitializeProperties& PCIP)
+AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	bWantsToRun = false;
@@ -16,8 +16,8 @@ AArenaCharacter::AArenaCharacter(const class FPostConstructInitializeProperties&
 	CrouchedMovementSpeed = 340.0f;
 
 	// Set size for collision capsule
-	CapsuleComponent->InitCapsuleSize(42.f, 96.0f);
-	CapsuleComponent->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_MAX);
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_MAX);
 
 	// rotate when the controller rotates
 	bUseControllerRotationPitch = false;
@@ -25,38 +25,38 @@ AArenaCharacter::AArenaCharacter(const class FPostConstructInitializeProperties&
 	bUseControllerRotationRoll = false;
 	
 	//Mesh = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("PawnMesh"));
-	Mesh->AttachParent = CapsuleComponent;
-	Mesh->bOnlyOwnerSee = false;
-	Mesh->bOwnerNoSee = false;
-	Mesh->bCastDynamicShadow = true;
-	Mesh->bReceivesDecals = false;
-	Mesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
-	Mesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
-	Mesh->bChartDistanceFactor = false;
-	Mesh->SetCollisionObjectType(ECC_Pawn);
-	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	Mesh->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
-	Mesh->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
-	Mesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	GetMesh()->AttachParent = GetCapsuleComponent();
+	GetMesh()->bOnlyOwnerSee = false;
+	GetMesh()->bOwnerNoSee = false;
+	GetMesh()->bCastDynamicShadow = true;
+	GetMesh()->bReceivesDecals = false;
+	GetMesh()->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
+	GetMesh()->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	GetMesh()->bChartDistanceFactor = false;
+	GetMesh()->SetCollisionObjectType(ECC_Pawn);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
 	// Configure character movement
-	CharacterMovement->MaxWalkSpeed = BaseMovementSpeed;
-	CharacterMovement->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	CharacterMovement->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate  
-	CharacterMovement->JumpZVelocity = 800.f;// 600 original
-	CharacterMovement->AirControl = 0.2f;
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
+	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->JumpZVelocity = 600.f;
+	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = PCIP.CreateDefaultSubobject<USpringArmComponent>(this, TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
 	CameraBoom->TargetArmLength = 150.0f;
 	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f); 
-	CameraBoom->bUseControllerViewRotation = true;
+	CameraBoom->bUsePawnControlRotation = true;
 
 	// Create a follow camera
 	FollowCamera = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("FollowCamera"));
 	FollowCamera->AttachTo(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUseControllerViewRotation = false; // Camera does not rotate relative to arm
+	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
@@ -79,9 +79,9 @@ void AArenaCharacter::PostInitializeComponents()
 	UpdatePawnMeshes();
 
 	// create material instance for setting team colors (3rd person view)
-	for (int32 iMat = 0; iMat < Mesh->GetNumMaterials(); iMat++)
+	for (int32 iMat = 0; iMat < GetMesh()->GetNumMaterials(); iMat++)
 	{
-		MeshMIDs.Add(Mesh->CreateAndSetMaterialInstanceDynamic(iMat));
+		MeshMIDs.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(iMat));
 	}
 
 	// play respawn effects
@@ -125,7 +125,7 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 
 	if (this->PlayerConfig.Stamina <= 0)
 	{
-		SetRunning(false, false);
+		OnStopRunning();
 	}
 
 	if (IsRunning())
@@ -179,7 +179,7 @@ void AArenaCharacter::PawnClientRestart()
 	SetCurrentWeapon(CurrentWeapon);
 
 	// set team colors for 1st person view
-	UMaterialInstanceDynamic* Mesh3PMID = Mesh->CreateAndSetMaterialInstanceDynamic(0);
+	UMaterialInstanceDynamic* Mesh3PMID = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
 	UpdateTeamColors(Mesh3PMID);
 }
 
@@ -520,14 +520,14 @@ void AArenaCharacter::OnStartTargeting()
 		{
 			SetRunning(false, false);
 		}
-		CharacterMovement->MaxWalkSpeed = TargetingMovementSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = TargetingMovementSpeed;
 		SetTargeting(true);
 	}
 }
 
 void AArenaCharacter::OnStopTargeting()
 {
-	CharacterMovement->MaxWalkSpeed = BaseMovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 	SetTargeting(false);
 }
 
@@ -587,7 +587,7 @@ void AArenaCharacter::OnMelee()
 
 void AArenaCharacter::OnStartJump()
 {
-	if (!CharacterMovement->IsFalling())
+	if (!GetCharacterMovement()->IsFalling())
 	{
 		IdleTime = 0.0f;
 		if (PlayerConfig.Stamina > JumpCost)
@@ -607,7 +607,7 @@ void AArenaCharacter::OnStopJump()
 
 void AArenaCharacter::OnStartCrouching()
 {
-	CharacterMovement->MaxWalkSpeed = CrouchedMovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = CrouchedMovementSpeed;
 	IdleTime = 0.0f;
 	SetRunning(false, false);
 	SetCrouched(true, false);
@@ -616,7 +616,7 @@ void AArenaCharacter::OnStartCrouching()
 
 void AArenaCharacter::OnStopCrouching()
 {
-	CharacterMovement->MaxWalkSpeed = BaseMovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 
 	SetCrouched(false, false);
 	UnCrouch();
@@ -624,10 +624,10 @@ void AArenaCharacter::OnStopCrouching()
 
 void AArenaCharacter::OnStartRunning()
 {
-	if (!CharacterMovement->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost)
+	if (!GetCharacterMovement()->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost)
 	{
 		IdleTime = 0.0f;
-		CharacterMovement->MaxWalkSpeed = RunningMovementSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = RunningMovementSpeed;
 
 		StopWeaponFire();
 		SetRunning(true, false);
@@ -636,7 +636,7 @@ void AArenaCharacter::OnStartRunning()
 
 void AArenaCharacter::OnStopRunning()
 {
-	CharacterMovement->MaxWalkSpeed = BaseMovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 	SetRunning(false, false);
 	// move a little bit
 	//TimeLine->SetTimelineLength = 0.5f;
@@ -653,7 +653,7 @@ float AArenaCharacter::GetBaseMovementSpeed() const
 
 USkeletalMeshComponent* AArenaCharacter::GetPawnMesh() const
 {
-	return Mesh;
+	return GetMesh();
 }
 
 AArenaRangedWeapon* AArenaCharacter::GetWeapon() const
@@ -703,7 +703,7 @@ float AArenaCharacter::GetCrouchedMovementSpeed() const
 
 bool AArenaCharacter::IsRunning() const
 {
-	if (!CharacterMovement)
+	if (!GetCharacterMovement())
 	{
 		return false;
 	}
@@ -937,7 +937,7 @@ bool AArenaCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, 
 	//GetWorld()->GetAuthGameMode<AArenaGameMode>()->Killed(Killer, KilledPlayer, this, DamageType);
 
 	NetUpdateFrequency = GetDefault<AArenaCharacter>()->NetUpdateFrequency;
-	CharacterMovement->ForceReplicationUpdate();
+	GetCharacterMovement()->ForceReplicationUpdate();
 
 	OnDeath(KillingDamage, DamageEvent, Killer ? Killer->GetPawn() : NULL, DamageCauser);
 	return true;
@@ -1009,13 +1009,13 @@ void AArenaCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Da
 	}
 
 	// disable collisions on capsule
-	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CapsuleComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	if (Mesh)
+	if (GetMesh())
 	{
 		static FName CollisionProfileName(TEXT("Ragdoll"));
-		Mesh->SetCollisionProfileName(CollisionProfileName);
+		GetMesh()->SetCollisionProfileName(CollisionProfileName);
 	}
 	SetActorEnableCollision(true);
 
@@ -1082,24 +1082,24 @@ void AArenaCharacter::SetRagdollPhysics()
 	{
 		bInRagdoll = false;
 	}
-	else if (!Mesh || !Mesh->GetPhysicsAsset())
+	else if (!GetMesh() || !GetMesh()->GetPhysicsAsset())
 	{
 		bInRagdoll = false;
 	}
 	else
 	{
 		// initialize physics/etc
-		Mesh->SetAllBodiesSimulatePhysics(true);
-		Mesh->SetSimulatePhysics(true);
-		Mesh->WakeAllRigidBodies();
-		Mesh->bBlendPhysics = true;
+		GetMesh()->SetAllBodiesSimulatePhysics(true);
+		GetMesh()->SetSimulatePhysics(true);
+		GetMesh()->WakeAllRigidBodies();
+		GetMesh()->bBlendPhysics = true;
 
 		bInRagdoll = true;
 	}
 
-	CharacterMovement->StopMovementImmediately();
-	CharacterMovement->DisableMovement();
-	CharacterMovement->SetComponentTickEnabled(false);
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->SetComponentTickEnabled(false);
 
 	if (!bInRagdoll)
 	{
