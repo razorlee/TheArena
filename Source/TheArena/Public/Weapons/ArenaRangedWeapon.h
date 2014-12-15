@@ -288,7 +288,7 @@ protected:
 
 	/** weapon mesh: 3rd person view */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	TSubobjectPtr<USkeletalMeshComponent> Mesh3P;
+	USkeletalMeshComponent* Mesh3P;
 
 	/** firing audio (bLoopedFireSound set) */
 	UPROPERTY(Transient)

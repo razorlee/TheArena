@@ -34,14 +34,14 @@ protected:
 
 	/** movement component */
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	TSubobjectPtr<UProjectileMovementComponent> MovementComp;
+	UProjectileMovementComponent* MovementComp;
 
 	/** collisions */
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	TSubobjectPtr<USphereComponent> CollisionComp;
+	USphereComponent* CollisionComp;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	TSubobjectPtr<UParticleSystemComponent> ParticleComp;
+	UParticleSystemComponent* ParticleComp;
 
 	/** effects for impact */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)

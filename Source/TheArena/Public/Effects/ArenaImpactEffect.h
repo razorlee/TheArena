@@ -11,7 +11,7 @@ class THEARENA_API AArenaImpactEffect : public AActor
 
 	/** explosion light */
 	UPROPERTY(VisibleDefaultsOnly, Category = Effect)
-	TSubobjectPtr<UPointLightComponent> ImpactLight;
+	UPointLightComponent* ImpactLight;
 
 	/** how long keep explosion light on? */
 	UPROPERTY(EditDefaultsOnly, Category = Effect)

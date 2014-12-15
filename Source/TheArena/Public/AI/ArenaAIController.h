@@ -11,10 +11,10 @@ class THEARENA_API AArenaAIController : public AAIController
 	GENERATED_UCLASS_BODY()	
 
 	UPROPERTY(transient)
-	TSubobjectPtr<class UBlackboardComponent> BlackboardComp;
+	class UBlackboardComponent* BlackboardComp;
 
 	UPROPERTY(transient)
-	TSubobjectPtr<class UBehaviorTreeComponent> BehaviorComp;
+	class UBehaviorTreeComponent* BehaviorComp;
 
 	// Begin AController interface
 	virtual void GameHasEnded(class AActor* EndGameFocus = NULL, bool bIsWinner = false) override;

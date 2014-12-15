@@ -84,17 +84,17 @@ class AArenaCharacter : public ACharacter
 	GENERATED_UCLASS_BODY()
 
 	/** spawn inventory, setup initial variables */
-	virtual void PostInitializeComponents() OVERRIDE;
+	virtual void PostInitializeComponents() override;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY()
-	TSubobjectPtr<class USpringArmComponent> CameraBoom;
+	class USpringArmComponent* CameraBoom;
 
 	/** Follow camera */
 	UPROPERTY()
-	TSubobjectPtr<class UCameraComponent> FollowCamera;
+	class UCameraComponent* FollowCamera;
 
-	virtual void Tick(float DeltaSeconds) OVERRIDE;
+	virtual void Tick(float DeltaSeconds) override;
 
 	/** cleanup inventory */
 	virtual void Destroyed() override;
@@ -202,7 +202,7 @@ class AArenaCharacter : public ACharacter
 	// Input handlers
 
 	// APawn interface
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) OVERRIDE;
+	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
 
 	/** Called for forwards/backward input */
