@@ -19,7 +19,9 @@
 #include "Public/Weapons/ArenaDamageType.h"
 #include "Public/TheArenaGameMode.h"
 #include "Public/Effects/ArenaImpactEffect.h"
+#include "Public/Effects/ArenaExplosionEffect.h"
 #include "Public/Player/ArenaPlayerCameraManager.h"
+#include "Public/Player/ArenaCharacterMovement.h"
 #include "Public/Player/ArenaPlayerController.h"
 #include "Public/Player/ArenaLocalPlayer.h"
 #include "Public/Online/ArenaGameSession.h"
@@ -29,6 +31,7 @@
 #include "Public/Weapons/ArenaRangedWeapon.h"
 #include "Public/Weapons/ArenaRangedWeapon_Projectile.h"
 #include "Public/Weapons/ArenaProjectile.h"
+#include "Public/Weapons/ArenaFragGrenade.h"
 #include "Public/Weapons/ArenaRangedWeapon_Instant.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogShooter, Log, All);

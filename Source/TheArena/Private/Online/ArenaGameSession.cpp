@@ -4,7 +4,7 @@
 #include "ArenaGameSession.h"
 
 
-AArenaGameSession::AArenaGameSession(const class FPostConstructInitializeProperties& PCIP)
+AArenaGameSession::AArenaGameSession(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	if (!HasAnyFlags(RF_ClassDefaultObject))

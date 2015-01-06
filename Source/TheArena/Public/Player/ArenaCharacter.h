@@ -11,35 +11,35 @@ struct FPlayerData
 {
 	GENERATED_USTRUCT_BODY()
 
-	// Current health of the Pawn
+	/** Current health of the Pawn */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
 	float Health;
 
-	// Current Stamina of the Pawn
+	/** Current Stamina of the Pawn */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
 	float Stamina;
 
-	// Current Energy of the Pawn
+	/** Current Energy of the Pawn */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
 	float Energy;
 
-	// Current Shield of the Pawn
+	/** Current Shield of the Pawn */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
 	float Shield;
 
-	// Rate of health regeneration
+	/** Rate of health regeneration */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
 	float HealthRegen;
 
-	// Rate of stamina regeneration
+	/**Rate of stamina regeneration */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
 	float StaminaRegen;
 
-	// Rate of energy regeneration
+	/** Rate of energy regeneration */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
 	float EnergyRegen;
 
-	// Rate of shield regeneration
+	/** Rate of shield regeneration */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
 	float ShieldRegen;
 
@@ -59,6 +59,22 @@ struct FPlayerData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
 	float LowShieldPercentage;
 
+	/** Increases the amount of damage mitigated */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
+	float Protection;
+
+	/** Reduces stamina cunsumption and increase stamina regeneration */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
+	float Mobility;
+
+	/** Decreases movement speed reduction */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
+	float Speed;
+
+	/** Increases the players rate of recovery from negative effects */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Resources)
+	float Recovery;
+
 	/** defaults */
 	FPlayerData()
 	{
@@ -74,9 +90,12 @@ struct FPlayerData
 		LowStaminaPercentage = 0.0f;
 		LowEnergyPercentage = 0.0f;
 		LowShieldPercentage = 0.0f;
+		Protection = 0.0f;
+		Mobility = 0.0f;
+		Speed = 0.0f;
+		Recovery = 0.0f;
 	}
 };
-
 
 UCLASS(Abstract)
 class AArenaCharacter : public ACharacter
@@ -198,12 +217,19 @@ class AArenaCharacter : public ACharacter
 	/** stop playing all montages */
 	void StopAllAnimMontages();
 
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* ThrowAnimation;
+
 	//////////////////////////////////////////////////////////////////////////
 	// Input handlers
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
+
+	/** [server] performs actual throw */
+	virtual void Throw();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -223,11 +249,23 @@ class AArenaCharacter : public ACharacter
 	/** player released start fire action */
 	void OnStopFire();
 
+	/** player pressed start fire action */
+	void OnStartThrow();
+
+	/** player released start fire action */
+	void OnStopThrow();
+
 	/** player pressed targeting action */
 	void OnStartTargeting();
 
 	/** player released targeting action */
 	void OnStopTargeting();
+
+	/** player pressed cover action */
+	void OnEnterCover();
+
+	/** player released cover action */
+	void OnExitCover();
 
 	/** player pressed next weapon action */
 	void OnNextWeapon();
@@ -275,6 +313,9 @@ class AArenaCharacter : public ACharacter
 	/** get weapon attach point */
 	FName GetWeaponAttachPoint() const;
 
+	/** get weapon attach point */
+	FName GetOffHandAttachPoint() const;
+
 	/** get total number of inventory items */
 	int32 GetInventoryCount() const;
 
@@ -303,6 +344,10 @@ class AArenaCharacter : public ACharacter
 	/** get running state */
 	UFUNCTION(BlueprintCallable, Category = Pawn)
 	bool IsRunning() const;
+
+	/** get running state */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	bool IsThrowing() const;
 
 	/** get max health */
 	UFUNCTION(BlueprintCallable, Category = Resources)
@@ -359,6 +404,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FName WeaponAttachPoint;
 
+	/** socket or bone name for attaching Utility mesh */
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	FName OffHandAttachPoint;
+
 	/** default inventory list */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	TArray<TSubclassOf<class AArenaRangedWeapon>> DefaultInventoryClasses;
@@ -366,6 +415,9 @@ protected:
 	/** weapons in inventory */
 	UPROPERTY(Transient, Replicated)
 	TArray<class AArenaRangedWeapon*> Inventory;
+
+	/** play weapon animations */
+	float PlayWeaponAnimation(UAnimMontage* Animation);
 
 	/** currently equipped weapon */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
@@ -392,6 +444,9 @@ protected:
 
 	/** current firing state */
 	uint8 bWantsToFire : 1;
+
+	/** current throwing state */
+	uint8 bWantsToThrow : 1;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY()
@@ -482,6 +537,10 @@ protected:
 
 public:
 
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class AArenaFragGrenade> GrenadeClass;
+
 	/** Identifies if pawn is in its dying state */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Resources)
 	uint32 bIsDying : 1;
@@ -559,6 +618,12 @@ protected:
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetTargeting(bool bNewTargeting);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartThrow();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopThrow();
 
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)

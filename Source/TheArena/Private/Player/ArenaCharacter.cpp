@@ -6,10 +6,11 @@
 // AArenaCharacter
 
 AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
-	: Super(PCIP)
+	: Super(PCIP.SetDefaultSubobjectClass<UArenaCharacterMovement>(ACharacter::CharacterMovementComponentName))
 {
 	bWantsToRun = false;
 	bWantsToFire = false;
+	bWantsToThrow = false;
 	BaseMovementSpeed = 400.0f;
 	TargetingMovementSpeed = 280.0f;
 	RunningMovementSpeed = 520.0f;
@@ -45,6 +46,9 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->SetNetAddressable();
+	GetCharacterMovement()->SetIsReplicated(true);
+	GetCharacterMovement()->ForceReplicationUpdate();
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = PCIP.CreateDefaultSubobject<USpringArmComponent>(this, TEXT("CameraBoom"));
@@ -354,11 +358,13 @@ void AArenaCharacter::SetTargeting(bool bNewTargeting)
 void AArenaCharacter::SetRunning(bool bNewRunning, bool bToggle)
 {
 	bWantsToRun = bNewRunning;
-	UpdateRunSounds(bNewRunning);
+
 	if (Role < ROLE_Authority)
 	{
 		ServerSetRunning(bNewRunning, bToggle);
 	}
+
+	UpdateRunSounds(bNewRunning);
 }
 
 void AArenaCharacter::SetCrouched(bool bNewCrouched, bool bToggle)
@@ -429,6 +435,9 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 	InputComponent->BindAction("Targeting", IE_Pressed, this, &AArenaCharacter::OnStartTargeting);
 	InputComponent->BindAction("Targeting", IE_Released, this, &AArenaCharacter::OnStopTargeting);
 
+	InputComponent->BindAction("Cover", IE_Pressed, this, &AArenaCharacter::OnEnterCover);
+	InputComponent->BindAction("Cover", IE_Released, this, &AArenaCharacter::OnExitCover);
+
 	InputComponent->BindAction("NextWeapon", IE_Pressed, this, &AArenaCharacter::OnNextWeapon);
 	InputComponent->BindAction("PrevWeapon", IE_Pressed, this, &AArenaCharacter::OnPrevWeapon);
 
@@ -438,6 +447,9 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 
 	InputComponent->BindAction("Fire", IE_Pressed, this, &AArenaCharacter::OnStartFire);
 	InputComponent->BindAction("Fire", IE_Released, this, &AArenaCharacter::OnStopFire);
+
+	InputComponent->BindAction("Throw", IE_Pressed, this, &AArenaCharacter::OnStartThrow);
+	InputComponent->BindAction("Throw", IE_Released, this, &AArenaCharacter::OnStopThrow);
 }
 
 void AArenaCharacter::MoveForward(float Value)
@@ -510,6 +522,77 @@ void AArenaCharacter::OnStopFire()
 	StopWeaponFire();
 }
 
+void AArenaCharacter::OnStartThrow()
+{
+	bWantsToThrow = true;
+}
+
+void AArenaCharacter::OnStopThrow()
+{
+	if (Role < ROLE_Authority)
+	{
+		ServerStartThrow();
+	}
+
+	if (1)
+	{
+		bWantsToThrow = false;
+
+		float AnimDuration = PlayWeaponAnimation(ThrowAnimation);
+		if (AnimDuration <= 0.0f)
+		{
+			AnimDuration = 0.7f;
+		}
+
+		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopReload, AnimDuration, false);
+		if (Role == ROLE_Authority)
+		{
+			GetWorldTimerManager().SetTimer(this, &AArenaCharacter::Throw, FMath::Max(0.1f, AnimDuration - 1.5f), false);
+		}
+
+		if (this && this->IsLocallyControlled())
+		{
+			//PlayWeaponSound(ReloadSound);
+		}
+	}
+}
+
+void AArenaCharacter::Throw()
+{
+	FVector FinalAim = FVector::ZeroVector;
+	FVector ShootDir = Instigator->GetBaseAimRotation().Vector();
+
+	USkeletalMeshComponent* UseMesh = GetPawnMesh();
+	FVector Origin = UseMesh->GetSocketLocation(OffHandAttachPoint);
+
+	FTransform SpawnTM(ShootDir.Rotation(), Origin);
+	AArenaFragGrenade* grenade = Cast<AArenaFragGrenade>(UGameplayStatics::BeginSpawningActorFromClass(this, GrenadeClass, SpawnTM));
+	if (grenade)
+	{
+		//Projectile->SetPawnOwner(this);
+		grenade->Instigator = Instigator;
+		grenade->SetOwner(this);
+		grenade->InitVelocity(ShootDir);
+
+		UGameplayStatics::FinishSpawningActor(grenade, SpawnTM);
+	}
+}
+
+float AArenaCharacter::PlayWeaponAnimation(UAnimMontage* Animation)
+{
+	float Duration = 0.0f;
+	if (this)
+	{
+		UAnimMontage* UseAnim = Animation;
+		if (UseAnim)
+		{
+			Duration = this->PlayAnimMontage(UseAnim);
+		}
+	}
+
+	return Duration;
+}
+
 void AArenaCharacter::OnStartTargeting()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
@@ -529,6 +612,16 @@ void AArenaCharacter::OnStopTargeting()
 {
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 	SetTargeting(false);
+}
+
+void AArenaCharacter::OnEnterCover()
+{
+
+}
+
+void AArenaCharacter::OnExitCover()
+{
+
 }
 
 void AArenaCharacter::OnNextWeapon()
@@ -624,9 +717,15 @@ void AArenaCharacter::OnStopCrouching()
 
 void AArenaCharacter::OnStartRunning()
 {
-	if (!GetCharacterMovement()->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost)
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (MyPC && MyPC->IsGameInputAllowed() && !GetCharacterMovement()->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost)
 	{
 		IdleTime = 0.0f;
+		if (IsTargeting())
+		{
+			SetTargeting(false);
+		}
+
 		GetCharacterMovement()->MaxWalkSpeed = RunningMovementSpeed;
 
 		StopWeaponFire();
@@ -664,6 +763,11 @@ AArenaRangedWeapon* AArenaCharacter::GetWeapon() const
 FName AArenaCharacter::GetWeaponAttachPoint() const
 {
 	return WeaponAttachPoint;
+}
+
+FName AArenaCharacter::GetOffHandAttachPoint() const
+{
+	return OffHandAttachPoint;
 }
 
 int32 AArenaCharacter::GetInventoryCount() const
@@ -708,6 +812,11 @@ bool AArenaCharacter::IsRunning() const
 		return false;
 	}
 	return (bWantsToRun) && !GetVelocity().IsZero() && (GetVelocity().SafeNormal2D() | GetActorRotation().Vector()) > -0.1;
+}
+
+bool AArenaCharacter::IsThrowing() const
+{
+	return bWantsToThrow;
 }
 
 /*bool AArenaCharacter::IsCrouched() const
@@ -1257,15 +1366,25 @@ void AArenaCharacter::ServerSetCrouched_Implementation(bool bNewCrouched, bool b
 	SetCrouched(bNewCrouched, bToggle);
 }
 
-/*bool AArenaCharacter::ServerMeleeAttack_Validate(class AArenaRangedWeapon* Weapon, AActor* target, const TArray<AActor*>& HActors)
+bool AArenaCharacter::ServerStartThrow_Validate()
 {
 	return true;
 }
 
-void AArenaCharacter::ServerMeleeAttack_Implementation(class AArenaRangedWeapon* Weapon, AActor* target, const TArray<AActor*>& HActors)
+void AArenaCharacter::ServerStartThrow_Implementation()
 {
-	Weapon->Melee(target, HActors);
-}*/
+	OnStartThrow();
+}
+
+bool AArenaCharacter::ServerStopThrow_Validate()
+{
+	return true;
+}
+
+void AArenaCharacter::ServerStopThrow_Implementation()
+{
+	OnStopThrow();
+}
 
 bool AArenaCharacter::ServerIdleTimer_Validate(const float idleTimer, class AArenaCharacter* client)
 {
