@@ -344,7 +344,7 @@ bool ATheArenaGameMode::CanDealDamage(class AArenaPlayerState* DamageInstigator,
 
 bool ATheArenaGameMode::AllowCheats(APlayerController* P)
 {
-	return true;
+	return false;
 }
 
 bool ATheArenaGameMode::ShouldSpawnAtStartSpot(AController* Player)

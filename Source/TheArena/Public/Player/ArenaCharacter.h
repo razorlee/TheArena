@@ -249,11 +249,14 @@ class AArenaCharacter : public ACharacter
 	/** player released start fire action */
 	void OnStopFire();
 
+	/** player pressed melee action */
+	void OnThrow();
+
 	/** player pressed start fire action */
-	void OnStartThrow();
+	void StartThrow(bool bFromReplication = false);
 
 	/** player released start fire action */
-	void OnStopThrow();
+	void StopThrow();
 
 	/** player pressed targeting action */
 	void OnStartTargeting();
@@ -446,6 +449,7 @@ protected:
 	uint8 bWantsToFire : 1;
 
 	/** current throwing state */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_Throw)
 	uint8 bWantsToThrow : 1;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -531,6 +535,12 @@ protected:
 
 	/** Responsible for cleaning up bodies on clients. */
 	virtual void TornOff();
+
+	//////////////////////////////////////////////////////////////////////////
+	// Replication
+
+	UFUNCTION()
+	void OnRep_Throw();
 
 	//////////////////////////////////////////////////////////////////////////
 	// Damage & death

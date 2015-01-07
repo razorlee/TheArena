@@ -448,8 +448,7 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 	InputComponent->BindAction("Fire", IE_Pressed, this, &AArenaCharacter::OnStartFire);
 	InputComponent->BindAction("Fire", IE_Released, this, &AArenaCharacter::OnStopFire);
 
-	InputComponent->BindAction("Throw", IE_Pressed, this, &AArenaCharacter::OnStartThrow);
-	InputComponent->BindAction("Throw", IE_Released, this, &AArenaCharacter::OnStopThrow);
+	InputComponent->BindAction("Throw", IE_Pressed, this, &AArenaCharacter::OnThrow);
 }
 
 void AArenaCharacter::MoveForward(float Value)
@@ -522,21 +521,16 @@ void AArenaCharacter::OnStopFire()
 	StopWeaponFire();
 }
 
-void AArenaCharacter::OnStartThrow()
+void AArenaCharacter::StartThrow(bool bFromReplication)
 {
-	bWantsToThrow = true;
-}
-
-void AArenaCharacter::OnStopThrow()
-{
-	if (Role < ROLE_Authority)
+	if (bFromReplication || Role < ROLE_Authority)
 	{
 		ServerStartThrow();
 	}
 
-	if (1)
+	if (bFromReplication || bWantsToThrow != true)
 	{
-		bWantsToThrow = false;
+		bWantsToThrow = true;
 
 		float AnimDuration = PlayWeaponAnimation(ThrowAnimation);
 		if (AnimDuration <= 0.0f)
@@ -544,7 +538,7 @@ void AArenaCharacter::OnStopThrow()
 			AnimDuration = 0.7f;
 		}
 
-		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopReload, AnimDuration, false);
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopThrow, AnimDuration, false);
 		if (Role == ROLE_Authority)
 		{
 			GetWorldTimerManager().SetTimer(this, &AArenaCharacter::Throw, FMath::Max(0.1f, AnimDuration - 1.5f), false);
@@ -552,9 +546,14 @@ void AArenaCharacter::OnStopThrow()
 
 		if (this && this->IsLocallyControlled())
 		{
-			//PlayWeaponSound(ReloadSound);
+			//PlayWeaponSound(ThrowSound);
 		}
 	}
+}
+
+void AArenaCharacter::StopThrow()
+{
+	bWantsToThrow = false;
 }
 
 void AArenaCharacter::Throw()
@@ -569,7 +568,7 @@ void AArenaCharacter::Throw()
 	AArenaFragGrenade* grenade = Cast<AArenaFragGrenade>(UGameplayStatics::BeginSpawningActorFromClass(this, GrenadeClass, SpawnTM));
 	if (grenade)
 	{
-		//Projectile->SetPawnOwner(this);
+		//grenade->SetPawnOwner(this);
 		grenade->Instigator = Instigator;
 		grenade->SetOwner(this);
 		grenade->InitVelocity(ShootDir);
@@ -674,6 +673,19 @@ void AArenaCharacter::OnMelee()
 		if (CurrentWeapon)
 		{
 			CurrentWeapon->StartMelee();
+		}
+	}
+}
+
+void AArenaCharacter::OnThrow()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (MyPC && MyPC->IsGameInputAllowed())
+	{
+		IdleTime = 0.0f;
+		if (CurrentWeapon)
+		{
+			StartThrow();
 		}
 	}
 }
@@ -1295,6 +1307,18 @@ void AArenaCharacter::SetCurrentWeapon(class AArenaRangedWeapon* NewWeapon, clas
 	}
 }
 
+void AArenaCharacter::OnRep_Throw()
+{
+	if (bWantsToThrow)
+	{
+		StartThrow(true);
+	}
+	else
+	{
+		StopThrow();
+	}
+}
+
 void AArenaCharacter::OnRep_CurrentWeapon(AArenaRangedWeapon* LastWeapon)
 {
 	SetCurrentWeapon(CurrentWeapon, LastWeapon);
@@ -1373,7 +1397,7 @@ bool AArenaCharacter::ServerStartThrow_Validate()
 
 void AArenaCharacter::ServerStartThrow_Implementation()
 {
-	OnStartThrow();
+	StartThrow();
 }
 
 bool AArenaCharacter::ServerStopThrow_Validate()
@@ -1383,7 +1407,7 @@ bool AArenaCharacter::ServerStopThrow_Validate()
 
 void AArenaCharacter::ServerStopThrow_Implementation()
 {
-	OnStopThrow();
+	StopThrow();
 }
 
 bool AArenaCharacter::ServerIdleTimer_Validate(const float idleTimer, class AArenaCharacter* client)
@@ -1408,6 +1432,7 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	DOREPLIFETIME_CONDITION(AArenaCharacter, bIsTargeting, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AArenaCharacter, bWantsToRun, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(AArenaCharacter, bWantsToCrouch, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(AArenaCharacter, bWantsToThrow, COND_Custom);
 	DOREPLIFETIME_CONDITION(AArenaCharacter, LastTakeHitInfo, COND_Custom);
 
 	// everyone

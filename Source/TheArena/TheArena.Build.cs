@@ -24,5 +24,8 @@ public class TheArena : ModuleRules
                 "AIModule",
 			}
        );
+
+       DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
+
     }
 }

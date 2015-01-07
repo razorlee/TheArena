@@ -8,6 +8,7 @@ public class TheArenaTarget : TargetRules
 	public TheArenaTarget(TargetInfo Target)
 	{
 		Type = TargetType.Game;
+        bUsesSteam = true;
 	}
 
 	//
