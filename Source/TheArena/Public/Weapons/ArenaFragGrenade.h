@@ -14,27 +14,27 @@ struct FGrenadeWeaponData
 	GENERATED_USTRUCT_BODY()
 
 	/** life time */
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile)
 	float ProjectileLife;
 
 	/** damage at impact point */
-	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
-	int32 ExplosionDamage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile)
+	float ExplosionDamage;
 
 	/** radius of damage */
-	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile)
 	float ExplosionRadius;
 
 	/** type of damage */
-	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Projectile)
 	TSubclassOf<UDamageType> DamageType;
 
 	/** defaults */
 	FGrenadeWeaponData()
 	{
 		ProjectileLife = 4.0f;
-		ExplosionDamage = 1000;
-		ExplosionRadius = 300.0f;
+		ExplosionDamage = 1000.0f;
+		ExplosionRadius = 500.0f;
 		DamageType = UDamageType::StaticClass();
 	}
 };
@@ -59,6 +59,10 @@ public:
 	void OnImpact(const FHitResult& HitResult);
 
 protected:
+
+	/** weapon data */
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = Projectile)
+	FGrenadeWeaponData Explosion;
 
 	/** movement component */
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)

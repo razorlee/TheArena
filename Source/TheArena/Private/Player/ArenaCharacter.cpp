@@ -531,6 +531,7 @@ void AArenaCharacter::StartThrow(bool bFromReplication)
 	if (bFromReplication || bWantsToThrow != true)
 	{
 		bWantsToThrow = true;
+		//this->PlayerConfig.Stamina -= JumpCost;
 
 		float AnimDuration = PlayWeaponAnimation(ThrowAnimation);
 		if (AnimDuration <= 0.0f)
@@ -692,14 +693,22 @@ void AArenaCharacter::OnThrow()
 
 void AArenaCharacter::OnStartJump()
 {
-	if (!GetCharacterMovement()->IsFalling())
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if ((MyPC && MyPC->IsGameInputAllowed()) && (!GetCharacterMovement()->IsFalling()))
 	{
 		IdleTime = 0.0f;
-		if (PlayerConfig.Stamina > JumpCost)
-		{
-			PlayerConfig.Stamina -= JumpCost;
+		if (this->PlayerConfig.Stamina > JumpCost)
+		{	
 			SetRunning(false, false);
 			SetCrouched(false, false);
+			if (Role < ROLE_Authority)
+			{
+				ServerJump(this);
+			}
+			else
+			{
+				this->PlayerConfig.Stamina -= JumpCost;
+			}
 			bPressedJump = true;
 		}
 	}
@@ -707,6 +716,7 @@ void AArenaCharacter::OnStartJump()
 
 void AArenaCharacter::OnStopJump()
 {
+	bWantsToJump = false;
 	bPressedJump = false;
 }
 
@@ -1388,6 +1398,16 @@ bool AArenaCharacter::ServerSetCrouched_Validate(bool bNewCrouched, bool bToggle
 void AArenaCharacter::ServerSetCrouched_Implementation(bool bNewCrouched, bool bToggle)
 {
 	SetCrouched(bNewCrouched, bToggle);
+}
+
+bool AArenaCharacter::ServerJump_Validate(class AArenaCharacter* client)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerJump_Implementation(class AArenaCharacter* client)
+{
+	client->PlayerConfig.Stamina -= JumpCost;
 }
 
 bool AArenaCharacter::ServerStartThrow_Validate()

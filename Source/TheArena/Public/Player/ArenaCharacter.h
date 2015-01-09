@@ -448,6 +448,9 @@ protected:
 	/** current firing state */
 	uint8 bWantsToFire : 1;
 
+	/** current jump state */
+	uint8 bWantsToJump : 1;
+
 	/** current throwing state */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Throw)
 	uint8 bWantsToThrow : 1;
@@ -634,6 +637,9 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopThrow();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerJump(class AArenaCharacter* client);
 
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)
