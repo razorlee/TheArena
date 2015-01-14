@@ -2,21 +2,21 @@
 
 #include "TheArena.h"
 
-AArena_TeamDeathMatch::AArena_TeamDeathMatch(const class FObjectInitializer& PCIP) 
-	: Super(PCIP)
+AArena_TeamDeathMatch::AArena_TeamDeathMatch(const class FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	NumTeams = 2;
 	bDelayedStart = true;
 }
 
-void AArena_TeamDeathMatch::InitNewPlayer(APlayerController* NewPlayer, const TSharedPtr<FUniqueNetId>& UniqueId, const FString& Options)
+void AArena_TeamDeathMatch::PostLogin(APlayerController* NewPlayer)
 {
-	Super::InitNewPlayer(NewPlayer, UniqueId, Options);
-
-	// assign to team
+	// Place player on a team before Super (VoIP team based init, findplayerstart, etc)
 	AArenaPlayerState* NewPlayerState = CastChecked<AArenaPlayerState>(NewPlayer->PlayerState);
 	const int32 TeamNum = ChooseTeam(NewPlayerState);
 	NewPlayerState->SetTeamNum(TeamNum);
+
+	Super::PostLogin(NewPlayer);
 }
 
 void AArena_TeamDeathMatch::InitGameState()

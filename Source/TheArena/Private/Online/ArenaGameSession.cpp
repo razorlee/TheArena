@@ -4,8 +4,13 @@
 #include "ArenaGameSession.h"
 
 
-AArenaGameSession::AArenaGameSession(const class FObjectInitializer& PCIP)
-	: Super(PCIP)
+namespace
+{
+	const FString CustomMatchKeyword("Custom");
+}
+
+AArenaGameSession::AArenaGameSession(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	if (!HasAnyFlags(RF_ClassDefaultObject))
 	{
@@ -13,22 +18,11 @@ AArenaGameSession::AArenaGameSession(const class FObjectInitializer& PCIP)
 		OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnDestroySessionComplete);
 
 		OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnFindSessionsComplete);
-		//OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnJoinSessionComplete);
+		OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnJoinSessionComplete);
 
 		OnStartSessionCompleteDelegate = FOnStartSessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnStartOnlineGameComplete);
 	}
 }
-
-/**
-* Creates a game session
-*
-* @param ControllerId id of the controller that owns this session
-*/
-void AArenaGameSession::CreateGameSession(int32 ControllerId)
-{
-	const FString GameType(TEXT("Type"));
-	HostSession(ControllerId, GameSessionName, GameType, false, true, AArenaGameSession::DEFAULT_NUM_PLAYERS);
-};
 
 /**
 * Delegate fired when a session start request has completed
@@ -109,15 +103,6 @@ void AArenaGameSession::HandleMatchHasEnded()
 	}
 }
 
-/**
-* Destroys a game session
-*
-* @param ControllerId id of the controller that owns this session
-*/
-void AArenaGameSession::DestroyGameSession(int32 ControllerId)
-{
-};
-
 bool AArenaGameSession::IsBusy() const
 {
 	if (HostSettings.IsValid() || SearchSettings.IsValid())
@@ -190,11 +175,6 @@ void AArenaGameSession::OnCreateSessionComplete(FName SessionName, bool bWasSucc
 	}
 
 	OnCreatePresenceSessionComplete().Broadcast(SessionName, bWasSuccessful);
-
-	if (!bWasSuccessful)
-	{
-		DelayedSessionDelete();
-	}
 }
 
 /**
@@ -216,27 +196,7 @@ void AArenaGameSession::OnDestroySessionComplete(FName SessionName, bool bWasSuc
 	}
 }
 
-void AArenaGameSession::DelayedSessionDelete()
-{
-	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
-	if (OnlineSub)
-	{
-		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-		EOnlineSessionState::Type SessionState = Sessions->GetSessionState(CurrentSessionParams.SessionName);
-		if (SessionState != EOnlineSessionState::Creating)
-		{
-			Sessions->AddOnDestroySessionCompleteDelegate(OnDestroySessionCompleteDelegate);
-			Sessions->DestroySession(CurrentSessionParams.SessionName);
-		}
-		else
-		{
-			// Retry shortly
-			GetWorldTimerManager().SetTimer(this, &AArenaGameSession::DelayedSessionDelete, 1.f);
-		}
-	}
-}
-
-bool AArenaGameSession::HostSession(int32 ControllerId, FName SessionName, const FString & GameType, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
+bool AArenaGameSession::HostSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, const FString& GameType, const FString& MapName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
 {
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
@@ -244,20 +204,22 @@ bool AArenaGameSession::HostSession(int32 ControllerId, FName SessionName, const
 		CurrentSessionParams.SessionName = SessionName;
 		CurrentSessionParams.bIsLAN = bIsLAN;
 		CurrentSessionParams.bIsPresence = bIsPresence;
-		CurrentSessionParams.ControllerId = ControllerId;
+		CurrentSessionParams.UserId = UserId;
 		MaxPlayers = MaxNumPlayers;
 
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-		if (Sessions.IsValid())
+		if (Sessions.IsValid() && CurrentSessionParams.UserId.IsValid())
 		{
-			HostSettings = MakeShareable(new FArenaOnlineSessionSettings(bIsLAN, bIsPresence, MaxPlayers));
+			HostSettings = MakeShareable(new FArenaOnlineSessionSettings(bIsLAN, bIsPresence, MaxNumPlayers));
 			HostSettings->Set(SETTING_GAMEMODE, GameType, EOnlineDataAdvertisementType::ViaOnlineService);
+			HostSettings->Set(SETTING_MAPNAME, MapName, EOnlineDataAdvertisementType::ViaOnlineService);
 			HostSettings->Set(SETTING_MATCHING_HOPPER, FString("TeamDeathmatch"), EOnlineDataAdvertisementType::DontAdvertise);
 			HostSettings->Set(SETTING_MATCHING_TIMEOUT, 120.0f, EOnlineDataAdvertisementType::ViaOnlineService);
 			HostSettings->Set(SETTING_SESSION_TEMPLATE_NAME, FString("GameSession"), EOnlineDataAdvertisementType::DontAdvertise);
+			HostSettings->Set(SEARCH_KEYWORDS, CustomMatchKeyword, EOnlineDataAdvertisementType::ViaOnlineService);
 
 			Sessions->AddOnCreateSessionCompleteDelegate(OnCreateSessionCompleteDelegate);
-			return Sessions->CreateSession(CurrentSessionParams.ControllerId, CurrentSessionParams.SessionName, *HostSettings);
+			return Sessions->CreateSession(*CurrentSessionParams.UserId, CurrentSessionParams.SessionName, *HostSettings);
 		}
 	}
 #if !UE_BUILD_SHIPPING
@@ -329,10 +291,10 @@ void AArenaGameSession::ContinueMatchmaking()
 		if (OnlineSub)
 		{
 			IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-			if (Sessions.IsValid())
+			if (Sessions.IsValid() && CurrentSessionParams.UserId.IsValid())
 			{
 				Sessions->AddOnJoinSessionCompleteDelegate(OnJoinSessionCompleteDelegate);
-				Sessions->JoinSession(CurrentSessionParams.ControllerId, CurrentSessionParams.SessionName, SearchSettings->SearchResults[CurrentSessionParams.BestSessionIdx]);
+				Sessions->JoinSession(*CurrentSessionParams.UserId, CurrentSessionParams.SessionName, SearchSettings->SearchResults[CurrentSessionParams.BestSessionIdx]);
 			}
 		}
 	}
@@ -348,7 +310,7 @@ void AArenaGameSession::OnNoMatchesAvailable()
 	SearchSettings = NULL;
 }
 
-void AArenaGameSession::FindSessions(int32 ControllerId, FName SessionName, bool bIsLAN, bool bIsPresence)
+void AArenaGameSession::FindSessions(TSharedPtr<FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence)
 {
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
@@ -356,16 +318,18 @@ void AArenaGameSession::FindSessions(int32 ControllerId, FName SessionName, bool
 		CurrentSessionParams.SessionName = SessionName;
 		CurrentSessionParams.bIsLAN = bIsLAN;
 		CurrentSessionParams.bIsPresence = bIsPresence;
-		CurrentSessionParams.ControllerId = ControllerId;
+		CurrentSessionParams.UserId = UserId;
 
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-		if (Sessions.IsValid())
+		if (Sessions.IsValid() && CurrentSessionParams.UserId.IsValid())
 		{
 			SearchSettings = MakeShareable(new FArenaOnlineSearchSettings(bIsLAN, bIsPresence));
+			SearchSettings->QuerySettings.Set(SEARCH_KEYWORDS, CustomMatchKeyword, EOnlineComparisonOp::Equals);
+
 			TSharedRef<FOnlineSessionSearch> SearchSettingsRef = SearchSettings.ToSharedRef();
 
 			Sessions->AddOnFindSessionsCompleteDelegate(OnFindSessionsCompleteDelegate);
-			Sessions->FindSessions(ControllerId, SearchSettingsRef);
+			Sessions->FindSessions(*CurrentSessionParams.UserId, SearchSettingsRef);
 		}
 	}
 	else
@@ -374,30 +338,30 @@ void AArenaGameSession::FindSessions(int32 ControllerId, FName SessionName, bool
 	}
 }
 
-/**
-* Joins one of the session in search results
-*
-* @param ControllerId controller that initiated the request
-* @param SessionName name of session
-* @param SessionIndexInSearchResults Index of the session in search results
-*
-* @return bool true if successful, false otherwise
-*/
-bool AArenaGameSession::JoinSession(int32 ControllerId, FName SessionName, int32 SessionIndexInSearchResults)
+bool AArenaGameSession::JoinSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, int32 SessionIndexInSearchResults)
 {
 	bool bResult = false;
 
 	if (SessionIndexInSearchResults >= 0 && SessionIndexInSearchResults < SearchSettings->SearchResults.Num())
 	{
-		IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
-		if (OnlineSub)
+		bResult = JoinSession(UserId, SessionName, SearchSettings->SearchResults[SessionIndexInSearchResults]);
+	}
+
+	return bResult;
+}
+
+bool AArenaGameSession::JoinSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult)
+{
+	bool bResult = false;
+
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+	if (OnlineSub)
+	{
+		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+		if (Sessions.IsValid() && UserId.IsValid())
 		{
-			IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-			if (Sessions.IsValid())
-			{
-				Sessions->AddOnJoinSessionCompleteDelegate(OnJoinSessionCompleteDelegate);
-				bResult = Sessions->JoinSession(ControllerId, SessionName, SearchSettings->SearchResults[SessionIndexInSearchResults]);
-			}
+			Sessions->AddOnJoinSessionCompleteDelegate(OnJoinSessionCompleteDelegate);
+			bResult = Sessions->JoinSession(*UserId, SessionName, SearchResult);
 		}
 	}
 
@@ -410,11 +374,11 @@ bool AArenaGameSession::JoinSession(int32 ControllerId, FName SessionName, int32
 * @param SessionName the name of the session this callback is for
 * @param bWasSuccessful true if the async action completed without error, false if there was an error
 */
-void AArenaGameSession::OnJoinSessionComplete(FName SessionName, bool bWasSuccessful)
+void AArenaGameSession::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
 	bool bWillTravel = false;
 
-	UE_LOG(LogOnlineGame, Verbose, TEXT("OnJoinSessionComplete %s bSuccess: %d"), *SessionName.ToString(), bWasSuccessful);
+	UE_LOG(LogOnlineGame, Verbose, TEXT("OnJoinSessionComplete %s bSuccess: %d"), *SessionName.ToString(), static_cast<int32>(Result));
 
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	IOnlineSessionPtr Sessions = NULL;
@@ -424,7 +388,7 @@ void AArenaGameSession::OnJoinSessionComplete(FName SessionName, bool bWasSucces
 		Sessions->ClearOnJoinSessionCompleteDelegate(OnJoinSessionCompleteDelegate);
 	}
 
-	OnJoinSessionComplete().Broadcast(bWasSuccessful);
+	OnJoinSessionComplete().Broadcast(Result);
 }
 
 bool AArenaGameSession::TravelToSession(int32 ControllerId, FName SessionName)
@@ -463,4 +427,3 @@ bool AArenaGameSession::TravelToSession(int32 ControllerId, FName SessionName)
 
 	return false;
 }
-

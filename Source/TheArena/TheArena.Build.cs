@@ -22,6 +22,9 @@ public class TheArena : ModuleRules
 				"OnlineSubsystemUtils",
 				"AssetRegistry",
                 "AIModule",
+                "UMG", 
+                "Slate", 
+                "SlateCore"
 			}
        );
 

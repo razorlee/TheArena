@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Online.h"
+#include "Online/ArenaOnlineGameSettings.h"
 #include "GameFramework/GameSession.h"
 #include "ArenaGameSession.generated.h"
 
@@ -14,8 +15,8 @@ struct FArenaGameSessionParams
 	bool bIsLAN;
 	/** Presence enabled session */
 	bool bIsPresence;
-	/** ControllerId of player initiating lobby */
-	int32 ControllerId;
+	/** Id of player initiating lobby */
+	TSharedPtr<FUniqueNetId> UserId;
 	/** Current search result choice to join */
 	int32 BestSessionIdx;
 
@@ -23,7 +24,6 @@ struct FArenaGameSessionParams
 		: SessionName(NAME_None)
 		, bIsLAN(false)
 		, bIsPresence(false)
-		, ControllerId(0)
 		, BestSessionIdx(0)
 	{
 	}
@@ -33,7 +33,9 @@ struct FArenaGameSessionParams
 UCLASS(config=game)
 class AArenaGameSession : public AGameSession
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+	AArenaGameSession(const FObjectInitializer& ObjectInitializer);
 
 protected:
 
@@ -84,7 +86,7 @@ protected:
 	* @param SessionName the name of the session this callback is for
 	* @param bWasSuccessful true if the async action completed without error, false if there was an error
 	*/
-	void OnJoinSessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	/**
 	* Delegate fired when a destroying an online session has completed
@@ -93,11 +95,6 @@ protected:
 	* @param bWasSuccessful true if the async action completed without error, false if there was an error
 	*/
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
-
-	/**
-	* Safe delete mechanism to make sure we aren't deleting a session too soon after its creation
-	*/
-	void DelayedSessionDelete();
 
 	/**
 	* Reset the variables the are keeping track of session join attempts
@@ -140,7 +137,7 @@ protected:
 	* @param bWasSuccessful was the create successful
 	*/
 	//DECLARE_DELEGATE_RetVal_TwoParams(bool, FOnJoinSessionComplete, FName /*SessionName*/, bool /*bWasSuccessful*/);
-	DECLARE_EVENT_OneParam(AArenaGameSession, FOnJoinSessionComplete, bool /*bWasSuccessful*/);
+	DECLARE_EVENT_OneParam(AArenaGameSession, FOnJoinSessionComplete, EOnJoinSessionCompleteResult::Type /*Result*/);
 	FOnJoinSessionComplete JoinSessionCompleteEvent;
 
 	/*
@@ -158,7 +155,7 @@ public:
 	/**
 	* Host a new online session
 	*
-	* @param ControllerId controller that initiated the request
+	* @param UserId user that initiated the request
 	* @param SessionName name of session
 	* @param bIsLAN is this going to hosted over LAN
 	* @param bIsPresence is the session to create a presence session
@@ -166,28 +163,38 @@ public:
 	*
 	* @return bool true if successful, false otherwise
 	*/
-	bool HostSession(int32 ControllerId, FName SessionName, const FString & GameType, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
+	bool HostSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, const FString& GameType, const FString& MapName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
 
 	/**
 	* Find an online session
 	*
-	* @param ControllerId controller that initiated the request
+	* @param UserId user that initiated the request
 	* @param SessionName name of session this search will generate
 	* @param bIsLAN are we searching LAN matches
 	* @param bIsPresence are we searching presence sessions
 	*/
-	void FindSessions(int32 ControllerId, FName SessionName, bool bIsLAN, bool bIsPresence);
+	void FindSessions(TSharedPtr<FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence);
 
 	/**
 	* Joins one of the session in search results
 	*
-	* @param ControllerId controller that initiated the request
+	* @param UserId user that initiated the request
 	* @param SessionName name of session
 	* @param SessionIndexInSearchResults Index of the session in search results
 	*
 	* @return bool true if successful, false otherwise
 	*/
-	bool JoinSession(int32 ControllerId, FName SessionName, int32 SessionIndexInSearchResults);
+	bool JoinSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, int32 SessionIndexInSearchResults);
+
+	/**
+	* Joins a session via a search result
+	*
+	* @param SessionName name of session
+	* @param SearchResult Session to join
+	*
+	* @return bool true if successful, false otherwise
+	*/
+	bool JoinSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult);
 
 	/** @return true if any online async work is in progress, false otherwise */
 	bool IsBusy() const;
@@ -218,25 +225,11 @@ public:
 	/** @return the delegate fired when search of session completes */
 	FOnFindSessionsComplete& OnFindSessionsComplete() { return FindSessionsCompleteEvent; }
 
-	/**
-	* Creates a game session
-	*
-	* @param ControllerId id of the controller that owns this session
-	*/
-	virtual void CreateGameSession(int32 ControllerId);
-
 	/** Handle starting the match */
 	virtual void HandleMatchHasStarted() override;
 
 	/** Handles when the match has ended */
 	virtual void HandleMatchHasEnded() override;
-
-	/**
-	* Destroys a game session
-	*
-	* @param ControllerId id of the controller that owns this session
-	*/
-	virtual void DestroyGameSession(int32 ControllerId);
 
 	/**
 	* Travel to a session URL (as client) for a given session
@@ -247,5 +240,5 @@ public:
 	* @return true if successful, false otherwise
 	*/
 	bool TravelToSession(int32 ControllerId, FName SessionName);
-	
 };
+

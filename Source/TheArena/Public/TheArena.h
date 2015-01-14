@@ -4,12 +4,20 @@
 #define __THEARENA_H__
 
 #include "Engine.h"
+#include "SlateBasics.h"
+#include "SlateExtras.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "UnrealNetwork.h"
+#include "Runtime/UMG/Public/UMG.h"
+#include "Runtime/UMG/Public/UMGStyle.h"
+#include "Runtime/UMG/Public/Slate/SObjectWidget.h"
+#include "Runtime/UMG/Public/IUMGModule.h"
+#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 
 //////////////////////////////////////////////////////////////////////////
 // The Arena Classes
 
+#include "Public/ArenaGameInstance.h"
 #include "Public/AI/BTTask_FindPointNearEnemy.h"
 #include "Public/AI/BTTask_HasLosTo.h"
 #include "Public/AI/ArenaAIController.h"

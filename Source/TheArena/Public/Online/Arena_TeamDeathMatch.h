@@ -12,10 +12,10 @@ class THEARENA_API AArena_TeamDeathMatch : public ATheArenaGameMode
 {
 	GENERATED_BODY()
 
-	AArena_TeamDeathMatch(const class FObjectInitializer& PCIP);
+	AArena_TeamDeathMatch(const class FObjectInitializer& ObjectInitializer);
 
 	/** initialize player */
-	virtual void InitNewPlayer(APlayerController* NewPlayer, const TSharedPtr<FUniqueNetId>& UniqueId, const FString& Options);
+	void PostLogin(APlayerController* NewPlayer) override;
 
 	/** initialize replicated game data */
 	virtual void InitGameState() override;

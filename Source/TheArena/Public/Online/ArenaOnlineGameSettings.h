@@ -1,7 +1,10 @@
+// Copyright 1998-2014 Epic Games, Inc. All Rights Reserved.
+
 #pragma once
 
-#include "Runtime/Online/OnlineSubsystem/Public/OnlineSessionSettings.h"
-
+/**
+* General session settings for a arena game
+*/
 class FArenaOnlineSessionSettings : public FOnlineSessionSettings
 {
 public:
@@ -10,7 +13,9 @@ public:
 	virtual ~FArenaOnlineSessionSettings() {}
 };
 
-
+/**
+* General search setting for a arena game
+*/
 class FArenaOnlineSearchSettings : public FOnlineSessionSearch
 {
 public:
@@ -19,7 +24,9 @@ public:
 	virtual ~FArenaOnlineSearchSettings() {}
 };
 
-
+/**
+* Search settings for an empty dedicated server to host a match
+*/
 class FArenaOnlineSearchSettingsEmptyDedicated : public FArenaOnlineSearchSettings
 {
 public:
