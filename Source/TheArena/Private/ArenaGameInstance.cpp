@@ -55,32 +55,22 @@ bool UArenaGameInstance::HostGame(ULocalPlayer* LocalPlayer, const FString& Game
 	return false;
 }
 
-bool UArenaGameInstance::JoinSession(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+void UArenaGameInstance::JoinSession()
 {
-	// needs to tear anything down based on current state?
-	AArenaGameSession* const GameSession = GetGameSession();
-	if (GameSession)
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+	if (OnlineSub)
 	{
-		AddNetworkFailureHandlers();
-		FOnJoinSessionCompleteDelegate joinDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UArenaGameInstance::OnJoinSessionCompleted);
-
-		/*GameSession->OnJoinSessionComplete().AddUObject(this, &UArenaGameInstance::OnJoinSessionComplete);
-
-		if (GameSession->JoinSession(LocalPlayer->GetPreferredUniqueNetId(), GameSessionName, SearchResult))
+		IOnlineSessionPtr SessionInt = OnlineSub->GetSessionInterface();
+		if (SessionInt.IsValid())
 		{
-			// If any error occured in the above, pending state would be set
-			if ((PendingState == CurrentState) || (PendingState == ArenaGameInstanceState::None))
+			int32 ControllerId = 0;
+			if (ControllerId != 255)
 			{
-				// Go ahead and go into loading state now
-				// If we fail, the delegate will handle showing the proper messaging and move to the correct state
-				//ShowLoadingScreen();
-				GotoState(ArenaGameInstanceState::Playing);
-				return true;
+				FOnJoinSessionCompleteDelegate joinDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UArenaGameInstance::OnJoinSessionCompleted);
+				SessionInt->AddOnJoinSessionCompleteDelegate(joinDelegate);
 			}
-		}*/
+		}
 	}
-
-	return false;
 }
 
 void UArenaGameInstance::TravelLocalSessionFailure(UWorld *World, ETravelFailure::Type FailureType, const FString& ReasonString)

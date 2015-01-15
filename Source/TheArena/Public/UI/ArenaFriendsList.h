@@ -41,8 +41,6 @@ class THEARENA_API UArenaFriendsList : public UUserWidget
 	GENERATED_BODY()
 
 	UArenaFriendsList(const FObjectInitializer& ObjectInitializer);
-	
-	void OnJoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 public:
 	/** Owning game instance */

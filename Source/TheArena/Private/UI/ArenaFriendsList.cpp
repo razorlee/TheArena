@@ -9,20 +9,6 @@ UArenaFriendsList::UArenaFriendsList(const FObjectInitializer& ObjectInitializer
 	//This sets the Delegate so we can be notified when the subsystem has completed reading the friends list.
 	, ReadCompleteDelegate(FOnReadFriendsListCompleteDelegate::CreateUObject(this, &ThisClass::OnReadFriendsListComplete))
 {
-	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
-	if (OnlineSub)
-	{
-		IOnlineSessionPtr SessionInt = OnlineSub->GetSessionInterface();
-		if (SessionInt.IsValid())
-		{
-			int32 ControllerId = 0;
-			if (ControllerId != 255)
-			{
-				FOnJoinSessionCompleteDelegate joinDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UArenaFriendsList::OnJoinSessionCompleted);
-				SessionInt->AddOnJoinSessionCompleteDelegate(joinDelegate);
-			}
-		}
-	}
 }
 
 UArenaFriendsList* UArenaFriendsList::GetFriendsList(UObject* WorldContextObject, class APlayerController* PlayerController)
@@ -87,9 +73,4 @@ void UArenaFriendsList::OnReadFriendsListComplete(int32 LocalUserNum, bool bWasS
 		TArray<FBlueprintFriend> Fail;
 		OnFailure.Broadcast(Fail);
 	}
-}
-
-void UArenaFriendsList::OnJoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
-{
-	GameInstance->JoinSession(SessionName, Result);
 }

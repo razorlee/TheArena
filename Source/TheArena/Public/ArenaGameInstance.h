@@ -30,8 +30,8 @@ public:
 
 	class AArenaGameSession* GetGameSession() const;
 
+	virtual void JoinSession();
 	bool HostGame(ULocalPlayer* LocalPlayer, const FString& GameType, const FString& InTravelURL);
-	bool JoinSession(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	/** Returns true if the game is in online mode */
 	bool GetIsOnline() const { return bIsOnline; }
