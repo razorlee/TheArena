@@ -294,6 +294,7 @@ void AArenaRangedWeapon::StopMelee()
 		bPendingMelee = false;
 		DetermineWeaponState();
 		StopWeaponAnimation(MeleeAnim);
+		HitActors.Empty();
 	}
 }
 
@@ -597,14 +598,16 @@ void AArenaRangedWeapon::Melee()
 			//Add this actor to the array because we are spawning one box per tick and we don't want to hit the same actor twice during the same attack animation
 			HitActors.AddUnique(OutOverlaps[i].GetActor());
 			FHitResult AttackHitResult;
-			FDamageEvent AttackDamageEvent;
+			const FDamageEvent AttackDamageEvent;
 			AArenaCharacter* GameCharacter = Cast<AArenaCharacter>(OutOverlaps[i].GetActor());
 
 			if (GameCharacter)
 			{
-				OutOverlaps[i].GetActor()->TakeDamage(WeaponConfig.MeleeDamage, AttackDamageEvent, Instigator->GetController(), MyPawn->Controller);
+				//OutOverlaps[i].GetActor()->TakeDamage(WeaponConfig.MeleeDamage, AttackDamageEvent, Instigator->GetController(), MyPawn->Controller);
+				UGameplayStatics::ApplyDamage(OutOverlaps[i].GetActor(), WeaponConfig.MeleeDamage, Instigator->GetController(), MyPawn->Controller, UDamageType::StaticClass());
 			}
 		}
+		OutOverlaps.Empty();
 	}
 }
 

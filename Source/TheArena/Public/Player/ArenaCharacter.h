@@ -80,11 +80,11 @@ struct FPlayerData
 	{
 		Health = 1000.0f;
 		Stamina = 1000.0f;
-		Energy = 0.0f;
+		Energy = 1000.0f;
 		Shield = 0.0f;
 		HealthRegen = 5.0f;
 		StaminaRegen = 5.0f;
-		EnergyRegen = 0.0f;
+		EnergyRegen = 5.0f;
 		ShieldRegen = 0.0f;
 		LowHealthPercentage = 0.25f;
 		LowStaminaPercentage = 0.0f;
@@ -221,6 +221,10 @@ class AArenaCharacter : public ACharacter
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* ThrowAnimation;
 
+	/** animation played on pawn (3rd person view) */
+	/*UPROPERTY(EditDefaultsOnly, Category = Animation) //tut1
+	UAnimMontage* StaggerAnimation;*/
+
 	//////////////////////////////////////////////////////////////////////////
 	// Input handlers
 
@@ -249,13 +253,13 @@ class AArenaCharacter : public ACharacter
 	/** player released start fire action */
 	void OnStopFire();
 
-	/** player pressed melee action */
+	/** player pressed throw action */
 	void OnThrow();
 
-	/** player pressed start fire action */
+	/** player pressed start throw action */
 	void StartThrow(bool bFromReplication = false);
 
-	/** player released start fire action */
+	/** player released start throw action */
 	void StopThrow();
 
 	/** player pressed targeting action */
@@ -281,6 +285,9 @@ class AArenaCharacter : public ACharacter
 
 	/** player pressed melee action */
 	void OnMelee();
+
+	/** player pressed melee action */
+	void OnDodge();
 
 	/** player pressed jump action */
 	void OnStartJump();
@@ -352,6 +359,10 @@ class AArenaCharacter : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = Pawn)
 	bool IsThrowing() const;
 
+	/** get stagger state */
+	/*UFUNCTION(BlueprintCallable, Category = Pawn)
+	bool IsStaggered() const;*/ //tut1
+
 	/** get max health */
 	UFUNCTION(BlueprintCallable, Category = Resources)
 	int32 GetMaxHealth() const;
@@ -369,12 +380,12 @@ class AArenaCharacter : public ACharacter
 	float GetCurrentStamina() const;
 
 	/** get max energy */
-	//UFUNCTION(BlueprintCallable, Category = Resources)
-	//int32 GetMaxEnergy() const;
+	UFUNCTION(BlueprintCallable, Category = Resources)
+	int32 GetMaxEnergy() const;
 
 	/** get current energy */
-	//UFUNCTION(BlueprintCallable, Category = Resources)
-	//float GetCurrentEnergy() const;
+	UFUNCTION(BlueprintCallable, Category = Resources)
+	float GetCurrentEnergy() const;
 
 	/** get max shields */
 	//UFUNCTION(BlueprintCallable, Category = Resources)
@@ -433,6 +444,17 @@ protected:
 	/** Time at which point the last take hit info for the actor times out and won't be replicated; Used to stop join-in-progress effects all over the screen */
 	float LastTakeHitTimeTimeout;
 
+	//////////////////////////////////////////////////////////////////////////
+	// Movement
+
+	/** Current movement axis deflecton forward/back (back is negative) */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
+	float MovementForwardAxis;
+
+	/** Current movement axis deflecton right/left (left is negative) */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
+	float MovementStrafeAxis;
+
 	/** current targeting state */
 	UPROPERTY(Transient, Replicated)
 	uint8 bIsTargeting : 1;
@@ -454,6 +476,16 @@ protected:
 	/** current throwing state */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Throw)
 	uint8 bWantsToThrow : 1;
+
+	/** current throwing state */
+	/*UPROPERTY(Transient, ReplicatedUsing = OnRep_Stagger)
+	uint8 bPendingStagger : 1;*/ //tut1
+
+	/** flags for dodge direction */
+	bool bPressedDodgeRight;
+	bool bPressedDodgeLeft;
+	bool bPressedDodgeForward;
+	bool bPressedDodgeBack;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY()
@@ -545,6 +577,9 @@ protected:
 	UFUNCTION()
 	void OnRep_Throw();
 
+	/*UFUNCTION()//tut1
+	void OnRep_Stagger();*/
+
 	//////////////////////////////////////////////////////////////////////////
 	// Damage & death
 
@@ -602,6 +637,9 @@ protected:
 	/** play effects on hit */
 	virtual void PlayHit(float DamageTaken, struct FDamageEvent const& DamageEvent, class APawn* PawnInstigator, class AActor* DamageCauser);
 
+	/** play stagger on hit */
+	//virtual void PlayStagger(); //tut1
+
 	/** switch to ragdoll */
 	void SetRagdollPhysics();
 
@@ -624,6 +662,9 @@ protected:
 
 	void SpawnDefaultInventory();
 
+	/** [server] remove all weapons from inventory and destroy them */
+	void DestroyInventory();
+
 	/** equip weapon */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon(class AArenaRangedWeapon* NewWeapon);
@@ -637,6 +678,12 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopThrow();
+
+	/*UFUNCTION(reliable, server, WithValidation) //tut1
+	void ServerStartStagger();
+
+	UFUNCTION(reliable, server, WithValidation) //tut1
+	void ServerStopStagger();*/
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerJump(class AArenaCharacter* client);

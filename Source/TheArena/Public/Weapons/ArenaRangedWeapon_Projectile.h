@@ -28,6 +28,10 @@ struct FProjectileWeaponData
 	UPROPERTY(EditDefaultsOnly, Category = Accuracy)
 	float FiringSpreadMax;
 
+	/** continuous firing: max increment */
+	UPROPERTY(EditDefaultsOnly, Category = Accuracy)
+	int32 BulletsPerRound;
+
 	/** life time */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	float ProjectileLife;
@@ -52,6 +56,7 @@ struct FProjectileWeaponData
 		TargetingSpreadMod = 0.25f;
 		FiringSpreadIncrement = 1.0f;
 		FiringSpreadMax = 10.0f;
+		BulletsPerRound = 1;
 		ProjectileLife = 10.0f;
 		HitDamage = 100;
 		ExplosionRadius = 1.0f;
@@ -59,7 +64,7 @@ struct FProjectileWeaponData
 	}
 };
 
-UCLASS()
+UCLASS(Abstract)
 class THEARENA_API AArenaRangedWeapon_Projectile : public AArenaRangedWeapon
 {
 	GENERATED_UCLASS_BODY()
@@ -74,7 +79,7 @@ protected:
 
 	virtual EAmmoType GetAmmoType() const override
 	{
-		return EAmmoType::ERocket;
+		return EAmmoType::EBullet;
 	}
 
 	/** weapon config */

@@ -20,6 +20,8 @@ public class TheArena : ModuleRules
 				"Engine",
 				"OnlineSubsystem",
 				"OnlineSubsystemUtils",
+                "Sockets",
+                "Networking",
 				"AssetRegistry",
                 "AIModule",
                 "UMG", 

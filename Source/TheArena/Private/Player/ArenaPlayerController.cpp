@@ -237,7 +237,7 @@ void AArenaPlayerController::SetGodMode(bool bEnable)
 
 void AArenaPlayerController::SetOpenMenu(bool bEnable)
 {
-	OpenMenu = bEnable;
+	this->OpenMenu = bEnable;
 }
 
 void AArenaPlayerController::SetAllowGameActions(bool bEnable)
@@ -537,7 +537,7 @@ bool AArenaPlayerController::IsGameInputAllowed() const
 
 bool AArenaPlayerController::GetOpenMenu() const
 {
-	return OpenMenu;
+	return this->OpenMenu;
 }
 
 bool AArenaPlayerController::GetAllowGameActions() const

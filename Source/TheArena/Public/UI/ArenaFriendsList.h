@@ -7,6 +7,10 @@
 #include "SlateExtras.h"
 #include "OnlineIdentityInterface.h"
 #include "OnlineSessionInterface.h"
+
+#include "OnlineSubsystem.h"
+#include "OnlineSubsystemUtils.h"
+
 #include "Blueprint/UserWidget.h"
 #include "ArenaFriendsList.generated.h"
 
@@ -53,12 +57,12 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FBlueprintGetFriendsListDelegate OnFailure;
 
-
-	UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject"), Category = "Online|Friends")
+	UFUNCTION(BlueprintCallable, Category = "Online|Friends")
 	static  UArenaFriendsList* GetFriendsList(UObject* WorldContextObject, class APlayerController* PlayerController);
 
 	// UOnlineBlueprintCallProxyBase interface
-	virtual void Activate(UArenaGameInstance* _GameInstance);
+	UFUNCTION(BlueprintCallable, Category = "Online|Friends")
+	virtual void Activate(UArenaGameInstance* _GameInstance); //override
 
 	TWeakObjectPtr<APlayerController> PlayerControllerWeakPtr;
 

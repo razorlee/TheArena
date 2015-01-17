@@ -11,6 +11,10 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	bWantsToRun = false;
 	bWantsToFire = false;
 	bWantsToThrow = false;
+	bPressedDodgeRight = false;
+	bPressedDodgeLeft = false;
+	bPressedDodgeForward = false;
+	bPressedDodgeBack = false;
 	BaseMovementSpeed = 400.0f;
 	TargetingMovementSpeed = 280.0f;
 	RunningMovementSpeed = 520.0f;
@@ -76,6 +80,7 @@ void AArenaCharacter::PostInitializeComponents()
 		IdleTime = 0.0f;
 		PlayerConfig.Health = GetMaxHealth();
 		PlayerConfig.Stamina = GetMaxStamina();
+		PlayerConfig.Energy = GetMaxEnergy();
 		SpawnDefaultInventory();
 	}
 	
@@ -108,6 +113,15 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+
+	if (this->PlayerConfig.Energy < this->GetMaxEnergy())
+	{
+		this->PlayerConfig.Energy += PlayerConfig.EnergyRegen * DeltaSeconds;
+		if (PlayerConfig.Energy > this->GetMaxEnergy())
+		{
+			PlayerConfig.Energy = this->GetMaxEnergy();
+		}
+	}
 
 	if ((this->PlayerConfig.Stamina < this->GetMaxStamina()) && (!IsRunning()))
 	{
@@ -169,7 +183,7 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 void AArenaCharacter::Destroyed()
 {
 	Super::Destroyed();
-	//DestroyInventory();
+	DestroyInventory();
 }
 
 void AArenaCharacter::PawnClientRestart()
@@ -445,6 +459,8 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 
 	InputComponent->BindAction("Melee", IE_Pressed, this, &AArenaCharacter::OnMelee);
 
+	InputComponent->BindAction("Dodge", IE_Pressed, this, &AArenaCharacter::OnDodge);
+
 	InputComponent->BindAction("Fire", IE_Pressed, this, &AArenaCharacter::OnStartFire);
 	InputComponent->BindAction("Fire", IE_Released, this, &AArenaCharacter::OnStopFire);
 
@@ -462,6 +478,7 @@ void AArenaCharacter::MoveForward(float Value)
 
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		MovementForwardAxis = Value;
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -477,7 +494,7 @@ void AArenaCharacter::MoveRight(float Value)
 
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// add movement in that direction
+		MovementStrafeAxis = Value;
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -531,7 +548,7 @@ void AArenaCharacter::StartThrow(bool bFromReplication)
 	if (bFromReplication || bWantsToThrow != true)
 	{
 		bWantsToThrow = true;
-		//this->PlayerConfig.Stamina -= JumpCost;
+		this->PlayerConfig.Energy -= 500;
 
 		float AnimDuration = PlayWeaponAnimation(ThrowAnimation);
 		if (AnimDuration <= 0.0f)
@@ -678,16 +695,45 @@ void AArenaCharacter::OnMelee()
 	}
 }
 
-void AArenaCharacter::OnThrow()
+void AArenaCharacter::OnDodge()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed())
 	{
 		IdleTime = 0.0f;
-		if (CurrentWeapon)
+
+		bPressedDodgeForward = false;
+		bPressedDodgeBack = false;
+		bPressedDodgeLeft = false;
+		bPressedDodgeRight = false;
+
+		if (MovementStrafeAxis > 0.5f)
 		{
-			StartThrow();
+			bPressedDodgeRight = true;
 		}
+		else if (MovementStrafeAxis < -0.5f)
+		{
+			bPressedDodgeLeft = true;
+		}
+		else if (MovementForwardAxis >= 0.f)
+		{
+			bPressedDodgeForward = true;
+		}
+		else
+		{
+			bPressedDodgeBack = true;
+		}
+		//StartDodge();
+	}
+}
+
+void AArenaCharacter::OnThrow()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (MyPC && MyPC->IsGameInputAllowed() && PlayerConfig.Energy >= 500)
+	{
+		IdleTime = 0.0f;
+		StartThrow();
 	}
 }
 
@@ -697,7 +743,7 @@ void AArenaCharacter::OnStartJump()
 	if ((MyPC && MyPC->IsGameInputAllowed()) && (!GetCharacterMovement()->IsFalling()))
 	{
 		IdleTime = 0.0f;
-		if (this->PlayerConfig.Stamina > JumpCost)
+		if (this->PlayerConfig.Stamina >= JumpCost)
 		{	
 			SetRunning(false, false);
 			SetCrouched(false, false);
@@ -864,6 +910,16 @@ int32 AArenaCharacter::GetMaxStamina() const
 float AArenaCharacter::GetCurrentStamina() const
 {
 	return PlayerConfig.Stamina;
+}
+
+int32 AArenaCharacter::GetMaxEnergy() const
+{
+	return GetClass()->GetDefaultObject<AArenaCharacter>()->PlayerConfig.Energy;
+}
+
+float AArenaCharacter::GetCurrentEnergy() const
+{
+	return PlayerConfig.Energy;
 }
 
 bool AArenaCharacter::IsAlive() const
@@ -1121,7 +1177,7 @@ void AArenaCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Da
 	}
 
 	// remove all weapons
-	//DestroyInventory();
+	DestroyInventory();
 
 	// switch back to 3rd person view
 	UpdatePawnMeshes();
@@ -1186,7 +1242,7 @@ void AArenaCharacter::PlayHit(float DamageTaken, struct FDamageEvent const& Dama
 	{
 		ApplyDamageMomentum(DamageTaken, DamageEvent, PawnInstigator, DamageCauser);
 	}
-
+	
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	//AArenaHUD* MyHUD = MyPC ? Cast<AArenaHUD>(MyPC->GetHUD()) : NULL;
 	//if (MyHUD)
@@ -1359,6 +1415,26 @@ void AArenaCharacter::SpawnDefaultInventory()
 		EquipWeapon(Inventory[0]);
 	}
 }
+
+void AArenaCharacter::DestroyInventory()
+{
+	if (Role < ROLE_Authority)
+	{
+		return;
+	}
+
+	// remove all weapons from inventory and destroy them
+	for (int32 i = Inventory.Num() - 1; i >= 0; i--)
+	{
+		AArenaRangedWeapon* Weapon = Inventory[i];
+		if (Weapon)
+		{
+			RemoveWeapon(Weapon);
+			Weapon->Destroy();
+		}
+	}
+}
+
 
 bool AArenaCharacter::ServerEquipWeapon_Validate(AArenaRangedWeapon* Weapon)
 {
