@@ -78,10 +78,19 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 
 	// effects and damage origin shouldn't be placed inside mesh at impact point
 	const FVector NudgedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
-
-	if (MyPawn)
+	if (this->WeaponConfig.IsExplosive == true)
 	{
-		UGameplayStatics::ApplyPointDamage(Impact.GetActor(), WeaponConfig.HitDamage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, WeaponConfig.DamageType);
+		if (WeaponConfig.ExplosionDamage > 0 && WeaponConfig.ExplosionRadius > 0 && WeaponConfig.DamageType)
+		{
+			UGameplayStatics::ApplyRadialDamage(this, WeaponConfig.ExplosionDamage, NudgedImpactLocation, WeaponConfig.ExplosionRadius, WeaponConfig.DamageType, TArray<AActor*>(), this, MyController.Get());
+		}
+	}
+	else
+	{
+		if (WeaponConfig.HitDamage > 0 && WeaponConfig.DamageType)
+		{
+			UGameplayStatics::ApplyPointDamage(Impact.GetActor(), WeaponConfig.HitDamage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, WeaponConfig.DamageType);
+		}
 	}
 	if (ImpactTemplate)
 	{

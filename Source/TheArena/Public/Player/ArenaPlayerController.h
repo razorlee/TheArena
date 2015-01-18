@@ -93,6 +93,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool GetOpenMenu() const;
 
+	/** Returns whether the friends list is open */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool ShowFriendsList() const;
+
+	/** Returns whether the HUD is open */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool ShowHUD() const;
+
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool GetAllowGameActions() const;
 

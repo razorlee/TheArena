@@ -26,11 +26,7 @@ class THEARENA_API AArenaProjectile : public AActor
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	void SetPawnOwner(class AArenaCharacter* MyPawn);
 
-protected:
-
-	/** pawn owner */
-	UPROPERTY(Transient)
-	class AArenaCharacter* MyPawn;
+private:
 
 	/** movement component */
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
@@ -42,6 +38,12 @@ protected:
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	UParticleSystemComponent* ParticleComp;
+
+protected:
+
+	/** pawn owner */
+	UPROPERTY(Transient)
+	class AArenaCharacter* MyPawn;
 
 	/** effects for impact */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
@@ -69,4 +71,12 @@ protected:
 
 	/** update velocity on client */
 	virtual void PostNetReceiveVelocity(const FVector& NewVelocity) override;
+
+protected:
+	/** Returns MovementComp subobject **/
+	FORCEINLINE UProjectileMovementComponent* GetMovementComp() const { return MovementComp; }
+	/** Returns CollisionComp subobject **/
+	FORCEINLINE USphereComponent* GetCollisionComp() const { return CollisionComp; }
+	/** Returns ParticleComp subobject **/
+	FORCEINLINE UParticleSystemComponent* GetParticleComp() const { return ParticleComp; }
 };

@@ -12,6 +12,7 @@ ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	//BotPawnClass = BotPawnOb.Class;
 
 	static ConstructorHelpers::FClassFinder<AHUD> ArenaHUD(TEXT("/Game/UI/HUD/Blueprints/Arena_HUD"));
+	//static ConstructorHelpers::FClassFinder<UUserWidget> ArenaHUD(TEXT("/Game/UI/Menu/ArenaHUD"));
 	HUDClass = ArenaHUD.Class;
 
 	PlayerControllerClass = AArenaPlayerController::StaticClass();

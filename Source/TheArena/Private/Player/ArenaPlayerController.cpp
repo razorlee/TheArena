@@ -215,6 +215,16 @@ void AArenaPlayerController::OnToggleInGameMenu()
 	}
 }
 
+void AArenaPlayerController::ShowFriendsList()
+{
+
+}
+
+void AArenaPlayerController::ShowFriendsList()
+{
+
+}
+
 void AArenaPlayerController::SetInfiniteAmmo(bool bEnable)
 {
 	bInfiniteAmmo = bEnable;

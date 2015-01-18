@@ -16,6 +16,10 @@ struct FProjectileWeaponData
 	UPROPERTY(EditDefaultsOnly, Category = Accuracy)
 	float WeaponSpread;
 
+	/** continuous firing: max increment */
+	UPROPERTY(EditDefaultsOnly, Category = Accuracy)
+	float FiringSpreadMax;
+
 	/** targeting spread modifier */
 	UPROPERTY(EditDefaultsOnly, Category = Accuracy)
 	float TargetingSpreadMod;
@@ -24,14 +28,6 @@ struct FProjectileWeaponData
 	UPROPERTY(EditDefaultsOnly, Category = Accuracy)
 	float FiringSpreadIncrement;
 
-	/** continuous firing: max increment */
-	UPROPERTY(EditDefaultsOnly, Category = Accuracy)
-	float FiringSpreadMax;
-
-	/** continuous firing: max increment */
-	UPROPERTY(EditDefaultsOnly, Category = Accuracy)
-	int32 BulletsPerRound;
-
 	/** life time */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	float ProjectileLife;
@@ -39,6 +35,17 @@ struct FProjectileWeaponData
 	/** damage amount */
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
 	int32 HitDamage;
+
+	/** continuous firing: max increment */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+	int32 BulletsPerRound;
+
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+	bool IsExplosive;
+
+	/** damage at impact point */
+	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
+	int32 ExplosionDamage;
 
 	/** radius of damage */
 	UPROPERTY(EditDefaultsOnly, Category = WeaponStat)
@@ -59,7 +66,9 @@ struct FProjectileWeaponData
 		BulletsPerRound = 1;
 		ProjectileLife = 10.0f;
 		HitDamage = 100;
-		ExplosionRadius = 1.0f;
+		IsExplosive = true;
+		ExplosionDamage = 0;
+		ExplosionRadius = 0.0f;
 		DamageType = UDamageType::StaticClass();
 	}
 };
