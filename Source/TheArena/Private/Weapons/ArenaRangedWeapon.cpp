@@ -163,7 +163,6 @@ void AArenaRangedWeapon::OnHolsterSecondary()
 {
 	if (MyPawn)
 	{
-		// Remove and hide both first and third person meshes
 		DetachMeshFromPawn();
 
 		FName AttachPoint = MyPawn->GetOffWeaponAttachPoint();
@@ -196,30 +195,28 @@ void AArenaRangedWeapon::OnHolster(bool IsPrimary)
 		FName AttachPoint;
 		if (IsPrimary == true)
 		{
+			bPendingHolster = true;
+
 			float Duration = PlayWeaponAnimation(HolsterAnim);
 			if (Duration <= 0.0f)
 			{
 				Duration = 0.5f;
 			}
-			EquipStartedTime = GetWorld()->GetTimeSeconds();
-			EquipDuration = Duration;
 
-			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnHolsterPrimary, FMath::Max(0.1f, Duration - 0.75f), false);
+			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnHolsterPrimary, FMath::Max(0.1f, Duration - 0.70f), false);
 		}
 		else
 		{
+			bPendingHolster = true;
+
 			float Duration = PlayWeaponAnimation(HolsterAnim);
 			if (Duration <= 0.0f)
 			{
 				Duration = 0.5f;
 			}
-			EquipStartedTime = GetWorld()->GetTimeSeconds();
-			EquipDuration = Duration;
 
-			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnHolsterSecondary, FMath::Max(0.1f, Duration - 0.75f), false);
+			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnHolsterSecondary, FMath::Max(0.1f, Duration - 0.70f), false);
 		}
-		
-
 	}
 }
 
@@ -338,7 +335,7 @@ void AArenaRangedWeapon::StopFire()
 	}
 }
 
-void AArenaRangedWeapon::StartReload(bool bFromReplication) //recall
+void AArenaRangedWeapon::StartReload(bool bFromReplication) 
 {
 	if (!bFromReplication && Role < ROLE_Authority)
 	{

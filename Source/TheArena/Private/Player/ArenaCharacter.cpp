@@ -300,33 +300,28 @@ AArenaRangedWeapon* AArenaCharacter::FindWeapon(TSubclassOf<AArenaRangedWeapon> 
 	return NULL;
 }
 
-void AArenaCharacter::EquipWeapon(AArenaRangedWeapon* Weapon)
+void AArenaCharacter::EquipWeapon(AArenaRangedWeapon* Weapon, bool IsEnteringCombat)
 {
 	if (Weapon)
 	{
 		if (Role == ROLE_Authority)
 		{
-			SetCurrentWeapon(Weapon);
-			//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::SetCurrentWeapon, 1.5f, false);
+			if (IsEnteringCombat == true)
+			{
+				SetCurrentWeapon(Weapon);
+				FinishEquipWeapon();
+			}
+			else
+			{
+				SetCurrentWeapon(Weapon);
+				StartEquipWeapon();
+				GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
+			}
+			
 		}
 		else
 		{
-			ServerEquipWeapon(Weapon);
-		}
-	}
-}
-
-void AArenaCharacter::UnEquipWeapon(AArenaRangedWeapon* Weapon)
-{
-	if (Weapon)
-	{
-		if (Role == ROLE_Authority)
-		{
-			SetCurrentWeaponOne(Weapon);
-		}
-		else
-		{
-			ServerUnEquipWeapon(Weapon);
+			ServerEquipWeapon(Weapon, IsEnteringCombat);
 		}
 	}
 }
@@ -421,7 +416,7 @@ void AArenaCharacter::UpdateCombatState()
 	if (bInCombat == true)
 	{
 		bUseControllerRotationYaw = true;
-		EquipWeapon(PrimaryWeapon);
+		EquipWeapon(PrimaryWeapon, true);
 	}
 	else
 	{
@@ -721,8 +716,7 @@ void AArenaCharacter::OnNextWeapon()
 		{
 			const int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
 			AArenaRangedWeapon* NextWeapon = Inventory[(CurrentWeaponIdx + 1) % Inventory.Num()];
-			UnEquipWeapon(CurrentWeapon);
-			EquipWeapon(NextWeapon);
+			EquipWeapon(NextWeapon, false);
 		}
 	}
 }
@@ -736,8 +730,7 @@ void AArenaCharacter::OnPrevWeapon()
 		{
 			const int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
 			AArenaRangedWeapon* PrevWeapon = Inventory[(CurrentWeaponIdx - 1 + Inventory.Num()) % Inventory.Num()];
-			UnEquipWeapon(CurrentWeapon);
-			EquipWeapon(PrevWeapon);
+			EquipWeapon(PrevWeapon, false);
 		}
 	}
 }
@@ -1441,43 +1434,45 @@ void AArenaCharacter::SetCurrentWeapon(class AArenaRangedWeapon* NextWeapon, cla
 
 	if (PrevWeapon != NULL)
 	{
-		LocalLastWeapon = PrevWeapon;
+		LastWeapon = PrevWeapon;
 	}
 	else if (NextWeapon != CurrentWeapon)
 	{
-		LocalLastWeapon = CurrentWeapon;
+		LastWeapon = CurrentWeapon;
 	}
 
-	// unequip previous
-	if (LocalLastWeapon)
+	NewWeapon = NextWeapon;
+}
+
+void AArenaCharacter::StartEquipWeapon()
+{
+	if (LastWeapon)
 	{
-		if (LocalLastWeapon->GetIsPrimaryWeapon() == true)
+		if (LastWeapon->GetIsPrimaryWeapon() == true)
 		{
-			//LocalLastWeapon->OnUnEquip(true);
+			LastWeapon->OnUnEquip(true);
 		}
 		else
 		{
-			//LocalLastWeapon->OnUnEquip(false);
+			LastWeapon->OnUnEquip(false);
 		}
-	}
-
-	CurrentWeapon = NextWeapon;
-
-	if (CurrentWeapon->GetIsPrimaryWeapon() == true)
-	{
-		//CurrentWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
-		//CurrentWeapon->OnEquip(true);
-	}
-	else
-	{
-		//CurrentWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
-		//CurrentWeapon->OnEquip(false);
 	}
 }
 
-void AArenaCharacter::SetCurrentWeaponOne(class AArenaRangedWeapon* NewWeapon, class AArenaRangedWeapon* LastWeapon)
+void AArenaCharacter::FinishEquipWeapon()
 {
-	
+	CurrentWeapon = NewWeapon;
+
+	if (CurrentWeapon->GetIsPrimaryWeapon() == true)
+	{
+		NewWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
+		NewWeapon->OnEquip(true);
+	}
+	else
+	{
+		NewWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
+		NewWeapon->OnEquip(false);
+	}
 }
 
 void AArenaCharacter::OnRep_Throw()
@@ -1492,19 +1487,28 @@ void AArenaCharacter::OnRep_Throw()
 	}
 }
 
-void AArenaCharacter::OnRep_CurrentWeapon(AArenaRangedWeapon* LastWeapon)
+void AArenaCharacter::OnRep_CurrentWeapon(AArenaRangedWeapon* LastWeapon)//recall
 {
-	SetCurrentWeapon(CurrentWeapon, LastWeapon);
+	//SetCurrentWeapon(CurrentWeapon, LastWeapon);
+	//StartEquipWeapon();
+	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
+
 }
 
 void AArenaCharacter::OnRep_PrimaryWeapon(AArenaRangedWeapon* NewWeapon)
 {
-	SetCurrentWeapon(NewWeapon, PrimaryWeapon);
+	/*SetCurrentWeapon(NewWeapon, PrimaryWeapon);
+	StartEquipWeapon();
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);*/
+
 }
 
 void AArenaCharacter::OnRep_SecondaryWeapon(AArenaRangedWeapon* NewWeapon)
 {
-	SetCurrentWeapon(NewWeapon, SecondaryWeapon);
+	/*SetCurrentWeapon(NewWeapon, SecondaryWeapon);
+	StartEquipWeapon();
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);*/
+
 }
 
 void AArenaCharacter::SpawnDefaultInventory()
@@ -1557,24 +1561,14 @@ void AArenaCharacter::DestroyInventory()
 }
 
 
-bool AArenaCharacter::ServerEquipWeapon_Validate(AArenaRangedWeapon* Weapon)
+bool AArenaCharacter::ServerEquipWeapon_Validate(AArenaRangedWeapon* Weapon, bool IsEnteringCombat)
 {
 	return true;
 }
 
-void AArenaCharacter::ServerEquipWeapon_Implementation(AArenaRangedWeapon* Weapon)
+void AArenaCharacter::ServerEquipWeapon_Implementation(AArenaRangedWeapon* Weapon, bool IsEnteringCombat)
 {
-	EquipWeapon(Weapon);
-}
-
-bool AArenaCharacter::ServerUnEquipWeapon_Validate(AArenaRangedWeapon* Weapon)
-{
-	return true;
-}
-
-void AArenaCharacter::ServerUnEquipWeapon_Implementation(AArenaRangedWeapon* Weapon)
-{
-	UnEquipWeapon(Weapon);
+	EquipWeapon(Weapon, IsEnteringCombat);
 }
 
 bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaRangedWeapon* mainWeapon, AArenaRangedWeapon* offWeapon)

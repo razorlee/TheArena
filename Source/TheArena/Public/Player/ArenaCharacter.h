@@ -179,7 +179,7 @@ class AArenaCharacter : public ACharacter
 
 	class AArenaRangedWeapon* FindWeapon(TSubclassOf<class AArenaRangedWeapon> WeaponClass);
 
-	void EquipWeapon(class AArenaRangedWeapon* Weapon);
+	void EquipWeapon(class AArenaRangedWeapon* Weapon, bool IsEnteringCombat);
 
 	void UnEquipWeapon(class AArenaRangedWeapon* Weapon);
 
@@ -700,8 +700,11 @@ protected:
 	/** updates current weapon */
 	void SetCurrentWeapon(class AArenaRangedWeapon* NewWeapon, class AArenaRangedWeapon* LastWeapon = NULL);
 
-	/** updates current weapon */
-	void SetCurrentWeaponOne(class AArenaRangedWeapon* NewWeapon, class AArenaRangedWeapon* LastWeapon = NULL);
+	/** holsters current weapon */
+	void StartEquipWeapon();
+
+	/** equips next weapon */
+	void FinishEquipWeapon();
 
 	/** current weapon rep handler */
 	UFUNCTION()
@@ -722,11 +725,7 @@ protected:
 
 	/** equip weapon */
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerEquipWeapon(class AArenaRangedWeapon* NewWeapon);
-
-	/** equip weapon */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerUnEquipWeapon(class AArenaRangedWeapon* NewWeapon);
+	void ServerEquipWeapon(class AArenaRangedWeapon* NewWeapon, bool IsEnteringCombat);
 
 	/** equip weapon */
 	UFUNCTION(reliable, server, WithValidation)
