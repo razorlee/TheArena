@@ -284,11 +284,8 @@ class AArenaCharacter : public ACharacter
 	/** player released cover action */
 	void OnExitCover();
 
-	/** player pressed next weapon action */
-	void OnNextWeapon();
-
 	/** player pressed prev weapon action */
-	void OnPrevWeapon();
+	void OnSwapWeapon();
 
 	/** player pressed reload action */
 	void OnReload();
