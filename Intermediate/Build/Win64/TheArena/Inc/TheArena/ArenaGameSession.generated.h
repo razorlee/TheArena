@@ -21,9 +21,27 @@
 	friend THEARENA_API class UClass* Z_Construct_UClass_AArenaGameSession(); \
 	public: \
 	DECLARE_CLASS(AArenaGameSession, AGameSession, COMPILED_IN_FLAGS(0 | CLASS_Config), 0, TheArena, NO_API) \
-	/** Standard constructor, called after all reflected properties have been initialized */    NO_API AArenaGameSession(const class FPostConstructInitializeProperties& PCIP); \
 	DECLARE_SERIALIZER(AArenaGameSession) \
-	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC};
+	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC}; \
+	UObject* _getUObject() const { return const_cast<AArenaGameSession*>(this); }
+
+
+#define AArenaGameSession_STANDARD_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API AArenaGameSession(const class FObjectInitializer& ObjectInitializer); \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaGameSession) \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaGameSession(const AArenaGameSession& InCopy); \
+public:
+
+
+#define AArenaGameSession_ENHANCED_CONSTRUCTORS \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaGameSession(const AArenaGameSession& InCopy); \
+public: \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaGameSession)
 
 
 #undef UCLASS_CURRENT_FILE_NAME
@@ -41,12 +59,27 @@ AArenaGameSession_EVENTPARMS
 
 
 #undef GENERATED_UCLASS_BODY
+#undef GENERATED_BODY
 #undef GENERATED_IINTERFACE_BODY
 #define GENERATED_UCLASS_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	AArenaGameSession_RPC_WRAPPERS \
 	AArenaGameSession_CALLBACK_WRAPPERS \
 	AArenaGameSession_INCLASS \
-public:
+	AArenaGameSession_STANDARD_CONSTRUCTORS \
+public: \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
+
+
+#define GENERATED_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
+public: \
+	AArenaGameSession_RPC_WRAPPERS \
+	AArenaGameSession_CALLBACK_WRAPPERS \
+	AArenaGameSession_INCLASS \
+	AArenaGameSession_ENHANCED_CONSTRUCTORS \
+private: \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 

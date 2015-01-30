@@ -22,6 +22,7 @@ AArenaRangedWeapon::AArenaRangedWeapon(const class FObjectInitializer& PCIP)
 	bPendingReload = false;
 	bPendingMelee = false;
 	bWantsToFire = false;
+	IsPrimaryWeapon = false;
 	CurrentState = EWeaponState::Idle;
 
 	CurrentAmmo = 0;
@@ -60,27 +61,48 @@ void AArenaRangedWeapon::Destroyed()
 //////////////////////////////////////////////////////////////////////////
 // Inventory
 
-void AArenaRangedWeapon::OnEquip()
+void AArenaRangedWeapon::OnEquip(bool IsPrimary)
 {
+	DetachMeshFromPawn();
 	AttachMeshToPawn();
 
 	bPendingEquip = true;
 	DetermineWeaponState();
-
-	float Duration = PlayWeaponAnimation(EquipAnim);
-	if (Duration <= 0.0f)
+	if (IsPrimary == true)
 	{
-		// failsafe
-		Duration = 0.5f;
+		float Duration = PlayWeaponAnimation(EquipAnim);
+		if (Duration <= 0.0f)
+		{
+			// failsafe
+			Duration = 0.5f;
+		}
+		EquipStartedTime = GetWorld()->GetTimeSeconds();
+		EquipDuration = Duration;
+
+		GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnEquipFinished, Duration, false);
+
+		if (MyPawn && MyPawn->IsLocallyControlled())
+		{
+			PlayWeaponSound(EquipSound);
+		}
 	}
-	EquipStartedTime = GetWorld()->GetTimeSeconds();
-	EquipDuration = Duration;
-
-	GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnEquipFinished, Duration, false);
-
-	if (MyPawn && MyPawn->IsLocallyControlled())
+	else
 	{
-		PlayWeaponSound(EquipSound);
+		float Duration = PlayWeaponAnimation(EquipAnim);
+		if (Duration <= 0.0f)
+		{
+			// failsafe
+			Duration = 0.5f;
+		}
+		EquipStartedTime = GetWorld()->GetTimeSeconds();
+		EquipDuration = Duration;
+
+		GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnEquipFinished, Duration, false);
+
+		if (MyPawn && MyPawn->IsLocallyControlled())
+		{
+			PlayWeaponSound(EquipSound);
+		}
 	}
 }
 
@@ -108,9 +130,101 @@ void AArenaRangedWeapon::OnEquipFinished()
 
 }
 
-void AArenaRangedWeapon::OnUnEquip()
+void AArenaRangedWeapon::OnHolsterPrimary()
 {
-	DetachMeshFromPawn();
+	if (MyPawn)
+	{
+		// Remove and hide both first and third person meshes
+		DetachMeshFromPawn();
+
+		FName AttachPoint = MyPawn->GetMainWeaponAttachPoint();
+
+		// For locally controller players we attach both weapons and let the bOnlyOwnerSee, bOwnerNoSee flags deal with visibility.
+		if (MyPawn->IsLocallyControlled() == true)
+		{
+			USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();
+			Mesh3P->SetHiddenInGame(false);
+			Mesh3P->AttachTo(PawnMesh3p, AttachPoint);
+		}
+		else
+		{
+			USkeletalMeshComponent* UseWeaponMesh = GetWeaponMesh();
+			USkeletalMeshComponent* UsePawnMesh = MyPawn->GetPawnMesh();
+			UseWeaponMesh->AttachTo(UsePawnMesh, AttachPoint);
+			UseWeaponMesh->SetHiddenInGame(false);
+		}
+	}
+
+	bIsEquipped = false;
+	bPendingEquip = false;
+}
+
+void AArenaRangedWeapon::OnHolsterSecondary()
+{
+	if (MyPawn)
+	{
+		// Remove and hide both first and third person meshes
+		DetachMeshFromPawn();
+
+		FName AttachPoint = MyPawn->GetOffWeaponAttachPoint();
+
+		// For locally controller players we attach both weapons and let the bOnlyOwnerSee, bOwnerNoSee flags deal with visibility.
+		if (MyPawn->IsLocallyControlled() == true)
+		{
+			USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();
+			Mesh3P->SetHiddenInGame(false);
+			Mesh3P->AttachTo(PawnMesh3p, AttachPoint);
+		}
+		else
+		{
+			USkeletalMeshComponent* UseWeaponMesh = GetWeaponMesh();
+			USkeletalMeshComponent* UsePawnMesh = MyPawn->GetPawnMesh();
+			UseWeaponMesh->AttachTo(UsePawnMesh, AttachPoint);
+			UseWeaponMesh->SetHiddenInGame(false);
+		}
+	}
+
+	bIsEquipped = false;
+	bPendingEquip = false;
+}
+
+void AArenaRangedWeapon::OnHolster(bool IsPrimary)
+{
+	if (MyPawn)
+	{
+		// For locally controller players we attach both weapons and let the bOnlyOwnerSee, bOwnerNoSee flags deal with visibility.
+		FName AttachPoint;
+		if (IsPrimary == true)
+		{
+			float Duration = PlayWeaponAnimation(HolsterAnim);
+			if (Duration <= 0.0f)
+			{
+				Duration = 0.5f;
+			}
+			EquipStartedTime = GetWorld()->GetTimeSeconds();
+			EquipDuration = Duration;
+
+			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnHolsterPrimary, FMath::Max(0.1f, Duration - 0.75f), false);
+		}
+		else
+		{
+			float Duration = PlayWeaponAnimation(HolsterAnim);
+			if (Duration <= 0.0f)
+			{
+				Duration = 0.5f;
+			}
+			EquipStartedTime = GetWorld()->GetTimeSeconds();
+			EquipDuration = Duration;
+
+			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnHolsterSecondary, FMath::Max(0.1f, Duration - 0.75f), false);
+		}
+		
+
+	}
+}
+
+void AArenaRangedWeapon::OnUnEquip(bool IsPrimary)
+{
 	bIsEquipped = false;
 	StopFire();
 
@@ -131,6 +245,15 @@ void AArenaRangedWeapon::OnUnEquip()
 		GetWorldTimerManager().ClearTimer(this, &AArenaRangedWeapon::OnEquipFinished);
 	}
 
+	if (IsPrimary == true)
+	{
+		OnHolster(true);
+	}
+	else
+	{
+		OnHolster(false);
+	}
+
 	DetermineWeaponState();
 }
 
@@ -148,7 +271,7 @@ void AArenaRangedWeapon::OnLeaveInventory()
 
 	if (IsAttachedToPawn())
 	{
-		OnUnEquip();
+		OnUnEquip(false);
 	}
 }
 
@@ -933,6 +1056,16 @@ void AArenaRangedWeapon::StopSimulatingWeaponFire()
 
 		PlayWeaponSound(FireFinishSound);
 	}
+}
+
+bool AArenaRangedWeapon::GetIsPrimaryWeapon()
+{
+	return IsPrimaryWeapon;
+}
+
+void AArenaRangedWeapon::SetIsPrimaryWeapon(bool bNewWeaponPriority)
+{
+	IsPrimaryWeapon = bNewWeaponPriority;
 }
 
 void AArenaRangedWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

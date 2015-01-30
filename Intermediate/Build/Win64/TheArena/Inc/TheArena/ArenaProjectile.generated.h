@@ -40,10 +40,30 @@
 	friend THEARENA_API class UClass* Z_Construct_UClass_AArenaProjectile(); \
 	public: \
 	DECLARE_CLASS(AArenaProjectile, AActor, COMPILED_IN_FLAGS(CLASS_Abstract), 0, TheArena, NO_API) \
-	/** Standard constructor, called after all reflected properties have been initialized */    NO_API AArenaProjectile(const class FPostConstructInitializeProperties& PCIP); \
 	DECLARE_SERIALIZER(AArenaProjectile) \
 	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC}; \
+	UObject* _getUObject() const { return const_cast<AArenaProjectile*>(this); } \
 	virtual void GetLifetimeReplicatedProps( TArray< FLifetimeProperty > & OutLifetimeProps ) const override;
+
+
+#define AArenaProjectile_STANDARD_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API AArenaProjectile(const class FObjectInitializer& ObjectInitializer); \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaProjectile) \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaProjectile(const AArenaProjectile& InCopy); \
+public:
+
+
+#define AArenaProjectile_ENHANCED_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API AArenaProjectile(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) { }; \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaProjectile(const AArenaProjectile& InCopy); \
+public: \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaProjectile)
 
 
 #undef UCLASS_CURRENT_FILE_NAME
@@ -61,12 +81,27 @@ AArenaProjectile_EVENTPARMS
 
 
 #undef GENERATED_UCLASS_BODY
+#undef GENERATED_BODY
 #undef GENERATED_IINTERFACE_BODY
 #define GENERATED_UCLASS_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	AArenaProjectile_RPC_WRAPPERS \
 	AArenaProjectile_CALLBACK_WRAPPERS \
 	AArenaProjectile_INCLASS \
-public:
+	AArenaProjectile_STANDARD_CONSTRUCTORS \
+public: \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
+
+
+#define GENERATED_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
+public: \
+	AArenaProjectile_RPC_WRAPPERS \
+	AArenaProjectile_CALLBACK_WRAPPERS \
+	AArenaProjectile_INCLASS \
+	AArenaProjectile_ENHANCED_CONSTRUCTORS \
+static_assert(false, "Unknown access specifier for GENERATED_BODY() macro in class ArenaProjectile."); \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 

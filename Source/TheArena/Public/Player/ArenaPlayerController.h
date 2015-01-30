@@ -64,7 +64,15 @@ public:
 
 	/** set open menu */
 	UFUNCTION(BlueprintCallable, Category = Menu)
-	void SetOpenMenu(bool bEnable);
+	void SetMenu(bool bEnable);
+
+	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetFriendsList(bool bEnable);
+
+	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetHUD(bool bEnable);
 
 	/** set open menu */
 	UFUNCTION(BlueprintCallable, Category = Menu)
@@ -91,15 +99,15 @@ public:
 
 	/** Returns whether the menu is open */
 	UFUNCTION(BlueprintCallable, Category = Menu)
-	bool GetOpenMenu() const;
+	bool IsMenuOpen() const;
 
 	/** Returns whether the friends list is open */
 	UFUNCTION(BlueprintCallable, Category = Menu)
-	bool ShowFriendsList() const;
+	bool IsFriendsListOpen() const;
 
 	/** Returns whether the HUD is open */
 	UFUNCTION(BlueprintCallable, Category = Menu)
-	bool ShowHUD() const;
+	bool IsHUDOpen() const;
 
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool GetAllowGameActions() const;
@@ -150,6 +158,14 @@ protected:
 	/** informs the HUD if the menu is open */
 	UPROPERTY(Transient, Replicated)
 	uint8 OpenMenu : 1;
+
+	/** informs the HUD if the menu is open */
+	UPROPERTY(Transient, Replicated)
+	uint8 OpenFriendsList : 1;
+
+	/** informs the HUD if the menu is open */
+	UPROPERTY(Transient, Replicated)
+	uint8 OpenHUD : 1;
 
 	/** infinite ammo cheat */
 	UPROPERTY(Transient, Replicated)

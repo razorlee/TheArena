@@ -34,10 +34,30 @@
 	static void StaticRegisterNativesATheArenaGameMode(); \
 	friend THEARENA_API class UClass* Z_Construct_UClass_ATheArenaGameMode(); \
 	public: \
-	DECLARE_CLASS(ATheArenaGameMode, AGameMode, COMPILED_IN_FLAGS(0 | CLASS_Config), 0, TheArena, NO_API) \
-	/** Standard constructor, called after all reflected properties have been initialized */    NO_API ATheArenaGameMode(const class FPostConstructInitializeProperties& PCIP); \
+	DECLARE_CLASS(ATheArenaGameMode, AGameMode, COMPILED_IN_FLAGS(0 | CLASS_Transient | CLASS_Config), 0, TheArena, NO_API) \
 	DECLARE_SERIALIZER(ATheArenaGameMode) \
-	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC};
+	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC}; \
+	UObject* _getUObject() const { return const_cast<ATheArenaGameMode*>(this); }
+
+
+#define ATheArenaGameMode_STANDARD_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API ATheArenaGameMode(const class FObjectInitializer& ObjectInitializer); \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(ATheArenaGameMode) \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API ATheArenaGameMode(const ATheArenaGameMode& InCopy); \
+public:
+
+
+#define ATheArenaGameMode_ENHANCED_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API ATheArenaGameMode(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) { }; \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API ATheArenaGameMode(const ATheArenaGameMode& InCopy); \
+public: \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(ATheArenaGameMode)
 
 
 #undef UCLASS_CURRENT_FILE_NAME
@@ -55,12 +75,27 @@ ATheArenaGameMode_EVENTPARMS
 
 
 #undef GENERATED_UCLASS_BODY
+#undef GENERATED_BODY
 #undef GENERATED_IINTERFACE_BODY
 #define GENERATED_UCLASS_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	ATheArenaGameMode_RPC_WRAPPERS \
 	ATheArenaGameMode_CALLBACK_WRAPPERS \
 	ATheArenaGameMode_INCLASS \
-public:
+	ATheArenaGameMode_STANDARD_CONSTRUCTORS \
+public: \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
+
+
+#define GENERATED_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
+public: \
+	ATheArenaGameMode_RPC_WRAPPERS \
+	ATheArenaGameMode_CALLBACK_WRAPPERS \
+	ATheArenaGameMode_INCLASS \
+	ATheArenaGameMode_ENHANCED_CONSTRUCTORS \
+static_assert(false, "Unknown access specifier for GENERATED_BODY() macro in class TheArenaGameMode."); \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 

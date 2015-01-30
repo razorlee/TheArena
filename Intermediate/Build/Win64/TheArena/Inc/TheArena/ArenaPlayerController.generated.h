@@ -23,11 +23,23 @@ extern THEARENA_API FName THEARENA_ServerSuicide;
 		P_FINISH; \
 		this->Suicide(); \
 	} \
+	DECLARE_FUNCTION(execSetOpenMenu) \
+	{ \
+		P_GET_UBOOL(bEnable); \
+		P_FINISH; \
+		this->SetOpenMenu(bEnable); \
+	} \
 	DECLARE_FUNCTION(execSetGodMode) \
 	{ \
 		P_GET_UBOOL(bEnable); \
 		P_FINISH; \
 		this->SetGodMode(bEnable); \
+	} \
+	DECLARE_FUNCTION(execSetAllowGameActions) \
+	{ \
+		P_GET_UBOOL(bEnable); \
+		P_FINISH; \
+		this->SetAllowGameActions(bEnable); \
 	} \
 	 virtual bool ServerSuicide_Validate(); \
 	virtual void ServerSuicide_Implementation(); \
@@ -41,6 +53,21 @@ extern THEARENA_API FName THEARENA_ServerSuicide;
 			return; \
 		} \
 		this->ServerSuicide_Implementation(); \
+	} \
+	DECLARE_FUNCTION(execIsGameInputAllowed) \
+	{ \
+		P_FINISH; \
+		*(bool*)Result=this->IsGameInputAllowed(); \
+	} \
+	DECLARE_FUNCTION(execGetOpenMenu) \
+	{ \
+		P_FINISH; \
+		*(bool*)Result=this->GetOpenMenu(); \
+	} \
+	DECLARE_FUNCTION(execGetAllowGameActions) \
+	{ \
+		P_FINISH; \
+		*(bool*)Result=this->GetAllowGameActions(); \
 	} \
 	virtual void ClientStartOnlineGame_Implementation(); \
  \
@@ -72,10 +99,30 @@ extern THEARENA_API FName THEARENA_ServerSuicide;
 	friend THEARENA_API class UClass* Z_Construct_UClass_AArenaPlayerController(); \
 	public: \
 	DECLARE_CLASS(AArenaPlayerController, APlayerController, COMPILED_IN_FLAGS(0 | CLASS_Config), 0, TheArena, NO_API) \
-	/** Standard constructor, called after all reflected properties have been initialized */    NO_API AArenaPlayerController(const class FPostConstructInitializeProperties& PCIP); \
 	DECLARE_SERIALIZER(AArenaPlayerController) \
 	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC}; \
+	UObject* _getUObject() const { return const_cast<AArenaPlayerController*>(this); } \
 	virtual void GetLifetimeReplicatedProps( TArray< FLifetimeProperty > & OutLifetimeProps ) const override;
+
+
+#define AArenaPlayerController_STANDARD_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API AArenaPlayerController(const class FObjectInitializer& ObjectInitializer); \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaPlayerController) \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaPlayerController(const AArenaPlayerController& InCopy); \
+public:
+
+
+#define AArenaPlayerController_ENHANCED_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API AArenaPlayerController(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) { }; \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaPlayerController(const AArenaPlayerController& InCopy); \
+public: \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaPlayerController)
 
 
 #undef UCLASS_CURRENT_FILE_NAME
@@ -93,12 +140,27 @@ AArenaPlayerController_EVENTPARMS
 
 
 #undef GENERATED_UCLASS_BODY
+#undef GENERATED_BODY
 #undef GENERATED_IINTERFACE_BODY
 #define GENERATED_UCLASS_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	AArenaPlayerController_RPC_WRAPPERS \
 	AArenaPlayerController_CALLBACK_WRAPPERS \
 	AArenaPlayerController_INCLASS \
-public:
+	AArenaPlayerController_STANDARD_CONSTRUCTORS \
+public: \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
+
+
+#define GENERATED_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
+public: \
+	AArenaPlayerController_RPC_WRAPPERS \
+	AArenaPlayerController_CALLBACK_WRAPPERS \
+	AArenaPlayerController_INCLASS \
+	AArenaPlayerController_ENHANCED_CONSTRUCTORS \
+static_assert(false, "Unknown access specifier for GENERATED_BODY() macro in class ArenaPlayerController."); \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 

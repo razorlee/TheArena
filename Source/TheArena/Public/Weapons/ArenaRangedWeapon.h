@@ -15,6 +15,7 @@ namespace EWeaponState
 		Firing,
 		Reloading,
 		Equipping,
+		Holstering,
 		Meleeing,
 	};
 }
@@ -116,13 +117,22 @@ class THEARENA_API AArenaRangedWeapon : public AActor
 	// Inventory
 
 	/** weapon is being equipped by owner pawn */
-	virtual void OnEquip();
+	virtual void OnEquip(bool IsPrimary);
 
 	/** weapon is now equipped by owner pawn */
 	virtual void OnEquipFinished();
 
-	/** weapon is holstered by owner pawn */
-	virtual void OnUnEquip();
+	/** weapon is unequipped by owner pawn */
+	virtual void OnUnEquip(bool IsPrimary);
+
+	/** weapon is being holstered by owner pawn */
+	virtual void OnHolster(bool IsPrimary);
+
+	/** weapon is now holstered by owner pawn */
+	virtual void OnHolsterPrimary();
+
+	/** weapon is now holstered by owner pawn */
+	virtual void OnHolsterSecondary();
 
 	/** [server] weapon was added to pawn's inventory */
 	virtual void OnEnterInventory(AArenaCharacter* NewOwner);
@@ -237,6 +247,9 @@ class THEARENA_API AArenaRangedWeapon : public AActor
 	//UPROPERTY(EditDefaultsOnly, Category = HUD)
 	//int32 SecondaryClipIconOffset;
 
+	UPROPERTY(EditDefaultsOnly)
+	bool IsPrimaryWeapon;
+
 	/** crosshair parts icons (left, top, right, bottom and center) */
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
 	FCanvasIcon Crosshair[5];
@@ -275,6 +288,12 @@ class THEARENA_API AArenaRangedWeapon : public AActor
 
 	/** gets the duration of equipping weapon*/
 	float GetEquipDuration() const;
+
+	/** Checks if the weapon is the players primary weapon*/
+	bool GetIsPrimaryWeapon();
+
+	/** sets the weapons as the players primary weapon*/
+	void SetIsPrimaryWeapon(bool bNewWeaponPriority);
 
 protected:
 
@@ -354,6 +373,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	FWeaponAnim EquipAnim;
 
+	/** holster animations */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	FWeaponAnim HolsterAnim;
+
+	/** holster sound */
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	USoundCue* HolsterSound;
+
 	/** fire animations */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	FWeaponAnim FireAnim;
@@ -376,6 +403,9 @@ protected:
 	/** is weapon currently equipped? */
 	uint32 bIsEquipped : 1;
 
+	/** is weapon currently holstered? */
+	uint32 bIsHolstered : 1;
+
 	/** is weapon fire active? */
 	uint32 bWantsToFire : 1;
 
@@ -389,6 +419,9 @@ protected:
 
 	/** is equip animation playing? */
 	uint32 bPendingEquip : 1;
+
+	/** is holster animation playing? */
+	uint32 bPendingHolster : 1;
 
 	/** weapon is refiring */
 	uint32 bRefiring;
@@ -509,7 +542,7 @@ protected:
 	/** stop playing weapon animations */
 	void StopWeaponAnimation(const FWeaponAnim& Animation);
 
-	/** Get the aim of the weapon, allowing for adjustments to be made by the weapon */
+	/** get the aim of the weapon, allowing for adjustments to be made by the weapon */
 	virtual FVector GetAdjustedAim() const;
 
 	/** Get the aim of the camera */

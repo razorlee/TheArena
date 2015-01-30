@@ -20,12 +20,12 @@ extern THEARENA_API FName THEARENA_ServerStartReload;
 extern THEARENA_API FName THEARENA_ServerStopFire;
 extern THEARENA_API FName THEARENA_ServerStopMelee;
 extern THEARENA_API FName THEARENA_ServerStopReload;
-#define AArenaRangedWeapon_USTRUCT_BODY_LINE_25 \
+#define AArenaRangedWeapon_USTRUCT_BODY_LINE_26 \
 	friend THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponData(); \
 	THEARENA_API static class UScriptStruct* StaticStruct();
 
 
-#define AArenaRangedWeapon_USTRUCT_BODY_LINE_76 \
+#define AArenaRangedWeapon_USTRUCT_BODY_LINE_77 \
 	friend THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim(); \
 	THEARENA_API static class UScriptStruct* StaticStruct();
 
@@ -133,6 +133,11 @@ extern THEARENA_API FName THEARENA_ServerStopReload;
 		P_FINISH; \
 		this->OnRep_MyPawn(); \
 	} \
+	DECLARE_FUNCTION(execOnRep_Melee) \
+	{ \
+		P_FINISH; \
+		this->OnRep_Melee(); \
+	} \
 	DECLARE_FUNCTION(execOnRep_BurstCounter) \
 	{ \
 		P_FINISH; \
@@ -159,10 +164,30 @@ extern THEARENA_API FName THEARENA_ServerStopReload;
 	friend THEARENA_API class UClass* Z_Construct_UClass_AArenaRangedWeapon(); \
 	public: \
 	DECLARE_CLASS(AArenaRangedWeapon, AActor, COMPILED_IN_FLAGS(CLASS_Abstract), 0, TheArena, NO_API) \
-	/** Standard constructor, called after all reflected properties have been initialized */    NO_API AArenaRangedWeapon(const class FPostConstructInitializeProperties& PCIP); \
 	DECLARE_SERIALIZER(AArenaRangedWeapon) \
 	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC}; \
+	UObject* _getUObject() const { return const_cast<AArenaRangedWeapon*>(this); } \
 	virtual void GetLifetimeReplicatedProps( TArray< FLifetimeProperty > & OutLifetimeProps ) const override;
+
+
+#define AArenaRangedWeapon_STANDARD_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API AArenaRangedWeapon(const class FObjectInitializer& ObjectInitializer); \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaRangedWeapon) \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaRangedWeapon(const AArenaRangedWeapon& InCopy); \
+public:
+
+
+#define AArenaRangedWeapon_ENHANCED_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API AArenaRangedWeapon(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) { }; \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaRangedWeapon(const AArenaRangedWeapon& InCopy); \
+public: \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaRangedWeapon)
 
 
 #undef UCLASS_CURRENT_FILE_NAME
@@ -180,12 +205,27 @@ AArenaRangedWeapon_EVENTPARMS
 
 
 #undef GENERATED_UCLASS_BODY
+#undef GENERATED_BODY
 #undef GENERATED_IINTERFACE_BODY
 #define GENERATED_UCLASS_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	AArenaRangedWeapon_RPC_WRAPPERS \
 	AArenaRangedWeapon_CALLBACK_WRAPPERS \
 	AArenaRangedWeapon_INCLASS \
-public:
+	AArenaRangedWeapon_STANDARD_CONSTRUCTORS \
+public: \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
+
+
+#define GENERATED_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
+public: \
+	AArenaRangedWeapon_RPC_WRAPPERS \
+	AArenaRangedWeapon_CALLBACK_WRAPPERS \
+	AArenaRangedWeapon_INCLASS \
+	AArenaRangedWeapon_ENHANCED_CONSTRUCTORS \
+static_assert(false, "Unknown access specifier for GENERATED_BODY() macro in class ArenaRangedWeapon."); \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 

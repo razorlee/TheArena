@@ -8,6 +8,10 @@
 #include "Public/TheArena.h"
 #include "TheArena.generated.dep.h"
 void EmptyLinkFunctionForGeneratedCodeTheArena() {}
+	void AArena_Menu::StaticRegisterNativesAArena_Menu()
+	{
+	}
+	IMPLEMENT_CLASS(AArena_Menu, 4212462006);
 static class UEnum* EShooterPhysMaterialType_StaticEnum()
 {
 	static class UEnum* Singleton = NULL;
@@ -19,7 +23,7 @@ static class UEnum* EShooterPhysMaterialType_StaticEnum()
 	}
 	return Singleton;
 }
-static FCompiledInDeferEnum Z_CompiledInDeferEnum_UEnum_EShooterPhysMaterialType(EShooterPhysMaterialType_StaticEnum);
+static FCompiledInDeferEnum Z_CompiledInDeferEnum_UEnum_EShooterPhysMaterialType(EShooterPhysMaterialType_StaticEnum, TEXT("/Script/TheArena"));
 class UScriptStruct* FDecalData::StaticStruct()
 {
 	static class UScriptStruct* Singleton = NULL;
@@ -32,7 +36,7 @@ class UScriptStruct* FDecalData::StaticStruct()
 	}
 	return Singleton;
 }
-static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FDecalData(FDecalData::StaticStruct);
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FDecalData(FDecalData::StaticStruct, TEXT("/Script/TheArena"));
 static struct FScriptStruct_TheArena_StaticRegisterNativesFDecalData
 {
 	FScriptStruct_TheArena_StaticRegisterNativesFDecalData()
@@ -52,7 +56,7 @@ class UScriptStruct* FTakeHitInfo::StaticStruct()
 	}
 	return Singleton;
 }
-static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FTakeHitInfo(FTakeHitInfo::StaticStruct);
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FTakeHitInfo(FTakeHitInfo::StaticStruct, TEXT("/Script/TheArena"));
 static struct FScriptStruct_TheArena_StaticRegisterNativesFTakeHitInfo
 {
 	FScriptStruct_TheArena_StaticRegisterNativesFTakeHitInfo()
@@ -63,7 +67,7 @@ static struct FScriptStruct_TheArena_StaticRegisterNativesFTakeHitInfo
 	void UArenaDamageType::StaticRegisterNativesUArenaDamageType()
 	{
 	}
-	IMPLEMENT_CLASS(UArenaDamageType, 34702855);
+	IMPLEMENT_CLASS(UArenaDamageType, 2447375435);
 class UScriptStruct* FPlayerData::StaticStruct()
 {
 	static class UScriptStruct* Singleton = NULL;
@@ -75,14 +79,17 @@ class UScriptStruct* FPlayerData::StaticStruct()
 	}
 	return Singleton;
 }
-static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FPlayerData(FPlayerData::StaticStruct);
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FPlayerData(FPlayerData::StaticStruct, TEXT("/Script/TheArena"));
 	void AArenaCharacter::StaticRegisterNativesAArenaCharacter()
 	{
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetAimOffsets",(Native)&AArenaCharacter::execGetAimOffsets);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetBaseMovementSpeed",(Native)&AArenaCharacter::execGetBaseMovementSpeed);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetCrouchedMovementSpeed",(Native)&AArenaCharacter::execGetCrouchedMovementSpeed);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetCurrentEnergy",(Native)&AArenaCharacter::execGetCurrentEnergy);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetCurrentHealth",(Native)&AArenaCharacter::execGetCurrentHealth);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetCurrentStamina",(Native)&AArenaCharacter::execGetCurrentStamina);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetIdleTime",(Native)&AArenaCharacter::execGetIdleTime);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetMaxEnergy",(Native)&AArenaCharacter::execGetMaxEnergy);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetMaxHealth",(Native)&AArenaCharacter::execGetMaxHealth);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetMaxStamina",(Native)&AArenaCharacter::execGetMaxStamina);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"GetRunningMovementSpeed",(Native)&AArenaCharacter::execGetRunningMovementSpeed);
@@ -91,20 +98,39 @@ static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FPlayerData(
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"IsFiring",(Native)&AArenaCharacter::execIsFiring);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"IsRunning",(Native)&AArenaCharacter::execIsRunning);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"IsTargeting",(Native)&AArenaCharacter::execIsTargeting);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"IsThrowing",(Native)&AArenaCharacter::execIsThrowing);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"OnRep_CurrentWeapon",(Native)&AArenaCharacter::execOnRep_CurrentWeapon);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"OnRep_LastTakeHitInfo",(Native)&AArenaCharacter::execOnRep_LastTakeHitInfo);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"OnRep_Throw",(Native)&AArenaCharacter::execOnRep_Throw);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"ServerEquipWeapon",(Native)&AArenaCharacter::execServerEquipWeapon);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"ServerIdleTimer",(Native)&AArenaCharacter::execServerIdleTimer);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"ServerJump",(Native)&AArenaCharacter::execServerJump);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"ServerSetCrouched",(Native)&AArenaCharacter::execServerSetCrouched);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"ServerSetRunning",(Native)&AArenaCharacter::execServerSetRunning);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"ServerSetTargeting",(Native)&AArenaCharacter::execServerSetTargeting);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"ServerStartThrow",(Native)&AArenaCharacter::execServerStartThrow);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaCharacter::StaticClass(),"ServerStopThrow",(Native)&AArenaCharacter::execServerStopThrow);
 		UScriptStruct::DeferCppStructOps(FName(TEXT("PlayerData")),new UScriptStruct::TCppStructOps<FPlayerData>);
 	}
-	IMPLEMENT_CLASS(AArenaCharacter, 73352830);
+	IMPLEMENT_CLASS(AArenaCharacter, 1983303274);
 	void AArenaCharacter::ServerEquipWeapon(class AArenaRangedWeapon* NewWeapon)
 	{
 		ArenaCharacter_eventServerEquipWeapon_Parms Parms;
 		Parms.NewWeapon=NewWeapon;
 		ProcessEvent(FindFunctionChecked(THEARENA_ServerEquipWeapon),&Parms);
+	}
+	void AArenaCharacter::ServerIdleTimer(const float idleTimer, class AArenaCharacter* client)
+	{
+		ArenaCharacter_eventServerIdleTimer_Parms Parms;
+		Parms.idleTimer=idleTimer;
+		Parms.client=client;
+		ProcessEvent(FindFunctionChecked(THEARENA_ServerIdleTimer),&Parms);
+	}
+	void AArenaCharacter::ServerJump(class AArenaCharacter* client)
+	{
+		ArenaCharacter_eventServerJump_Parms Parms;
+		Parms.client=client;
+		ProcessEvent(FindFunctionChecked(THEARENA_ServerJump),&Parms);
 	}
 	void AArenaCharacter::ServerSetCrouched(bool bNewCrouched, bool bToggle)
 	{
@@ -126,27 +152,85 @@ static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FPlayerData(
 		Parms.bNewTargeting=bNewTargeting ? true : false;
 		ProcessEvent(FindFunctionChecked(THEARENA_ServerSetTargeting),&Parms);
 	}
+	void AArenaCharacter::ServerStartThrow()
+	{
+		ProcessEvent(FindFunctionChecked(THEARENA_ServerStartThrow),NULL);
+	}
+	void AArenaCharacter::ServerStopThrow()
+	{
+		ProcessEvent(FindFunctionChecked(THEARENA_ServerStopThrow),NULL);
+	}
 	void AArenaAI::StaticRegisterNativesAArenaAI()
 	{
 	}
-	IMPLEMENT_CLASS(AArenaAI, 2865115589);
+	IMPLEMENT_CLASS(AArenaAI, 1356222128);
 	void AArenaAIController::StaticRegisterNativesAArenaAIController()
 	{
 		FNativeFunctionRegistrar::RegisterFunction(AArenaAIController::StaticClass(),"FindClosestEnemy",(Native)&AArenaAIController::execFindClosestEnemy);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaAIController::StaticClass(),"FindClosestEnemyWithLOS",(Native)&AArenaAIController::execFindClosestEnemyWithLOS);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaAIController::StaticClass(),"ShootEnemy",(Native)&AArenaAIController::execShootEnemy);
 	}
-	IMPLEMENT_CLASS(AArenaAIController, 4038740651);
+	IMPLEMENT_CLASS(AArenaAIController, 811429023);
+	void UArenaCharacterMovement::StaticRegisterNativesUArenaCharacterMovement()
+	{
+	}
+	IMPLEMENT_CLASS(UArenaCharacterMovement, 1805522595);
+	void AArenaExplosionEffect::StaticRegisterNativesAArenaExplosionEffect()
+	{
+	}
+	IMPLEMENT_CLASS(AArenaExplosionEffect, 811482215);
+class UScriptStruct* FGrenadeWeaponData::StaticStruct()
+{
+	static class UScriptStruct* Singleton = NULL;
+	if (!Singleton)
+	{
+		extern THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaFragGrenade_FGrenadeWeaponData();
+		extern THEARENA_API uint32 Get_Z_Construct_UScriptStruct_AArenaFragGrenade_FGrenadeWeaponData_CRC();
+		Singleton = GetStaticStruct(Z_Construct_UScriptStruct_AArenaFragGrenade_FGrenadeWeaponData, AArenaFragGrenade::StaticClass(), TEXT("GrenadeWeaponData"), sizeof(FGrenadeWeaponData), Get_Z_Construct_UScriptStruct_AArenaFragGrenade_FGrenadeWeaponData_CRC());
+	}
+	return Singleton;
+}
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FGrenadeWeaponData(FGrenadeWeaponData::StaticStruct, TEXT("/Script/TheArena"));
+	void AArenaFragGrenade::StaticRegisterNativesAArenaFragGrenade()
+	{
+		FNativeFunctionRegistrar::RegisterFunction(AArenaFragGrenade::StaticClass(),"OnImpact",(Native)&AArenaFragGrenade::execOnImpact);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaFragGrenade::StaticClass(),"OnRep_Exploded",(Native)&AArenaFragGrenade::execOnRep_Exploded);
+		UScriptStruct::DeferCppStructOps(FName(TEXT("GrenadeWeaponData")),new UScriptStruct::TCppStructOps<FGrenadeWeaponData>);
+	}
+	IMPLEMENT_CLASS(AArenaFragGrenade, 352102566);
+class UScriptStruct* FBlueprintFriend::StaticStruct()
+{
+	static class UScriptStruct* Singleton = NULL;
+	if (!Singleton)
+	{
+		extern THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_UArenaFriendsList_FBlueprintFriend();
+		extern THEARENA_API uint32 Get_Z_Construct_UScriptStruct_UArenaFriendsList_FBlueprintFriend_CRC();
+		Singleton = GetStaticStruct(Z_Construct_UScriptStruct_UArenaFriendsList_FBlueprintFriend, UArenaFriendsList::StaticClass(), TEXT("BlueprintFriend"), sizeof(FBlueprintFriend), Get_Z_Construct_UScriptStruct_UArenaFriendsList_FBlueprintFriend_CRC());
+	}
+	return Singleton;
+}
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FBlueprintFriend(FBlueprintFriend::StaticStruct, TEXT("/Script/TheArena"));
+	void UArenaFriendsList::StaticRegisterNativesUArenaFriendsList()
+	{
+		FNativeFunctionRegistrar::RegisterFunction(UArenaFriendsList::StaticClass(),"Activate",(Native)&UArenaFriendsList::execActivate);
+		FNativeFunctionRegistrar::RegisterFunction(UArenaFriendsList::StaticClass(),"GetFriendsList",(Native)&UArenaFriendsList::execGetFriendsList);
+		UScriptStruct::DeferCppStructOps(FName(TEXT("BlueprintFriend")),new UScriptStruct::TCppStructOps<FBlueprintFriend>);
+	}
+	IMPLEMENT_CLASS(UArenaFriendsList, 484150744);
+	void UArenaGameInstance::StaticRegisterNativesUArenaGameInstance()
+	{
+	}
+	IMPLEMENT_CLASS(UArenaGameInstance, 3511397152);
 	void AArenaGameSession::StaticRegisterNativesAArenaGameSession()
 	{
 	}
-	IMPLEMENT_CLASS(AArenaGameSession, 2814148760);
+	IMPLEMENT_CLASS(AArenaGameSession, 2242506916);
 	void AArenaPlayerState::StaticRegisterNativesAArenaPlayerState()
 	{
 		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerState::StaticClass(),"InformAboutKill",(Native)&AArenaPlayerState::execInformAboutKill);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerState::StaticClass(),"OnRep_TeamColor",(Native)&AArenaPlayerState::execOnRep_TeamColor);
 	}
-	IMPLEMENT_CLASS(AArenaPlayerState, 3868947208);
+	IMPLEMENT_CLASS(AArenaPlayerState, 799272072);
 	void AArenaPlayerState::InformAboutKill(class AArenaPlayerState* KillerPlayerState, const class UDamageType* KillerDamageType, class AArenaPlayerState* KilledPlayerState)
 	{
 		ArenaPlayerState_eventInformAboutKill_Parms Parms;
@@ -158,29 +242,34 @@ static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FPlayerData(
 	void AArenaGameState::StaticRegisterNativesAArenaGameState()
 	{
 	}
-	IMPLEMENT_CLASS(AArenaGameState, 2724155267);
+	IMPLEMENT_CLASS(AArenaGameState, 1517615431);
 	void AArenaImpactEffect::StaticRegisterNativesAArenaImpactEffect()
 	{
 	}
-	IMPLEMENT_CLASS(AArenaImpactEffect, 3064490352);
+	IMPLEMENT_CLASS(AArenaImpactEffect, 2738320189);
 	void UArenaLocalPlayer::StaticRegisterNativesUArenaLocalPlayer()
 	{
 	}
-	IMPLEMENT_CLASS(UArenaLocalPlayer, 2234493143);
+	IMPLEMENT_CLASS(UArenaLocalPlayer, 4091533968);
 	void AArenaPlayerCameraManager::StaticRegisterNativesAArenaPlayerCameraManager()
 	{
 	}
-	IMPLEMENT_CLASS(AArenaPlayerCameraManager, 1962230892);
+	IMPLEMENT_CLASS(AArenaPlayerCameraManager, 3876576859);
 	void AArenaPlayerController::StaticRegisterNativesAArenaPlayerController()
 	{
 		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"ClientEndOnlineGame",(Native)&AArenaPlayerController::execClientEndOnlineGame);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"ClientGameStarted",(Native)&AArenaPlayerController::execClientGameStarted);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"ClientStartOnlineGame",(Native)&AArenaPlayerController::execClientStartOnlineGame);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"GetAllowGameActions",(Native)&AArenaPlayerController::execGetAllowGameActions);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"GetOpenMenu",(Native)&AArenaPlayerController::execGetOpenMenu);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"IsGameInputAllowed",(Native)&AArenaPlayerController::execIsGameInputAllowed);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"ServerSuicide",(Native)&AArenaPlayerController::execServerSuicide);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"SetAllowGameActions",(Native)&AArenaPlayerController::execSetAllowGameActions);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"SetGodMode",(Native)&AArenaPlayerController::execSetGodMode);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"SetOpenMenu",(Native)&AArenaPlayerController::execSetOpenMenu);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaPlayerController::StaticClass(),"Suicide",(Native)&AArenaPlayerController::execSuicide);
 	}
-	IMPLEMENT_CLASS(AArenaPlayerController, 1190322412);
+	IMPLEMENT_CLASS(AArenaPlayerController, 963437185);
 	void AArenaPlayerController::ClientEndOnlineGame()
 	{
 		ProcessEvent(FindFunctionChecked(THEARENA_ClientEndOnlineGame),NULL);
@@ -197,6 +286,10 @@ static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FPlayerData(
 	{
 		ProcessEvent(FindFunctionChecked(THEARENA_ServerSuicide),NULL);
 	}
+	void AArenaPlayerController_Menu::StaticRegisterNativesAArenaPlayerController_Menu()
+	{
+	}
+	IMPLEMENT_CLASS(AArenaPlayerController_Menu, 1600199260);
 class UScriptStruct* FWeaponData::StaticStruct()
 {
 	static class UScriptStruct* Singleton = NULL;
@@ -208,7 +301,7 @@ class UScriptStruct* FWeaponData::StaticStruct()
 	}
 	return Singleton;
 }
-static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FWeaponData(FWeaponData::StaticStruct);
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FWeaponData(FWeaponData::StaticStruct, TEXT("/Script/TheArena"));
 class UScriptStruct* FWeaponAnim::StaticStruct()
 {
 	static class UScriptStruct* Singleton = NULL;
@@ -220,23 +313,26 @@ class UScriptStruct* FWeaponAnim::StaticStruct()
 	}
 	return Singleton;
 }
-static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FWeaponAnim(FWeaponAnim::StaticStruct);
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FWeaponAnim(FWeaponAnim::StaticStruct, TEXT("/Script/TheArena"));
 	void AArenaRangedWeapon::StaticRegisterNativesAArenaRangedWeapon()
 	{
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"ClientStartReload",(Native)&AArenaRangedWeapon::execClientStartReload);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"GetPawnOwner",(Native)&AArenaRangedWeapon::execGetPawnOwner);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"OnRep_BurstCounter",(Native)&AArenaRangedWeapon::execOnRep_BurstCounter);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"OnRep_Melee",(Native)&AArenaRangedWeapon::execOnRep_Melee);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"OnRep_MyPawn",(Native)&AArenaRangedWeapon::execOnRep_MyPawn);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"OnRep_Reload",(Native)&AArenaRangedWeapon::execOnRep_Reload);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"ServerHandleFiring",(Native)&AArenaRangedWeapon::execServerHandleFiring);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"ServerStartFire",(Native)&AArenaRangedWeapon::execServerStartFire);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"ServerStartMelee",(Native)&AArenaRangedWeapon::execServerStartMelee);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"ServerStartReload",(Native)&AArenaRangedWeapon::execServerStartReload);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"ServerStopFire",(Native)&AArenaRangedWeapon::execServerStopFire);
+		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"ServerStopMelee",(Native)&AArenaRangedWeapon::execServerStopMelee);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon::StaticClass(),"ServerStopReload",(Native)&AArenaRangedWeapon::execServerStopReload);
 		UScriptStruct::DeferCppStructOps(FName(TEXT("WeaponAnim")),new UScriptStruct::TCppStructOps<FWeaponAnim>);
 		UScriptStruct::DeferCppStructOps(FName(TEXT("WeaponData")),new UScriptStruct::TCppStructOps<FWeaponData>);
 	}
-	IMPLEMENT_CLASS(AArenaRangedWeapon, 4119986792);
+	IMPLEMENT_CLASS(AArenaRangedWeapon, 3092510780);
 	void AArenaRangedWeapon::ClientStartReload()
 	{
 		ProcessEvent(FindFunctionChecked(THEARENA_ClientStartReload),NULL);
@@ -249,6 +345,10 @@ static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FWeaponAnim(
 	{
 		ProcessEvent(FindFunctionChecked(THEARENA_ServerStartFire),NULL);
 	}
+	void AArenaRangedWeapon::ServerStartMelee()
+	{
+		ProcessEvent(FindFunctionChecked(THEARENA_ServerStartMelee),NULL);
+	}
 	void AArenaRangedWeapon::ServerStartReload()
 	{
 		ProcessEvent(FindFunctionChecked(THEARENA_ServerStartReload),NULL);
@@ -256,6 +356,10 @@ static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FWeaponAnim(
 	void AArenaRangedWeapon::ServerStopFire()
 	{
 		ProcessEvent(FindFunctionChecked(THEARENA_ServerStopFire),NULL);
+	}
+	void AArenaRangedWeapon::ServerStopMelee()
+	{
+		ProcessEvent(FindFunctionChecked(THEARENA_ServerStopMelee),NULL);
 	}
 	void AArenaRangedWeapon::ServerStopReload()
 	{
@@ -272,13 +376,13 @@ class UScriptStruct* FProjectileWeaponData::StaticStruct()
 	}
 	return Singleton;
 }
-static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FProjectileWeaponData(FProjectileWeaponData::StaticStruct);
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FProjectileWeaponData(FProjectileWeaponData::StaticStruct, TEXT("/Script/TheArena"));
 	void AArenaRangedWeapon_Projectile::StaticRegisterNativesAArenaRangedWeapon_Projectile()
 	{
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon_Projectile::StaticClass(),"ServerFireProjectile",(Native)&AArenaRangedWeapon_Projectile::execServerFireProjectile);
 		UScriptStruct::DeferCppStructOps(FName(TEXT("ProjectileWeaponData")),new UScriptStruct::TCppStructOps<FProjectileWeaponData>);
 	}
-	IMPLEMENT_CLASS(AArenaRangedWeapon_Projectile, 2958360570);
+	IMPLEMENT_CLASS(AArenaRangedWeapon_Projectile, 3607525079);
 	void AArenaRangedWeapon_Projectile::ServerFireProjectile(FVector Origin, struct FVector_NetQuantizeNormal ShootDir)
 	{
 		ArenaRangedWeapon_Projectile_eventServerFireProjectile_Parms Parms;
@@ -292,7 +396,7 @@ static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FProjectileW
 		FNativeFunctionRegistrar::RegisterFunction(AArenaProjectile::StaticClass(),"OnRep_Exploded",(Native)&AArenaProjectile::execOnRep_Exploded);
 		FNativeFunctionRegistrar::RegisterFunction(AArenaProjectile::StaticClass(),"SetPawnOwner",(Native)&AArenaProjectile::execSetPawnOwner);
 	}
-	IMPLEMENT_CLASS(AArenaProjectile, 3107721277);
+	IMPLEMENT_CLASS(AArenaProjectile, 3395609270);
 class UScriptStruct* FInstantHitInfo::StaticStruct()
 {
 	static class UScriptStruct* Singleton = NULL;
@@ -304,7 +408,7 @@ class UScriptStruct* FInstantHitInfo::StaticStruct()
 	}
 	return Singleton;
 }
-static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FInstantHitInfo(FInstantHitInfo::StaticStruct);
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FInstantHitInfo(FInstantHitInfo::StaticStruct, TEXT("/Script/TheArena"));
 class UScriptStruct* FInstantWeaponData::StaticStruct()
 {
 	static class UScriptStruct* Singleton = NULL;
@@ -316,7 +420,7 @@ class UScriptStruct* FInstantWeaponData::StaticStruct()
 	}
 	return Singleton;
 }
-static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FInstantWeaponData(FInstantWeaponData::StaticStruct);
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FInstantWeaponData(FInstantWeaponData::StaticStruct, TEXT("/Script/TheArena"));
 	void AArenaRangedWeapon_Instant::StaticRegisterNativesAArenaRangedWeapon_Instant()
 	{
 		FNativeFunctionRegistrar::RegisterFunction(AArenaRangedWeapon_Instant::StaticClass(),"OnRep_HitNotify",(Native)&AArenaRangedWeapon_Instant::execOnRep_HitNotify);
@@ -325,7 +429,7 @@ static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FInstantWeap
 		UScriptStruct::DeferCppStructOps(FName(TEXT("InstantWeaponData")),new UScriptStruct::TCppStructOps<FInstantWeaponData>);
 		UScriptStruct::DeferCppStructOps(FName(TEXT("InstantHitInfo")),new UScriptStruct::TCppStructOps<FInstantHitInfo>);
 	}
-	IMPLEMENT_CLASS(AArenaRangedWeapon_Instant, 2701138744);
+	IMPLEMENT_CLASS(AArenaRangedWeapon_Instant, 276882876);
 	void AArenaRangedWeapon_Instant::ServerNotifyHit(const struct FHitResult Impact, struct FVector_NetQuantizeNormal ShootDir, int32 RandomSeed, float ReticleSpread)
 	{
 		ArenaRangedWeapon_Instant_eventServerNotifyHit_Parms Parms;
@@ -343,20 +447,85 @@ static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FInstantWeap
 		Parms.ReticleSpread=ReticleSpread;
 		ProcessEvent(FindFunctionChecked(THEARENA_ServerNotifyMiss),&Parms);
 	}
+class UScriptStruct* FShotgunWeaponData::StaticStruct()
+{
+	static class UScriptStruct* Singleton = NULL;
+	if (!Singleton)
+	{
+		extern THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaShotgun_FShotgunWeaponData();
+		extern THEARENA_API uint32 Get_Z_Construct_UScriptStruct_AArenaShotgun_FShotgunWeaponData_CRC();
+		Singleton = GetStaticStruct(Z_Construct_UScriptStruct_AArenaShotgun_FShotgunWeaponData, AArenaShotgun::StaticClass(), TEXT("ShotgunWeaponData"), sizeof(FShotgunWeaponData), Get_Z_Construct_UScriptStruct_AArenaShotgun_FShotgunWeaponData_CRC());
+	}
+	return Singleton;
+}
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FShotgunWeaponData(FShotgunWeaponData::StaticStruct, TEXT("/Script/TheArena"));
+	void AArenaShotgun::StaticRegisterNativesAArenaShotgun()
+	{
+		FNativeFunctionRegistrar::RegisterFunction(AArenaShotgun::StaticClass(),"ServerFireProjectile",(Native)&AArenaShotgun::execServerFireProjectile);
+		UScriptStruct::DeferCppStructOps(FName(TEXT("ShotgunWeaponData")),new UScriptStruct::TCppStructOps<FShotgunWeaponData>);
+	}
+	IMPLEMENT_CLASS(AArenaShotgun, 1616639862);
+	void AArenaShotgun::ServerFireProjectile(FVector Origin, struct FVector_NetQuantizeNormal ShootDir)
+	{
+		ArenaShotgun_eventServerFireProjectile_Parms Parms;
+		Parms.Origin=Origin;
+		Parms.ShootDir=ShootDir;
+		ProcessEvent(FindFunctionChecked(THEARENA_ServerFireProjectile),&Parms);
+	}
+class UScriptStruct* FSniperWeaponData::StaticStruct()
+{
+	static class UScriptStruct* Singleton = NULL;
+	if (!Singleton)
+	{
+		extern THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaSniperRifle_FSniperWeaponData();
+		extern THEARENA_API uint32 Get_Z_Construct_UScriptStruct_AArenaSniperRifle_FSniperWeaponData_CRC();
+		Singleton = GetStaticStruct(Z_Construct_UScriptStruct_AArenaSniperRifle_FSniperWeaponData, AArenaSniperRifle::StaticClass(), TEXT("SniperWeaponData"), sizeof(FSniperWeaponData), Get_Z_Construct_UScriptStruct_AArenaSniperRifle_FSniperWeaponData_CRC());
+	}
+	return Singleton;
+}
+static FCompiledInDeferStruct Z_CompiledInDeferStruct_UScriptStruct_FSniperWeaponData(FSniperWeaponData::StaticStruct, TEXT("/Script/TheArena"));
+	void AArenaSniperRifle::StaticRegisterNativesAArenaSniperRifle()
+	{
+		FNativeFunctionRegistrar::RegisterFunction(AArenaSniperRifle::StaticClass(),"ServerFireProjectile",(Native)&AArenaSniperRifle::execServerFireProjectile);
+		UScriptStruct::DeferCppStructOps(FName(TEXT("SniperWeaponData")),new UScriptStruct::TCppStructOps<FSniperWeaponData>);
+	}
+	IMPLEMENT_CLASS(AArenaSniperRifle, 2882653628);
+	void AArenaSniperRifle::ServerFireProjectile(FVector Origin, struct FVector_NetQuantizeNormal ShootDir)
+	{
+		ArenaSniperRifle_eventServerFireProjectile_Parms Parms;
+		Parms.Origin=Origin;
+		Parms.ShootDir=ShootDir;
+		ProcessEvent(FindFunctionChecked(THEARENA_ServerFireProjectile),&Parms);
+	}
+	void UArenaStartMenu::StaticRegisterNativesUArenaStartMenu()
+	{
+		FNativeFunctionRegistrar::RegisterFunction(UArenaStartMenu::StaticClass(),"HostGame",(Native)&UArenaStartMenu::execHostGame);
+		FNativeFunctionRegistrar::RegisterFunction(UArenaStartMenu::StaticClass(),"HostTeamDeathMatch",(Native)&UArenaStartMenu::execHostTeamDeathMatch);
+		FNativeFunctionRegistrar::RegisterFunction(UArenaStartMenu::StaticClass(),"SetUp",(Native)&UArenaStartMenu::execSetUp);
+	}
+	IMPLEMENT_CLASS(UArenaStartMenu, 642847062);
+	void AArenaTeamStart::StaticRegisterNativesAArenaTeamStart()
+	{
+	}
+	IMPLEMENT_CLASS(AArenaTeamStart, 2086495237);
 	void UBTTask_FindPointNearEnemy::StaticRegisterNativesUBTTask_FindPointNearEnemy()
 	{
 	}
-	IMPLEMENT_CLASS(UBTTask_FindPointNearEnemy, 3297010658);
+	IMPLEMENT_CLASS(UBTTask_FindPointNearEnemy, 3266863428);
 	void UBTTask_HasLosTo::StaticRegisterNativesUBTTask_HasLosTo()
 	{
 	}
-	IMPLEMENT_CLASS(UBTTask_HasLosTo, 1815916669);
+	IMPLEMENT_CLASS(UBTTask_HasLosTo, 3648180446);
 	void ATheArenaGameMode::StaticRegisterNativesATheArenaGameMode()
 	{
 		FNativeFunctionRegistrar::RegisterFunction(ATheArenaGameMode::StaticClass(),"FinishMatch",(Native)&ATheArenaGameMode::execFinishMatch);
 		FNativeFunctionRegistrar::RegisterFunction(ATheArenaGameMode::StaticClass(),"SetAllowBots",(Native)&ATheArenaGameMode::execSetAllowBots);
 	}
-	IMPLEMENT_CLASS(ATheArenaGameMode, 121110106);
+	IMPLEMENT_CLASS(ATheArenaGameMode, 2074827309);
+	void AArena_TeamDeathMatch::StaticRegisterNativesAArena_TeamDeathMatch()
+	{
+	}
+	IMPLEMENT_CLASS(AArena_TeamDeathMatch, 1942371209);
 FName THEARENA_ClientEndOnlineGame = FName(TEXT("ClientEndOnlineGame"));
 FName THEARENA_ClientGameStarted = FName(TEXT("ClientGameStarted"));
 FName THEARENA_ClientStartOnlineGame = FName(TEXT("ClientStartOnlineGame"));
@@ -365,18 +534,25 @@ FName THEARENA_InformAboutKill = FName(TEXT("InformAboutKill"));
 FName THEARENA_ServerEquipWeapon = FName(TEXT("ServerEquipWeapon"));
 FName THEARENA_ServerFireProjectile = FName(TEXT("ServerFireProjectile"));
 FName THEARENA_ServerHandleFiring = FName(TEXT("ServerHandleFiring"));
+FName THEARENA_ServerIdleTimer = FName(TEXT("ServerIdleTimer"));
+FName THEARENA_ServerJump = FName(TEXT("ServerJump"));
 FName THEARENA_ServerNotifyHit = FName(TEXT("ServerNotifyHit"));
 FName THEARENA_ServerNotifyMiss = FName(TEXT("ServerNotifyMiss"));
 FName THEARENA_ServerSetCrouched = FName(TEXT("ServerSetCrouched"));
 FName THEARENA_ServerSetRunning = FName(TEXT("ServerSetRunning"));
 FName THEARENA_ServerSetTargeting = FName(TEXT("ServerSetTargeting"));
 FName THEARENA_ServerStartFire = FName(TEXT("ServerStartFire"));
+FName THEARENA_ServerStartMelee = FName(TEXT("ServerStartMelee"));
 FName THEARENA_ServerStartReload = FName(TEXT("ServerStartReload"));
+FName THEARENA_ServerStartThrow = FName(TEXT("ServerStartThrow"));
 FName THEARENA_ServerStopFire = FName(TEXT("ServerStopFire"));
+FName THEARENA_ServerStopMelee = FName(TEXT("ServerStopMelee"));
 FName THEARENA_ServerStopReload = FName(TEXT("ServerStopReload"));
+FName THEARENA_ServerStopThrow = FName(TEXT("ServerStopThrow"));
 FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 #if USE_COMPILED_IN_NATIVES
 // Cross Module References
+	ENGINE_API class UClass* Z_Construct_UClass_AGameMode();
 	ENGINE_API class UScriptStruct* Z_Construct_UScriptStruct_UEngineTypes_FRadialDamageEvent();
 	ENGINE_API class UScriptStruct* Z_Construct_UScriptStruct_UEngineTypes_FPointDamageEvent();
 	ENGINE_API class UScriptStruct* Z_Construct_UScriptStruct_UEngineTypes_FDamageEvent();
@@ -393,37 +569,43 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 	ENGINE_API class UClass* Z_Construct_UClass_USoundCue_NoRegister();
 	ENGINE_API class UClass* Z_Construct_UClass_UParticleSystem_NoRegister();
 	ENGINE_API class UClass* Z_Construct_UClass_UMaterialInstanceDynamic_NoRegister();
+	ENGINE_API class UClass* Z_Construct_UClass_UAnimMontage_NoRegister();
 	ENGINE_API class UClass* Z_Construct_UClass_UCameraComponent_NoRegister();
 	ENGINE_API class UClass* Z_Construct_UClass_USpringArmComponent_NoRegister();
 	AIMODULE_API class UClass* Z_Construct_UClass_UBehaviorTree_NoRegister();
 	AIMODULE_API class UClass* Z_Construct_UClass_AAIController();
 	AIMODULE_API class UClass* Z_Construct_UClass_UBehaviorTreeComponent_NoRegister();
 	AIMODULE_API class UClass* Z_Construct_UClass_UBlackboardComponent_NoRegister();
-	ENGINE_API class UClass* Z_Construct_UClass_AGameSession();
-	ENGINE_API class UClass* Z_Construct_UClass_UDamageType_NoRegister();
-	ENGINE_API class UClass* Z_Construct_UClass_APlayerState();
-	ENGINE_API class UClass* Z_Construct_UClass_AGameState();
+	ENGINE_API class UClass* Z_Construct_UClass_UCharacterMovementComponent();
 	ENGINE_API class UClass* Z_Construct_UClass_AActor();
 	ENGINE_API class UScriptStruct* Z_Construct_UScriptStruct_UEngineTypes_FHitResult();
 	ENGINE_API class UClass* Z_Construct_UClass_UPointLightComponent_NoRegister();
+	ENGINE_API class UClass* Z_Construct_UClass_UDamageType_NoRegister();
+	ENGINE_API class UClass* Z_Construct_UClass_UParticleSystemComponent_NoRegister();
+	ENGINE_API class UClass* Z_Construct_UClass_USphereComponent_NoRegister();
+	ENGINE_API class UClass* Z_Construct_UClass_UProjectileMovementComponent_NoRegister();
+	ENGINE_API class UClass* Z_Construct_UClass_APlayerController_NoRegister();
+	UMG_API class UClass* Z_Construct_UClass_UUserWidget();
+	ENGINE_API class UClass* Z_Construct_UClass_UGameInstance();
+	ENGINE_API class UClass* Z_Construct_UClass_AGameSession();
+	ENGINE_API class UClass* Z_Construct_UClass_APlayerState();
+	ENGINE_API class UClass* Z_Construct_UClass_AGameState();
 	ENGINE_API class UClass* Z_Construct_UClass_ULocalPlayer();
 	ENGINE_API class UClass* Z_Construct_UClass_APlayerCameraManager();
 	ENGINE_API class UClass* Z_Construct_UClass_APlayerController();
-	ENGINE_API class UClass* Z_Construct_UClass_UAnimMontage_NoRegister();
 	ENGINE_API class UClass* Z_Construct_UClass_UCameraShake_NoRegister();
-	ENGINE_API class UClass* Z_Construct_UClass_UParticleSystemComponent_NoRegister();
 	ENGINE_API class UClass* Z_Construct_UClass_USkeletalMeshComponent_NoRegister();
 	ENGINE_API class UScriptStruct* Z_Construct_UScriptStruct_FVector_NetQuantizeNormal();
 	COREUOBJECT_API class UScriptStruct* Z_Construct_UScriptStruct_UObject_FVector();
-	ENGINE_API class UClass* Z_Construct_UClass_USphereComponent_NoRegister();
-	ENGINE_API class UClass* Z_Construct_UClass_UProjectileMovementComponent_NoRegister();
+	ENGINE_API class UClass* Z_Construct_UClass_ULocalPlayer_NoRegister();
+	ENGINE_API class UClass* Z_Construct_UClass_APlayerStart();
 	AIMODULE_API class UClass* Z_Construct_UClass_UBTTask_BlackboardBase();
 	AIMODULE_API class UClass* Z_Construct_UClass_UBTDecorator();
 	AIMODULE_API class UScriptStruct* Z_Construct_UScriptStruct_UBehaviorTreeTypes_FBlackboardKeySelector();
-	ENGINE_API class UClass* Z_Construct_UClass_AGameMode();
-	ENGINE_API class UClass* Z_Construct_UClass_AHUD_NoRegister();
 	ENGINE_API class UClass* Z_Construct_UClass_APawn_NoRegister();
 
+	THEARENA_API class UClass* Z_Construct_UClass_AArena_Menu_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_AArena_Menu();
 	THEARENA_API class UEnum* Z_Construct_UEnum_TheArena_EShooterPhysMaterialType();
 	THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_FTakeHitInfo();
 	THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_FDecalData();
@@ -433,8 +615,11 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetAimOffsets();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetBaseMovementSpeed();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetCrouchedMovementSpeed();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetCurrentEnergy();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetCurrentHealth();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetCurrentStamina();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetIdleTime();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetMaxEnergy();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetMaxHealth();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetMaxStamina();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_GetRunningMovementSpeed();
@@ -443,12 +628,18 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_IsFiring();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_IsRunning();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_IsTargeting();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_IsThrowing();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_OnRep_CurrentWeapon();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_OnRep_LastTakeHitInfo();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_OnRep_Throw();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_ServerEquipWeapon();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_ServerIdleTimer();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_ServerJump();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_ServerSetCrouched();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_ServerSetRunning();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_ServerSetTargeting();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_ServerStartThrow();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaCharacter_ServerStopThrow();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaCharacter_NoRegister();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaCharacter();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaAI_NoRegister();
@@ -458,6 +649,23 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaAIController_ShootEnemy();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaAIController_NoRegister();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaAIController();
+	THEARENA_API class UClass* Z_Construct_UClass_UArenaCharacterMovement_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_UArenaCharacterMovement();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaExplosionEffect_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaExplosionEffect();
+	THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaFragGrenade_FGrenadeWeaponData();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaFragGrenade_OnImpact();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaFragGrenade_OnRep_Exploded();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaFragGrenade_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaFragGrenade();
+	THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_UArenaFriendsList_FBlueprintFriend();
+	THEARENA_API class UFunction* Z_Construct_UFunction_UArenaFriendsList_Activate();
+	THEARENA_API class UFunction* Z_Construct_UFunction_UArenaFriendsList_BlueprintGetFriendsListDelegate__DelegateSignature();
+	THEARENA_API class UFunction* Z_Construct_UFunction_UArenaFriendsList_GetFriendsList();
+	THEARENA_API class UClass* Z_Construct_UClass_UArenaFriendsList_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_UArenaFriendsList();
+	THEARENA_API class UClass* Z_Construct_UClass_UArenaGameInstance_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_UArenaGameInstance();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaGameSession_NoRegister();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaGameSession();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerState_InformAboutKill();
@@ -475,22 +683,32 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_ClientEndOnlineGame();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_ClientGameStarted();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_ClientStartOnlineGame();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_GetAllowGameActions();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_GetOpenMenu();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_IsGameInputAllowed();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_ServerSuicide();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_SetAllowGameActions();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_SetGodMode();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_SetOpenMenu();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaPlayerController_Suicide();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaPlayerController_NoRegister();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaPlayerController();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaPlayerController_Menu_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaPlayerController_Menu();
 	THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim();
 	THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponData();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ClientStartReload();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_GetPawnOwner();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_OnRep_BurstCounter();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_OnRep_Melee();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_OnRep_MyPawn();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_OnRep_Reload();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerHandleFiring();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerStartFire();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerStartMelee();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerStartReload();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerStopFire();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerStopMelee();
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerStopReload();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaRangedWeapon_NoRegister();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaRangedWeapon();
@@ -510,6 +728,21 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaRangedWeapon_Instant_ServerNotifyMiss();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaRangedWeapon_Instant_NoRegister();
 	THEARENA_API class UClass* Z_Construct_UClass_AArenaRangedWeapon_Instant();
+	THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaShotgun_FShotgunWeaponData();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaShotgun_ServerFireProjectile();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaShotgun_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaShotgun();
+	THEARENA_API class UScriptStruct* Z_Construct_UScriptStruct_AArenaSniperRifle_FSniperWeaponData();
+	THEARENA_API class UFunction* Z_Construct_UFunction_AArenaSniperRifle_ServerFireProjectile();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaSniperRifle_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaSniperRifle();
+	THEARENA_API class UFunction* Z_Construct_UFunction_UArenaStartMenu_HostGame();
+	THEARENA_API class UFunction* Z_Construct_UFunction_UArenaStartMenu_HostTeamDeathMatch();
+	THEARENA_API class UFunction* Z_Construct_UFunction_UArenaStartMenu_SetUp();
+	THEARENA_API class UClass* Z_Construct_UClass_UArenaStartMenu_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_UArenaStartMenu();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaTeamStart_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_AArenaTeamStart();
 	THEARENA_API class UClass* Z_Construct_UClass_UBTTask_FindPointNearEnemy_NoRegister();
 	THEARENA_API class UClass* Z_Construct_UClass_UBTTask_FindPointNearEnemy();
 	THEARENA_API class UClass* Z_Construct_UClass_UBTTask_HasLosTo_NoRegister();
@@ -518,14 +751,49 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 	THEARENA_API class UFunction* Z_Construct_UFunction_ATheArenaGameMode_SetAllowBots();
 	THEARENA_API class UClass* Z_Construct_UClass_ATheArenaGameMode_NoRegister();
 	THEARENA_API class UClass* Z_Construct_UClass_ATheArenaGameMode();
+	THEARENA_API class UClass* Z_Construct_UClass_AArena_TeamDeathMatch_NoRegister();
+	THEARENA_API class UClass* Z_Construct_UClass_AArena_TeamDeathMatch();
 	THEARENA_API class UPackage* Z_Construct_UPackage_TheArena();
+	UClass* Z_Construct_UClass_AArena_Menu_NoRegister()
+	{
+		return AArena_Menu::StaticClass();
+	}
+	UClass* Z_Construct_UClass_AArena_Menu()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_AGameMode();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = AArena_Menu::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x209002AC;
+
+
+				OuterClass->ClassConfigName = FName(TEXT("Game"));
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation Info MovementReplication Replication Actor"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/Arena_Menu.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/Arena_Menu.h"));
+				MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_AArena_Menu(Z_Construct_UClass_AArena_Menu, TEXT("AArena_Menu"));
 	UEnum* Z_Construct_UEnum_TheArena_EShooterPhysMaterialType()
 	{
 		UPackage* Outer=Z_Construct_UPackage_TheArena();
 		static UEnum* ReturnEnum = NULL;
 		if (!ReturnEnum)
 		{
-			ReturnEnum = new(Outer, TEXT("EShooterPhysMaterialType"), RF_Public|RF_Transient|RF_Native) UEnum(FPostConstructInitializeProperties());
+			ReturnEnum = new(Outer, TEXT("EShooterPhysMaterialType"), RF_Public|RF_Transient|RF_Native) UEnum(FObjectInitializer());
 			TArray<FName> EnumNames;
 			EnumNames.Add(FName(TEXT("EShooterPhysMaterialType::Unknown")));
 			EnumNames.Add(FName(TEXT("EShooterPhysMaterialType::Concrete")));
@@ -552,13 +820,13 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UScriptStruct* ReturnStruct = NULL;
 		if (!ReturnStruct)
 		{
-			ReturnStruct = new(Outer, TEXT("TakeHitInfo"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FPostConstructInitializeProperties(), NULL, new UScriptStruct::TCppStructOps<FTakeHitInfo>, EStructFlags(0x00000001));
-			UProperty* NewProp_RadialDamageEvent = new(ReturnStruct, TEXT("RadialDamageEvent"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(RadialDamageEvent, FTakeHitInfo), 0x0000000000000000, Z_Construct_UScriptStruct_UEngineTypes_FRadialDamageEvent()); // 1982278809
-			UProperty* NewProp_PointDamageEvent = new(ReturnStruct, TEXT("PointDamageEvent"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(PointDamageEvent, FTakeHitInfo), 0x0000000000000000, Z_Construct_UScriptStruct_UEngineTypes_FPointDamageEvent()); // 942409284
-			UProperty* NewProp_GeneralDamageEvent = new(ReturnStruct, TEXT("GeneralDamageEvent"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(GeneralDamageEvent, FTakeHitInfo), 0x0000000000000000, Z_Construct_UScriptStruct_UEngineTypes_FDamageEvent()); // 1735714017
+			ReturnStruct = new(Outer, TEXT("TakeHitInfo"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FTakeHitInfo>, EStructFlags(0x00000001));
+			UProperty* NewProp_RadialDamageEvent = new(ReturnStruct, TEXT("RadialDamageEvent"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(RadialDamageEvent, FTakeHitInfo), 0x0000000000000000, Z_Construct_UScriptStruct_UEngineTypes_FRadialDamageEvent());
+			UProperty* NewProp_PointDamageEvent = new(ReturnStruct, TEXT("PointDamageEvent"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(PointDamageEvent, FTakeHitInfo), 0x0000000000000000, Z_Construct_UScriptStruct_UEngineTypes_FPointDamageEvent());
+			UProperty* NewProp_GeneralDamageEvent = new(ReturnStruct, TEXT("GeneralDamageEvent"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(GeneralDamageEvent, FTakeHitInfo), 0x0000000000000000, Z_Construct_UScriptStruct_UEngineTypes_FDamageEvent());
 			UProperty* NewProp_EnsureReplicationByte = new(ReturnStruct, TEXT("EnsureReplicationByte"), RF_Public|RF_Transient|RF_Native) UByteProperty(CPP_PROPERTY_BASE(EnsureReplicationByte, FTakeHitInfo), 0x0000000000000000);
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bKilled, FTakeHitInfo, uint8);
-			UProperty* NewProp_bKilled = new(ReturnStruct, TEXT("bKilled"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bKilled, FTakeHitInfo), 0x0000000000000000, CPP_BOOL_PROPERTY_BITMASK(bKilled, FTakeHitInfo), sizeof(uint8), false);
+			UProperty* NewProp_bKilled = new(ReturnStruct, TEXT("bKilled"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bKilled, FTakeHitInfo), 0x0000000000000000, CPP_BOOL_PROPERTY_BITMASK(bKilled, FTakeHitInfo), sizeof(uint8), false);
 			UProperty* NewProp_DamageEventClassID = new(ReturnStruct, TEXT("DamageEventClassID"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(DamageEventClassID, FTakeHitInfo), 0x0000000000000000);
 			UProperty* NewProp_DamageCauser = new(ReturnStruct, TEXT("DamageCauser"), RF_Public|RF_Transient|RF_Native) UWeakObjectProperty(CPP_PROPERTY_BASE(DamageCauser, FTakeHitInfo), 0x0000000000000000, Z_Construct_UClass_AActor_NoRegister());
 			UProperty* NewProp_PawnInstigator = new(ReturnStruct, TEXT("PawnInstigator"), RF_Public|RF_Transient|RF_Native) UWeakObjectProperty(CPP_PROPERTY_BASE(PawnInstigator, FTakeHitInfo), 0x0000000000000000, Z_Construct_UClass_AArenaCharacter_NoRegister());
@@ -593,14 +861,14 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnStruct;
 	}
-	uint32 Get_Z_Construct_UScriptStruct_FTakeHitInfo_CRC() { return 1890597861U; }
+	uint32 Get_Z_Construct_UScriptStruct_FTakeHitInfo_CRC() { return 3268107066U; }
 	UScriptStruct* Z_Construct_UScriptStruct_FDecalData()
 	{
 		UPackage* Outer=Z_Construct_UPackage_TheArena();
 		static UScriptStruct* ReturnStruct = NULL;
 		if (!ReturnStruct)
 		{
-			ReturnStruct = new(Outer, TEXT("DecalData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FPostConstructInitializeProperties(), NULL, new UScriptStruct::TCppStructOps<FDecalData>, EStructFlags(0x00000001));
+			ReturnStruct = new(Outer, TEXT("DecalData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FDecalData>, EStructFlags(0x00000001));
 			UProperty* NewProp_LifeSpan = new(ReturnStruct, TEXT("LifeSpan"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(LifeSpan, FDecalData), 0x0000000000010001);
 			UProperty* NewProp_DecalSize = new(ReturnStruct, TEXT("DecalSize"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(DecalSize, FDecalData), 0x0000000000010001);
 			UProperty* NewProp_DecalMaterial = new(ReturnStruct, TEXT("DecalMaterial"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DecalMaterial, FDecalData), 0x0000000000010001, Z_Construct_UClass_UMaterial_NoRegister());
@@ -621,7 +889,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnStruct;
 	}
-	uint32 Get_Z_Construct_UScriptStruct_FDecalData_CRC() { return 4078626812U; }
+	uint32 Get_Z_Construct_UScriptStruct_FDecalData_CRC() { return 3253232189U; }
 	UClass* Z_Construct_UClass_UArenaDamageType_NoRegister()
 	{
 		return UArenaDamageType::StaticClass();
@@ -634,30 +902,33 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_UDamageType();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = UArenaDamageType::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00110080;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20110080;
 
 
-			UProperty* NewProp_KilledForceFeedback = new(OuterClass, TEXT("KilledForceFeedback"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(KilledForceFeedback, UArenaDamageType), 0x0000000000010011, Z_Construct_UClass_UForceFeedbackEffect_NoRegister());
-			UProperty* NewProp_HitForceFeedback = new(OuterClass, TEXT("HitForceFeedback"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(HitForceFeedback, UArenaDamageType), 0x0000000000010011, Z_Construct_UClass_UForceFeedbackEffect_NoRegister());
-			UProperty* NewProp_KillIcon = new(OuterClass, TEXT("KillIcon"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(KillIcon, UArenaDamageType), 0x0000000000010011, Z_Construct_UScriptStruct_UCanvas_FCanvasIcon()); // 2330067727
-			OuterClass->StaticLink();
+				UProperty* NewProp_KilledForceFeedback = new(OuterClass, TEXT("KilledForceFeedback"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(KilledForceFeedback, UArenaDamageType), 0x0000000000010011, Z_Construct_UClass_UForceFeedbackEffect_NoRegister());
+				UProperty* NewProp_HitForceFeedback = new(OuterClass, TEXT("HitForceFeedback"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(HitForceFeedback, UArenaDamageType), 0x0000000000010011, Z_Construct_UClass_UForceFeedbackEffect_NoRegister());
+				UProperty* NewProp_KillIcon = new(OuterClass, TEXT("KillIcon"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(KillIcon, UArenaDamageType), 0x0000000000010011, Z_Construct_UScriptStruct_UCanvas_FCanvasIcon());
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaDamageType.h"));
-			MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaDamageType.h"));
-			MetaData->SetValue(NewProp_KilledForceFeedback, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_KilledForceFeedback, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaDamageType.h"));
-			MetaData->SetValue(NewProp_KilledForceFeedback, TEXT("ToolTip"), TEXT("force feedback effect to play on a player killed by this damage type"));
-			MetaData->SetValue(NewProp_HitForceFeedback, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_HitForceFeedback, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaDamageType.h"));
-			MetaData->SetValue(NewProp_HitForceFeedback, TEXT("ToolTip"), TEXT("force feedback effect to play on a player hit by this damage type"));
-			MetaData->SetValue(NewProp_KillIcon, TEXT("Category"), TEXT("HUD"));
-			MetaData->SetValue(NewProp_KillIcon, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaDamageType.h"));
-			MetaData->SetValue(NewProp_KillIcon, TEXT("ToolTip"), TEXT("icon displayed in death messages log when killed with this weapon"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaDamageType.h"));
+				MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaDamageType.h"));
+				MetaData->SetValue(NewProp_KilledForceFeedback, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_KilledForceFeedback, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaDamageType.h"));
+				MetaData->SetValue(NewProp_KilledForceFeedback, TEXT("ToolTip"), TEXT("force feedback effect to play on a player killed by this damage type"));
+				MetaData->SetValue(NewProp_HitForceFeedback, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_HitForceFeedback, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaDamageType.h"));
+				MetaData->SetValue(NewProp_HitForceFeedback, TEXT("ToolTip"), TEXT("force feedback effect to play on a player hit by this damage type"));
+				MetaData->SetValue(NewProp_KillIcon, TEXT("Category"), TEXT("HUD"));
+				MetaData->SetValue(NewProp_KillIcon, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaDamageType.h"));
+				MetaData->SetValue(NewProp_KillIcon, TEXT("ToolTip"), TEXT("icon displayed in death messages log when killed with this weapon"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -669,7 +940,11 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UScriptStruct* ReturnStruct = NULL;
 		if (!ReturnStruct)
 		{
-			ReturnStruct = new(Outer, TEXT("PlayerData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FPostConstructInitializeProperties(), NULL, new UScriptStruct::TCppStructOps<FPlayerData>, EStructFlags(0x00000001));
+			ReturnStruct = new(Outer, TEXT("PlayerData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FPlayerData>, EStructFlags(0x00000001));
+			UProperty* NewProp_Recovery = new(ReturnStruct, TEXT("Recovery"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(Recovery, FPlayerData), 0x0000000000000005);
+			UProperty* NewProp_Speed = new(ReturnStruct, TEXT("Speed"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(Speed, FPlayerData), 0x0000000000000005);
+			UProperty* NewProp_Mobility = new(ReturnStruct, TEXT("Mobility"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(Mobility, FPlayerData), 0x0000000000000005);
+			UProperty* NewProp_Protection = new(ReturnStruct, TEXT("Protection"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(Protection, FPlayerData), 0x0000000000000005);
 			UProperty* NewProp_LowShieldPercentage = new(ReturnStruct, TEXT("LowShieldPercentage"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(LowShieldPercentage, FPlayerData), 0x0000000000000005);
 			UProperty* NewProp_LowEnergyPercentage = new(ReturnStruct, TEXT("LowEnergyPercentage"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(LowEnergyPercentage, FPlayerData), 0x0000000000000005);
 			UProperty* NewProp_LowStaminaPercentage = new(ReturnStruct, TEXT("LowStaminaPercentage"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(LowStaminaPercentage, FPlayerData), 0x0000000000000005);
@@ -686,6 +961,18 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 #if WITH_METADATA
 			UMetaData* MetaData = ReturnStruct->GetOutermost()->GetMetaData();
 			MetaData->SetValue(ReturnStruct, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(NewProp_Recovery, TEXT("Category"), TEXT("Resources"));
+			MetaData->SetValue(NewProp_Recovery, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(NewProp_Recovery, TEXT("ToolTip"), TEXT("Increases the players rate of recovery from negative effects"));
+			MetaData->SetValue(NewProp_Speed, TEXT("Category"), TEXT("Resources"));
+			MetaData->SetValue(NewProp_Speed, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(NewProp_Speed, TEXT("ToolTip"), TEXT("Decreases movement speed reduction"));
+			MetaData->SetValue(NewProp_Mobility, TEXT("Category"), TEXT("Resources"));
+			MetaData->SetValue(NewProp_Mobility, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(NewProp_Mobility, TEXT("ToolTip"), TEXT("Reduces stamina cunsumption and increase stamina regeneration"));
+			MetaData->SetValue(NewProp_Protection, TEXT("Category"), TEXT("Resources"));
+			MetaData->SetValue(NewProp_Protection, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(NewProp_Protection, TEXT("ToolTip"), TEXT("Increases the amount of damage mitigated"));
 			MetaData->SetValue(NewProp_LowShieldPercentage, TEXT("Category"), TEXT("Resources"));
 			MetaData->SetValue(NewProp_LowShieldPercentage, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
 			MetaData->SetValue(NewProp_LowShieldPercentage, TEXT("ToolTip"), TEXT("The percentage of shield when low shield effects should start"));
@@ -726,7 +1013,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnStruct;
 	}
-	uint32 Get_Z_Construct_UScriptStruct_AArenaCharacter_FPlayerData_CRC() { return 2205019966U; }
+	uint32 Get_Z_Construct_UScriptStruct_AArenaCharacter_FPlayerData_CRC() { return 388435079U; }
 	UFunction* Z_Construct_UFunction_AArenaCharacter_GetAimOffsets()
 	{
 		struct ArenaCharacter_eventGetAimOffsets_Parms
@@ -737,8 +1024,8 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetAimOffsets"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54820401, 65535, sizeof(ArenaCharacter_eventGetAimOffsets_Parms));
-			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetAimOffsets_Parms), 0x0000000000000580, Z_Construct_UScriptStruct_UObject_FRotator()); // 584624545
+			ReturnFunction = new(OuterClass, TEXT("GetAimOffsets"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54820401, 65535, sizeof(ArenaCharacter_eventGetAimOffsets_Parms));
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetAimOffsets_Parms), 0x0000000000000580, Z_Construct_UScriptStruct_UObject_FRotator());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -761,7 +1048,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetBaseMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetBaseMovementSpeed_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetBaseMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetBaseMovementSpeed_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetBaseMovementSpeed_Parms), 0x0000000000000580);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -785,7 +1072,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetCrouchedMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetCrouchedMovementSpeed_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetCrouchedMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetCrouchedMovementSpeed_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetCrouchedMovementSpeed_Parms), 0x0000000000000580);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -794,6 +1081,30 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Pawn"));
 			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
 			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("get the new value for running speed"));
+			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaCharacter_GetCurrentEnergy()
+	{
+		struct ArenaCharacter_eventGetCurrentEnergy_Parms
+		{
+			float ReturnValue;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("GetCurrentEnergy"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetCurrentEnergy_Parms));
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetCurrentEnergy_Parms), 0x0000000000000580);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Resources"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("get current energy"));
 			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
 #endif
 		}
@@ -809,7 +1120,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetCurrentHealth"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetCurrentHealth_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetCurrentHealth"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetCurrentHealth_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetCurrentHealth_Parms), 0x0000000000000580);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -833,7 +1144,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetCurrentStamina"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetCurrentStamina_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetCurrentStamina"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetCurrentStamina_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetCurrentStamina_Parms), 0x0000000000000580);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -842,6 +1153,54 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Resources"));
 			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
 			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("get current stamina"));
+			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaCharacter_GetIdleTime()
+	{
+		struct ArenaCharacter_eventGetIdleTime_Parms
+		{
+			float ReturnValue;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("GetIdleTime"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetIdleTime_Parms));
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetIdleTime_Parms), 0x0000000000000580);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Pawn"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("get current IdleTime"));
+			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaCharacter_GetMaxEnergy()
+	{
+		struct ArenaCharacter_eventGetMaxEnergy_Parms
+		{
+			int32 ReturnValue;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("GetMaxEnergy"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetMaxEnergy_Parms));
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetMaxEnergy_Parms), 0x0000000000000580);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Resources"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("get max energy"));
 			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
 #endif
 		}
@@ -857,7 +1216,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetMaxHealth"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetMaxHealth_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetMaxHealth"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetMaxHealth_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetMaxHealth_Parms), 0x0000000000000580);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -881,7 +1240,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetMaxStamina"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetMaxStamina_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetMaxStamina"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetMaxStamina_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetMaxStamina_Parms), 0x0000000000000580);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -905,7 +1264,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetRunningMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetRunningMovementSpeed_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetRunningMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetRunningMovementSpeed_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetRunningMovementSpeed_Parms), 0x0000000000000580);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -929,7 +1288,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetTargetingMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetTargetingMovementSpeed_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetTargetingMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetTargetingMovementSpeed_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetTargetingMovementSpeed_Parms), 0x0000000000000580);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -953,7 +1312,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetWeapon"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetWeapon_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetWeapon"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventGetWeapon_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaCharacter_eventGetWeapon_Parms), 0x0000000000000580, Z_Construct_UClass_AArenaRangedWeapon_NoRegister());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -977,9 +1336,9 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("IsFiring"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventIsFiring_Parms));
+			ReturnFunction = new(OuterClass, TEXT("IsFiring"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventIsFiring_Parms));
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(ReturnValue, ArenaCharacter_eventIsFiring_Parms, bool);
-			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaCharacter_eventIsFiring_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaCharacter_eventIsFiring_Parms), sizeof(bool), true);
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaCharacter_eventIsFiring_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaCharacter_eventIsFiring_Parms), sizeof(bool), true);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1002,9 +1361,9 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("IsRunning"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventIsRunning_Parms));
+			ReturnFunction = new(OuterClass, TEXT("IsRunning"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventIsRunning_Parms));
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(ReturnValue, ArenaCharacter_eventIsRunning_Parms, bool);
-			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaCharacter_eventIsRunning_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaCharacter_eventIsRunning_Parms), sizeof(bool), true);
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaCharacter_eventIsRunning_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaCharacter_eventIsRunning_Parms), sizeof(bool), true);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1027,9 +1386,9 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("IsTargeting"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventIsTargeting_Parms));
+			ReturnFunction = new(OuterClass, TEXT("IsTargeting"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventIsTargeting_Parms));
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(ReturnValue, ArenaCharacter_eventIsTargeting_Parms, bool);
-			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaCharacter_eventIsTargeting_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaCharacter_eventIsTargeting_Parms), sizeof(bool), true);
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaCharacter_eventIsTargeting_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaCharacter_eventIsTargeting_Parms), sizeof(bool), true);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1037,6 +1396,31 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Game|Weapon"));
 			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
 			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("get targeting state"));
+			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaCharacter_IsThrowing()
+	{
+		struct ArenaCharacter_eventIsThrowing_Parms
+		{
+			bool ReturnValue;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("IsThrowing"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaCharacter_eventIsThrowing_Parms));
+			CPP_BOOL_PROPERTY_BITMASK_STRUCT(ReturnValue, ArenaCharacter_eventIsThrowing_Parms, bool);
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaCharacter_eventIsThrowing_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaCharacter_eventIsThrowing_Parms), sizeof(bool), true);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Pawn"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("get running state"));
 			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
 #endif
 		}
@@ -1052,7 +1436,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("OnRep_CurrentWeapon"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00080401, 65535, sizeof(ArenaCharacter_eventOnRep_CurrentWeapon_Parms));
+			ReturnFunction = new(OuterClass, TEXT("OnRep_CurrentWeapon"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535, sizeof(ArenaCharacter_eventOnRep_CurrentWeapon_Parms));
 			UProperty* NewProp_LastWeapon = new(ReturnFunction, TEXT("LastWeapon"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LastWeapon, ArenaCharacter_eventOnRep_CurrentWeapon_Parms), 0x0000000000000080, Z_Construct_UClass_AArenaRangedWeapon_NoRegister());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -1071,7 +1455,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("OnRep_LastTakeHitInfo"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00080401, 65535);
+			ReturnFunction = new(OuterClass, TEXT("OnRep_LastTakeHitInfo"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1082,13 +1466,30 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnFunction;
 	}
+	UFunction* Z_Construct_UFunction_AArenaCharacter_OnRep_Throw()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("OnRep_Throw"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("Replication"));
+#endif
+		}
+		return ReturnFunction;
+	}
 	UFunction* Z_Construct_UFunction_AArenaCharacter_ServerEquipWeapon()
 	{
 		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerEquipWeapon"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerEquipWeapon_Parms));
+			ReturnFunction = new(OuterClass, TEXT("ServerEquipWeapon"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerEquipWeapon_Parms));
 			UProperty* NewProp_NewWeapon = new(ReturnFunction, TEXT("NewWeapon"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(NewWeapon, ArenaCharacter_eventServerEquipWeapon_Parms), 0x0000000000000080, Z_Construct_UClass_AArenaRangedWeapon_NoRegister());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -1101,17 +1502,57 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnFunction;
 	}
+	UFunction* Z_Construct_UFunction_AArenaCharacter_ServerIdleTimer()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("ServerIdleTimer"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerIdleTimer_Parms));
+			UProperty* NewProp_client = new(ReturnFunction, TEXT("client"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(client, ArenaCharacter_eventServerIdleTimer_Parms), 0x0000000000000080, Z_Construct_UClass_AArenaCharacter_NoRegister());
+			UProperty* NewProp_idleTimer = new(ReturnFunction, TEXT("idleTimer"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(idleTimer, ArenaCharacter_eventServerIdleTimer_Parms), 0x0000000000000082);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("reset idle timer on server"));
+			MetaData->SetValue(NewProp_client, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(NewProp_idleTimer, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaCharacter_ServerJump()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("ServerJump"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerJump_Parms));
+			UProperty* NewProp_client = new(ReturnFunction, TEXT("client"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(client, ArenaCharacter_eventServerJump_Parms), 0x0000000000000080, Z_Construct_UClass_AArenaCharacter_NoRegister());
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("UFUNCTION(reliable, server, WithValidation) //tut1\n       void ServerStartStagger();\n\n       UFUNCTION(reliable, server, WithValidation) //tut1\n       void ServerStopStagger();"));
+			MetaData->SetValue(NewProp_client, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
 	UFunction* Z_Construct_UFunction_AArenaCharacter_ServerSetCrouched()
 	{
 		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerSetCrouched"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerSetCrouched_Parms));
+			ReturnFunction = new(OuterClass, TEXT("ServerSetCrouched"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerSetCrouched_Parms));
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bToggle, ArenaCharacter_eventServerSetCrouched_Parms, bool);
-			UProperty* NewProp_bToggle = new(ReturnFunction, TEXT("bToggle"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bToggle, ArenaCharacter_eventServerSetCrouched_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bToggle, ArenaCharacter_eventServerSetCrouched_Parms), sizeof(bool), true);
+			UProperty* NewProp_bToggle = new(ReturnFunction, TEXT("bToggle"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bToggle, ArenaCharacter_eventServerSetCrouched_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bToggle, ArenaCharacter_eventServerSetCrouched_Parms), sizeof(bool), true);
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bNewCrouched, ArenaCharacter_eventServerSetCrouched_Parms, bool);
-			UProperty* NewProp_bNewCrouched = new(ReturnFunction, TEXT("bNewCrouched"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bNewCrouched, ArenaCharacter_eventServerSetCrouched_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bNewCrouched, ArenaCharacter_eventServerSetCrouched_Parms), sizeof(bool), true);
+			UProperty* NewProp_bNewCrouched = new(ReturnFunction, TEXT("bNewCrouched"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bNewCrouched, ArenaCharacter_eventServerSetCrouched_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bNewCrouched, ArenaCharacter_eventServerSetCrouched_Parms), sizeof(bool), true);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1130,11 +1571,11 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerSetRunning"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerSetRunning_Parms));
+			ReturnFunction = new(OuterClass, TEXT("ServerSetRunning"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerSetRunning_Parms));
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bToggle, ArenaCharacter_eventServerSetRunning_Parms, bool);
-			UProperty* NewProp_bToggle = new(ReturnFunction, TEXT("bToggle"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bToggle, ArenaCharacter_eventServerSetRunning_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bToggle, ArenaCharacter_eventServerSetRunning_Parms), sizeof(bool), true);
+			UProperty* NewProp_bToggle = new(ReturnFunction, TEXT("bToggle"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bToggle, ArenaCharacter_eventServerSetRunning_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bToggle, ArenaCharacter_eventServerSetRunning_Parms), sizeof(bool), true);
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bNewRunning, ArenaCharacter_eventServerSetRunning_Parms, bool);
-			UProperty* NewProp_bNewRunning = new(ReturnFunction, TEXT("bNewRunning"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bNewRunning, ArenaCharacter_eventServerSetRunning_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bNewRunning, ArenaCharacter_eventServerSetRunning_Parms), sizeof(bool), true);
+			UProperty* NewProp_bNewRunning = new(ReturnFunction, TEXT("bNewRunning"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bNewRunning, ArenaCharacter_eventServerSetRunning_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bNewRunning, ArenaCharacter_eventServerSetRunning_Parms), sizeof(bool), true);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1153,9 +1594,9 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerSetTargeting"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerSetTargeting_Parms));
+			ReturnFunction = new(OuterClass, TEXT("ServerSetTargeting"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535, sizeof(ArenaCharacter_eventServerSetTargeting_Parms));
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bNewTargeting, ArenaCharacter_eventServerSetTargeting_Parms, bool);
-			UProperty* NewProp_bNewTargeting = new(ReturnFunction, TEXT("bNewTargeting"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bNewTargeting, ArenaCharacter_eventServerSetTargeting_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bNewTargeting, ArenaCharacter_eventServerSetTargeting_Parms), sizeof(bool), true);
+			UProperty* NewProp_bNewTargeting = new(ReturnFunction, TEXT("bNewTargeting"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bNewTargeting, ArenaCharacter_eventServerSetTargeting_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bNewTargeting, ArenaCharacter_eventServerSetTargeting_Parms), sizeof(bool), true);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1163,6 +1604,38 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
 			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("update targeting state"));
 			MetaData->SetValue(NewProp_bNewTargeting, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaCharacter_ServerStartThrow()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("ServerStartThrow"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaCharacter_ServerStopThrow()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaCharacter();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("ServerStopThrow"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
 #endif
 		}
 		return ReturnFunction;
@@ -1179,207 +1652,263 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_ACharacter();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaCharacter::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00800081;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20800081;
 
-			OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaCharacter_FPlayerData()); // 2205019966
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetAimOffsets());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetBaseMovementSpeed());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetCrouchedMovementSpeed());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetCurrentHealth());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetCurrentStamina());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetMaxHealth());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetMaxStamina());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetRunningMovementSpeed());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetTargetingMovementSpeed());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetWeapon());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_IsFiring());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_IsRunning());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_IsTargeting());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_OnRep_CurrentWeapon());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_OnRep_LastTakeHitInfo());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerEquipWeapon());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerSetCrouched());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerSetRunning());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerSetTargeting());
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaCharacter_FPlayerData()); // 388435079
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetAimOffsets());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetBaseMovementSpeed());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetCrouchedMovementSpeed());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetCurrentEnergy());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetCurrentHealth());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetCurrentStamina());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetIdleTime());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetMaxEnergy());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetMaxHealth());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetMaxStamina());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetRunningMovementSpeed());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetTargetingMovementSpeed());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_GetWeapon());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_IsFiring());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_IsRunning());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_IsTargeting());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_IsThrowing());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_OnRep_CurrentWeapon());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_OnRep_LastTakeHitInfo());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_OnRep_Throw());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerEquipWeapon());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerIdleTimer());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerJump());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerSetCrouched());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerSetRunning());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerSetTargeting());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerStartThrow());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaCharacter_ServerStopThrow());
 
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bHasEnergyGenerator, AArenaCharacter, uint8);
-			UProperty* NewProp_bHasEnergyGenerator = new(OuterClass, TEXT("bHasEnergyGenerator"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bHasEnergyGenerator, AArenaCharacter), 0x0000000000020015, CPP_BOOL_PROPERTY_BITMASK(bHasEnergyGenerator, AArenaCharacter), sizeof(uint8), false);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bHasShield, AArenaCharacter, uint8);
-			UProperty* NewProp_bHasShield = new(OuterClass, TEXT("bHasShield"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bHasShield, AArenaCharacter), 0x0000000000020015, CPP_BOOL_PROPERTY_BITMASK(bHasShield, AArenaCharacter), sizeof(uint8), false);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bIsDying, AArenaCharacter, uint8);
-			UProperty* NewProp_bIsDying = new(OuterClass, TEXT("bIsDying"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bIsDying, AArenaCharacter), 0x0000000000020015, CPP_BOOL_PROPERTY_BITMASK(bIsDying, AArenaCharacter), sizeof(uint8), false);
-			UProperty* NewProp_LowShieldWarningPlayer = new(OuterClass, TEXT("LowShieldWarningPlayer"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowShieldWarningPlayer, AArenaCharacter), 0x0000080004080008, Z_Construct_UClass_UAudioComponent_NoRegister());
-			UProperty* NewProp_LowEnergyWarningPlayer = new(OuterClass, TEXT("LowEnergyWarningPlayer"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowEnergyWarningPlayer, AArenaCharacter), 0x0000080004080008, Z_Construct_UClass_UAudioComponent_NoRegister());
-			UProperty* NewProp_LowStaminaWarningPlayer = new(OuterClass, TEXT("LowStaminaWarningPlayer"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowStaminaWarningPlayer, AArenaCharacter), 0x0000080004080008, Z_Construct_UClass_UAudioComponent_NoRegister());
-			UProperty* NewProp_LowHealthWarningPlayer = new(OuterClass, TEXT("LowHealthWarningPlayer"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowHealthWarningPlayer, AArenaCharacter), 0x0000080004080008, Z_Construct_UClass_UAudioComponent_NoRegister());
-			UProperty* NewProp_RunLoopAC = new(OuterClass, TEXT("RunLoopAC"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RunLoopAC, AArenaCharacter), 0x0000080004080008, Z_Construct_UClass_UAudioComponent_NoRegister());
-			UProperty* NewProp_TargetingSound = new(OuterClass, TEXT("TargetingSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(TargetingSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_RunStopSound = new(OuterClass, TEXT("RunStopSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RunStopSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_RunLoopSound = new(OuterClass, TEXT("RunLoopSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RunLoopSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_LowShieldSound = new(OuterClass, TEXT("LowShieldSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowShieldSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_LowEnergySound = new(OuterClass, TEXT("LowEnergySound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowEnergySound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_LowStaminaSound = new(OuterClass, TEXT("LowStaminaSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowStaminaSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_LowHealthSound = new(OuterClass, TEXT("LowHealthSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowHealthSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_RespawnSound = new(OuterClass, TEXT("RespawnSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RespawnSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_RespawnFX = new(OuterClass, TEXT("RespawnFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RespawnFX, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_DeathSound = new(OuterClass, TEXT("DeathSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DeathSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_MeshMIDs = new(OuterClass, TEXT("MeshMIDs"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(MeshMIDs, AArenaCharacter), 0x0000080000002000);
-			UProperty* NewProp_MeshMIDs_Inner = new(NewProp_MeshMIDs, TEXT("MeshMIDs"), RF_Public|RF_Transient|RF_Native) UObjectProperty(FPostConstructInitializeProperties(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UClass_UMaterialInstanceDynamic_NoRegister());
-			UProperty* NewProp_BaseLookUpRate = new(OuterClass, TEXT("BaseLookUpRate"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(BaseLookUpRate, AArenaCharacter), 0x0000080000000000);
-			UProperty* NewProp_BaseTurnRate = new(OuterClass, TEXT("BaseTurnRate"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(BaseTurnRate, AArenaCharacter), 0x0000080000000000);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bWantsToCrouch, AArenaCharacter, uint8);
-			UProperty* NewProp_bWantsToCrouch = new(OuterClass, TEXT("bWantsToCrouch"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bWantsToCrouch, AArenaCharacter), 0x0000080000002000, CPP_BOOL_PROPERTY_BITMASK(bWantsToCrouch, AArenaCharacter), sizeof(uint8), false);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bWantsToRun, AArenaCharacter, uint8);
-			UProperty* NewProp_bWantsToRun = new(OuterClass, TEXT("bWantsToRun"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bWantsToRun, AArenaCharacter), 0x0000080000002000, CPP_BOOL_PROPERTY_BITMASK(bWantsToRun, AArenaCharacter), sizeof(uint8), false);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bIsTargeting, AArenaCharacter, uint8);
-			UProperty* NewProp_bIsTargeting = new(OuterClass, TEXT("bIsTargeting"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bIsTargeting, AArenaCharacter), 0x0000080000002000, CPP_BOOL_PROPERTY_BITMASK(bIsTargeting, AArenaCharacter), sizeof(uint8), false);
-			UProperty* NewProp_LastTakeHitInfo = new(OuterClass, TEXT("LastTakeHitInfo"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(LastTakeHitInfo, AArenaCharacter), 0x0000080100002020, Z_Construct_UScriptStruct_FTakeHitInfo()); // 1890597861
-			NewProp_LastTakeHitInfo->RepNotifyFunc = FName(TEXT("OnRep_LastTakeHitInfo"));
-			UProperty* NewProp_CurrentWeapon = new(OuterClass, TEXT("CurrentWeapon"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(CurrentWeapon, AArenaCharacter), 0x0000080100002020, Z_Construct_UClass_AArenaRangedWeapon_NoRegister());
-			NewProp_CurrentWeapon->RepNotifyFunc = FName(TEXT("OnRep_CurrentWeapon"));
-			UProperty* NewProp_Inventory = new(OuterClass, TEXT("Inventory"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(Inventory, AArenaCharacter), 0x0000080000002000);
-			UProperty* NewProp_Inventory_Inner = new(NewProp_Inventory, TEXT("Inventory"), RF_Public|RF_Transient|RF_Native) UObjectProperty(FPostConstructInitializeProperties(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UClass_AArenaRangedWeapon_NoRegister());
-			UProperty* NewProp_DefaultInventoryClasses = new(OuterClass, TEXT("DefaultInventoryClasses"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(DefaultInventoryClasses, AArenaCharacter), 0x0000080000010001);
-			UProperty* NewProp_DefaultInventoryClasses_Inner = new(NewProp_DefaultInventoryClasses, TEXT("DefaultInventoryClasses"), RF_Public|RF_Transient|RF_Native) UClassProperty(FPostConstructInitializeProperties(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UClass_AArenaRangedWeapon_NoRegister());
-			UProperty* NewProp_WeaponAttachPoint = new(OuterClass, TEXT("WeaponAttachPoint"), RF_Public|RF_Transient|RF_Native) UNameProperty(CPP_PROPERTY_BASE(WeaponAttachPoint, AArenaCharacter), 0x0000080000010001);
-			UProperty* NewProp_PlayerConfig = new(OuterClass, TEXT("PlayerConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(PlayerConfig, AArenaCharacter), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaCharacter_FPlayerData()); // 2205019966
-			UProperty* NewProp_TargetingMovementSpeed = new(OuterClass, TEXT("TargetingMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(TargetingMovementSpeed, AArenaCharacter), 0x0000000000010001);
-			UProperty* NewProp_DodgeCost = new(OuterClass, TEXT("DodgeCost"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(DodgeCost, AArenaCharacter), 0x0000000000000005);
-			UProperty* NewProp_JumpCost = new(OuterClass, TEXT("JumpCost"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(JumpCost, AArenaCharacter), 0x0000000000000005);
-			UProperty* NewProp_SprintCost = new(OuterClass, TEXT("SprintCost"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(SprintCost, AArenaCharacter), 0x0000000000000005);
-			UProperty* NewProp_CrouchedMovementSpeed = new(OuterClass, TEXT("CrouchedMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(CrouchedMovementSpeed, AArenaCharacter), 0x0000000000010001);
-			UProperty* NewProp_RunningMovementSpeed = new(OuterClass, TEXT("RunningMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(RunningMovementSpeed, AArenaCharacter), 0x0000000000010001);
-			UProperty* NewProp_BaseMovementSpeed = new(OuterClass, TEXT("BaseMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(BaseMovementSpeed, AArenaCharacter), 0x0000000000000005);
-			UProperty* NewProp_FollowCamera = new(OuterClass, TEXT("FollowCamera"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FollowCamera, AArenaCharacter), 0x0000000004480008, Z_Construct_UClass_UCameraComponent_NoRegister());
-			UProperty* NewProp_CameraBoom = new(OuterClass, TEXT("CameraBoom"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(CameraBoom, AArenaCharacter), 0x0000000004480008, Z_Construct_UClass_USpringArmComponent_NoRegister());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetAimOffsets());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetBaseMovementSpeed());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetCrouchedMovementSpeed());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetCurrentHealth());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetCurrentStamina());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetMaxHealth());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetMaxStamina());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetRunningMovementSpeed());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetTargetingMovementSpeed());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetWeapon());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_IsFiring());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_IsRunning());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_IsTargeting());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_OnRep_CurrentWeapon());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_OnRep_LastTakeHitInfo());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerEquipWeapon());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerSetCrouched());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerSetRunning());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerSetTargeting());
-			OuterClass->StaticLink();
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bHasEnergyGenerator, AArenaCharacter, uint8);
+				UProperty* NewProp_bHasEnergyGenerator = new(OuterClass, TEXT("bHasEnergyGenerator"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bHasEnergyGenerator, AArenaCharacter), 0x0000000000020015, CPP_BOOL_PROPERTY_BITMASK(bHasEnergyGenerator, AArenaCharacter), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bHasShield, AArenaCharacter, uint8);
+				UProperty* NewProp_bHasShield = new(OuterClass, TEXT("bHasShield"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bHasShield, AArenaCharacter), 0x0000000000020015, CPP_BOOL_PROPERTY_BITMASK(bHasShield, AArenaCharacter), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bIsDying, AArenaCharacter, uint8);
+				UProperty* NewProp_bIsDying = new(OuterClass, TEXT("bIsDying"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bIsDying, AArenaCharacter), 0x0000000000020015, CPP_BOOL_PROPERTY_BITMASK(bIsDying, AArenaCharacter), sizeof(uint8), false);
+				UProperty* NewProp_GrenadeClass = new(OuterClass, TEXT("GrenadeClass"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(GrenadeClass, AArenaCharacter), 0x0000000000010001, Z_Construct_UClass_AArenaFragGrenade_NoRegister());
+				UProperty* NewProp_LowShieldWarningPlayer = new(OuterClass, TEXT("LowShieldWarningPlayer"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowShieldWarningPlayer, AArenaCharacter), 0x0000080000080008, Z_Construct_UClass_UAudioComponent_NoRegister());
+				UProperty* NewProp_LowEnergyWarningPlayer = new(OuterClass, TEXT("LowEnergyWarningPlayer"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowEnergyWarningPlayer, AArenaCharacter), 0x0000080000080008, Z_Construct_UClass_UAudioComponent_NoRegister());
+				UProperty* NewProp_LowStaminaWarningPlayer = new(OuterClass, TEXT("LowStaminaWarningPlayer"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowStaminaWarningPlayer, AArenaCharacter), 0x0000080000080008, Z_Construct_UClass_UAudioComponent_NoRegister());
+				UProperty* NewProp_LowHealthWarningPlayer = new(OuterClass, TEXT("LowHealthWarningPlayer"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowHealthWarningPlayer, AArenaCharacter), 0x0000080000080008, Z_Construct_UClass_UAudioComponent_NoRegister());
+				UProperty* NewProp_RunLoopAC = new(OuterClass, TEXT("RunLoopAC"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RunLoopAC, AArenaCharacter), 0x0000080000080008, Z_Construct_UClass_UAudioComponent_NoRegister());
+				UProperty* NewProp_TargetingSound = new(OuterClass, TEXT("TargetingSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(TargetingSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_RunStopSound = new(OuterClass, TEXT("RunStopSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RunStopSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_RunLoopSound = new(OuterClass, TEXT("RunLoopSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RunLoopSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_LowShieldSound = new(OuterClass, TEXT("LowShieldSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowShieldSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_LowEnergySound = new(OuterClass, TEXT("LowEnergySound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowEnergySound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_LowStaminaSound = new(OuterClass, TEXT("LowStaminaSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowStaminaSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_LowHealthSound = new(OuterClass, TEXT("LowHealthSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(LowHealthSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_RespawnSound = new(OuterClass, TEXT("RespawnSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RespawnSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_RespawnFX = new(OuterClass, TEXT("RespawnFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(RespawnFX, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_DeathSound = new(OuterClass, TEXT("DeathSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DeathSound, AArenaCharacter), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_MeshMIDs = new(OuterClass, TEXT("MeshMIDs"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(MeshMIDs, AArenaCharacter), 0x0000080000002000);
+				UProperty* NewProp_MeshMIDs_Inner = new(NewProp_MeshMIDs, TEXT("MeshMIDs"), RF_Public|RF_Transient|RF_Native) UObjectProperty(FObjectInitializer(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UClass_UMaterialInstanceDynamic_NoRegister());
+				UProperty* NewProp_BaseLookUpRate = new(OuterClass, TEXT("BaseLookUpRate"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(BaseLookUpRate, AArenaCharacter), 0x0000080000000000);
+				UProperty* NewProp_BaseTurnRate = new(OuterClass, TEXT("BaseTurnRate"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(BaseTurnRate, AArenaCharacter), 0x0000080000000000);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bWantsToThrow, AArenaCharacter, uint8);
+				UProperty* NewProp_bWantsToThrow = new(OuterClass, TEXT("bWantsToThrow"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bWantsToThrow, AArenaCharacter), 0x0000080100002020, CPP_BOOL_PROPERTY_BITMASK(bWantsToThrow, AArenaCharacter), sizeof(uint8), false);
+				NewProp_bWantsToThrow->RepNotifyFunc = FName(TEXT("OnRep_Throw"));
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bWantsToCrouch, AArenaCharacter, uint8);
+				UProperty* NewProp_bWantsToCrouch = new(OuterClass, TEXT("bWantsToCrouch"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bWantsToCrouch, AArenaCharacter), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bWantsToCrouch, AArenaCharacter), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bWantsToRun, AArenaCharacter, uint8);
+				UProperty* NewProp_bWantsToRun = new(OuterClass, TEXT("bWantsToRun"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bWantsToRun, AArenaCharacter), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bWantsToRun, AArenaCharacter), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bIsTargeting, AArenaCharacter, uint8);
+				UProperty* NewProp_bIsTargeting = new(OuterClass, TEXT("bIsTargeting"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bIsTargeting, AArenaCharacter), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bIsTargeting, AArenaCharacter), sizeof(uint8), false);
+				UProperty* NewProp_MovementStrafeAxis = new(OuterClass, TEXT("MovementStrafeAxis"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(MovementStrafeAxis, AArenaCharacter), 0x0000080000020015);
+				UProperty* NewProp_MovementForwardAxis = new(OuterClass, TEXT("MovementForwardAxis"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(MovementForwardAxis, AArenaCharacter), 0x0000080000020015);
+				UProperty* NewProp_LastTakeHitInfo = new(OuterClass, TEXT("LastTakeHitInfo"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(LastTakeHitInfo, AArenaCharacter), 0x0000080100002020, Z_Construct_UScriptStruct_FTakeHitInfo());
+				NewProp_LastTakeHitInfo->RepNotifyFunc = FName(TEXT("OnRep_LastTakeHitInfo"));
+				UProperty* NewProp_CurrentWeapon = new(OuterClass, TEXT("CurrentWeapon"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(CurrentWeapon, AArenaCharacter), 0x0000080100002020, Z_Construct_UClass_AArenaRangedWeapon_NoRegister());
+				NewProp_CurrentWeapon->RepNotifyFunc = FName(TEXT("OnRep_CurrentWeapon"));
+				UProperty* NewProp_Inventory = new(OuterClass, TEXT("Inventory"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(Inventory, AArenaCharacter), 0x0000080000002020);
+				UProperty* NewProp_Inventory_Inner = new(NewProp_Inventory, TEXT("Inventory"), RF_Public|RF_Transient|RF_Native) UObjectProperty(FObjectInitializer(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UClass_AArenaRangedWeapon_NoRegister());
+				UProperty* NewProp_DefaultInventoryClasses = new(OuterClass, TEXT("DefaultInventoryClasses"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(DefaultInventoryClasses, AArenaCharacter), 0x0000080000010001);
+				UProperty* NewProp_DefaultInventoryClasses_Inner = new(NewProp_DefaultInventoryClasses, TEXT("DefaultInventoryClasses"), RF_Public|RF_Transient|RF_Native) UClassProperty(FObjectInitializer(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UClass_AArenaRangedWeapon_NoRegister());
+				UProperty* NewProp_OffHandAttachPoint = new(OuterClass, TEXT("OffHandAttachPoint"), RF_Public|RF_Transient|RF_Native) UNameProperty(CPP_PROPERTY_BASE(OffHandAttachPoint, AArenaCharacter), 0x0000080000010001);
+				UProperty* NewProp_WeaponAttachPoint = new(OuterClass, TEXT("WeaponAttachPoint"), RF_Public|RF_Transient|RF_Native) UNameProperty(CPP_PROPERTY_BASE(WeaponAttachPoint, AArenaCharacter), 0x0000080000010001);
+				UProperty* NewProp_PlayerConfig = new(OuterClass, TEXT("PlayerConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(PlayerConfig, AArenaCharacter), 0x0000080000010021, Z_Construct_UScriptStruct_AArenaCharacter_FPlayerData());
+				UProperty* NewProp_ThrowAnimation = new(OuterClass, TEXT("ThrowAnimation"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ThrowAnimation, AArenaCharacter), 0x0000000000010001, Z_Construct_UClass_UAnimMontage_NoRegister());
+				UProperty* NewProp_IdleTime = new(OuterClass, TEXT("IdleTime"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(IdleTime, AArenaCharacter), 0x0000000000002020);
+				UProperty* NewProp_TargetingMovementSpeed = new(OuterClass, TEXT("TargetingMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(TargetingMovementSpeed, AArenaCharacter), 0x0000000000010001);
+				UProperty* NewProp_DodgeCost = new(OuterClass, TEXT("DodgeCost"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(DodgeCost, AArenaCharacter), 0x0000000000000005);
+				UProperty* NewProp_JumpCost = new(OuterClass, TEXT("JumpCost"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(JumpCost, AArenaCharacter), 0x0000000000000005);
+				UProperty* NewProp_SprintCost = new(OuterClass, TEXT("SprintCost"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(SprintCost, AArenaCharacter), 0x0000000000000005);
+				UProperty* NewProp_CrouchedMovementSpeed = new(OuterClass, TEXT("CrouchedMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(CrouchedMovementSpeed, AArenaCharacter), 0x0000000000010001);
+				UProperty* NewProp_RunningMovementSpeed = new(OuterClass, TEXT("RunningMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(RunningMovementSpeed, AArenaCharacter), 0x0000000000010001);
+				UProperty* NewProp_BaseMovementSpeed = new(OuterClass, TEXT("BaseMovementSpeed"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(BaseMovementSpeed, AArenaCharacter), 0x0000000000000005);
+				UProperty* NewProp_FollowCamera = new(OuterClass, TEXT("FollowCamera"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FollowCamera, AArenaCharacter), 0x0000000000080008, Z_Construct_UClass_UCameraComponent_NoRegister());
+				UProperty* NewProp_CameraBoom = new(OuterClass, TEXT("CameraBoom"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(CameraBoom, AArenaCharacter), 0x0000000000080008, Z_Construct_UClass_USpringArmComponent_NoRegister());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetAimOffsets()); // 3657052815
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetBaseMovementSpeed()); // 818011711
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetCrouchedMovementSpeed()); // 4163005389
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetCurrentEnergy()); // 4120486491
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetCurrentHealth()); // 469453682
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetCurrentStamina()); // 3185071218
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetIdleTime()); // 3778114410
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetMaxEnergy()); // 562444689
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetMaxHealth()); // 4173047108
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetMaxStamina()); // 3075463351
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetRunningMovementSpeed()); // 270067700
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetTargetingMovementSpeed()); // 1209287406
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_GetWeapon()); // 1674575792
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_IsFiring()); // 1915574291
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_IsRunning()); // 3335881066
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_IsTargeting()); // 2122158888
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_IsThrowing()); // 3457625222
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_OnRep_CurrentWeapon()); // 1613096594
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_OnRep_LastTakeHitInfo()); // 4175230035
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_OnRep_Throw()); // 4096476375
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerEquipWeapon()); // 1105470025
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerIdleTimer()); // 2500267524
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerJump()); // 3696153763
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerSetCrouched()); // 863872285
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerSetRunning()); // 791932448
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerSetTargeting()); // 3522464023
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerStartThrow()); // 925048488
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaCharacter_ServerStopThrow()); // 931178385
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Navigation AI|Navigation Pawn|Character|InternalEvents"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaCharacter.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_bHasEnergyGenerator, TEXT("Category"), TEXT("Resources"));
-			MetaData->SetValue(NewProp_bHasEnergyGenerator, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_bHasEnergyGenerator, TEXT("ToolTip"), TEXT("Identifies if pawn is in its dying state"));
-			MetaData->SetValue(NewProp_bHasShield, TEXT("Category"), TEXT("Resources"));
-			MetaData->SetValue(NewProp_bHasShield, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_bHasShield, TEXT("ToolTip"), TEXT("Identifies if pawn is in its dying state"));
-			MetaData->SetValue(NewProp_bIsDying, TEXT("Category"), TEXT("Resources"));
-			MetaData->SetValue(NewProp_bIsDying, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_bIsDying, TEXT("ToolTip"), TEXT("Identifies if pawn is in its dying state"));
-			MetaData->SetValue(NewProp_LowShieldWarningPlayer, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_LowShieldWarningPlayer, TEXT("ToolTip"), TEXT("hook to looped low shield sound used to stop/adjust volume"));
-			MetaData->SetValue(NewProp_LowEnergyWarningPlayer, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_LowEnergyWarningPlayer, TEXT("ToolTip"), TEXT("hook to looped low energy sound used to stop/adjust volume"));
-			MetaData->SetValue(NewProp_LowStaminaWarningPlayer, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_LowStaminaWarningPlayer, TEXT("ToolTip"), TEXT("hook to looped low stamina sound used to stop/adjust volume"));
-			MetaData->SetValue(NewProp_LowHealthWarningPlayer, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_LowHealthWarningPlayer, TEXT("ToolTip"), TEXT("hook to looped low health sound used to stop/adjust volume"));
-			MetaData->SetValue(NewProp_RunLoopAC, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_RunLoopAC, TEXT("ToolTip"), TEXT("manipulates run loop sound"));
-			MetaData->SetValue(NewProp_TargetingSound, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_TargetingSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_TargetingSound, TEXT("ToolTip"), TEXT("sound played when targeting state changes"));
-			MetaData->SetValue(NewProp_RunStopSound, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_RunStopSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_RunStopSound, TEXT("ToolTip"), TEXT("create property for running end sound cue !currently broken!"));
-			MetaData->SetValue(NewProp_RunLoopSound, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_RunLoopSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_RunLoopSound, TEXT("ToolTip"), TEXT("create property for running loop sound cue"));
-			MetaData->SetValue(NewProp_LowShieldSound, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_LowShieldSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_LowShieldSound, TEXT("ToolTip"), TEXT("sound played when shield is low"));
-			MetaData->SetValue(NewProp_LowEnergySound, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_LowEnergySound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_LowEnergySound, TEXT("ToolTip"), TEXT("sound played when energy is low"));
-			MetaData->SetValue(NewProp_LowStaminaSound, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_LowStaminaSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_LowStaminaSound, TEXT("ToolTip"), TEXT("sound played when stamina is low"));
-			MetaData->SetValue(NewProp_LowHealthSound, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_LowHealthSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_LowHealthSound, TEXT("ToolTip"), TEXT("sound played when health is low"));
-			MetaData->SetValue(NewProp_RespawnSound, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_RespawnSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_RespawnSound, TEXT("ToolTip"), TEXT("sound played on respawn"));
-			MetaData->SetValue(NewProp_RespawnFX, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_RespawnFX, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_RespawnFX, TEXT("ToolTip"), TEXT("effect played on respawn"));
-			MetaData->SetValue(NewProp_DeathSound, TEXT("Category"), TEXT("Aesthetics"));
-			MetaData->SetValue(NewProp_DeathSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_DeathSound, TEXT("ToolTip"), TEXT("sound played on death, local player only"));
-			MetaData->SetValue(NewProp_MeshMIDs, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_MeshMIDs, TEXT("ToolTip"), TEXT("material instances for setting team color in mesh (3rd person view)"));
-			MetaData->SetValue(NewProp_BaseLookUpRate, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_BaseLookUpRate, TEXT("ToolTip"), TEXT("Base look up/down rate, in deg/sec. Other scaling may affect final rate."));
-			MetaData->SetValue(NewProp_BaseTurnRate, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_BaseTurnRate, TEXT("ToolTip"), TEXT("Base turn rate, in deg/sec. Other scaling may affect final turn rate."));
-			MetaData->SetValue(NewProp_bWantsToCrouch, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_bWantsToCrouch, TEXT("ToolTip"), TEXT("current crouch state"));
-			MetaData->SetValue(NewProp_bWantsToRun, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_bWantsToRun, TEXT("ToolTip"), TEXT("current running state"));
-			MetaData->SetValue(NewProp_bIsTargeting, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_bIsTargeting, TEXT("ToolTip"), TEXT("current targeting state"));
-			MetaData->SetValue(NewProp_LastTakeHitInfo, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_LastTakeHitInfo, TEXT("ToolTip"), TEXT("Replicate where this pawn was last hit and damaged"));
-			MetaData->SetValue(NewProp_CurrentWeapon, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_CurrentWeapon, TEXT("ToolTip"), TEXT("currently equipped weapon"));
-			MetaData->SetValue(NewProp_Inventory, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_Inventory, TEXT("ToolTip"), TEXT("weapons in inventory"));
-			MetaData->SetValue(NewProp_DefaultInventoryClasses, TEXT("Category"), TEXT("Inventory"));
-			MetaData->SetValue(NewProp_DefaultInventoryClasses, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_DefaultInventoryClasses, TEXT("ToolTip"), TEXT("default inventory list"));
-			MetaData->SetValue(NewProp_WeaponAttachPoint, TEXT("Category"), TEXT("Inventory"));
-			MetaData->SetValue(NewProp_WeaponAttachPoint, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_WeaponAttachPoint, TEXT("ToolTip"), TEXT("socket or bone name for attaching weapon mesh"));
-			MetaData->SetValue(NewProp_PlayerConfig, TEXT("Category"), TEXT("Resources"));
-			MetaData->SetValue(NewProp_PlayerConfig, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_PlayerConfig, TEXT("ToolTip"), TEXT("weapon data"));
-			MetaData->SetValue(NewProp_TargetingMovementSpeed, TEXT("Category"), TEXT("Game|Weapon"));
-			MetaData->SetValue(NewProp_TargetingMovementSpeed, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_TargetingMovementSpeed, TEXT("ToolTip"), TEXT("replaces max movement speed"));
-			MetaData->SetValue(NewProp_DodgeCost, TEXT("Category"), TEXT("Pawn"));
-			MetaData->SetValue(NewProp_DodgeCost, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_DodgeCost, TEXT("ToolTip"), TEXT("replaces max movement speed"));
-			MetaData->SetValue(NewProp_JumpCost, TEXT("Category"), TEXT("Pawn"));
-			MetaData->SetValue(NewProp_JumpCost, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_JumpCost, TEXT("ToolTip"), TEXT("replaces max movement speed"));
-			MetaData->SetValue(NewProp_SprintCost, TEXT("Category"), TEXT("Pawn"));
-			MetaData->SetValue(NewProp_SprintCost, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_SprintCost, TEXT("ToolTip"), TEXT("replaces max movement speed"));
-			MetaData->SetValue(NewProp_CrouchedMovementSpeed, TEXT("Category"), TEXT("Pawn"));
-			MetaData->SetValue(NewProp_CrouchedMovementSpeed, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_CrouchedMovementSpeed, TEXT("ToolTip"), TEXT("replaces max movement speed"));
-			MetaData->SetValue(NewProp_RunningMovementSpeed, TEXT("Category"), TEXT("Pawn"));
-			MetaData->SetValue(NewProp_RunningMovementSpeed, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_RunningMovementSpeed, TEXT("ToolTip"), TEXT("replaces max movement speed"));
-			MetaData->SetValue(NewProp_BaseMovementSpeed, TEXT("Category"), TEXT("Pawn"));
-			MetaData->SetValue(NewProp_BaseMovementSpeed, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_BaseMovementSpeed, TEXT("ToolTip"), TEXT("set the default movement speed"));
-			MetaData->SetValue(NewProp_FollowCamera, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_FollowCamera, TEXT("ToolTip"), TEXT("Follow camera"));
-			MetaData->SetValue(NewProp_CameraBoom, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
-			MetaData->SetValue(NewProp_CameraBoom, TEXT("ToolTip"), TEXT("Camera boom positioning the camera behind the character"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Navigation AI|Navigation Pawn|Character|InternalEvents"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaCharacter.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_bHasEnergyGenerator, TEXT("Category"), TEXT("Resources"));
+				MetaData->SetValue(NewProp_bHasEnergyGenerator, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_bHasEnergyGenerator, TEXT("ToolTip"), TEXT("Identifies if pawn is in its dying state"));
+				MetaData->SetValue(NewProp_bHasShield, TEXT("Category"), TEXT("Resources"));
+				MetaData->SetValue(NewProp_bHasShield, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_bHasShield, TEXT("ToolTip"), TEXT("Identifies if pawn is in its dying state"));
+				MetaData->SetValue(NewProp_bIsDying, TEXT("Category"), TEXT("Resources"));
+				MetaData->SetValue(NewProp_bIsDying, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_bIsDying, TEXT("ToolTip"), TEXT("Identifies if pawn is in its dying state"));
+				MetaData->SetValue(NewProp_GrenadeClass, TEXT("Category"), TEXT("Projectile"));
+				MetaData->SetValue(NewProp_GrenadeClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_GrenadeClass, TEXT("ToolTip"), TEXT("Projectile class to spawn"));
+				MetaData->SetValue(NewProp_LowShieldWarningPlayer, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_LowShieldWarningPlayer, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_LowShieldWarningPlayer, TEXT("ToolTip"), TEXT("hook to looped low shield sound used to stop/adjust volume"));
+				MetaData->SetValue(NewProp_LowEnergyWarningPlayer, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_LowEnergyWarningPlayer, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_LowEnergyWarningPlayer, TEXT("ToolTip"), TEXT("hook to looped low energy sound used to stop/adjust volume"));
+				MetaData->SetValue(NewProp_LowStaminaWarningPlayer, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_LowStaminaWarningPlayer, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_LowStaminaWarningPlayer, TEXT("ToolTip"), TEXT("hook to looped low stamina sound used to stop/adjust volume"));
+				MetaData->SetValue(NewProp_LowHealthWarningPlayer, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_LowHealthWarningPlayer, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_LowHealthWarningPlayer, TEXT("ToolTip"), TEXT("hook to looped low health sound used to stop/adjust volume"));
+				MetaData->SetValue(NewProp_RunLoopAC, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_RunLoopAC, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_RunLoopAC, TEXT("ToolTip"), TEXT("manipulates run loop sound"));
+				MetaData->SetValue(NewProp_TargetingSound, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_TargetingSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_TargetingSound, TEXT("ToolTip"), TEXT("sound played when targeting state changes"));
+				MetaData->SetValue(NewProp_RunStopSound, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_RunStopSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_RunStopSound, TEXT("ToolTip"), TEXT("create property for running end sound cue !currently broken!"));
+				MetaData->SetValue(NewProp_RunLoopSound, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_RunLoopSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_RunLoopSound, TEXT("ToolTip"), TEXT("create property for running loop sound cue"));
+				MetaData->SetValue(NewProp_LowShieldSound, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_LowShieldSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_LowShieldSound, TEXT("ToolTip"), TEXT("sound played when shield is low"));
+				MetaData->SetValue(NewProp_LowEnergySound, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_LowEnergySound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_LowEnergySound, TEXT("ToolTip"), TEXT("sound played when energy is low"));
+				MetaData->SetValue(NewProp_LowStaminaSound, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_LowStaminaSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_LowStaminaSound, TEXT("ToolTip"), TEXT("sound played when stamina is low"));
+				MetaData->SetValue(NewProp_LowHealthSound, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_LowHealthSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_LowHealthSound, TEXT("ToolTip"), TEXT("sound played when health is low"));
+				MetaData->SetValue(NewProp_RespawnSound, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_RespawnSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_RespawnSound, TEXT("ToolTip"), TEXT("sound played on respawn"));
+				MetaData->SetValue(NewProp_RespawnFX, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_RespawnFX, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_RespawnFX, TEXT("ToolTip"), TEXT("effect played on respawn"));
+				MetaData->SetValue(NewProp_DeathSound, TEXT("Category"), TEXT("Aesthetics"));
+				MetaData->SetValue(NewProp_DeathSound, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_DeathSound, TEXT("ToolTip"), TEXT("sound played on death, local player only"));
+				MetaData->SetValue(NewProp_MeshMIDs, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_MeshMIDs, TEXT("ToolTip"), TEXT("material instances for setting team color in mesh (3rd person view)"));
+				MetaData->SetValue(NewProp_BaseLookUpRate, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_BaseLookUpRate, TEXT("ToolTip"), TEXT("Base look up/down rate, in deg/sec. Other scaling may affect final rate."));
+				MetaData->SetValue(NewProp_BaseTurnRate, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_BaseTurnRate, TEXT("ToolTip"), TEXT("Base turn rate, in deg/sec. Other scaling may affect final turn rate."));
+				MetaData->SetValue(NewProp_bWantsToThrow, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_bWantsToThrow, TEXT("ToolTip"), TEXT("current throwing state"));
+				MetaData->SetValue(NewProp_bWantsToCrouch, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_bWantsToCrouch, TEXT("ToolTip"), TEXT("current crouch state"));
+				MetaData->SetValue(NewProp_bWantsToRun, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_bWantsToRun, TEXT("ToolTip"), TEXT("current running state"));
+				MetaData->SetValue(NewProp_bIsTargeting, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_bIsTargeting, TEXT("ToolTip"), TEXT("current targeting state"));
+				MetaData->SetValue(NewProp_MovementStrafeAxis, TEXT("Category"), TEXT("Movement"));
+				MetaData->SetValue(NewProp_MovementStrafeAxis, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_MovementStrafeAxis, TEXT("ToolTip"), TEXT("Current movement axis deflecton right/left (left is negative)"));
+				MetaData->SetValue(NewProp_MovementForwardAxis, TEXT("Category"), TEXT("Movement"));
+				MetaData->SetValue(NewProp_MovementForwardAxis, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_MovementForwardAxis, TEXT("ToolTip"), TEXT("Current movement axis deflecton forward/back (back is negative)"));
+				MetaData->SetValue(NewProp_LastTakeHitInfo, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_LastTakeHitInfo, TEXT("ToolTip"), TEXT("Replicate where this pawn was last hit and damaged"));
+				MetaData->SetValue(NewProp_CurrentWeapon, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_CurrentWeapon, TEXT("ToolTip"), TEXT("currently equipped weapon"));
+				MetaData->SetValue(NewProp_Inventory, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_Inventory, TEXT("ToolTip"), TEXT("weapons in inventory"));
+				MetaData->SetValue(NewProp_DefaultInventoryClasses, TEXT("Category"), TEXT("Inventory"));
+				MetaData->SetValue(NewProp_DefaultInventoryClasses, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_DefaultInventoryClasses, TEXT("ToolTip"), TEXT("default inventory list"));
+				MetaData->SetValue(NewProp_OffHandAttachPoint, TEXT("Category"), TEXT("Inventory"));
+				MetaData->SetValue(NewProp_OffHandAttachPoint, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_OffHandAttachPoint, TEXT("ToolTip"), TEXT("socket or bone name for attaching Utility mesh"));
+				MetaData->SetValue(NewProp_WeaponAttachPoint, TEXT("Category"), TEXT("Inventory"));
+				MetaData->SetValue(NewProp_WeaponAttachPoint, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_WeaponAttachPoint, TEXT("ToolTip"), TEXT("socket or bone name for attaching weapon mesh"));
+				MetaData->SetValue(NewProp_PlayerConfig, TEXT("Category"), TEXT("Resources"));
+				MetaData->SetValue(NewProp_PlayerConfig, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_PlayerConfig, TEXT("ToolTip"), TEXT("weapon data"));
+				MetaData->SetValue(NewProp_ThrowAnimation, TEXT("Category"), TEXT("Animation"));
+				MetaData->SetValue(NewProp_ThrowAnimation, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_ThrowAnimation, TEXT("ToolTip"), TEXT("animation played on pawn (3rd person view)"));
+				MetaData->SetValue(NewProp_IdleTime, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_IdleTime, TEXT("ToolTip"), TEXT("replaces max movement speed"));
+				MetaData->SetValue(NewProp_TargetingMovementSpeed, TEXT("Category"), TEXT("Game|Weapon"));
+				MetaData->SetValue(NewProp_TargetingMovementSpeed, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_TargetingMovementSpeed, TEXT("ToolTip"), TEXT("replaces max movement speed"));
+				MetaData->SetValue(NewProp_DodgeCost, TEXT("Category"), TEXT("Pawn"));
+				MetaData->SetValue(NewProp_DodgeCost, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_DodgeCost, TEXT("ToolTip"), TEXT("replaces max movement speed"));
+				MetaData->SetValue(NewProp_JumpCost, TEXT("Category"), TEXT("Pawn"));
+				MetaData->SetValue(NewProp_JumpCost, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_JumpCost, TEXT("ToolTip"), TEXT("replaces max movement speed"));
+				MetaData->SetValue(NewProp_SprintCost, TEXT("Category"), TEXT("Pawn"));
+				MetaData->SetValue(NewProp_SprintCost, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_SprintCost, TEXT("ToolTip"), TEXT("replaces max movement speed"));
+				MetaData->SetValue(NewProp_CrouchedMovementSpeed, TEXT("Category"), TEXT("Pawn"));
+				MetaData->SetValue(NewProp_CrouchedMovementSpeed, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_CrouchedMovementSpeed, TEXT("ToolTip"), TEXT("replaces max movement speed"));
+				MetaData->SetValue(NewProp_RunningMovementSpeed, TEXT("Category"), TEXT("Pawn"));
+				MetaData->SetValue(NewProp_RunningMovementSpeed, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_RunningMovementSpeed, TEXT("ToolTip"), TEXT("replaces max movement speed"));
+				MetaData->SetValue(NewProp_BaseMovementSpeed, TEXT("Category"), TEXT("Pawn"));
+				MetaData->SetValue(NewProp_BaseMovementSpeed, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_BaseMovementSpeed, TEXT("ToolTip"), TEXT("set the default movement speed"));
+				MetaData->SetValue(NewProp_FollowCamera, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_FollowCamera, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_FollowCamera, TEXT("ToolTip"), TEXT("Follow camera"));
+				MetaData->SetValue(NewProp_CameraBoom, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_CameraBoom, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacter.h"));
+				MetaData->SetValue(NewProp_CameraBoom, TEXT("ToolTip"), TEXT("Camera boom positioning the camera behind the character"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -1397,20 +1926,23 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AArenaCharacter();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaAI::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900080;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900080;
 
 
-			UProperty* NewProp_BotBehavior = new(OuterClass, TEXT("BotBehavior"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(BotBehavior, AArenaAI), 0x0000000000000001, Z_Construct_UClass_UBehaviorTree_NoRegister());
-			OuterClass->StaticLink();
+				UProperty* NewProp_BotBehavior = new(OuterClass, TEXT("BotBehavior"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(BotBehavior, AArenaAI), 0x0000000000000001, Z_Construct_UClass_UBehaviorTree_NoRegister());
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Navigation AI|Navigation Pawn|Character|InternalEvents"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("AI/ArenaAI.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAI.h"));
-			MetaData->SetValue(NewProp_BotBehavior, TEXT("Category"), TEXT("Behavior"));
-			MetaData->SetValue(NewProp_BotBehavior, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAI.h"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Navigation AI|Navigation Pawn|Character|InternalEvents"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("AI/ArenaAI.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAI.h"));
+				MetaData->SetValue(NewProp_BotBehavior, TEXT("Category"), TEXT("Behavior"));
+				MetaData->SetValue(NewProp_BotBehavior, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAI.h"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -1422,7 +1954,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("FindClosestEnemy"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x04020401, 65535);
+			ReturnFunction = new(OuterClass, TEXT("FindClosestEnemy"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020401, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1445,9 +1977,9 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("FindClosestEnemyWithLOS"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x04020401, 65535, sizeof(ArenaAIController_eventFindClosestEnemyWithLOS_Parms));
+			ReturnFunction = new(OuterClass, TEXT("FindClosestEnemyWithLOS"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020401, 65535, sizeof(ArenaAIController_eventFindClosestEnemyWithLOS_Parms));
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(ReturnValue, ArenaAIController_eventFindClosestEnemyWithLOS_Parms, bool);
-			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaAIController_eventFindClosestEnemyWithLOS_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaAIController_eventFindClosestEnemyWithLOS_Parms), sizeof(bool), true);
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaAIController_eventFindClosestEnemyWithLOS_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaAIController_eventFindClosestEnemyWithLOS_Parms), sizeof(bool), true);
 			UProperty* NewProp_ExcludeEnemy = new(ReturnFunction, TEXT("ExcludeEnemy"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ExcludeEnemy, ArenaAIController_eventFindClosestEnemyWithLOS_Parms), 0x0000000000000080, Z_Construct_UClass_AArenaCharacter_NoRegister());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -1467,7 +1999,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ShootEnemy"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x04020401, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ShootEnemy"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020401, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1491,32 +2023,439 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AAIController();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaAIController::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900280;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900280;
 
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaAIController_FindClosestEnemy());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaAIController_FindClosestEnemyWithLOS());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaAIController_ShootEnemy());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaAIController_FindClosestEnemy());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaAIController_FindClosestEnemyWithLOS());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaAIController_ShootEnemy());
 
-			UProperty* NewProp_BehaviorComp = new(OuterClass, TEXT("BehaviorComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(BehaviorComp, AArenaAIController), 0x0000000004482008, Z_Construct_UClass_UBehaviorTreeComponent_NoRegister());
-			UProperty* NewProp_BlackboardComp = new(OuterClass, TEXT("BlackboardComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(BlackboardComp, AArenaAIController), 0x0000000004482008, Z_Construct_UClass_UBlackboardComponent_NoRegister());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaAIController_FindClosestEnemy());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaAIController_FindClosestEnemyWithLOS());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaAIController_ShootEnemy());
-			OuterClass->StaticLink();
+				UProperty* NewProp_BehaviorComp = new(OuterClass, TEXT("BehaviorComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(BehaviorComp, AArenaAIController), 0x0000000000082008, Z_Construct_UClass_UBehaviorTreeComponent_NoRegister());
+				UProperty* NewProp_BlackboardComp = new(OuterClass, TEXT("BlackboardComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(BlackboardComp, AArenaAIController), 0x0000000000082008, Z_Construct_UClass_UBlackboardComponent_NoRegister());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaAIController_FindClosestEnemy()); // 3455032577
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaAIController_FindClosestEnemyWithLOS()); // 3097365229
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaAIController_ShootEnemy()); // 1496726306
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Collision Rendering Utilities|Transformation"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("AI/ArenaAIController.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAIController.h"));
-			MetaData->SetValue(NewProp_BehaviorComp, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAIController.h"));
-			MetaData->SetValue(NewProp_BlackboardComp, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAIController.h"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Collision Rendering Utilities|Transformation"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("AI/ArenaAIController.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAIController.h"));
+				MetaData->SetValue(NewProp_BehaviorComp, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_BehaviorComp, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAIController.h"));
+				MetaData->SetValue(NewProp_BlackboardComp, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_BlackboardComp, TEXT("ModuleRelativePath"), TEXT("Public/AI/ArenaAIController.h"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AArenaAIController(Z_Construct_UClass_AArenaAIController, TEXT("AArenaAIController"));
+	UClass* Z_Construct_UClass_UArenaCharacterMovement_NoRegister()
+	{
+		return UArenaCharacterMovement::StaticClass();
+	}
+	UClass* Z_Construct_UClass_UArenaCharacterMovement()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_UCharacterMovementComponent();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = UArenaCharacterMovement::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20B00080;
+
+
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("ComponentReplication"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaCharacterMovement.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaCharacterMovement.h"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_UArenaCharacterMovement(Z_Construct_UClass_UArenaCharacterMovement, TEXT("UArenaCharacterMovement"));
+	UClass* Z_Construct_UClass_AArenaExplosionEffect_NoRegister()
+	{
+		return AArenaExplosionEffect::StaticClass();
+	}
+	UClass* Z_Construct_UClass_AArenaExplosionEffect()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_AActor();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = AArenaExplosionEffect::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900081;
+
+
+				UProperty* NewProp_SurfaceHit = new(OuterClass, TEXT("SurfaceHit"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(SurfaceHit, AArenaExplosionEffect), 0x0000000000000014, Z_Construct_UScriptStruct_UEngineTypes_FHitResult());
+				UProperty* NewProp_Decal = new(OuterClass, TEXT("Decal"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Decal, AArenaExplosionEffect), 0x0000000000010001, Z_Construct_UScriptStruct_FDecalData());
+				UProperty* NewProp_ExplosionSound = new(OuterClass, TEXT("ExplosionSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ExplosionSound, AArenaExplosionEffect), 0x0000000000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_ExplosionLightFadeOut = new(OuterClass, TEXT("ExplosionLightFadeOut"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ExplosionLightFadeOut, AArenaExplosionEffect), 0x0000000000010001);
+				UProperty* NewProp_ExplosionLight = new(OuterClass, TEXT("ExplosionLight"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ExplosionLight, AArenaExplosionEffect), 0x00000000000b0009, Z_Construct_UClass_UPointLightComponent_NoRegister());
+				UProperty* NewProp_ExplosionFX = new(OuterClass, TEXT("ExplosionFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ExplosionFX, AArenaExplosionEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Effects/ArenaExplosionEffect.h"));
+				MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaExplosionEffect.h"));
+				MetaData->SetValue(NewProp_SurfaceHit, TEXT("Category"), TEXT("Surface"));
+				MetaData->SetValue(NewProp_SurfaceHit, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaExplosionEffect.h"));
+				MetaData->SetValue(NewProp_SurfaceHit, TEXT("ToolTip"), TEXT("surface data for spawning"));
+				MetaData->SetValue(NewProp_Decal, TEXT("Category"), TEXT("Effect"));
+				MetaData->SetValue(NewProp_Decal, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaExplosionEffect.h"));
+				MetaData->SetValue(NewProp_Decal, TEXT("ToolTip"), TEXT("explosion decals"));
+				MetaData->SetValue(NewProp_ExplosionSound, TEXT("Category"), TEXT("Effect"));
+				MetaData->SetValue(NewProp_ExplosionSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaExplosionEffect.h"));
+				MetaData->SetValue(NewProp_ExplosionSound, TEXT("ToolTip"), TEXT("explosion sound"));
+				MetaData->SetValue(NewProp_ExplosionLightFadeOut, TEXT("Category"), TEXT("Effect"));
+				MetaData->SetValue(NewProp_ExplosionLightFadeOut, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaExplosionEffect.h"));
+				MetaData->SetValue(NewProp_ExplosionLightFadeOut, TEXT("ToolTip"), TEXT("how long keep explosion light on?"));
+				MetaData->SetValue(NewProp_ExplosionLight, TEXT("Category"), TEXT("Effect"));
+				MetaData->SetValue(NewProp_ExplosionLight, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_ExplosionLight, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaExplosionEffect.h"));
+				MetaData->SetValue(NewProp_ExplosionLight, TEXT("ToolTip"), TEXT("explosion light"));
+				MetaData->SetValue(NewProp_ExplosionFX, TEXT("Category"), TEXT("Effect"));
+				MetaData->SetValue(NewProp_ExplosionFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaExplosionEffect.h"));
+				MetaData->SetValue(NewProp_ExplosionFX, TEXT("ToolTip"), TEXT("explosion FX"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_AArenaExplosionEffect(Z_Construct_UClass_AArenaExplosionEffect, TEXT("AArenaExplosionEffect"));
+	UScriptStruct* Z_Construct_UScriptStruct_AArenaFragGrenade_FGrenadeWeaponData()
+	{
+		UStruct* Outer=Z_Construct_UClass_AArenaFragGrenade();
+		static UScriptStruct* ReturnStruct = NULL;
+		if (!ReturnStruct)
+		{
+			ReturnStruct = new(Outer, TEXT("GrenadeWeaponData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FGrenadeWeaponData>, EStructFlags(0x00000001));
+			UProperty* NewProp_DamageType = new(ReturnStruct, TEXT("DamageType"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(DamageType, FGrenadeWeaponData), 0x0000000000000005, Z_Construct_UClass_UDamageType_NoRegister());
+			UProperty* NewProp_ExplosionRadius = new(ReturnStruct, TEXT("ExplosionRadius"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ExplosionRadius, FGrenadeWeaponData), 0x0000000000000005);
+			UProperty* NewProp_ExplosionDamage = new(ReturnStruct, TEXT("ExplosionDamage"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ExplosionDamage, FGrenadeWeaponData), 0x0000000000000005);
+			UProperty* NewProp_ProjectileLife = new(ReturnStruct, TEXT("ProjectileLife"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ProjectileLife, FGrenadeWeaponData), 0x0000000000000005);
+			ReturnStruct->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnStruct->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnStruct, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+			MetaData->SetValue(NewProp_DamageType, TEXT("Category"), TEXT("Projectile"));
+			MetaData->SetValue(NewProp_DamageType, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+			MetaData->SetValue(NewProp_DamageType, TEXT("ToolTip"), TEXT("type of damage"));
+			MetaData->SetValue(NewProp_ExplosionRadius, TEXT("Category"), TEXT("Projectile"));
+			MetaData->SetValue(NewProp_ExplosionRadius, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+			MetaData->SetValue(NewProp_ExplosionRadius, TEXT("ToolTip"), TEXT("radius of damage"));
+			MetaData->SetValue(NewProp_ExplosionDamage, TEXT("Category"), TEXT("Projectile"));
+			MetaData->SetValue(NewProp_ExplosionDamage, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+			MetaData->SetValue(NewProp_ExplosionDamage, TEXT("ToolTip"), TEXT("damage at impact point"));
+			MetaData->SetValue(NewProp_ProjectileLife, TEXT("Category"), TEXT("Projectile"));
+			MetaData->SetValue(NewProp_ProjectileLife, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+			MetaData->SetValue(NewProp_ProjectileLife, TEXT("ToolTip"), TEXT("life time"));
+#endif
+		}
+		return ReturnStruct;
+	}
+	uint32 Get_Z_Construct_UScriptStruct_AArenaFragGrenade_FGrenadeWeaponData_CRC() { return 365310490U; }
+	UFunction* Z_Construct_UFunction_AArenaFragGrenade_OnImpact()
+	{
+		struct ArenaFragGrenade_eventOnImpact_Parms
+		{
+			struct FHitResult HitResult;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaFragGrenade();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("OnImpact"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00420401, 65535, sizeof(ArenaFragGrenade_eventOnImpact_Parms));
+			UProperty* NewProp_HitResult = new(ReturnFunction, TEXT("HitResult"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(HitResult, ArenaFragGrenade_eventOnImpact_Parms), 0x0000000008000182, Z_Construct_UScriptStruct_UEngineTypes_FHitResult());
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("handle hit"));
+			MetaData->SetValue(NewProp_HitResult, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaFragGrenade_OnRep_Exploded()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaFragGrenade();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("OnRep_Exploded"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("[client] explosion happened"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UClass* Z_Construct_UClass_AArenaFragGrenade_NoRegister()
+	{
+		return AArenaFragGrenade::StaticClass();
+	}
+	UClass* Z_Construct_UClass_AArenaFragGrenade()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_AActor();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = AArenaFragGrenade::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900081;
+
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaFragGrenade_FGrenadeWeaponData()); // 365310490
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaFragGrenade_OnImpact());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaFragGrenade_OnRep_Exploded());
+
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bExploded, AArenaFragGrenade, bool);
+				UProperty* NewProp_bExploded = new(OuterClass, TEXT("bExploded"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bExploded, AArenaFragGrenade), 0x0000080100002020, CPP_BOOL_PROPERTY_BITMASK(bExploded, AArenaFragGrenade), sizeof(bool), true);
+				NewProp_bExploded->RepNotifyFunc = FName(TEXT("OnRep_Exploded"));
+				UProperty* NewProp_ExplosionTemplate = new(OuterClass, TEXT("ExplosionTemplate"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(ExplosionTemplate, AArenaFragGrenade), 0x0000080000010001, Z_Construct_UClass_AArenaExplosionEffect_NoRegister());
+				UProperty* NewProp_ParticleComp = new(OuterClass, TEXT("ParticleComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ParticleComp, AArenaFragGrenade), 0x00000800000b0009, Z_Construct_UClass_UParticleSystemComponent_NoRegister());
+				UProperty* NewProp_CollisionComp = new(OuterClass, TEXT("CollisionComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(CollisionComp, AArenaFragGrenade), 0x00000800000b0009, Z_Construct_UClass_USphereComponent_NoRegister());
+				UProperty* NewProp_MovementComp = new(OuterClass, TEXT("MovementComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MovementComp, AArenaFragGrenade), 0x00000800000b0009, Z_Construct_UClass_UProjectileMovementComponent_NoRegister());
+				UProperty* NewProp_Explosion = new(OuterClass, TEXT("Explosion"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Explosion, AArenaFragGrenade), 0x0000080000010021, Z_Construct_UScriptStruct_AArenaFragGrenade_FGrenadeWeaponData());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaFragGrenade_OnImpact()); // 955732209
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaFragGrenade_OnRep_Exploded()); // 364240055
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaFragGrenade.h"));
+				MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+				MetaData->SetValue(NewProp_bExploded, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+				MetaData->SetValue(NewProp_bExploded, TEXT("ToolTip"), TEXT("did it explode?"));
+				MetaData->SetValue(NewProp_ExplosionTemplate, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_ExplosionTemplate, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+				MetaData->SetValue(NewProp_ExplosionTemplate, TEXT("ToolTip"), TEXT("effects for explosion"));
+				MetaData->SetValue(NewProp_ParticleComp, TEXT("Category"), TEXT("Projectile"));
+				MetaData->SetValue(NewProp_ParticleComp, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_ParticleComp, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+				MetaData->SetValue(NewProp_CollisionComp, TEXT("Category"), TEXT("Projectile"));
+				MetaData->SetValue(NewProp_CollisionComp, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_CollisionComp, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+				MetaData->SetValue(NewProp_CollisionComp, TEXT("ToolTip"), TEXT("collisions"));
+				MetaData->SetValue(NewProp_MovementComp, TEXT("Category"), TEXT("Projectile"));
+				MetaData->SetValue(NewProp_MovementComp, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_MovementComp, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+				MetaData->SetValue(NewProp_MovementComp, TEXT("ToolTip"), TEXT("movement component"));
+				MetaData->SetValue(NewProp_Explosion, TEXT("Category"), TEXT("Projectile"));
+				MetaData->SetValue(NewProp_Explosion, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaFragGrenade.h"));
+				MetaData->SetValue(NewProp_Explosion, TEXT("ToolTip"), TEXT("weapon data"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_AArenaFragGrenade(Z_Construct_UClass_AArenaFragGrenade, TEXT("AArenaFragGrenade"));
+	UScriptStruct* Z_Construct_UScriptStruct_UArenaFriendsList_FBlueprintFriend()
+	{
+		UStruct* Outer=Z_Construct_UClass_UArenaFriendsList();
+		static UScriptStruct* ReturnStruct = NULL;
+		if (!ReturnStruct)
+		{
+			ReturnStruct = new(Outer, TEXT("BlueprintFriend"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FBlueprintFriend>, EStructFlags(0x00000001));
+			UProperty* NewProp_UniqueNetId = new(ReturnStruct, TEXT("UniqueNetId"), RF_Public|RF_Transient|RF_Native) UStrProperty(CPP_PROPERTY_BASE(UniqueNetId, FBlueprintFriend), 0x0000000000000005);
+			UProperty* NewProp_Presence = new(ReturnStruct, TEXT("Presence"), RF_Public|RF_Transient|RF_Native) UStrProperty(CPP_PROPERTY_BASE(Presence, FBlueprintFriend), 0x0000000000000005);
+			UProperty* NewProp_RealName = new(ReturnStruct, TEXT("RealName"), RF_Public|RF_Transient|RF_Native) UStrProperty(CPP_PROPERTY_BASE(RealName, FBlueprintFriend), 0x0000000000000005);
+			UProperty* NewProp_DisplayName = new(ReturnStruct, TEXT("DisplayName"), RF_Public|RF_Transient|RF_Native) UStrProperty(CPP_PROPERTY_BASE(DisplayName, FBlueprintFriend), 0x0000000000000005);
+			ReturnStruct->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnStruct->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnStruct, TEXT("BlueprintType"), TEXT("true"));
+			MetaData->SetValue(ReturnStruct, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+			MetaData->SetValue(NewProp_UniqueNetId, TEXT("Category"), TEXT("Online|Friend"));
+			MetaData->SetValue(NewProp_UniqueNetId, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+			MetaData->SetValue(NewProp_Presence, TEXT("Category"), TEXT("Online|Friend"));
+			MetaData->SetValue(NewProp_Presence, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+			MetaData->SetValue(NewProp_RealName, TEXT("Category"), TEXT("Online|Friend"));
+			MetaData->SetValue(NewProp_RealName, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+			MetaData->SetValue(NewProp_DisplayName, TEXT("Category"), TEXT("Online|Friend"));
+			MetaData->SetValue(NewProp_DisplayName, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+#endif
+		}
+		return ReturnStruct;
+	}
+	uint32 Get_Z_Construct_UScriptStruct_UArenaFriendsList_FBlueprintFriend_CRC() { return 4078189479U; }
+	UFunction* Z_Construct_UFunction_UArenaFriendsList_Activate()
+	{
+		struct ArenaFriendsList_eventActivate_Parms
+		{
+			class UArenaGameInstance* _GameInstance;
+		};
+		UClass* OuterClass=Z_Construct_UClass_UArenaFriendsList();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("Activate"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020400, 65535, sizeof(ArenaFriendsList_eventActivate_Parms));
+			UProperty* NewProp__GameInstance = new(ReturnFunction, TEXT("_GameInstance"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(_GameInstance, ArenaFriendsList_eventActivate_Parms), 0x0000000000000080, Z_Construct_UClass_UArenaGameInstance_NoRegister());
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Online|Friends"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("UOnlineBlueprintCallProxyBase interface"));
+			MetaData->SetValue(NewProp__GameInstance, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_UArenaFriendsList_BlueprintGetFriendsListDelegate__DelegateSignature()
+	{
+		struct ArenaFriendsList_eventBlueprintGetFriendsListDelegate_Parms
+		{
+			TArray<struct FBlueprintFriend> Results;
+		};
+		UClass* OuterClass=Z_Construct_UClass_UArenaFriendsList();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("BlueprintGetFriendsListDelegate__DelegateSignature"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00530000, 65535, sizeof(ArenaFriendsList_eventBlueprintGetFriendsListDelegate_Parms));
+			UProperty* NewProp_Results = new(ReturnFunction, TEXT("Results"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(Results, ArenaFriendsList_eventBlueprintGetFriendsListDelegate_Parms), 0x0000000008000182);
+			UProperty* NewProp_Results_Inner = new(NewProp_Results, TEXT("Results"), RF_Public|RF_Transient|RF_Native) UStructProperty(FObjectInitializer(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UScriptStruct_UArenaFriendsList_FBlueprintFriend());
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+			MetaData->SetValue(NewProp_Results, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_UArenaFriendsList_GetFriendsList()
+	{
+		struct ArenaFriendsList_eventGetFriendsList_Parms
+		{
+			class UObject* WorldContextObject;
+			class APlayerController* PlayerController;
+			class UArenaFriendsList* ReturnValue;
+		};
+		UClass* OuterClass=Z_Construct_UClass_UArenaFriendsList();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("GetFriendsList"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04022401, 65535, sizeof(ArenaFriendsList_eventGetFriendsList_Parms));
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaFriendsList_eventGetFriendsList_Parms), 0x0000000000000580, Z_Construct_UClass_UArenaFriendsList_NoRegister());
+			UProperty* NewProp_PlayerController = new(ReturnFunction, TEXT("PlayerController"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(PlayerController, ArenaFriendsList_eventGetFriendsList_Parms), 0x0000000000000080, Z_Construct_UClass_APlayerController_NoRegister());
+			UProperty* NewProp_WorldContextObject = new(ReturnFunction, TEXT("WorldContextObject"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(WorldContextObject, ArenaFriendsList_eventGetFriendsList_Parms), 0x0000000000000080, Z_Construct_UClass_UObject_NoRegister());
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Online|Friends"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+			MetaData->SetValue(NewProp_PlayerController, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+			MetaData->SetValue(NewProp_WorldContextObject, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UClass* Z_Construct_UClass_UArenaFriendsList_NoRegister()
+	{
+		return UArenaFriendsList::StaticClass();
+	}
+	UClass* Z_Construct_UClass_UArenaFriendsList()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_UUserWidget();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = UArenaFriendsList::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20901080;
+
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_UArenaFriendsList_FBlueprintFriend()); // 4078189479
+				OuterClass->LinkChild(Z_Construct_UFunction_UArenaFriendsList_Activate());
+				OuterClass->LinkChild(Z_Construct_UFunction_UArenaFriendsList_BlueprintGetFriendsListDelegate__DelegateSignature());
+				OuterClass->LinkChild(Z_Construct_UFunction_UArenaFriendsList_GetFriendsList());
+
+				UProperty* NewProp_OnFailure = new(OuterClass, TEXT("OnFailure"), RF_Public|RF_Transient|RF_Native) UMulticastDelegateProperty(CPP_PROPERTY_BASE(OnFailure, UArenaFriendsList), 0x0000000010080000, Z_Construct_UFunction_UArenaFriendsList_BlueprintGetFriendsListDelegate__DelegateSignature());
+				UProperty* NewProp_OnSuccess = new(OuterClass, TEXT("OnSuccess"), RF_Public|RF_Transient|RF_Native) UMulticastDelegateProperty(CPP_PROPERTY_BASE(OnSuccess, UArenaFriendsList), 0x0000000010080000, Z_Construct_UFunction_UArenaFriendsList_BlueprintGetFriendsListDelegate__DelegateSignature());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_UArenaFriendsList_Activate()); // 2020696186
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_UArenaFriendsList_BlueprintGetFriendsListDelegate__DelegateSignature()); // 1071549920
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_UArenaFriendsList_GetFriendsList()); // 300762457
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("UI/ArenaFriendsList.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+				MetaData->SetValue(NewProp_OnFailure, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+				MetaData->SetValue(NewProp_OnFailure, TEXT("ToolTip"), TEXT("Called when there was an error creating the session"));
+				MetaData->SetValue(NewProp_OnSuccess, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaFriendsList.h"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_UArenaFriendsList(Z_Construct_UClass_UArenaFriendsList, TEXT("UArenaFriendsList"));
+	UClass* Z_Construct_UClass_UArenaGameInstance_NoRegister()
+	{
+		return UArenaGameInstance::StaticClass();
+	}
+	UClass* Z_Construct_UClass_UArenaGameInstance()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_UGameInstance();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = UArenaGameInstance::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20000088;
+
+
+				OuterClass->ClassConfigName = FName(TEXT("Game"));
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("ArenaGameInstance.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/ArenaGameInstance.h"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_UArenaGameInstance(Z_Construct_UClass_UArenaGameInstance, TEXT("UArenaGameInstance"));
 	UClass* Z_Construct_UClass_AArenaGameSession_NoRegister()
 	{
 		return AArenaGameSession::StaticClass();
@@ -1529,19 +2468,22 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AGameSession();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaGameSession::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00800284;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20800284;
 
 
-			OuterClass->ClassConfigName = FName(TEXT("game"));
-			OuterClass->StaticLink();
+				OuterClass->ClassConfigName = FName(TEXT("game"));
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/ArenaGameSession.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameSession.h"));
-			MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/ArenaGameSession.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameSession.h"));
+				MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -1553,7 +2495,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("InformAboutKill"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x01020CC0, 65535, sizeof(ArenaPlayerState_eventInformAboutKill_Parms));
+			ReturnFunction = new(OuterClass, TEXT("InformAboutKill"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x01020CC0, 65535, sizeof(ArenaPlayerState_eventInformAboutKill_Parms));
 			UProperty* NewProp_KilledPlayerState = new(ReturnFunction, TEXT("KilledPlayerState"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(KilledPlayerState, ArenaPlayerState_eventInformAboutKill_Parms), 0x0000000000000080, Z_Construct_UClass_AArenaPlayerState_NoRegister());
 			UProperty* NewProp_KillerDamageType = new(ReturnFunction, TEXT("KillerDamageType"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(KillerDamageType, ArenaPlayerState_eventInformAboutKill_Parms), 0x0000000000000082, Z_Construct_UClass_UDamageType_NoRegister());
 			UProperty* NewProp_KillerPlayerState = new(ReturnFunction, TEXT("KillerPlayerState"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(KillerPlayerState, ArenaPlayerState_eventInformAboutKill_Parms), 0x0000000000000080, Z_Construct_UClass_AArenaPlayerState_NoRegister());
@@ -1576,7 +2518,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("OnRep_TeamColor"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00020401, 65535);
+			ReturnFunction = new(OuterClass, TEXT("OnRep_TeamColor"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00020401, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1599,38 +2541,41 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_APlayerState();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaPlayerState::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900280;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900280;
 
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerState_InformAboutKill());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerState_OnRep_TeamColor());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerState_InformAboutKill());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerState_OnRep_TeamColor());
 
-			UProperty* NewProp_NumRocketsFired = new(OuterClass, TEXT("NumRocketsFired"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumRocketsFired, AArenaPlayerState), 0x0000080000000000);
-			UProperty* NewProp_NumBulletsFired = new(OuterClass, TEXT("NumBulletsFired"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumBulletsFired, AArenaPlayerState), 0x0000080000000000);
-			UProperty* NewProp_NumDeaths = new(OuterClass, TEXT("NumDeaths"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumDeaths, AArenaPlayerState), 0x0000080000002020);
-			UProperty* NewProp_NumKills = new(OuterClass, TEXT("NumKills"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumKills, AArenaPlayerState), 0x0000080000002020);
-			UProperty* NewProp_TeamNumber = new(OuterClass, TEXT("TeamNumber"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(TeamNumber, AArenaPlayerState), 0x0000080100002020);
-			NewProp_TeamNumber->RepNotifyFunc = FName(TEXT("OnRep_TeamColor"));
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerState_InformAboutKill());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerState_OnRep_TeamColor());
-			OuterClass->StaticLink();
+				UProperty* NewProp_NumRocketsFired = new(OuterClass, TEXT("NumRocketsFired"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumRocketsFired, AArenaPlayerState), 0x0000080000000000);
+				UProperty* NewProp_NumBulletsFired = new(OuterClass, TEXT("NumBulletsFired"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumBulletsFired, AArenaPlayerState), 0x0000080000000000);
+				UProperty* NewProp_NumDeaths = new(OuterClass, TEXT("NumDeaths"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumDeaths, AArenaPlayerState), 0x0000080000002020);
+				UProperty* NewProp_NumKills = new(OuterClass, TEXT("NumKills"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumKills, AArenaPlayerState), 0x0000080000002020);
+				UProperty* NewProp_TeamNumber = new(OuterClass, TEXT("TeamNumber"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(TeamNumber, AArenaPlayerState), 0x0000080100002020);
+				NewProp_TeamNumber->RepNotifyFunc = FName(TEXT("OnRep_TeamColor"));
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerState_InformAboutKill()); // 3710640671
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerState_OnRep_TeamColor()); // 3410530817
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/ArenaPlayerState.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
-			MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
-			MetaData->SetValue(NewProp_NumRocketsFired, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
-			MetaData->SetValue(NewProp_NumRocketsFired, TEXT("ToolTip"), TEXT("number of rockets fired this match"));
-			MetaData->SetValue(NewProp_NumBulletsFired, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
-			MetaData->SetValue(NewProp_NumBulletsFired, TEXT("ToolTip"), TEXT("number of bullets fired this match"));
-			MetaData->SetValue(NewProp_NumDeaths, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
-			MetaData->SetValue(NewProp_NumDeaths, TEXT("ToolTip"), TEXT("number of deaths"));
-			MetaData->SetValue(NewProp_NumKills, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
-			MetaData->SetValue(NewProp_NumKills, TEXT("ToolTip"), TEXT("number of kills"));
-			MetaData->SetValue(NewProp_TeamNumber, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
-			MetaData->SetValue(NewProp_TeamNumber, TEXT("ToolTip"), TEXT("team number"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/ArenaPlayerState.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
+				MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
+				MetaData->SetValue(NewProp_NumRocketsFired, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
+				MetaData->SetValue(NewProp_NumRocketsFired, TEXT("ToolTip"), TEXT("number of rockets fired this match"));
+				MetaData->SetValue(NewProp_NumBulletsFired, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
+				MetaData->SetValue(NewProp_NumBulletsFired, TEXT("ToolTip"), TEXT("number of bullets fired this match"));
+				MetaData->SetValue(NewProp_NumDeaths, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
+				MetaData->SetValue(NewProp_NumDeaths, TEXT("ToolTip"), TEXT("number of deaths"));
+				MetaData->SetValue(NewProp_NumKills, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
+				MetaData->SetValue(NewProp_NumKills, TEXT("ToolTip"), TEXT("number of kills"));
+				MetaData->SetValue(NewProp_TeamNumber, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaPlayerState.h"));
+				MetaData->SetValue(NewProp_TeamNumber, TEXT("ToolTip"), TEXT("team number"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -1648,32 +2593,35 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AGameState();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaGameState::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00800280;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20800280;
 
 
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bTimerPaused, AArenaGameState, bool);
-			UProperty* NewProp_bTimerPaused = new(OuterClass, TEXT("bTimerPaused"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bTimerPaused, AArenaGameState), 0x0000000000002020, CPP_BOOL_PROPERTY_BITMASK(bTimerPaused, AArenaGameState), sizeof(bool), true);
-			UProperty* NewProp_RemainingTime = new(OuterClass, TEXT("RemainingTime"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(RemainingTime, AArenaGameState), 0x0000000000002020);
-			UProperty* NewProp_TeamScores = new(OuterClass, TEXT("TeamScores"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(TeamScores, AArenaGameState), 0x0000000000002020);
-			UProperty* NewProp_TeamScores_Inner = new(NewProp_TeamScores, TEXT("TeamScores"), RF_Public|RF_Transient|RF_Native) UIntProperty(FPostConstructInitializeProperties(), EC_CppProperty, 0, 0x0000000000000000);
-			UProperty* NewProp_NumTeams = new(OuterClass, TEXT("NumTeams"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumTeams, AArenaGameState), 0x0000000000002020);
-			OuterClass->StaticLink();
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bTimerPaused, AArenaGameState, bool);
+				UProperty* NewProp_bTimerPaused = new(OuterClass, TEXT("bTimerPaused"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bTimerPaused, AArenaGameState), 0x0000000000002020, CPP_BOOL_PROPERTY_BITMASK(bTimerPaused, AArenaGameState), sizeof(bool), true);
+				UProperty* NewProp_RemainingTime = new(OuterClass, TEXT("RemainingTime"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(RemainingTime, AArenaGameState), 0x0000000000002020);
+				UProperty* NewProp_TeamScores = new(OuterClass, TEXT("TeamScores"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(TeamScores, AArenaGameState), 0x0000000000002020);
+				UProperty* NewProp_TeamScores_Inner = new(NewProp_TeamScores, TEXT("TeamScores"), RF_Public|RF_Transient|RF_Native) UIntProperty(FObjectInitializer(), EC_CppProperty, 0, 0x0000000000000000);
+				UProperty* NewProp_NumTeams = new(OuterClass, TEXT("NumTeams"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(NumTeams, AArenaGameState), 0x0000000000002020);
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/ArenaGameState.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
-			MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
-			MetaData->SetValue(NewProp_bTimerPaused, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
-			MetaData->SetValue(NewProp_bTimerPaused, TEXT("ToolTip"), TEXT("is timer paused?"));
-			MetaData->SetValue(NewProp_RemainingTime, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
-			MetaData->SetValue(NewProp_RemainingTime, TEXT("ToolTip"), TEXT("time left for warmup / match"));
-			MetaData->SetValue(NewProp_TeamScores, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
-			MetaData->SetValue(NewProp_TeamScores, TEXT("ToolTip"), TEXT("accumulated score per team"));
-			MetaData->SetValue(NewProp_NumTeams, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
-			MetaData->SetValue(NewProp_NumTeams, TEXT("ToolTip"), TEXT("number of teams in current game"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/ArenaGameState.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
+				MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
+				MetaData->SetValue(NewProp_bTimerPaused, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
+				MetaData->SetValue(NewProp_bTimerPaused, TEXT("ToolTip"), TEXT("is timer paused?"));
+				MetaData->SetValue(NewProp_RemainingTime, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
+				MetaData->SetValue(NewProp_RemainingTime, TEXT("ToolTip"), TEXT("time left for warmup / match"));
+				MetaData->SetValue(NewProp_TeamScores, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
+				MetaData->SetValue(NewProp_TeamScores, TEXT("ToolTip"), TEXT("accumulated score per team"));
+				MetaData->SetValue(NewProp_NumTeams, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaGameState.h"));
+				MetaData->SetValue(NewProp_NumTeams, TEXT("ToolTip"), TEXT("number of teams in current game"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -1691,112 +2639,116 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AActor();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaImpactEffect::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900081;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900081;
 
 
-			UProperty* NewProp_SurfaceHit = new(OuterClass, TEXT("SurfaceHit"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(SurfaceHit, AArenaImpactEffect), 0x0000000000000014, Z_Construct_UScriptStruct_UEngineTypes_FHitResult()); // 2510479624
-			UProperty* NewProp_DefaultDecal = new(OuterClass, TEXT("DefaultDecal"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(DefaultDecal, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UScriptStruct_FDecalData()); // 4078626812
-			UProperty* NewProp_EnergySound = new(OuterClass, TEXT("EnergySound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(EnergySound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_FleshSound = new(OuterClass, TEXT("FleshSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FleshSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_GrassSound = new(OuterClass, TEXT("GrassSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(GrassSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_GlassSound = new(OuterClass, TEXT("GlassSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(GlassSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_WoodSound = new(OuterClass, TEXT("WoodSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(WoodSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_MetalSound = new(OuterClass, TEXT("MetalSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MetalSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_WaterSound = new(OuterClass, TEXT("WaterSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(WaterSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_DirtSound = new(OuterClass, TEXT("DirtSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DirtSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_ConcreteSound = new(OuterClass, TEXT("ConcreteSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ConcreteSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_DefaultSound = new(OuterClass, TEXT("DefaultSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DefaultSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
-			UProperty* NewProp_EnergyFX = new(OuterClass, TEXT("EnergyFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(EnergyFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_FleshFX = new(OuterClass, TEXT("FleshFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FleshFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_GrassFX = new(OuterClass, TEXT("GrassFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(GrassFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_GlassFX = new(OuterClass, TEXT("GlassFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(GlassFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_WoodFX = new(OuterClass, TEXT("WoodFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(WoodFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_MetalFX = new(OuterClass, TEXT("MetalFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MetalFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_WaterFX = new(OuterClass, TEXT("WaterFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(WaterFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_DirtFX = new(OuterClass, TEXT("DirtFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DirtFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_ConcreteFX = new(OuterClass, TEXT("ConcreteFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ConcreteFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_DefaultFX = new(OuterClass, TEXT("DefaultFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DefaultFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_ImpactLightFadeOut = new(OuterClass, TEXT("ImpactLightFadeOut"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ImpactLightFadeOut, AArenaImpactEffect), 0x0000000000010001);
-			UProperty* NewProp_ImpactLight = new(OuterClass, TEXT("ImpactLight"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ImpactLight, AArenaImpactEffect), 0x00000000044b0009, Z_Construct_UClass_UPointLightComponent_NoRegister());
-			OuterClass->StaticLink();
+				UProperty* NewProp_SurfaceHit = new(OuterClass, TEXT("SurfaceHit"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(SurfaceHit, AArenaImpactEffect), 0x0000000000000014, Z_Construct_UScriptStruct_UEngineTypes_FHitResult());
+				UProperty* NewProp_DefaultDecal = new(OuterClass, TEXT("DefaultDecal"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(DefaultDecal, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UScriptStruct_FDecalData());
+				UProperty* NewProp_EnergySound = new(OuterClass, TEXT("EnergySound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(EnergySound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_FleshSound = new(OuterClass, TEXT("FleshSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FleshSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_GrassSound = new(OuterClass, TEXT("GrassSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(GrassSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_GlassSound = new(OuterClass, TEXT("GlassSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(GlassSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_WoodSound = new(OuterClass, TEXT("WoodSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(WoodSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_MetalSound = new(OuterClass, TEXT("MetalSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MetalSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_WaterSound = new(OuterClass, TEXT("WaterSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(WaterSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_DirtSound = new(OuterClass, TEXT("DirtSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DirtSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_ConcreteSound = new(OuterClass, TEXT("ConcreteSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ConcreteSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_DefaultSound = new(OuterClass, TEXT("DefaultSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DefaultSound, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_USoundBase_NoRegister());
+				UProperty* NewProp_EnergyFX = new(OuterClass, TEXT("EnergyFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(EnergyFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_FleshFX = new(OuterClass, TEXT("FleshFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FleshFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_GrassFX = new(OuterClass, TEXT("GrassFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(GrassFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_GlassFX = new(OuterClass, TEXT("GlassFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(GlassFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_WoodFX = new(OuterClass, TEXT("WoodFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(WoodFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_MetalFX = new(OuterClass, TEXT("MetalFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MetalFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_WaterFX = new(OuterClass, TEXT("WaterFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(WaterFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_DirtFX = new(OuterClass, TEXT("DirtFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DirtFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_ConcreteFX = new(OuterClass, TEXT("ConcreteFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ConcreteFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_DefaultFX = new(OuterClass, TEXT("DefaultFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(DefaultFX, AArenaImpactEffect), 0x0000000000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_ImpactLightFadeOut = new(OuterClass, TEXT("ImpactLightFadeOut"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ImpactLightFadeOut, AArenaImpactEffect), 0x0000000000010001);
+				UProperty* NewProp_ImpactLight = new(OuterClass, TEXT("ImpactLight"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ImpactLight, AArenaImpactEffect), 0x00000000000b0009, Z_Construct_UClass_UPointLightComponent_NoRegister());
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_SurfaceHit, TEXT("Category"), TEXT("Surface"));
-			MetaData->SetValue(NewProp_SurfaceHit, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_SurfaceHit, TEXT("ToolTip"), TEXT("surface data for spawning"));
-			MetaData->SetValue(NewProp_DefaultDecal, TEXT("Category"), TEXT("Defaults"));
-			MetaData->SetValue(NewProp_DefaultDecal, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_DefaultDecal, TEXT("ToolTip"), TEXT("default decal when material specific override doesn't exist"));
-			MetaData->SetValue(NewProp_EnergySound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_EnergySound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_FleshSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_FleshSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_FleshSound, TEXT("ToolTip"), TEXT("impact FX on flesh"));
-			MetaData->SetValue(NewProp_GrassSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_GrassSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_GrassSound, TEXT("ToolTip"), TEXT("impact FX on grass"));
-			MetaData->SetValue(NewProp_GlassSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_GlassSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_GlassSound, TEXT("ToolTip"), TEXT("impact FX on glass"));
-			MetaData->SetValue(NewProp_WoodSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_WoodSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_WoodSound, TEXT("ToolTip"), TEXT("impact FX on wood"));
-			MetaData->SetValue(NewProp_MetalSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_MetalSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_MetalSound, TEXT("ToolTip"), TEXT("impact FX on metal"));
-			MetaData->SetValue(NewProp_WaterSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_WaterSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_WaterSound, TEXT("ToolTip"), TEXT("impact FX on water"));
-			MetaData->SetValue(NewProp_DirtSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_DirtSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_DirtSound, TEXT("ToolTip"), TEXT("impact FX on dirt"));
-			MetaData->SetValue(NewProp_ConcreteSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_ConcreteSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_ConcreteSound, TEXT("ToolTip"), TEXT("impact FX on concrete"));
-			MetaData->SetValue(NewProp_DefaultSound, TEXT("Category"), TEXT("Defaults"));
-			MetaData->SetValue(NewProp_DefaultSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_DefaultSound, TEXT("ToolTip"), TEXT("default impact sound used when material specific override doesn't exist"));
-			MetaData->SetValue(NewProp_EnergyFX, TEXT("Category"), TEXT("Visual"));
-			MetaData->SetValue(NewProp_EnergyFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_FleshFX, TEXT("Category"), TEXT("Visual"));
-			MetaData->SetValue(NewProp_FleshFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_FleshFX, TEXT("ToolTip"), TEXT("impact FX on flesh"));
-			MetaData->SetValue(NewProp_GrassFX, TEXT("Category"), TEXT("Visual"));
-			MetaData->SetValue(NewProp_GrassFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_GrassFX, TEXT("ToolTip"), TEXT("impact FX on grass"));
-			MetaData->SetValue(NewProp_GlassFX, TEXT("Category"), TEXT("Visual"));
-			MetaData->SetValue(NewProp_GlassFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_GlassFX, TEXT("ToolTip"), TEXT("impact FX on glass"));
-			MetaData->SetValue(NewProp_WoodFX, TEXT("Category"), TEXT("Visual"));
-			MetaData->SetValue(NewProp_WoodFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_WoodFX, TEXT("ToolTip"), TEXT("impact FX on wood"));
-			MetaData->SetValue(NewProp_MetalFX, TEXT("Category"), TEXT("Visual"));
-			MetaData->SetValue(NewProp_MetalFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_MetalFX, TEXT("ToolTip"), TEXT("impact FX on metal"));
-			MetaData->SetValue(NewProp_WaterFX, TEXT("Category"), TEXT("Visual"));
-			MetaData->SetValue(NewProp_WaterFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_WaterFX, TEXT("ToolTip"), TEXT("impact FX on water"));
-			MetaData->SetValue(NewProp_DirtFX, TEXT("Category"), TEXT("Visual"));
-			MetaData->SetValue(NewProp_DirtFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_DirtFX, TEXT("ToolTip"), TEXT("impact FX on dirt"));
-			MetaData->SetValue(NewProp_ConcreteFX, TEXT("Category"), TEXT("Visual"));
-			MetaData->SetValue(NewProp_ConcreteFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_ConcreteFX, TEXT("ToolTip"), TEXT("impact FX on concrete"));
-			MetaData->SetValue(NewProp_DefaultFX, TEXT("Category"), TEXT("Defaults"));
-			MetaData->SetValue(NewProp_DefaultFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_DefaultFX, TEXT("ToolTip"), TEXT("default impact FX used when material specific override doesn't exist"));
-			MetaData->SetValue(NewProp_ImpactLightFadeOut, TEXT("Category"), TEXT("Effect"));
-			MetaData->SetValue(NewProp_ImpactLightFadeOut, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_ImpactLightFadeOut, TEXT("ToolTip"), TEXT("how long keep explosion light on?"));
-			MetaData->SetValue(NewProp_ImpactLight, TEXT("Category"), TEXT("Effect"));
-			MetaData->SetValue(NewProp_ImpactLight, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
-			MetaData->SetValue(NewProp_ImpactLight, TEXT("ToolTip"), TEXT("explosion light"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_SurfaceHit, TEXT("Category"), TEXT("Surface"));
+				MetaData->SetValue(NewProp_SurfaceHit, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_SurfaceHit, TEXT("ToolTip"), TEXT("surface data for spawning"));
+				MetaData->SetValue(NewProp_DefaultDecal, TEXT("Category"), TEXT("Defaults"));
+				MetaData->SetValue(NewProp_DefaultDecal, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_DefaultDecal, TEXT("ToolTip"), TEXT("default decal when material specific override doesn't exist"));
+				MetaData->SetValue(NewProp_EnergySound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_EnergySound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_FleshSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_FleshSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_FleshSound, TEXT("ToolTip"), TEXT("impact FX on flesh"));
+				MetaData->SetValue(NewProp_GrassSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_GrassSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_GrassSound, TEXT("ToolTip"), TEXT("impact FX on grass"));
+				MetaData->SetValue(NewProp_GlassSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_GlassSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_GlassSound, TEXT("ToolTip"), TEXT("impact FX on glass"));
+				MetaData->SetValue(NewProp_WoodSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_WoodSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_WoodSound, TEXT("ToolTip"), TEXT("impact FX on wood"));
+				MetaData->SetValue(NewProp_MetalSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_MetalSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_MetalSound, TEXT("ToolTip"), TEXT("impact FX on metal"));
+				MetaData->SetValue(NewProp_WaterSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_WaterSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_WaterSound, TEXT("ToolTip"), TEXT("impact FX on water"));
+				MetaData->SetValue(NewProp_DirtSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_DirtSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_DirtSound, TEXT("ToolTip"), TEXT("impact FX on dirt"));
+				MetaData->SetValue(NewProp_ConcreteSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_ConcreteSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_ConcreteSound, TEXT("ToolTip"), TEXT("impact FX on concrete"));
+				MetaData->SetValue(NewProp_DefaultSound, TEXT("Category"), TEXT("Defaults"));
+				MetaData->SetValue(NewProp_DefaultSound, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_DefaultSound, TEXT("ToolTip"), TEXT("default impact sound used when material specific override doesn't exist"));
+				MetaData->SetValue(NewProp_EnergyFX, TEXT("Category"), TEXT("Visual"));
+				MetaData->SetValue(NewProp_EnergyFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_FleshFX, TEXT("Category"), TEXT("Visual"));
+				MetaData->SetValue(NewProp_FleshFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_FleshFX, TEXT("ToolTip"), TEXT("impact FX on flesh"));
+				MetaData->SetValue(NewProp_GrassFX, TEXT("Category"), TEXT("Visual"));
+				MetaData->SetValue(NewProp_GrassFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_GrassFX, TEXT("ToolTip"), TEXT("impact FX on grass"));
+				MetaData->SetValue(NewProp_GlassFX, TEXT("Category"), TEXT("Visual"));
+				MetaData->SetValue(NewProp_GlassFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_GlassFX, TEXT("ToolTip"), TEXT("impact FX on glass"));
+				MetaData->SetValue(NewProp_WoodFX, TEXT("Category"), TEXT("Visual"));
+				MetaData->SetValue(NewProp_WoodFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_WoodFX, TEXT("ToolTip"), TEXT("impact FX on wood"));
+				MetaData->SetValue(NewProp_MetalFX, TEXT("Category"), TEXT("Visual"));
+				MetaData->SetValue(NewProp_MetalFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_MetalFX, TEXT("ToolTip"), TEXT("impact FX on metal"));
+				MetaData->SetValue(NewProp_WaterFX, TEXT("Category"), TEXT("Visual"));
+				MetaData->SetValue(NewProp_WaterFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_WaterFX, TEXT("ToolTip"), TEXT("impact FX on water"));
+				MetaData->SetValue(NewProp_DirtFX, TEXT("Category"), TEXT("Visual"));
+				MetaData->SetValue(NewProp_DirtFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_DirtFX, TEXT("ToolTip"), TEXT("impact FX on dirt"));
+				MetaData->SetValue(NewProp_ConcreteFX, TEXT("Category"), TEXT("Visual"));
+				MetaData->SetValue(NewProp_ConcreteFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_ConcreteFX, TEXT("ToolTip"), TEXT("impact FX on concrete"));
+				MetaData->SetValue(NewProp_DefaultFX, TEXT("Category"), TEXT("Defaults"));
+				MetaData->SetValue(NewProp_DefaultFX, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_DefaultFX, TEXT("ToolTip"), TEXT("default impact FX used when material specific override doesn't exist"));
+				MetaData->SetValue(NewProp_ImpactLightFadeOut, TEXT("Category"), TEXT("Effect"));
+				MetaData->SetValue(NewProp_ImpactLightFadeOut, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_ImpactLightFadeOut, TEXT("ToolTip"), TEXT("how long keep explosion light on?"));
+				MetaData->SetValue(NewProp_ImpactLight, TEXT("Category"), TEXT("Effect"));
+				MetaData->SetValue(NewProp_ImpactLight, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_ImpactLight, TEXT("ModuleRelativePath"), TEXT("Public/Effects/ArenaImpactEffect.h"));
+				MetaData->SetValue(NewProp_ImpactLight, TEXT("ToolTip"), TEXT("explosion light"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -1814,17 +2766,20 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_ULocalPlayer();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = UArenaLocalPlayer::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x0010008C;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x2010008C;
 
 
-			OuterClass->ClassConfigName = FName(TEXT("game"));
-			OuterClass->StaticLink();
+				OuterClass->ClassConfigName = FName(TEXT("game"));
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaLocalPlayer.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaLocalPlayer.h"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaLocalPlayer.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaLocalPlayer.h"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -1842,16 +2797,19 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_APlayerCameraManager();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaPlayerCameraManager::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900288;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900288;
 
 
-			OuterClass->StaticLink();
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaPlayerCameraManager.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerCameraManager.h"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaPlayerCameraManager.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerCameraManager.h"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -1863,7 +2821,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ClientEndOnlineGame"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x01020CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ClientEndOnlineGame"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x01020CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1880,7 +2838,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ClientGameStarted"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x01020CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ClientGameStarted"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x01020CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1897,7 +2855,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ClientStartOnlineGame"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x01020CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ClientStartOnlineGame"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x01020CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1908,19 +2866,118 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnFunction;
 	}
+	UFunction* Z_Construct_UFunction_AArenaPlayerController_GetAllowGameActions()
+	{
+		struct ArenaPlayerController_eventGetAllowGameActions_Parms
+		{
+			bool ReturnValue;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaPlayerController();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("GetAllowGameActions"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaPlayerController_eventGetAllowGameActions_Parms));
+			CPP_BOOL_PROPERTY_BITMASK_STRUCT(ReturnValue, ArenaPlayerController_eventGetAllowGameActions_Parms, bool);
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaPlayerController_eventGetAllowGameActions_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaPlayerController_eventGetAllowGameActions_Parms), sizeof(bool), true);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Menu"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaPlayerController_GetOpenMenu()
+	{
+		struct ArenaPlayerController_eventGetOpenMenu_Parms
+		{
+			bool ReturnValue;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaPlayerController();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("GetOpenMenu"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaPlayerController_eventGetOpenMenu_Parms));
+			CPP_BOOL_PROPERTY_BITMASK_STRUCT(ReturnValue, ArenaPlayerController_eventGetOpenMenu_Parms, bool);
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaPlayerController_eventGetOpenMenu_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaPlayerController_eventGetOpenMenu_Parms), sizeof(bool), true);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Menu"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("Returns whether the menu is open"));
+			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaPlayerController_IsGameInputAllowed()
+	{
+		struct ArenaPlayerController_eventIsGameInputAllowed_Parms
+		{
+			bool ReturnValue;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaPlayerController();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("IsGameInputAllowed"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaPlayerController_eventIsGameInputAllowed_Parms));
+			CPP_BOOL_PROPERTY_BITMASK_STRUCT(ReturnValue, ArenaPlayerController_eventIsGameInputAllowed_Parms, bool);
+			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(ReturnValue, ArenaPlayerController_eventIsGameInputAllowed_Parms), 0x0000000000000580, CPP_BOOL_PROPERTY_BITMASK(ReturnValue, ArenaPlayerController_eventIsGameInputAllowed_Parms), sizeof(bool), true);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Menu"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("check if gameplay related actions (movement, weapon usage, etc) are allowed right now"));
+			MetaData->SetValue(NewProp_ReturnValue, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
 	UFunction* Z_Construct_UFunction_AArenaPlayerController_ServerSuicide()
 	{
 		UClass* OuterClass=Z_Construct_UClass_AArenaPlayerController();
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerSuicide"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ServerSuicide"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
 			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
 			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
 			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("Notifies the server that the client has suicided"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaPlayerController_SetAllowGameActions()
+	{
+		struct ArenaPlayerController_eventSetAllowGameActions_Parms
+		{
+			bool bEnable;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaPlayerController();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("SetAllowGameActions"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020401, 65535, sizeof(ArenaPlayerController_eventSetAllowGameActions_Parms));
+			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bEnable, ArenaPlayerController_eventSetAllowGameActions_Parms, bool);
+			UProperty* NewProp_bEnable = new(ReturnFunction, TEXT("bEnable"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bEnable, ArenaPlayerController_eventSetAllowGameActions_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bEnable, ArenaPlayerController_eventSetAllowGameActions_Parms), sizeof(bool), true);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Menu"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("set open menu"));
+			MetaData->SetValue(NewProp_bEnable, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
 #endif
 		}
 		return ReturnFunction;
@@ -1935,9 +2992,9 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("SetGodMode"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00020601, 65535, sizeof(ArenaPlayerController_eventSetGodMode_Parms));
+			ReturnFunction = new(OuterClass, TEXT("SetGodMode"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00020601, 65535, sizeof(ArenaPlayerController_eventSetGodMode_Parms));
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bEnable, ArenaPlayerController_eventSetGodMode_Parms, bool);
-			UProperty* NewProp_bEnable = new(ReturnFunction, TEXT("bEnable"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bEnable, ArenaPlayerController_eventSetGodMode_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bEnable, ArenaPlayerController_eventSetGodMode_Parms), sizeof(bool), true);
+			UProperty* NewProp_bEnable = new(ReturnFunction, TEXT("bEnable"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bEnable, ArenaPlayerController_eventSetGodMode_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bEnable, ArenaPlayerController_eventSetGodMode_Parms), sizeof(bool), true);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1949,13 +3006,38 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnFunction;
 	}
+	UFunction* Z_Construct_UFunction_AArenaPlayerController_SetOpenMenu()
+	{
+		struct ArenaPlayerController_eventSetOpenMenu_Parms
+		{
+			bool bEnable;
+		};
+		UClass* OuterClass=Z_Construct_UClass_AArenaPlayerController();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("SetOpenMenu"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020401, 65535, sizeof(ArenaPlayerController_eventSetOpenMenu_Parms));
+			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bEnable, ArenaPlayerController_eventSetOpenMenu_Parms, bool);
+			UProperty* NewProp_bEnable = new(ReturnFunction, TEXT("bEnable"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bEnable, ArenaPlayerController_eventSetOpenMenu_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bEnable, ArenaPlayerController_eventSetOpenMenu_Parms), sizeof(bool), true);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Menu"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("set open menu"));
+			MetaData->SetValue(NewProp_bEnable, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
 	UFunction* Z_Construct_UFunction_AArenaPlayerController_Suicide()
 	{
 		UClass* OuterClass=Z_Construct_UClass_AArenaPlayerController();
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("Suicide"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00080600, 65535);
+			ReturnFunction = new(OuterClass, TEXT("Suicide"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080600, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -1978,58 +3060,107 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_APlayerController();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaPlayerController::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900284;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900284;
 
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_ClientEndOnlineGame());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_ClientGameStarted());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_ClientStartOnlineGame());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_ServerSuicide());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_SetGodMode());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_Suicide());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_ClientEndOnlineGame());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_ClientGameStarted());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_ClientStartOnlineGame());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_GetAllowGameActions());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_GetOpenMenu());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_IsGameInputAllowed());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_ServerSuicide());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_SetAllowGameActions());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_SetGodMode());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_SetOpenMenu());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaPlayerController_Suicide());
 
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bGodMode, AArenaPlayerController, uint8);
-			UProperty* NewProp_bGodMode = new(OuterClass, TEXT("bGodMode"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bGodMode, AArenaPlayerController), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bGodMode, AArenaPlayerController), sizeof(uint8), false);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bHealthRegen, AArenaPlayerController, uint8);
-			UProperty* NewProp_bHealthRegen = new(OuterClass, TEXT("bHealthRegen"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bHealthRegen, AArenaPlayerController), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bHealthRegen, AArenaPlayerController), sizeof(uint8), false);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bInfiniteClip, AArenaPlayerController, uint8);
-			UProperty* NewProp_bInfiniteClip = new(OuterClass, TEXT("bInfiniteClip"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInfiniteClip, AArenaPlayerController), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bInfiniteClip, AArenaPlayerController), sizeof(uint8), false);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bInfiniteAmmo, AArenaPlayerController, uint8);
-			UProperty* NewProp_bInfiniteAmmo = new(OuterClass, TEXT("bInfiniteAmmo"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInfiniteAmmo, AArenaPlayerController), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bInfiniteAmmo, AArenaPlayerController), sizeof(uint8), false);
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_ClientEndOnlineGame());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_ClientGameStarted());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_ClientStartOnlineGame());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_ServerSuicide());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_SetGodMode());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_Suicide());
-			OuterClass->ClassConfigName = FName(TEXT("game"));
-			OuterClass->StaticLink();
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bGodMode, AArenaPlayerController, uint8);
+				UProperty* NewProp_bGodMode = new(OuterClass, TEXT("bGodMode"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bGodMode, AArenaPlayerController), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bGodMode, AArenaPlayerController), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bHealthRegen, AArenaPlayerController, uint8);
+				UProperty* NewProp_bHealthRegen = new(OuterClass, TEXT("bHealthRegen"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bHealthRegen, AArenaPlayerController), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bHealthRegen, AArenaPlayerController), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bInfiniteClip, AArenaPlayerController, uint8);
+				UProperty* NewProp_bInfiniteClip = new(OuterClass, TEXT("bInfiniteClip"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInfiniteClip, AArenaPlayerController), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bInfiniteClip, AArenaPlayerController), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bInfiniteAmmo, AArenaPlayerController, uint8);
+				UProperty* NewProp_bInfiniteAmmo = new(OuterClass, TEXT("bInfiniteAmmo"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInfiniteAmmo, AArenaPlayerController), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(bInfiniteAmmo, AArenaPlayerController), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(OpenMenu, AArenaPlayerController, uint8);
+				UProperty* NewProp_OpenMenu = new(OuterClass, TEXT("OpenMenu"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(OpenMenu, AArenaPlayerController), 0x0000080000002020, CPP_BOOL_PROPERTY_BITMASK(OpenMenu, AArenaPlayerController), sizeof(uint8), false);
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_ClientEndOnlineGame()); // 2717731082
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_ClientGameStarted()); // 4220155836
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_ClientStartOnlineGame()); // 1199813440
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_GetAllowGameActions()); // 1361822980
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_GetOpenMenu()); // 1413145835
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_IsGameInputAllowed()); // 2302096193
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_ServerSuicide()); // 2535651261
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_SetAllowGameActions()); // 4019037751
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_SetGodMode()); // 291182200
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_SetOpenMenu()); // 1309901577
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaPlayerController_Suicide()); // 596784763
+				OuterClass->ClassConfigName = FName(TEXT("game"));
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Collision Rendering Utilities|Transformation"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaPlayerController.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
-			MetaData->SetValue(NewProp_bGodMode, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
-			MetaData->SetValue(NewProp_bGodMode, TEXT("ToolTip"), TEXT("god mode cheat"));
-			MetaData->SetValue(NewProp_bHealthRegen, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
-			MetaData->SetValue(NewProp_bHealthRegen, TEXT("ToolTip"), TEXT("health regen cheat"));
-			MetaData->SetValue(NewProp_bInfiniteClip, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
-			MetaData->SetValue(NewProp_bInfiniteClip, TEXT("ToolTip"), TEXT("infinite clip cheat"));
-			MetaData->SetValue(NewProp_bInfiniteAmmo, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
-			MetaData->SetValue(NewProp_bInfiniteAmmo, TEXT("ToolTip"), TEXT("infinite ammo cheat"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Collision Rendering Utilities|Transformation"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaPlayerController.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+				MetaData->SetValue(NewProp_bGodMode, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+				MetaData->SetValue(NewProp_bGodMode, TEXT("ToolTip"), TEXT("god mode cheat"));
+				MetaData->SetValue(NewProp_bHealthRegen, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+				MetaData->SetValue(NewProp_bHealthRegen, TEXT("ToolTip"), TEXT("health regen cheat"));
+				MetaData->SetValue(NewProp_bInfiniteClip, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+				MetaData->SetValue(NewProp_bInfiniteClip, TEXT("ToolTip"), TEXT("infinite clip cheat"));
+				MetaData->SetValue(NewProp_bInfiniteAmmo, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+				MetaData->SetValue(NewProp_bInfiniteAmmo, TEXT("ToolTip"), TEXT("infinite ammo cheat"));
+				MetaData->SetValue(NewProp_OpenMenu, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController.h"));
+				MetaData->SetValue(NewProp_OpenMenu, TEXT("ToolTip"), TEXT("informs the HUD if the menu is open"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AArenaPlayerController(Z_Construct_UClass_AArenaPlayerController, TEXT("AArenaPlayerController"));
+	UClass* Z_Construct_UClass_AArenaPlayerController_Menu_NoRegister()
+	{
+		return AArenaPlayerController_Menu::StaticClass();
+	}
+	UClass* Z_Construct_UClass_AArenaPlayerController_Menu()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_APlayerController();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = AArenaPlayerController_Menu::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900284;
+
+
+				OuterClass->ClassConfigName = FName(TEXT("Game"));
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Collision Rendering Utilities|Transformation"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Player/ArenaPlayerController_Menu.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Player/ArenaPlayerController_Menu.h"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_AArenaPlayerController_Menu(Z_Construct_UClass_AArenaPlayerController_Menu, TEXT("AArenaPlayerController_Menu"));
 	UScriptStruct* Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim()
 	{
 		UStruct* Outer=Z_Construct_UClass_AArenaRangedWeapon();
 		static UScriptStruct* ReturnStruct = NULL;
 		if (!ReturnStruct)
 		{
-			ReturnStruct = new(Outer, TEXT("WeaponAnim"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FPostConstructInitializeProperties(), NULL, new UScriptStruct::TCppStructOps<FWeaponAnim>, EStructFlags(0x00000001));
+			ReturnStruct = new(Outer, TEXT("WeaponAnim"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FWeaponAnim>, EStructFlags(0x00000001));
 			UProperty* NewProp_Pawn3P = new(ReturnStruct, TEXT("Pawn3P"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(Pawn3P, FWeaponAnim), 0x0000000000010001, Z_Construct_UClass_UAnimMontage_NoRegister());
 			ReturnStruct->StaticLink();
 #if WITH_METADATA
@@ -2042,23 +3173,24 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnStruct;
 	}
-	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim_CRC() { return 2249408027U; }
+	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim_CRC() { return 831480871U; }
 	UScriptStruct* Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponData()
 	{
 		UStruct* Outer=Z_Construct_UClass_AArenaRangedWeapon();
 		static UScriptStruct* ReturnStruct = NULL;
 		if (!ReturnStruct)
 		{
-			ReturnStruct = new(Outer, TEXT("WeaponData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FPostConstructInitializeProperties(), NULL, new UScriptStruct::TCppStructOps<FWeaponData>, EStructFlags(0x00000001));
+			ReturnStruct = new(Outer, TEXT("WeaponData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FWeaponData>, EStructFlags(0x00000001));
 			UProperty* NewProp_NoAnimReloadDuration = new(ReturnStruct, TEXT("NoAnimReloadDuration"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(NoAnimReloadDuration, FWeaponData), 0x0000000000010001);
 			UProperty* NewProp_TimeBetweenShots = new(ReturnStruct, TEXT("TimeBetweenShots"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(TimeBetweenShots, FWeaponData), 0x0000000000010001);
 			UProperty* NewProp_InitialClips = new(ReturnStruct, TEXT("InitialClips"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(InitialClips, FWeaponData), 0x0000000000010001);
 			UProperty* NewProp_AmmoPerClip = new(ReturnStruct, TEXT("AmmoPerClip"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(AmmoPerClip, FWeaponData), 0x0000000000010001);
 			UProperty* NewProp_MaxAmmo = new(ReturnStruct, TEXT("MaxAmmo"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(MaxAmmo, FWeaponData), 0x0000000000010001);
+			UProperty* NewProp_MeleeDamage = new(ReturnStruct, TEXT("MeleeDamage"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(MeleeDamage, FWeaponData), 0x0000000000010001);
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bInfiniteClip, FWeaponData, bool);
-			UProperty* NewProp_bInfiniteClip = new(ReturnStruct, TEXT("bInfiniteClip"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInfiniteClip, FWeaponData), 0x0000000000010001, CPP_BOOL_PROPERTY_BITMASK(bInfiniteClip, FWeaponData), sizeof(bool), true);
+			UProperty* NewProp_bInfiniteClip = new(ReturnStruct, TEXT("bInfiniteClip"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInfiniteClip, FWeaponData), 0x0000000000010001, CPP_BOOL_PROPERTY_BITMASK(bInfiniteClip, FWeaponData), sizeof(bool), true);
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bInfiniteAmmo, FWeaponData, bool);
-			UProperty* NewProp_bInfiniteAmmo = new(ReturnStruct, TEXT("bInfiniteAmmo"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInfiniteAmmo, FWeaponData), 0x0000000000010001, CPP_BOOL_PROPERTY_BITMASK(bInfiniteAmmo, FWeaponData), sizeof(bool), true);
+			UProperty* NewProp_bInfiniteAmmo = new(ReturnStruct, TEXT("bInfiniteAmmo"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInfiniteAmmo, FWeaponData), 0x0000000000010001, CPP_BOOL_PROPERTY_BITMASK(bInfiniteAmmo, FWeaponData), sizeof(bool), true);
 			ReturnStruct->StaticLink();
 #if WITH_METADATA
 			UMetaData* MetaData = ReturnStruct->GetOutermost()->GetMetaData();
@@ -2078,6 +3210,9 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			MetaData->SetValue(NewProp_MaxAmmo, TEXT("Category"), TEXT("Ammo"));
 			MetaData->SetValue(NewProp_MaxAmmo, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
 			MetaData->SetValue(NewProp_MaxAmmo, TEXT("ToolTip"), TEXT("max ammo"));
+			MetaData->SetValue(NewProp_MeleeDamage, TEXT("Category"), TEXT("Ammo"));
+			MetaData->SetValue(NewProp_MeleeDamage, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+			MetaData->SetValue(NewProp_MeleeDamage, TEXT("ToolTip"), TEXT("damage amount"));
 			MetaData->SetValue(NewProp_bInfiniteClip, TEXT("Category"), TEXT("Ammo"));
 			MetaData->SetValue(NewProp_bInfiniteClip, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
 			MetaData->SetValue(NewProp_bInfiniteClip, TEXT("ToolTip"), TEXT("infinite ammo in clip, no reload required"));
@@ -2088,14 +3223,14 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnStruct;
 	}
-	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponData_CRC() { return 2456398476U; }
+	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponData_CRC() { return 434867556U; }
 	UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ClientStartReload()
 	{
 		UClass* OuterClass=Z_Construct_UClass_AArenaRangedWeapon();
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ClientStartReload"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x01020CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ClientStartReload"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x01020CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2116,7 +3251,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("GetPawnOwner"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x54020401, 65535, sizeof(ArenaRangedWeapon_eventGetPawnOwner_Parms));
+			ReturnFunction = new(OuterClass, TEXT("GetPawnOwner"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x54020401, 65535, sizeof(ArenaRangedWeapon_eventGetPawnOwner_Parms));
 			UProperty* NewProp_ReturnValue = new(ReturnFunction, TEXT("ReturnValue"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ReturnValue, ArenaRangedWeapon_eventGetPawnOwner_Parms), 0x0000000000000580, Z_Construct_UClass_AArenaCharacter_NoRegister());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -2136,7 +3271,23 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("OnRep_BurstCounter"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00080401, 65535);
+			ReturnFunction = new(OuterClass, TEXT("OnRep_BurstCounter"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaRangedWeapon_OnRep_Melee()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaRangedWeapon();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("OnRep_Melee"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2152,7 +3303,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("OnRep_MyPawn"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00080401, 65535);
+			ReturnFunction = new(OuterClass, TEXT("OnRep_MyPawn"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2169,7 +3320,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("OnRep_Reload"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00080401, 65535);
+			ReturnFunction = new(OuterClass, TEXT("OnRep_Reload"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2185,7 +3336,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerHandleFiring"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ServerHandleFiring"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2202,7 +3353,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerStartFire"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ServerStartFire"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2213,13 +3364,29 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnFunction;
 	}
+	UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerStartMelee()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaRangedWeapon();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("ServerStartMelee"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
 	UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerStartReload()
 	{
 		UClass* OuterClass=Z_Construct_UClass_AArenaRangedWeapon();
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerStartReload"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ServerStartReload"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2235,7 +3402,23 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerStopFire"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ServerStopFire"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_AArenaRangedWeapon_ServerStopMelee()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaRangedWeapon();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("ServerStopMelee"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2251,7 +3434,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerStopReload"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535);
+			ReturnFunction = new(OuterClass, TEXT("ServerStopReload"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2273,148 +3456,199 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AActor();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaRangedWeapon::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900081;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900081;
 
-			OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim()); // 2249408027
-			OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponData()); // 2456398476
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ClientStartReload());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_GetPawnOwner());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_BurstCounter());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_MyPawn());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_Reload());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerHandleFiring());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartFire());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartReload());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopFire());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopReload());
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim()); // 831480871
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponData()); // 434867556
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ClientStartReload());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_GetPawnOwner());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_BurstCounter());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_Melee());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_MyPawn());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_Reload());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerHandleFiring());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartFire());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartMelee());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartReload());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopFire());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopMelee());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopReload());
 
-			UProperty* NewProp_BurstCounter = new(OuterClass, TEXT("BurstCounter"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(BurstCounter, AArenaRangedWeapon), 0x0000080100002020);
-			NewProp_BurstCounter->RepNotifyFunc = FName(TEXT("OnRep_BurstCounter"));
-			UProperty* NewProp_CurrentAmmoInClip = new(OuterClass, TEXT("CurrentAmmoInClip"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(CurrentAmmoInClip, AArenaRangedWeapon), 0x0000080000002020);
-			UProperty* NewProp_CurrentAmmo = new(OuterClass, TEXT("CurrentAmmo"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(CurrentAmmo, AArenaRangedWeapon), 0x0000080000002020);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bPendingReload, AArenaRangedWeapon, uint8);
-			UProperty* NewProp_bPendingReload = new(OuterClass, TEXT("bPendingReload"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bPendingReload, AArenaRangedWeapon), 0x0000080100002020, CPP_BOOL_PROPERTY_BITMASK(bPendingReload, AArenaRangedWeapon), sizeof(uint8), false);
-			NewProp_bPendingReload->RepNotifyFunc = FName(TEXT("OnRep_Reload"));
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bLoopedFireAnim, AArenaRangedWeapon, uint8);
-			UProperty* NewProp_bLoopedFireAnim = new(OuterClass, TEXT("bLoopedFireAnim"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bLoopedFireAnim, AArenaRangedWeapon), 0x0000080000010001, CPP_BOOL_PROPERTY_BITMASK(bLoopedFireAnim, AArenaRangedWeapon), sizeof(uint8), false);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bLoopedFireSound, AArenaRangedWeapon, uint8);
-			UProperty* NewProp_bLoopedFireSound = new(OuterClass, TEXT("bLoopedFireSound"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bLoopedFireSound, AArenaRangedWeapon), 0x0000080000010001, CPP_BOOL_PROPERTY_BITMASK(bLoopedFireSound, AArenaRangedWeapon), sizeof(uint8), false);
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bLoopedMuzzleFX, AArenaRangedWeapon, uint8);
-			UProperty* NewProp_bLoopedMuzzleFX = new(OuterClass, TEXT("bLoopedMuzzleFX"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bLoopedMuzzleFX, AArenaRangedWeapon), 0x0000080000010001, CPP_BOOL_PROPERTY_BITMASK(bLoopedMuzzleFX, AArenaRangedWeapon), sizeof(uint8), false);
-			UProperty* NewProp_FireAnim = new(OuterClass, TEXT("FireAnim"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(FireAnim, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim()); // 2249408027
-			UProperty* NewProp_EquipAnim = new(OuterClass, TEXT("EquipAnim"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(EquipAnim, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim()); // 2249408027
-			UProperty* NewProp_EquipSound = new(OuterClass, TEXT("EquipSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(EquipSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_MeleeAnim = new(OuterClass, TEXT("MeleeAnim"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(MeleeAnim, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim()); // 2249408027
-			UProperty* NewProp_ReloadAnim = new(OuterClass, TEXT("ReloadAnim"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ReloadAnim, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim()); // 2249408027
-			UProperty* NewProp_MeleeSound = new(OuterClass, TEXT("MeleeSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MeleeSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_ReloadSound = new(OuterClass, TEXT("ReloadSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ReloadSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_OutOfAmmoSound = new(OuterClass, TEXT("OutOfAmmoSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(OutOfAmmoSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_FireFinishSound = new(OuterClass, TEXT("FireFinishSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireFinishSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_FireLoopSound = new(OuterClass, TEXT("FireLoopSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireLoopSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_FireSound = new(OuterClass, TEXT("FireSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
-			UProperty* NewProp_FireForceFeedback = new(OuterClass, TEXT("FireForceFeedback"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireForceFeedback, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_UForceFeedbackEffect_NoRegister());
-			UProperty* NewProp_FireCameraShake = new(OuterClass, TEXT("FireCameraShake"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(FireCameraShake, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_UCameraShake_NoRegister());
-			UProperty* NewProp_MuzzlePSC = new(OuterClass, TEXT("MuzzlePSC"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MuzzlePSC, AArenaRangedWeapon), 0x0000080004082008, Z_Construct_UClass_UParticleSystemComponent_NoRegister());
-			UProperty* NewProp_MuzzleFX = new(OuterClass, TEXT("MuzzleFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MuzzleFX, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_MuzzleAttachPoint = new(OuterClass, TEXT("MuzzleAttachPoint"), RF_Public|RF_Transient|RF_Native) UNameProperty(CPP_PROPERTY_BASE(MuzzleAttachPoint, AArenaRangedWeapon), 0x0000080000010001);
-			UProperty* NewProp_FireAC = new(OuterClass, TEXT("FireAC"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireAC, AArenaRangedWeapon), 0x0000080004082008, Z_Construct_UClass_UAudioComponent_NoRegister());
-			UProperty* NewProp_Mesh3P = new(OuterClass, TEXT("Mesh3P"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(Mesh3P, AArenaRangedWeapon), 0x00000800044b0009, Z_Construct_UClass_USkeletalMeshComponent_NoRegister());
-			UProperty* NewProp_WeaponConfig = new(OuterClass, TEXT("WeaponConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(WeaponConfig, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponData()); // 2456398476
-			UProperty* NewProp_MyPawn = new(OuterClass, TEXT("MyPawn"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MyPawn, AArenaRangedWeapon), 0x0000080100002020, Z_Construct_UClass_AArenaCharacter_NoRegister());
-			NewProp_MyPawn->RepNotifyFunc = FName(TEXT("OnRep_MyPawn"));
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ClientStartReload());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_GetPawnOwner());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_BurstCounter());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_MyPawn());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_Reload());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerHandleFiring());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartFire());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartReload());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopFire());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopReload());
-			OuterClass->StaticLink();
+				UProperty* NewProp_BurstCounter = new(OuterClass, TEXT("BurstCounter"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(BurstCounter, AArenaRangedWeapon), 0x0000080100002020);
+				NewProp_BurstCounter->RepNotifyFunc = FName(TEXT("OnRep_BurstCounter"));
+				UProperty* NewProp_CurrentAmmoInClip = new(OuterClass, TEXT("CurrentAmmoInClip"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(CurrentAmmoInClip, AArenaRangedWeapon), 0x0000080000002020);
+				UProperty* NewProp_CurrentAmmo = new(OuterClass, TEXT("CurrentAmmo"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(CurrentAmmo, AArenaRangedWeapon), 0x0000080000002020);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bPendingReload, AArenaRangedWeapon, uint8);
+				UProperty* NewProp_bPendingReload = new(OuterClass, TEXT("bPendingReload"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bPendingReload, AArenaRangedWeapon), 0x0000080100002020, CPP_BOOL_PROPERTY_BITMASK(bPendingReload, AArenaRangedWeapon), sizeof(uint8), false);
+				NewProp_bPendingReload->RepNotifyFunc = FName(TEXT("OnRep_Reload"));
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bPendingMelee, AArenaRangedWeapon, uint8);
+				UProperty* NewProp_bPendingMelee = new(OuterClass, TEXT("bPendingMelee"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bPendingMelee, AArenaRangedWeapon), 0x0000080100002020, CPP_BOOL_PROPERTY_BITMASK(bPendingMelee, AArenaRangedWeapon), sizeof(uint8), false);
+				NewProp_bPendingMelee->RepNotifyFunc = FName(TEXT("OnRep_Melee"));
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bLoopedFireAnim, AArenaRangedWeapon, uint8);
+				UProperty* NewProp_bLoopedFireAnim = new(OuterClass, TEXT("bLoopedFireAnim"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bLoopedFireAnim, AArenaRangedWeapon), 0x0000080000010001, CPP_BOOL_PROPERTY_BITMASK(bLoopedFireAnim, AArenaRangedWeapon), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bLoopedFireSound, AArenaRangedWeapon, uint8);
+				UProperty* NewProp_bLoopedFireSound = new(OuterClass, TEXT("bLoopedFireSound"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bLoopedFireSound, AArenaRangedWeapon), 0x0000080000010001, CPP_BOOL_PROPERTY_BITMASK(bLoopedFireSound, AArenaRangedWeapon), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bLoopedMuzzleFX, AArenaRangedWeapon, uint8);
+				UProperty* NewProp_bLoopedMuzzleFX = new(OuterClass, TEXT("bLoopedMuzzleFX"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bLoopedMuzzleFX, AArenaRangedWeapon), 0x0000080000010001, CPP_BOOL_PROPERTY_BITMASK(bLoopedMuzzleFX, AArenaRangedWeapon), sizeof(uint8), false);
+				UProperty* NewProp_FireAnim = new(OuterClass, TEXT("FireAnim"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(FireAnim, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim());
+				UProperty* NewProp_EquipAnim = new(OuterClass, TEXT("EquipAnim"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(EquipAnim, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim());
+				UProperty* NewProp_EquipSound = new(OuterClass, TEXT("EquipSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(EquipSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_MeleeAnim = new(OuterClass, TEXT("MeleeAnim"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(MeleeAnim, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim());
+				UProperty* NewProp_ReloadAnim = new(OuterClass, TEXT("ReloadAnim"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ReloadAnim, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponAnim());
+				UProperty* NewProp_MeleeSound = new(OuterClass, TEXT("MeleeSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MeleeSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_ReloadSound = new(OuterClass, TEXT("ReloadSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ReloadSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_OutOfAmmoSound = new(OuterClass, TEXT("OutOfAmmoSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(OutOfAmmoSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_FireFinishSound = new(OuterClass, TEXT("FireFinishSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireFinishSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_FireLoopSound = new(OuterClass, TEXT("FireLoopSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireLoopSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_FireSound = new(OuterClass, TEXT("FireSound"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireSound, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_USoundCue_NoRegister());
+				UProperty* NewProp_FireForceFeedback = new(OuterClass, TEXT("FireForceFeedback"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireForceFeedback, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_UForceFeedbackEffect_NoRegister());
+				UProperty* NewProp_FireCameraShake = new(OuterClass, TEXT("FireCameraShake"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(FireCameraShake, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_UCameraShake_NoRegister());
+				UProperty* NewProp_MuzzlePSC = new(OuterClass, TEXT("MuzzlePSC"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MuzzlePSC, AArenaRangedWeapon), 0x0000080000082008, Z_Construct_UClass_UParticleSystemComponent_NoRegister());
+				UProperty* NewProp_MuzzleFX = new(OuterClass, TEXT("MuzzleFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MuzzleFX, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_MuzzleAttachPoint = new(OuterClass, TEXT("MuzzleAttachPoint"), RF_Public|RF_Transient|RF_Native) UNameProperty(CPP_PROPERTY_BASE(MuzzleAttachPoint, AArenaRangedWeapon), 0x0000080000010001);
+				UProperty* NewProp_FireAC = new(OuterClass, TEXT("FireAC"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(FireAC, AArenaRangedWeapon), 0x0000080000082008, Z_Construct_UClass_UAudioComponent_NoRegister());
+				UProperty* NewProp_Mesh3P = new(OuterClass, TEXT("Mesh3P"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(Mesh3P, AArenaRangedWeapon), 0x00000800000b0009, Z_Construct_UClass_USkeletalMeshComponent_NoRegister());
+				UProperty* NewProp_WeaponConfig = new(OuterClass, TEXT("WeaponConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(WeaponConfig, AArenaRangedWeapon), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_FWeaponData());
+				UProperty* NewProp_MyPawn = new(OuterClass, TEXT("MyPawn"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MyPawn, AArenaRangedWeapon), 0x0000080100002020, Z_Construct_UClass_AArenaCharacter_NoRegister());
+				NewProp_MyPawn->RepNotifyFunc = FName(TEXT("OnRep_MyPawn"));
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bHideCrosshairWhileNotAiming, AArenaRangedWeapon, bool);
+				UProperty* NewProp_bHideCrosshairWhileNotAiming = new(OuterClass, TEXT("bHideCrosshairWhileNotAiming"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bHideCrosshairWhileNotAiming, AArenaRangedWeapon), 0x0000000000010001, CPP_BOOL_PROPERTY_BITMASK(bHideCrosshairWhileNotAiming, AArenaRangedWeapon), sizeof(bool), true);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(UseCustomAimingCrosshair, AArenaRangedWeapon, bool);
+				UProperty* NewProp_UseCustomAimingCrosshair = new(OuterClass, TEXT("UseCustomAimingCrosshair"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(UseCustomAimingCrosshair, AArenaRangedWeapon), 0x0000000000010001, CPP_BOOL_PROPERTY_BITMASK(UseCustomAimingCrosshair, AArenaRangedWeapon), sizeof(bool), true);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(UseCustomCrosshair, AArenaRangedWeapon, bool);
+				UProperty* NewProp_UseCustomCrosshair = new(OuterClass, TEXT("UseCustomCrosshair"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(UseCustomCrosshair, AArenaRangedWeapon), 0x0000000000010001, CPP_BOOL_PROPERTY_BITMASK(UseCustomCrosshair, AArenaRangedWeapon), sizeof(bool), true);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(UseLaserDot, AArenaRangedWeapon, bool);
+				UProperty* NewProp_UseLaserDot = new(OuterClass, TEXT("UseLaserDot"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(UseLaserDot, AArenaRangedWeapon), 0x0000000000010001, CPP_BOOL_PROPERTY_BITMASK(UseLaserDot, AArenaRangedWeapon), sizeof(bool), true);
+				UProperty* NewProp_AimingCrosshair = new(OuterClass, TEXT("AimingCrosshair"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(AimingCrosshair, AArenaRangedWeapon), 0x0000000000010001, Z_Construct_UScriptStruct_UCanvas_FCanvasIcon());
+				NewProp_AimingCrosshair->ArrayDim = CPP_ARRAY_DIM(AimingCrosshair, AArenaRangedWeapon);
+				UProperty* NewProp_Crosshair = new(OuterClass, TEXT("Crosshair"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Crosshair, AArenaRangedWeapon), 0x0000000000010001, Z_Construct_UScriptStruct_UCanvas_FCanvasIcon());
+				NewProp_Crosshair->ArrayDim = CPP_ARRAY_DIM(Crosshair, AArenaRangedWeapon);
+				UProperty* NewProp_HitActors = new(OuterClass, TEXT("HitActors"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(HitActors, AArenaRangedWeapon), 0x0000000000000000);
+				UProperty* NewProp_HitActors_Inner = new(NewProp_HitActors, TEXT("HitActors"), RF_Public|RF_Transient|RF_Native) UObjectProperty(FObjectInitializer(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UClass_AActor_NoRegister());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ClientStartReload()); // 1020431788
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_GetPawnOwner()); // 1490094028
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_BurstCounter()); // 1670110306
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_Melee()); // 1000210082
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_MyPawn()); // 3459876706
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_OnRep_Reload()); // 1258572490
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerHandleFiring()); // 909784085
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartFire()); // 3723225599
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartMelee()); // 1497609
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStartReload()); // 2499466203
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopFire()); // 3558586730
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopMelee()); // 1347513290
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_ServerStopReload()); // 1329301907
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_BurstCounter, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_BurstCounter, TEXT("ToolTip"), TEXT("burst counter, used for replicating fire events to remote clients"));
-			MetaData->SetValue(NewProp_CurrentAmmoInClip, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_CurrentAmmoInClip, TEXT("ToolTip"), TEXT("current ammo - inside clip"));
-			MetaData->SetValue(NewProp_CurrentAmmo, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_CurrentAmmo, TEXT("ToolTip"), TEXT("current total ammo"));
-			MetaData->SetValue(NewProp_bPendingReload, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_bPendingReload, TEXT("ToolTip"), TEXT("is reload animation playing?"));
-			MetaData->SetValue(NewProp_bLoopedFireAnim, TEXT("Category"), TEXT("Animation"));
-			MetaData->SetValue(NewProp_bLoopedFireAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_bLoopedFireAnim, TEXT("ToolTip"), TEXT("is fire animation looped?"));
-			MetaData->SetValue(NewProp_bLoopedFireSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_bLoopedFireSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_bLoopedFireSound, TEXT("ToolTip"), TEXT("is fire sound looped?"));
-			MetaData->SetValue(NewProp_bLoopedMuzzleFX, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_bLoopedMuzzleFX, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_bLoopedMuzzleFX, TEXT("ToolTip"), TEXT("is muzzle FX looped?"));
-			MetaData->SetValue(NewProp_FireAnim, TEXT("Category"), TEXT("Animation"));
-			MetaData->SetValue(NewProp_FireAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_FireAnim, TEXT("ToolTip"), TEXT("fire animations"));
-			MetaData->SetValue(NewProp_EquipAnim, TEXT("Category"), TEXT("Animation"));
-			MetaData->SetValue(NewProp_EquipAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_EquipAnim, TEXT("ToolTip"), TEXT("equip animations"));
-			MetaData->SetValue(NewProp_EquipSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_EquipSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_EquipSound, TEXT("ToolTip"), TEXT("equip sound"));
-			MetaData->SetValue(NewProp_MeleeAnim, TEXT("Category"), TEXT("Animation"));
-			MetaData->SetValue(NewProp_MeleeAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_MeleeAnim, TEXT("ToolTip"), TEXT("melee animations"));
-			MetaData->SetValue(NewProp_ReloadAnim, TEXT("Category"), TEXT("Animation"));
-			MetaData->SetValue(NewProp_ReloadAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_ReloadAnim, TEXT("ToolTip"), TEXT("reload animations"));
-			MetaData->SetValue(NewProp_MeleeSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_MeleeSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_MeleeSound, TEXT("ToolTip"), TEXT("reload sound"));
-			MetaData->SetValue(NewProp_ReloadSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_ReloadSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_ReloadSound, TEXT("ToolTip"), TEXT("reload sound"));
-			MetaData->SetValue(NewProp_OutOfAmmoSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_OutOfAmmoSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_OutOfAmmoSound, TEXT("ToolTip"), TEXT("out of ammo sound"));
-			MetaData->SetValue(NewProp_FireFinishSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_FireFinishSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_FireFinishSound, TEXT("ToolTip"), TEXT("finished burst sound (bLoopedFireSound set)"));
-			MetaData->SetValue(NewProp_FireLoopSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_FireLoopSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_FireLoopSound, TEXT("ToolTip"), TEXT("looped fire sound (bLoopedFireSound set)"));
-			MetaData->SetValue(NewProp_FireSound, TEXT("Category"), TEXT("Sound"));
-			MetaData->SetValue(NewProp_FireSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_FireSound, TEXT("ToolTip"), TEXT("single fire sound (bLoopedFireSound not set)"));
-			MetaData->SetValue(NewProp_FireForceFeedback, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_FireForceFeedback, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_FireForceFeedback, TEXT("ToolTip"), TEXT("force feedback effect to play when the weapon is fired"));
-			MetaData->SetValue(NewProp_FireCameraShake, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_FireCameraShake, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_FireCameraShake, TEXT("ToolTip"), TEXT("camera shake on firing"));
-			MetaData->SetValue(NewProp_MuzzlePSC, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_MuzzlePSC, TEXT("ToolTip"), TEXT("spawned component for muzzle FX"));
-			MetaData->SetValue(NewProp_MuzzleFX, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_MuzzleFX, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_MuzzleFX, TEXT("ToolTip"), TEXT("FX for muzzle flash"));
-			MetaData->SetValue(NewProp_MuzzleAttachPoint, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_MuzzleAttachPoint, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_MuzzleAttachPoint, TEXT("ToolTip"), TEXT("name of bone/socket for muzzle in weapon mesh"));
-			MetaData->SetValue(NewProp_FireAC, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_FireAC, TEXT("ToolTip"), TEXT("firing audio (bLoopedFireSound set)"));
-			MetaData->SetValue(NewProp_Mesh3P, TEXT("Category"), TEXT("Mesh"));
-			MetaData->SetValue(NewProp_Mesh3P, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_Mesh3P, TEXT("ToolTip"), TEXT("weapon mesh: 3rd person view"));
-			MetaData->SetValue(NewProp_WeaponConfig, TEXT("Category"), TEXT("Config"));
-			MetaData->SetValue(NewProp_WeaponConfig, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_WeaponConfig, TEXT("ToolTip"), TEXT("weapon data"));
-			MetaData->SetValue(NewProp_MyPawn, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
-			MetaData->SetValue(NewProp_MyPawn, TEXT("ToolTip"), TEXT("pawn owner"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_BurstCounter, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_BurstCounter, TEXT("ToolTip"), TEXT("burst counter, used for replicating fire events to remote clients"));
+				MetaData->SetValue(NewProp_CurrentAmmoInClip, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_CurrentAmmoInClip, TEXT("ToolTip"), TEXT("current ammo - inside clip"));
+				MetaData->SetValue(NewProp_CurrentAmmo, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_CurrentAmmo, TEXT("ToolTip"), TEXT("current total ammo"));
+				MetaData->SetValue(NewProp_bPendingReload, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_bPendingReload, TEXT("ToolTip"), TEXT("is reload animation playing?"));
+				MetaData->SetValue(NewProp_bPendingMelee, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_bPendingMelee, TEXT("ToolTip"), TEXT("is weapon fire active?"));
+				MetaData->SetValue(NewProp_bLoopedFireAnim, TEXT("Category"), TEXT("Animation"));
+				MetaData->SetValue(NewProp_bLoopedFireAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_bLoopedFireAnim, TEXT("ToolTip"), TEXT("is fire animation looped?"));
+				MetaData->SetValue(NewProp_bLoopedFireSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_bLoopedFireSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_bLoopedFireSound, TEXT("ToolTip"), TEXT("is fire sound looped?"));
+				MetaData->SetValue(NewProp_bLoopedMuzzleFX, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_bLoopedMuzzleFX, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_bLoopedMuzzleFX, TEXT("ToolTip"), TEXT("is muzzle FX looped?"));
+				MetaData->SetValue(NewProp_FireAnim, TEXT("Category"), TEXT("Animation"));
+				MetaData->SetValue(NewProp_FireAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_FireAnim, TEXT("ToolTip"), TEXT("fire animations"));
+				MetaData->SetValue(NewProp_EquipAnim, TEXT("Category"), TEXT("Animation"));
+				MetaData->SetValue(NewProp_EquipAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_EquipAnim, TEXT("ToolTip"), TEXT("equip animations"));
+				MetaData->SetValue(NewProp_EquipSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_EquipSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_EquipSound, TEXT("ToolTip"), TEXT("equip sound"));
+				MetaData->SetValue(NewProp_MeleeAnim, TEXT("Category"), TEXT("Animation"));
+				MetaData->SetValue(NewProp_MeleeAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_MeleeAnim, TEXT("ToolTip"), TEXT("melee animations"));
+				MetaData->SetValue(NewProp_ReloadAnim, TEXT("Category"), TEXT("Animation"));
+				MetaData->SetValue(NewProp_ReloadAnim, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_ReloadAnim, TEXT("ToolTip"), TEXT("reload animations"));
+				MetaData->SetValue(NewProp_MeleeSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_MeleeSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_MeleeSound, TEXT("ToolTip"), TEXT("reload sound"));
+				MetaData->SetValue(NewProp_ReloadSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_ReloadSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_ReloadSound, TEXT("ToolTip"), TEXT("reload sound"));
+				MetaData->SetValue(NewProp_OutOfAmmoSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_OutOfAmmoSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_OutOfAmmoSound, TEXT("ToolTip"), TEXT("out of ammo sound"));
+				MetaData->SetValue(NewProp_FireFinishSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_FireFinishSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_FireFinishSound, TEXT("ToolTip"), TEXT("finished burst sound (bLoopedFireSound set)"));
+				MetaData->SetValue(NewProp_FireLoopSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_FireLoopSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_FireLoopSound, TEXT("ToolTip"), TEXT("looped fire sound (bLoopedFireSound set)"));
+				MetaData->SetValue(NewProp_FireSound, TEXT("Category"), TEXT("Sound"));
+				MetaData->SetValue(NewProp_FireSound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_FireSound, TEXT("ToolTip"), TEXT("single fire sound (bLoopedFireSound not set)"));
+				MetaData->SetValue(NewProp_FireForceFeedback, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_FireForceFeedback, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_FireForceFeedback, TEXT("ToolTip"), TEXT("force feedback effect to play when the weapon is fired"));
+				MetaData->SetValue(NewProp_FireCameraShake, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_FireCameraShake, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_FireCameraShake, TEXT("ToolTip"), TEXT("camera shake on firing"));
+				MetaData->SetValue(NewProp_MuzzlePSC, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_MuzzlePSC, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_MuzzlePSC, TEXT("ToolTip"), TEXT("spawned component for muzzle FX"));
+				MetaData->SetValue(NewProp_MuzzleFX, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_MuzzleFX, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_MuzzleFX, TEXT("ToolTip"), TEXT("FX for muzzle flash"));
+				MetaData->SetValue(NewProp_MuzzleAttachPoint, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_MuzzleAttachPoint, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_MuzzleAttachPoint, TEXT("ToolTip"), TEXT("name of bone/socket for muzzle in weapon mesh"));
+				MetaData->SetValue(NewProp_FireAC, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_FireAC, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_FireAC, TEXT("ToolTip"), TEXT("firing audio (bLoopedFireSound set)"));
+				MetaData->SetValue(NewProp_Mesh3P, TEXT("Category"), TEXT("Mesh"));
+				MetaData->SetValue(NewProp_Mesh3P, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_Mesh3P, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_Mesh3P, TEXT("ToolTip"), TEXT("weapon mesh: 3rd person view"));
+				MetaData->SetValue(NewProp_WeaponConfig, TEXT("Category"), TEXT("Config"));
+				MetaData->SetValue(NewProp_WeaponConfig, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_WeaponConfig, TEXT("ToolTip"), TEXT("weapon data"));
+				MetaData->SetValue(NewProp_MyPawn, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_MyPawn, TEXT("ToolTip"), TEXT("pawn owner"));
+				MetaData->SetValue(NewProp_bHideCrosshairWhileNotAiming, TEXT("Category"), TEXT("HUD"));
+				MetaData->SetValue(NewProp_bHideCrosshairWhileNotAiming, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_bHideCrosshairWhileNotAiming, TEXT("ToolTip"), TEXT("true - crosshair will not be shown unless aiming with the weapon"));
+				MetaData->SetValue(NewProp_UseCustomAimingCrosshair, TEXT("Category"), TEXT("HUD"));
+				MetaData->SetValue(NewProp_UseCustomAimingCrosshair, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_UseCustomAimingCrosshair, TEXT("ToolTip"), TEXT("false = use custom one if set, otherwise default crosshair"));
+				MetaData->SetValue(NewProp_UseCustomCrosshair, TEXT("Category"), TEXT("HUD"));
+				MetaData->SetValue(NewProp_UseCustomCrosshair, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_UseCustomCrosshair, TEXT("ToolTip"), TEXT("false = default crosshair"));
+				MetaData->SetValue(NewProp_UseLaserDot, TEXT("Category"), TEXT("HUD"));
+				MetaData->SetValue(NewProp_UseLaserDot, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_UseLaserDot, TEXT("ToolTip"), TEXT("only use red colored center part of aiming crosshair"));
+				MetaData->SetValue(NewProp_AimingCrosshair, TEXT("Category"), TEXT("HUD"));
+				MetaData->SetValue(NewProp_AimingCrosshair, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_AimingCrosshair, TEXT("ToolTip"), TEXT("crosshair parts icons when targeting (left, top, right, bottom and center)"));
+				MetaData->SetValue(NewProp_Crosshair, TEXT("Category"), TEXT("HUD"));
+				MetaData->SetValue(NewProp_Crosshair, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_Crosshair, TEXT("ToolTip"), TEXT("crosshair parts icons (left, top, right, bottom and center)"));
+				MetaData->SetValue(NewProp_HitActors, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon.h"));
+				MetaData->SetValue(NewProp_HitActors, TEXT("ToolTip"), TEXT("list of actors hit by melee"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -2426,11 +3660,12 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UScriptStruct* ReturnStruct = NULL;
 		if (!ReturnStruct)
 		{
-			ReturnStruct = new(Outer, TEXT("ProjectileWeaponData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FPostConstructInitializeProperties(), NULL, new UScriptStruct::TCppStructOps<FProjectileWeaponData>, EStructFlags(0x00000001));
+			ReturnStruct = new(Outer, TEXT("ProjectileWeaponData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FProjectileWeaponData>, EStructFlags(0x00000001));
 			UProperty* NewProp_DamageType = new(ReturnStruct, TEXT("DamageType"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(DamageType, FProjectileWeaponData), 0x0000000000010001, Z_Construct_UClass_UDamageType_NoRegister());
 			UProperty* NewProp_ExplosionRadius = new(ReturnStruct, TEXT("ExplosionRadius"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ExplosionRadius, FProjectileWeaponData), 0x0000000000010001);
 			UProperty* NewProp_HitDamage = new(ReturnStruct, TEXT("HitDamage"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(HitDamage, FProjectileWeaponData), 0x0000000000010001);
 			UProperty* NewProp_ProjectileLife = new(ReturnStruct, TEXT("ProjectileLife"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ProjectileLife, FProjectileWeaponData), 0x0000000000010001);
+			UProperty* NewProp_BulletsPerRound = new(ReturnStruct, TEXT("BulletsPerRound"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(BulletsPerRound, FProjectileWeaponData), 0x0000000000010001);
 			UProperty* NewProp_FiringSpreadMax = new(ReturnStruct, TEXT("FiringSpreadMax"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(FiringSpreadMax, FProjectileWeaponData), 0x0000000000010001);
 			UProperty* NewProp_FiringSpreadIncrement = new(ReturnStruct, TEXT("FiringSpreadIncrement"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(FiringSpreadIncrement, FProjectileWeaponData), 0x0000000000010001);
 			UProperty* NewProp_TargetingSpreadMod = new(ReturnStruct, TEXT("TargetingSpreadMod"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(TargetingSpreadMod, FProjectileWeaponData), 0x0000000000010001);
@@ -2452,6 +3687,9 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			MetaData->SetValue(NewProp_ProjectileLife, TEXT("Category"), TEXT("Projectile"));
 			MetaData->SetValue(NewProp_ProjectileLife, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Projectile.h"));
 			MetaData->SetValue(NewProp_ProjectileLife, TEXT("ToolTip"), TEXT("life time"));
+			MetaData->SetValue(NewProp_BulletsPerRound, TEXT("Category"), TEXT("Accuracy"));
+			MetaData->SetValue(NewProp_BulletsPerRound, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Projectile.h"));
+			MetaData->SetValue(NewProp_BulletsPerRound, TEXT("ToolTip"), TEXT("continuous firing: max increment"));
 			MetaData->SetValue(NewProp_FiringSpreadMax, TEXT("Category"), TEXT("Accuracy"));
 			MetaData->SetValue(NewProp_FiringSpreadMax, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Projectile.h"));
 			MetaData->SetValue(NewProp_FiringSpreadMax, TEXT("ToolTip"), TEXT("continuous firing: max increment"));
@@ -2471,16 +3709,16 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnStruct;
 	}
-	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_Projectile_FProjectileWeaponData_CRC() { return 751338342U; }
+	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_Projectile_FProjectileWeaponData_CRC() { return 497472860U; }
 	UFunction* Z_Construct_UFunction_AArenaRangedWeapon_Projectile_ServerFireProjectile()
 	{
 		UClass* OuterClass=Z_Construct_UClass_AArenaRangedWeapon_Projectile();
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerFireProjectile"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80A80CC0, 65535, sizeof(ArenaRangedWeapon_Projectile_eventServerFireProjectile_Parms));
-			UProperty* NewProp_ShootDir = new(ReturnFunction, TEXT("ShootDir"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ShootDir, ArenaRangedWeapon_Projectile_eventServerFireProjectile_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_FVector_NetQuantizeNormal()); // 2350424088
-			UProperty* NewProp_Origin = new(ReturnFunction, TEXT("Origin"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Origin, ArenaRangedWeapon_Projectile_eventServerFireProjectile_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_UObject_FVector()); // 2500075670
+			ReturnFunction = new(OuterClass, TEXT("ServerFireProjectile"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80A80CC0, 65535, sizeof(ArenaRangedWeapon_Projectile_eventServerFireProjectile_Parms));
+			UProperty* NewProp_ShootDir = new(ReturnFunction, TEXT("ShootDir"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ShootDir, ArenaRangedWeapon_Projectile_eventServerFireProjectile_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_FVector_NetQuantizeNormal());
+			UProperty* NewProp_Origin = new(ReturnFunction, TEXT("Origin"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Origin, ArenaRangedWeapon_Projectile_eventServerFireProjectile_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_UObject_FVector());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2505,23 +3743,26 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AArenaRangedWeapon();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaRangedWeapon_Projectile::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900080;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900081;
 
-			OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_Projectile_FProjectileWeaponData()); // 751338342
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_Projectile_ServerFireProjectile());
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_Projectile_FProjectileWeaponData()); // 497472860
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_Projectile_ServerFireProjectile());
 
-			UProperty* NewProp_ProjectileConfig = new(OuterClass, TEXT("ProjectileConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ProjectileConfig, AArenaRangedWeapon_Projectile), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_Projectile_FProjectileWeaponData()); // 751338342
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_Projectile_ServerFireProjectile());
-			OuterClass->StaticLink();
+				UProperty* NewProp_ProjectileConfig = new(OuterClass, TEXT("ProjectileConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ProjectileConfig, AArenaRangedWeapon_Projectile), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_Projectile_FProjectileWeaponData());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_Projectile_ServerFireProjectile()); // 4279356454
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaRangedWeapon_Projectile.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Projectile.h"));
-			MetaData->SetValue(NewProp_ProjectileConfig, TEXT("Category"), TEXT("Config"));
-			MetaData->SetValue(NewProp_ProjectileConfig, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Projectile.h"));
-			MetaData->SetValue(NewProp_ProjectileConfig, TEXT("ToolTip"), TEXT("weapon config"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaRangedWeapon_Projectile.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Projectile.h"));
+				MetaData->SetValue(NewProp_ProjectileConfig, TEXT("Category"), TEXT("Config"));
+				MetaData->SetValue(NewProp_ProjectileConfig, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Projectile.h"));
+				MetaData->SetValue(NewProp_ProjectileConfig, TEXT("ToolTip"), TEXT("weapon config"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -2537,8 +3778,8 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("OnImpact"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00420401, 65535, sizeof(ArenaProjectile_eventOnImpact_Parms));
-			UProperty* NewProp_HitResult = new(ReturnFunction, TEXT("HitResult"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(HitResult, ArenaProjectile_eventOnImpact_Parms), 0x0000000008000182, Z_Construct_UScriptStruct_UEngineTypes_FHitResult()); // 2510479624
+			ReturnFunction = new(OuterClass, TEXT("OnImpact"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00420401, 65535, sizeof(ArenaProjectile_eventOnImpact_Parms));
+			UProperty* NewProp_HitResult = new(ReturnFunction, TEXT("HitResult"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(HitResult, ArenaProjectile_eventOnImpact_Parms), 0x0000000008000182, Z_Construct_UScriptStruct_UEngineTypes_FHitResult());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2556,7 +3797,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("OnRep_Exploded"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00080401, 65535);
+			ReturnFunction = new(OuterClass, TEXT("OnRep_Exploded"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2577,7 +3818,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("SetPawnOwner"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x04020401, 65535, sizeof(ArenaProjectile_eventSetPawnOwner_Parms));
+			ReturnFunction = new(OuterClass, TEXT("SetPawnOwner"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020401, 65535, sizeof(ArenaProjectile_eventSetPawnOwner_Parms));
 			UProperty* NewProp_MyPawn = new(ReturnFunction, TEXT("MyPawn"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MyPawn, ArenaProjectile_eventSetPawnOwner_Parms), 0x0000000000000080, Z_Construct_UClass_AArenaCharacter_NoRegister());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -2603,47 +3844,53 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AActor();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaProjectile::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900081;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900081;
 
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaProjectile_OnImpact());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaProjectile_OnRep_Exploded());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaProjectile_SetPawnOwner());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaProjectile_OnImpact());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaProjectile_OnRep_Exploded());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaProjectile_SetPawnOwner());
 
-			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bExploded, AArenaProjectile, bool);
-			UProperty* NewProp_bExploded = new(OuterClass, TEXT("bExploded"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bExploded, AArenaProjectile), 0x0000080100002020, CPP_BOOL_PROPERTY_BITMASK(bExploded, AArenaProjectile), sizeof(bool), true);
-			NewProp_bExploded->RepNotifyFunc = FName(TEXT("OnRep_Exploded"));
-			UProperty* NewProp_ImpactTemplate = new(OuterClass, TEXT("ImpactTemplate"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(ImpactTemplate, AArenaProjectile), 0x0000080000010001, Z_Construct_UClass_AArenaImpactEffect_NoRegister());
-			UProperty* NewProp_ParticleComp = new(OuterClass, TEXT("ParticleComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ParticleComp, AArenaProjectile), 0x00000800044b0009, Z_Construct_UClass_UParticleSystemComponent_NoRegister());
-			UProperty* NewProp_CollisionComp = new(OuterClass, TEXT("CollisionComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(CollisionComp, AArenaProjectile), 0x00000800044b0009, Z_Construct_UClass_USphereComponent_NoRegister());
-			UProperty* NewProp_MovementComp = new(OuterClass, TEXT("MovementComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MovementComp, AArenaProjectile), 0x00000800044b0009, Z_Construct_UClass_UProjectileMovementComponent_NoRegister());
-			UProperty* NewProp_MyPawn = new(OuterClass, TEXT("MyPawn"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MyPawn, AArenaProjectile), 0x0000080000002000, Z_Construct_UClass_AArenaCharacter_NoRegister());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaProjectile_OnImpact());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaProjectile_OnRep_Exploded());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaProjectile_SetPawnOwner());
-			OuterClass->StaticLink();
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bExploded, AArenaProjectile, bool);
+				UProperty* NewProp_bExploded = new(OuterClass, TEXT("bExploded"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bExploded, AArenaProjectile), 0x0000080100002020, CPP_BOOL_PROPERTY_BITMASK(bExploded, AArenaProjectile), sizeof(bool), true);
+				NewProp_bExploded->RepNotifyFunc = FName(TEXT("OnRep_Exploded"));
+				UProperty* NewProp_ImpactTemplate = new(OuterClass, TEXT("ImpactTemplate"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(ImpactTemplate, AArenaProjectile), 0x0000080000010001, Z_Construct_UClass_AArenaImpactEffect_NoRegister());
+				UProperty* NewProp_ParticleComp = new(OuterClass, TEXT("ParticleComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(ParticleComp, AArenaProjectile), 0x00000800000b0009, Z_Construct_UClass_UParticleSystemComponent_NoRegister());
+				UProperty* NewProp_CollisionComp = new(OuterClass, TEXT("CollisionComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(CollisionComp, AArenaProjectile), 0x00000800000b0009, Z_Construct_UClass_USphereComponent_NoRegister());
+				UProperty* NewProp_MovementComp = new(OuterClass, TEXT("MovementComp"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MovementComp, AArenaProjectile), 0x00000800000b0009, Z_Construct_UClass_UProjectileMovementComponent_NoRegister());
+				UProperty* NewProp_MyPawn = new(OuterClass, TEXT("MyPawn"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(MyPawn, AArenaProjectile), 0x0000080000002000, Z_Construct_UClass_AArenaCharacter_NoRegister());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaProjectile_OnImpact()); // 2406332784
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaProjectile_OnRep_Exploded()); // 1375530500
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaProjectile_SetPawnOwner()); // 2933785863
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaProjectile.h"));
-			MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
-			MetaData->SetValue(NewProp_bExploded, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
-			MetaData->SetValue(NewProp_bExploded, TEXT("ToolTip"), TEXT("did it explode?"));
-			MetaData->SetValue(NewProp_ImpactTemplate, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_ImpactTemplate, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
-			MetaData->SetValue(NewProp_ImpactTemplate, TEXT("ToolTip"), TEXT("effects for impact"));
-			MetaData->SetValue(NewProp_ParticleComp, TEXT("Category"), TEXT("Projectile"));
-			MetaData->SetValue(NewProp_ParticleComp, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
-			MetaData->SetValue(NewProp_CollisionComp, TEXT("Category"), TEXT("Projectile"));
-			MetaData->SetValue(NewProp_CollisionComp, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
-			MetaData->SetValue(NewProp_CollisionComp, TEXT("ToolTip"), TEXT("collisions"));
-			MetaData->SetValue(NewProp_MovementComp, TEXT("Category"), TEXT("Projectile"));
-			MetaData->SetValue(NewProp_MovementComp, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
-			MetaData->SetValue(NewProp_MovementComp, TEXT("ToolTip"), TEXT("movement component"));
-			MetaData->SetValue(NewProp_MyPawn, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
-			MetaData->SetValue(NewProp_MyPawn, TEXT("ToolTip"), TEXT("pawn owner"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("BlueprintType"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaProjectile.h"));
+				MetaData->SetValue(OuterClass, TEXT("IsBlueprintBase"), TEXT("true"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
+				MetaData->SetValue(NewProp_bExploded, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
+				MetaData->SetValue(NewProp_bExploded, TEXT("ToolTip"), TEXT("did it explode?"));
+				MetaData->SetValue(NewProp_ImpactTemplate, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_ImpactTemplate, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
+				MetaData->SetValue(NewProp_ImpactTemplate, TEXT("ToolTip"), TEXT("effects for impact"));
+				MetaData->SetValue(NewProp_ParticleComp, TEXT("Category"), TEXT("Projectile"));
+				MetaData->SetValue(NewProp_ParticleComp, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_ParticleComp, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
+				MetaData->SetValue(NewProp_CollisionComp, TEXT("Category"), TEXT("Projectile"));
+				MetaData->SetValue(NewProp_CollisionComp, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_CollisionComp, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
+				MetaData->SetValue(NewProp_CollisionComp, TEXT("ToolTip"), TEXT("collisions"));
+				MetaData->SetValue(NewProp_MovementComp, TEXT("Category"), TEXT("Projectile"));
+				MetaData->SetValue(NewProp_MovementComp, TEXT("EditInline"), TEXT("true"));
+				MetaData->SetValue(NewProp_MovementComp, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
+				MetaData->SetValue(NewProp_MovementComp, TEXT("ToolTip"), TEXT("movement component"));
+				MetaData->SetValue(NewProp_MyPawn, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaProjectile.h"));
+				MetaData->SetValue(NewProp_MyPawn, TEXT("ToolTip"), TEXT("pawn owner"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -2655,7 +3902,7 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UScriptStruct* ReturnStruct = NULL;
 		if (!ReturnStruct)
 		{
-			ReturnStruct = new(Outer, TEXT("InstantWeaponData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FPostConstructInitializeProperties(), NULL, new UScriptStruct::TCppStructOps<FInstantWeaponData>, EStructFlags(0x00000001));
+			ReturnStruct = new(Outer, TEXT("InstantWeaponData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FInstantWeaponData>, EStructFlags(0x00000001));
 			UProperty* NewProp_AllowedViewDotHitDir = new(ReturnStruct, TEXT("AllowedViewDotHitDir"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(AllowedViewDotHitDir, FInstantWeaponData), 0x0000000000010001);
 			UProperty* NewProp_ClientSideHitLeeway = new(ReturnStruct, TEXT("ClientSideHitLeeway"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ClientSideHitLeeway, FInstantWeaponData), 0x0000000000010001);
 			UProperty* NewProp_DamageType = new(ReturnStruct, TEXT("DamageType"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(DamageType, FInstantWeaponData), 0x0000000000010001, Z_Construct_UClass_UDamageType_NoRegister());
@@ -2700,17 +3947,17 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnStruct;
 	}
-	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantWeaponData_CRC() { return 2275531573U; }
+	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantWeaponData_CRC() { return 2626889995U; }
 	UScriptStruct* Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantHitInfo()
 	{
 		UStruct* Outer=Z_Construct_UClass_AArenaRangedWeapon_Instant();
 		static UScriptStruct* ReturnStruct = NULL;
 		if (!ReturnStruct)
 		{
-			ReturnStruct = new(Outer, TEXT("InstantHitInfo"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FPostConstructInitializeProperties(), NULL, new UScriptStruct::TCppStructOps<FInstantHitInfo>, EStructFlags(0x00000001));
+			ReturnStruct = new(Outer, TEXT("InstantHitInfo"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FInstantHitInfo>, EStructFlags(0x00000001));
 			UProperty* NewProp_RandomSeed = new(ReturnStruct, TEXT("RandomSeed"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(RandomSeed, FInstantHitInfo), 0x0000000000000000);
 			UProperty* NewProp_ReticleSpread = new(ReturnStruct, TEXT("ReticleSpread"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReticleSpread, FInstantHitInfo), 0x0000000000000000);
-			UProperty* NewProp_Origin = new(ReturnStruct, TEXT("Origin"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Origin, FInstantHitInfo), 0x0000000000000000, Z_Construct_UScriptStruct_UObject_FVector()); // 2500075670
+			UProperty* NewProp_Origin = new(ReturnStruct, TEXT("Origin"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Origin, FInstantHitInfo), 0x0000000000000000, Z_Construct_UScriptStruct_UObject_FVector());
 			ReturnStruct->StaticLink();
 #if WITH_METADATA
 			UMetaData* MetaData = ReturnStruct->GetOutermost()->GetMetaData();
@@ -2722,14 +3969,14 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		}
 		return ReturnStruct;
 	}
-	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantHitInfo_CRC() { return 2458051855U; }
+	uint32 Get_Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantHitInfo_CRC() { return 921090116U; }
 	UFunction* Z_Construct_UFunction_AArenaRangedWeapon_Instant_OnRep_HitNotify()
 	{
 		UClass* OuterClass=Z_Construct_UClass_AArenaRangedWeapon_Instant();
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("OnRep_HitNotify"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00080401, 65535);
+			ReturnFunction = new(OuterClass, TEXT("OnRep_HitNotify"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00080401, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2746,11 +3993,11 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerNotifyHit"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280CC0, 65535, sizeof(ArenaRangedWeapon_Instant_eventServerNotifyHit_Parms));
+			ReturnFunction = new(OuterClass, TEXT("ServerNotifyHit"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280CC0, 65535, sizeof(ArenaRangedWeapon_Instant_eventServerNotifyHit_Parms));
 			UProperty* NewProp_ReticleSpread = new(ReturnFunction, TEXT("ReticleSpread"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReticleSpread, ArenaRangedWeapon_Instant_eventServerNotifyHit_Parms), 0x0000000000000080);
 			UProperty* NewProp_RandomSeed = new(ReturnFunction, TEXT("RandomSeed"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(RandomSeed, ArenaRangedWeapon_Instant_eventServerNotifyHit_Parms), 0x0000000000000080);
-			UProperty* NewProp_ShootDir = new(ReturnFunction, TEXT("ShootDir"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ShootDir, ArenaRangedWeapon_Instant_eventServerNotifyHit_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_FVector_NetQuantizeNormal()); // 2350424088
-			UProperty* NewProp_Impact = new(ReturnFunction, TEXT("Impact"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Impact, ArenaRangedWeapon_Instant_eventServerNotifyHit_Parms), 0x0000000000000082, Z_Construct_UScriptStruct_UEngineTypes_FHitResult()); // 2510479624
+			UProperty* NewProp_ShootDir = new(ReturnFunction, TEXT("ShootDir"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ShootDir, ArenaRangedWeapon_Instant_eventServerNotifyHit_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_FVector_NetQuantizeNormal());
+			UProperty* NewProp_Impact = new(ReturnFunction, TEXT("Impact"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Impact, ArenaRangedWeapon_Instant_eventServerNotifyHit_Parms), 0x0000000000000082, Z_Construct_UScriptStruct_UEngineTypes_FHitResult());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2771,10 +4018,10 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("ServerNotifyMiss"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x80280C40, 65535, sizeof(ArenaRangedWeapon_Instant_eventServerNotifyMiss_Parms));
+			ReturnFunction = new(OuterClass, TEXT("ServerNotifyMiss"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80280C40, 65535, sizeof(ArenaRangedWeapon_Instant_eventServerNotifyMiss_Parms));
 			UProperty* NewProp_ReticleSpread = new(ReturnFunction, TEXT("ReticleSpread"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ReticleSpread, ArenaRangedWeapon_Instant_eventServerNotifyMiss_Parms), 0x0000000000000080);
 			UProperty* NewProp_RandomSeed = new(ReturnFunction, TEXT("RandomSeed"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(RandomSeed, ArenaRangedWeapon_Instant_eventServerNotifyMiss_Parms), 0x0000000000000080);
-			UProperty* NewProp_ShootDir = new(ReturnFunction, TEXT("ShootDir"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ShootDir, ArenaRangedWeapon_Instant_eventServerNotifyMiss_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_FVector_NetQuantizeNormal()); // 2350424088
+			UProperty* NewProp_ShootDir = new(ReturnFunction, TEXT("ShootDir"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ShootDir, ArenaRangedWeapon_Instant_eventServerNotifyMiss_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_FVector_NetQuantizeNormal());
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
@@ -2800,49 +4047,422 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AArenaRangedWeapon();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = AArenaRangedWeapon_Instant::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00900081;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900081;
 
-			OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantWeaponData()); // 2275531573
-			OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantHitInfo()); // 2458051855
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_Instant_OnRep_HitNotify());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_Instant_ServerNotifyHit());
-			OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_Instant_ServerNotifyMiss());
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantWeaponData()); // 2626889995
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantHitInfo()); // 921090116
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_Instant_OnRep_HitNotify());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_Instant_ServerNotifyHit());
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaRangedWeapon_Instant_ServerNotifyMiss());
 
-			UProperty* NewProp_HitNotify = new(OuterClass, TEXT("HitNotify"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(HitNotify, AArenaRangedWeapon_Instant), 0x0000080100002020, Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantHitInfo()); // 2458051855
-			NewProp_HitNotify->RepNotifyFunc = FName(TEXT("OnRep_HitNotify"));
-			UProperty* NewProp_TrailTargetParam = new(OuterClass, TEXT("TrailTargetParam"), RF_Public|RF_Transient|RF_Native) UNameProperty(CPP_PROPERTY_BASE(TrailTargetParam, AArenaRangedWeapon_Instant), 0x0000080000010001);
-			UProperty* NewProp_TrailFX = new(OuterClass, TEXT("TrailFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(TrailFX, AArenaRangedWeapon_Instant), 0x0000080000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
-			UProperty* NewProp_ImpactTemplate = new(OuterClass, TEXT("ImpactTemplate"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(ImpactTemplate, AArenaRangedWeapon_Instant), 0x0000080000010001, Z_Construct_UClass_AArenaImpactEffect_NoRegister());
-			UProperty* NewProp_InstantConfig = new(OuterClass, TEXT("InstantConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(InstantConfig, AArenaRangedWeapon_Instant), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantWeaponData()); // 2275531573
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_Instant_OnRep_HitNotify());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_Instant_ServerNotifyHit());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_Instant_ServerNotifyMiss());
-			OuterClass->StaticLink();
+				UProperty* NewProp_HitNotify = new(OuterClass, TEXT("HitNotify"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(HitNotify, AArenaRangedWeapon_Instant), 0x0000080100002020, Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantHitInfo());
+				NewProp_HitNotify->RepNotifyFunc = FName(TEXT("OnRep_HitNotify"));
+				UProperty* NewProp_TrailTargetParam = new(OuterClass, TEXT("TrailTargetParam"), RF_Public|RF_Transient|RF_Native) UNameProperty(CPP_PROPERTY_BASE(TrailTargetParam, AArenaRangedWeapon_Instant), 0x0000080000010001);
+				UProperty* NewProp_TrailFX = new(OuterClass, TEXT("TrailFX"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(TrailFX, AArenaRangedWeapon_Instant), 0x0000080000010001, Z_Construct_UClass_UParticleSystem_NoRegister());
+				UProperty* NewProp_ImpactTemplate = new(OuterClass, TEXT("ImpactTemplate"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(ImpactTemplate, AArenaRangedWeapon_Instant), 0x0000080000010001, Z_Construct_UClass_AArenaImpactEffect_NoRegister());
+				UProperty* NewProp_InstantConfig = new(OuterClass, TEXT("InstantConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(InstantConfig, AArenaRangedWeapon_Instant), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaRangedWeapon_Instant_FInstantWeaponData());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_Instant_OnRep_HitNotify()); // 3978773585
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_Instant_ServerNotifyHit()); // 1242296117
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaRangedWeapon_Instant_ServerNotifyMiss()); // 1458999544
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaRangedWeapon_Instant.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
-			MetaData->SetValue(NewProp_HitNotify, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
-			MetaData->SetValue(NewProp_HitNotify, TEXT("ToolTip"), TEXT("instant hit notify for replication"));
-			MetaData->SetValue(NewProp_TrailTargetParam, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_TrailTargetParam, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
-			MetaData->SetValue(NewProp_TrailTargetParam, TEXT("ToolTip"), TEXT("param name for beam target in smoke trail"));
-			MetaData->SetValue(NewProp_TrailFX, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_TrailFX, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
-			MetaData->SetValue(NewProp_TrailFX, TEXT("ToolTip"), TEXT("smoke trail"));
-			MetaData->SetValue(NewProp_ImpactTemplate, TEXT("Category"), TEXT("Effects"));
-			MetaData->SetValue(NewProp_ImpactTemplate, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
-			MetaData->SetValue(NewProp_ImpactTemplate, TEXT("ToolTip"), TEXT("impact effects"));
-			MetaData->SetValue(NewProp_InstantConfig, TEXT("Category"), TEXT("Config"));
-			MetaData->SetValue(NewProp_InstantConfig, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
-			MetaData->SetValue(NewProp_InstantConfig, TEXT("ToolTip"), TEXT("weapon config"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaRangedWeapon_Instant.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
+				MetaData->SetValue(NewProp_HitNotify, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
+				MetaData->SetValue(NewProp_HitNotify, TEXT("ToolTip"), TEXT("instant hit notify for replication"));
+				MetaData->SetValue(NewProp_TrailTargetParam, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_TrailTargetParam, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
+				MetaData->SetValue(NewProp_TrailTargetParam, TEXT("ToolTip"), TEXT("param name for beam target in smoke trail"));
+				MetaData->SetValue(NewProp_TrailFX, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_TrailFX, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
+				MetaData->SetValue(NewProp_TrailFX, TEXT("ToolTip"), TEXT("smoke trail"));
+				MetaData->SetValue(NewProp_ImpactTemplate, TEXT("Category"), TEXT("Effects"));
+				MetaData->SetValue(NewProp_ImpactTemplate, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
+				MetaData->SetValue(NewProp_ImpactTemplate, TEXT("ToolTip"), TEXT("impact effects"));
+				MetaData->SetValue(NewProp_InstantConfig, TEXT("Category"), TEXT("Config"));
+				MetaData->SetValue(NewProp_InstantConfig, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaRangedWeapon_Instant.h"));
+				MetaData->SetValue(NewProp_InstantConfig, TEXT("ToolTip"), TEXT("weapon config"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
 	static FCompiledInDefer Z_CompiledInDefer_UClass_AArenaRangedWeapon_Instant(Z_Construct_UClass_AArenaRangedWeapon_Instant, TEXT("AArenaRangedWeapon_Instant"));
+	UScriptStruct* Z_Construct_UScriptStruct_AArenaShotgun_FShotgunWeaponData()
+	{
+		UStruct* Outer=Z_Construct_UClass_AArenaShotgun();
+		static UScriptStruct* ReturnStruct = NULL;
+		if (!ReturnStruct)
+		{
+			ReturnStruct = new(Outer, TEXT("ShotgunWeaponData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FShotgunWeaponData>, EStructFlags(0x00000001));
+			UProperty* NewProp_DamageType = new(ReturnStruct, TEXT("DamageType"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(DamageType, FShotgunWeaponData), 0x0000000000010001, Z_Construct_UClass_UDamageType_NoRegister());
+			UProperty* NewProp_ExplosionRadius = new(ReturnStruct, TEXT("ExplosionRadius"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ExplosionRadius, FShotgunWeaponData), 0x0000000000010001);
+			UProperty* NewProp_HitDamage = new(ReturnStruct, TEXT("HitDamage"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(HitDamage, FShotgunWeaponData), 0x0000000000010001);
+			UProperty* NewProp_ProjectileLife = new(ReturnStruct, TEXT("ProjectileLife"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ProjectileLife, FShotgunWeaponData), 0x0000000000010001);
+			UProperty* NewProp_FiringSpreadMax = new(ReturnStruct, TEXT("FiringSpreadMax"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(FiringSpreadMax, FShotgunWeaponData), 0x0000000000010001);
+			UProperty* NewProp_FiringSpreadIncrement = new(ReturnStruct, TEXT("FiringSpreadIncrement"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(FiringSpreadIncrement, FShotgunWeaponData), 0x0000000000010001);
+			UProperty* NewProp_TargetingSpreadMod = new(ReturnStruct, TEXT("TargetingSpreadMod"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(TargetingSpreadMod, FShotgunWeaponData), 0x0000000000010001);
+			UProperty* NewProp_WeaponSpread = new(ReturnStruct, TEXT("WeaponSpread"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(WeaponSpread, FShotgunWeaponData), 0x0000000000010001);
+			UProperty* NewProp_ProjectileClass = new(ReturnStruct, TEXT("ProjectileClass"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(ProjectileClass, FShotgunWeaponData), 0x0000000000010001, Z_Construct_UClass_AArenaProjectile_NoRegister());
+			ReturnStruct->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnStruct->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnStruct, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_DamageType, TEXT("Category"), TEXT("WeaponStat"));
+			MetaData->SetValue(NewProp_DamageType, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_DamageType, TEXT("ToolTip"), TEXT("type of damage"));
+			MetaData->SetValue(NewProp_ExplosionRadius, TEXT("Category"), TEXT("WeaponStat"));
+			MetaData->SetValue(NewProp_ExplosionRadius, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_ExplosionRadius, TEXT("ToolTip"), TEXT("radius of damage"));
+			MetaData->SetValue(NewProp_HitDamage, TEXT("Category"), TEXT("WeaponStat"));
+			MetaData->SetValue(NewProp_HitDamage, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_HitDamage, TEXT("ToolTip"), TEXT("damage amount"));
+			MetaData->SetValue(NewProp_ProjectileLife, TEXT("Category"), TEXT("Projectile"));
+			MetaData->SetValue(NewProp_ProjectileLife, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_ProjectileLife, TEXT("ToolTip"), TEXT("life time"));
+			MetaData->SetValue(NewProp_FiringSpreadMax, TEXT("Category"), TEXT("Accuracy"));
+			MetaData->SetValue(NewProp_FiringSpreadMax, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_FiringSpreadMax, TEXT("ToolTip"), TEXT("continuous firing: max increment"));
+			MetaData->SetValue(NewProp_FiringSpreadIncrement, TEXT("Category"), TEXT("Accuracy"));
+			MetaData->SetValue(NewProp_FiringSpreadIncrement, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_FiringSpreadIncrement, TEXT("ToolTip"), TEXT("continuous firing: spread increment"));
+			MetaData->SetValue(NewProp_TargetingSpreadMod, TEXT("Category"), TEXT("Accuracy"));
+			MetaData->SetValue(NewProp_TargetingSpreadMod, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_TargetingSpreadMod, TEXT("ToolTip"), TEXT("targeting spread modifier"));
+			MetaData->SetValue(NewProp_WeaponSpread, TEXT("Category"), TEXT("Accuracy"));
+			MetaData->SetValue(NewProp_WeaponSpread, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_WeaponSpread, TEXT("ToolTip"), TEXT("base weapon spread (degrees)"));
+			MetaData->SetValue(NewProp_ProjectileClass, TEXT("Category"), TEXT("Projectile"));
+			MetaData->SetValue(NewProp_ProjectileClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_ProjectileClass, TEXT("ToolTip"), TEXT("projectile class"));
+#endif
+		}
+		return ReturnStruct;
+	}
+	uint32 Get_Z_Construct_UScriptStruct_AArenaShotgun_FShotgunWeaponData_CRC() { return 790469357U; }
+	UFunction* Z_Construct_UFunction_AArenaShotgun_ServerFireProjectile()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaShotgun();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("ServerFireProjectile"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80A80CC0, 65535, sizeof(ArenaShotgun_eventServerFireProjectile_Parms));
+			UProperty* NewProp_ShootDir = new(ReturnFunction, TEXT("ShootDir"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ShootDir, ArenaShotgun_eventServerFireProjectile_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_FVector_NetQuantizeNormal());
+			UProperty* NewProp_Origin = new(ReturnFunction, TEXT("Origin"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Origin, ArenaShotgun_eventServerFireProjectile_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_UObject_FVector());
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("spawn projectile on server"));
+			MetaData->SetValue(NewProp_ShootDir, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+			MetaData->SetValue(NewProp_Origin, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UClass* Z_Construct_UClass_AArenaShotgun_NoRegister()
+	{
+		return AArenaShotgun::StaticClass();
+	}
+	UClass* Z_Construct_UClass_AArenaShotgun()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_AArenaRangedWeapon();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = AArenaShotgun::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900081;
+
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaShotgun_FShotgunWeaponData()); // 790469357
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaShotgun_ServerFireProjectile());
+
+				UProperty* NewProp_ProjectileConfig = new(OuterClass, TEXT("ProjectileConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ProjectileConfig, AArenaShotgun), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaShotgun_FShotgunWeaponData());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaShotgun_ServerFireProjectile()); // 2618074496
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaShotgun.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+				MetaData->SetValue(NewProp_ProjectileConfig, TEXT("Category"), TEXT("Config"));
+				MetaData->SetValue(NewProp_ProjectileConfig, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaShotgun.h"));
+				MetaData->SetValue(NewProp_ProjectileConfig, TEXT("ToolTip"), TEXT("weapon config"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_AArenaShotgun(Z_Construct_UClass_AArenaShotgun, TEXT("AArenaShotgun"));
+	UScriptStruct* Z_Construct_UScriptStruct_AArenaSniperRifle_FSniperWeaponData()
+	{
+		UStruct* Outer=Z_Construct_UClass_AArenaSniperRifle();
+		static UScriptStruct* ReturnStruct = NULL;
+		if (!ReturnStruct)
+		{
+			ReturnStruct = new(Outer, TEXT("SniperWeaponData"), RF_Public|RF_Transient|RF_Native) UScriptStruct(FObjectInitializer(), NULL, new UScriptStruct::TCppStructOps<FSniperWeaponData>, EStructFlags(0x00000001));
+			UProperty* NewProp_DamageType = new(ReturnStruct, TEXT("DamageType"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(DamageType, FSniperWeaponData), 0x0000000000010001, Z_Construct_UClass_UDamageType_NoRegister());
+			UProperty* NewProp_ExplosionRadius = new(ReturnStruct, TEXT("ExplosionRadius"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ExplosionRadius, FSniperWeaponData), 0x0000000000010001);
+			UProperty* NewProp_HitDamage = new(ReturnStruct, TEXT("HitDamage"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(HitDamage, FSniperWeaponData), 0x0000000000010001);
+			UProperty* NewProp_ProjectileLife = new(ReturnStruct, TEXT("ProjectileLife"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(ProjectileLife, FSniperWeaponData), 0x0000000000010001);
+			UProperty* NewProp_FiringSpreadMax = new(ReturnStruct, TEXT("FiringSpreadMax"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(FiringSpreadMax, FSniperWeaponData), 0x0000000000010001);
+			UProperty* NewProp_FiringSpreadIncrement = new(ReturnStruct, TEXT("FiringSpreadIncrement"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(FiringSpreadIncrement, FSniperWeaponData), 0x0000000000010001);
+			UProperty* NewProp_TargetingSpreadMod = new(ReturnStruct, TEXT("TargetingSpreadMod"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(TargetingSpreadMod, FSniperWeaponData), 0x0000000000010001);
+			UProperty* NewProp_WeaponSpread = new(ReturnStruct, TEXT("WeaponSpread"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(WeaponSpread, FSniperWeaponData), 0x0000000000010001);
+			UProperty* NewProp_ProjectileClass = new(ReturnStruct, TEXT("ProjectileClass"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(ProjectileClass, FSniperWeaponData), 0x0000000000010001, Z_Construct_UClass_AArenaProjectile_NoRegister());
+			ReturnStruct->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnStruct->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnStruct, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_DamageType, TEXT("Category"), TEXT("WeaponStat"));
+			MetaData->SetValue(NewProp_DamageType, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_DamageType, TEXT("ToolTip"), TEXT("type of damage"));
+			MetaData->SetValue(NewProp_ExplosionRadius, TEXT("Category"), TEXT("WeaponStat"));
+			MetaData->SetValue(NewProp_ExplosionRadius, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_ExplosionRadius, TEXT("ToolTip"), TEXT("radius of damage"));
+			MetaData->SetValue(NewProp_HitDamage, TEXT("Category"), TEXT("WeaponStat"));
+			MetaData->SetValue(NewProp_HitDamage, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_HitDamage, TEXT("ToolTip"), TEXT("damage amount"));
+			MetaData->SetValue(NewProp_ProjectileLife, TEXT("Category"), TEXT("Projectile"));
+			MetaData->SetValue(NewProp_ProjectileLife, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_ProjectileLife, TEXT("ToolTip"), TEXT("life time"));
+			MetaData->SetValue(NewProp_FiringSpreadMax, TEXT("Category"), TEXT("Accuracy"));
+			MetaData->SetValue(NewProp_FiringSpreadMax, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_FiringSpreadMax, TEXT("ToolTip"), TEXT("continuous firing: max increment"));
+			MetaData->SetValue(NewProp_FiringSpreadIncrement, TEXT("Category"), TEXT("Accuracy"));
+			MetaData->SetValue(NewProp_FiringSpreadIncrement, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_FiringSpreadIncrement, TEXT("ToolTip"), TEXT("continuous firing: spread increment"));
+			MetaData->SetValue(NewProp_TargetingSpreadMod, TEXT("Category"), TEXT("Accuracy"));
+			MetaData->SetValue(NewProp_TargetingSpreadMod, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_TargetingSpreadMod, TEXT("ToolTip"), TEXT("targeting spread modifier"));
+			MetaData->SetValue(NewProp_WeaponSpread, TEXT("Category"), TEXT("Accuracy"));
+			MetaData->SetValue(NewProp_WeaponSpread, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_WeaponSpread, TEXT("ToolTip"), TEXT("base weapon spread (degrees)"));
+			MetaData->SetValue(NewProp_ProjectileClass, TEXT("Category"), TEXT("Projectile"));
+			MetaData->SetValue(NewProp_ProjectileClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_ProjectileClass, TEXT("ToolTip"), TEXT("projectile class"));
+#endif
+		}
+		return ReturnStruct;
+	}
+	uint32 Get_Z_Construct_UScriptStruct_AArenaSniperRifle_FSniperWeaponData_CRC() { return 1854718054U; }
+	UFunction* Z_Construct_UFunction_AArenaSniperRifle_ServerFireProjectile()
+	{
+		UClass* OuterClass=Z_Construct_UClass_AArenaSniperRifle();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("ServerFireProjectile"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x80A80CC0, 65535, sizeof(ArenaSniperRifle_eventServerFireProjectile_Parms));
+			UProperty* NewProp_ShootDir = new(ReturnFunction, TEXT("ShootDir"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ShootDir, ArenaSniperRifle_eventServerFireProjectile_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_FVector_NetQuantizeNormal());
+			UProperty* NewProp_Origin = new(ReturnFunction, TEXT("Origin"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(Origin, ArenaSniperRifle_eventServerFireProjectile_Parms), 0x0000000000000080, Z_Construct_UScriptStruct_UObject_FVector());
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("spawn projectile on server"));
+			MetaData->SetValue(NewProp_ShootDir, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+			MetaData->SetValue(NewProp_Origin, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UClass* Z_Construct_UClass_AArenaSniperRifle_NoRegister()
+	{
+		return AArenaSniperRifle::StaticClass();
+	}
+	UClass* Z_Construct_UClass_AArenaSniperRifle()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_AArenaRangedWeapon();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = AArenaSniperRifle::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900080;
+
+				OuterClass->LinkChild(Z_Construct_UScriptStruct_AArenaSniperRifle_FSniperWeaponData()); // 1854718054
+				OuterClass->LinkChild(Z_Construct_UFunction_AArenaSniperRifle_ServerFireProjectile());
+
+				UProperty* NewProp_ProjectileConfig = new(OuterClass, TEXT("ProjectileConfig"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(ProjectileConfig, AArenaSniperRifle), 0x0000080000010001, Z_Construct_UScriptStruct_AArenaSniperRifle_FSniperWeaponData());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_AArenaSniperRifle_ServerFireProjectile()); // 3217066381
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Weapons/ArenaSniperRifle.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+				MetaData->SetValue(NewProp_ProjectileConfig, TEXT("Category"), TEXT("Config"));
+				MetaData->SetValue(NewProp_ProjectileConfig, TEXT("ModuleRelativePath"), TEXT("Public/Weapons/ArenaSniperRifle.h"));
+				MetaData->SetValue(NewProp_ProjectileConfig, TEXT("ToolTip"), TEXT("weapon config"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_AArenaSniperRifle(Z_Construct_UClass_AArenaSniperRifle, TEXT("AArenaSniperRifle"));
+	UFunction* Z_Construct_UFunction_UArenaStartMenu_HostGame()
+	{
+		struct ArenaStartMenu_eventHostGame_Parms
+		{
+			FString GameType;
+		};
+		UClass* OuterClass=Z_Construct_UClass_UArenaStartMenu();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("HostGame"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020401, 65535, sizeof(ArenaStartMenu_eventHostGame_Parms));
+			UProperty* NewProp_GameType = new(ReturnFunction, TEXT("GameType"), RF_Public|RF_Transient|RF_Native) UStrProperty(CPP_PROPERTY_BASE(GameType, ArenaStartMenu_eventHostGame_Parms), 0x0000000000000080);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Online"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaStartMenu.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("Hosts a game, using the passed in game type"));
+			MetaData->SetValue(NewProp_GameType, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaStartMenu.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_UArenaStartMenu_HostTeamDeathMatch()
+	{
+		UClass* OuterClass=Z_Construct_UClass_UArenaStartMenu();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("HostTeamDeathMatch"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020401, 65535);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Online"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaStartMenu.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("Hosts team deathmatch game"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_UArenaStartMenu_SetUp()
+	{
+		struct ArenaStartMenu_eventSetUp_Parms
+		{
+			class UArenaGameInstance* _GameInstance;
+			class ULocalPlayer* _PlayerOwner;
+		};
+		UClass* OuterClass=Z_Construct_UClass_UArenaStartMenu();
+		static UFunction* ReturnFunction = NULL;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(OuterClass, TEXT("SetUp"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x04020401, 65535, sizeof(ArenaStartMenu_eventSetUp_Parms));
+			UProperty* NewProp__PlayerOwner = new(ReturnFunction, TEXT("_PlayerOwner"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(_PlayerOwner, ArenaStartMenu_eventSetUp_Parms), 0x0000000000000080, Z_Construct_UClass_ULocalPlayer_NoRegister());
+			UProperty* NewProp__GameInstance = new(ReturnFunction, TEXT("_GameInstance"), RF_Public|RF_Transient|RF_Native) UObjectProperty(CPP_PROPERTY_BASE(_GameInstance, ArenaStartMenu_eventSetUp_Parms), 0x0000000000000080, Z_Construct_UClass_UArenaGameInstance_NoRegister());
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Online"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaStartMenu.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("Initialize menu"));
+			MetaData->SetValue(NewProp__PlayerOwner, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaStartMenu.h"));
+			MetaData->SetValue(NewProp__GameInstance, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaStartMenu.h"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UClass* Z_Construct_UClass_UArenaStartMenu_NoRegister()
+	{
+		return UArenaStartMenu::StaticClass();
+	}
+	UClass* Z_Construct_UClass_UArenaStartMenu()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_UUserWidget();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = UArenaStartMenu::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20801080;
+
+				OuterClass->LinkChild(Z_Construct_UFunction_UArenaStartMenu_HostGame());
+				OuterClass->LinkChild(Z_Construct_UFunction_UArenaStartMenu_HostTeamDeathMatch());
+				OuterClass->LinkChild(Z_Construct_UFunction_UArenaStartMenu_SetUp());
+
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_UArenaStartMenu_HostGame()); // 2266062943
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_UArenaStartMenu_HostTeamDeathMatch()); // 1762113569
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_UArenaStartMenu_SetUp()); // 1692840236
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("UI/ArenaStartMenu.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/UI/ArenaStartMenu.h"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_UArenaStartMenu(Z_Construct_UClass_UArenaStartMenu, TEXT("UArenaStartMenu"));
+	UClass* Z_Construct_UClass_AArenaTeamStart_NoRegister()
+	{
+		return AArenaTeamStart::StaticClass();
+	}
+	UClass* Z_Construct_UClass_AArenaTeamStart()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_APlayerStart();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = AArenaTeamStart::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20900080;
+
+
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bNotForBots, AArenaTeamStart, uint8);
+				UProperty* NewProp_bNotForBots = new(OuterClass, TEXT("bNotForBots"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bNotForBots, AArenaTeamStart), 0x0000000000000801, CPP_BOOL_PROPERTY_BITMASK(bNotForBots, AArenaTeamStart), sizeof(uint8), false);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(bNotForPlayers, AArenaTeamStart, uint8);
+				UProperty* NewProp_bNotForPlayers = new(OuterClass, TEXT("bNotForPlayers"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bNotForPlayers, AArenaTeamStart), 0x0000000000000801, CPP_BOOL_PROPERTY_BITMASK(bNotForPlayers, AArenaTeamStart), sizeof(uint8), false);
+				UProperty* NewProp_SpawnTeam = new(OuterClass, TEXT("SpawnTeam"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(SpawnTeam, AArenaTeamStart), 0x0000000000000801);
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Lighting LightColor Force Collision"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/ArenaTeamStart.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaTeamStart.h"));
+				MetaData->SetValue(NewProp_bNotForBots, TEXT("Category"), TEXT("Team"));
+				MetaData->SetValue(NewProp_bNotForBots, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaTeamStart.h"));
+				MetaData->SetValue(NewProp_bNotForBots, TEXT("ToolTip"), TEXT("Whether bots can start at this point"));
+				MetaData->SetValue(NewProp_bNotForPlayers, TEXT("Category"), TEXT("Team"));
+				MetaData->SetValue(NewProp_bNotForPlayers, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaTeamStart.h"));
+				MetaData->SetValue(NewProp_bNotForPlayers, TEXT("ToolTip"), TEXT("Whether players can start at this point"));
+				MetaData->SetValue(NewProp_SpawnTeam, TEXT("Category"), TEXT("Team"));
+				MetaData->SetValue(NewProp_SpawnTeam, TEXT("ModuleRelativePath"), TEXT("Public/Online/ArenaTeamStart.h"));
+				MetaData->SetValue(NewProp_SpawnTeam, TEXT("ToolTip"), TEXT("Which team can start at this point"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_AArenaTeamStart(Z_Construct_UClass_AArenaTeamStart, TEXT("AArenaTeamStart"));
 	UClass* Z_Construct_UClass_UBTTask_FindPointNearEnemy_NoRegister()
 	{
 		return UBTTask_FindPointNearEnemy::StaticClass();
@@ -2855,16 +4475,19 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_UBTTask_BlackboardBase();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = UBTTask_FindPointNearEnemy::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00100080;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20100080;
 
 
-			OuterClass->StaticLink();
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("AI/BTTask_FindPointNearEnemy.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/AI/BTTask_FindPointNearEnemy.h"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("AI/BTTask_FindPointNearEnemy.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/AI/BTTask_FindPointNearEnemy.h"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -2882,19 +4505,22 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_UBTDecorator();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = UBTTask_HasLosTo::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x00100080;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x20100080;
 
 
-			UProperty* NewProp_EnemyKey = new(OuterClass, TEXT("EnemyKey"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(EnemyKey, UBTTask_HasLosTo), 0x0000080000000001, Z_Construct_UScriptStruct_UBehaviorTreeTypes_FBlackboardKeySelector()); // 2251347563
-			OuterClass->StaticLink();
+				UProperty* NewProp_EnemyKey = new(OuterClass, TEXT("EnemyKey"), RF_Public|RF_Transient|RF_Native) UStructProperty(CPP_PROPERTY_BASE(EnemyKey, UBTTask_HasLosTo), 0x0000080000000001, Z_Construct_UScriptStruct_UBehaviorTreeTypes_FBlackboardKeySelector());
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("AI/BTTask_HasLosTo.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/AI/BTTask_HasLosTo.h"));
-			MetaData->SetValue(NewProp_EnemyKey, TEXT("Category"), TEXT("Condition"));
-			MetaData->SetValue(NewProp_EnemyKey, TEXT("ModuleRelativePath"), TEXT("Public/AI/BTTask_HasLosTo.h"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("AI/BTTask_HasLosTo.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/AI/BTTask_HasLosTo.h"));
+				MetaData->SetValue(NewProp_EnemyKey, TEXT("Category"), TEXT("Condition"));
+				MetaData->SetValue(NewProp_EnemyKey, TEXT("ModuleRelativePath"), TEXT("Public/AI/BTTask_HasLosTo.h"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
@@ -2906,12 +4532,12 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("FinishMatch"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00020601, 65535);
+			ReturnFunction = new(OuterClass, TEXT("FinishMatch"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00020601, 65535);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
 			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
-			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
 			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("finish current match and lock players"));
 #endif
 		}
@@ -2928,18 +4554,18 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 		static UFunction* ReturnFunction = NULL;
 		if (!ReturnFunction)
 		{
-			ReturnFunction = new(OuterClass, TEXT("SetAllowBots"), RF_Public|RF_Transient|RF_Native) UFunction(FPostConstructInitializeProperties(), NULL, 0x00020601, 65535, sizeof(TheArenaGameMode_eventSetAllowBots_Parms));
+			ReturnFunction = new(OuterClass, TEXT("SetAllowBots"), RF_Public|RF_Transient|RF_Native) UFunction(FObjectInitializer(), NULL, 0x00020601, 65535, sizeof(TheArenaGameMode_eventSetAllowBots_Parms));
 			UProperty* NewProp_InMaxBots = new(ReturnFunction, TEXT("InMaxBots"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(InMaxBots, TheArenaGameMode_eventSetAllowBots_Parms), 0x0000000000000080);
 			CPP_BOOL_PROPERTY_BITMASK_STRUCT(bInAllowBots, TheArenaGameMode_eventSetAllowBots_Parms, bool);
-			UProperty* NewProp_bInAllowBots = new(ReturnFunction, TEXT("bInAllowBots"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FPostConstructInitializeProperties(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInAllowBots, TheArenaGameMode_eventSetAllowBots_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bInAllowBots, TheArenaGameMode_eventSetAllowBots_Parms), sizeof(bool), true);
+			UProperty* NewProp_bInAllowBots = new(ReturnFunction, TEXT("bInAllowBots"), RF_Public|RF_Transient|RF_Native) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(bInAllowBots, TheArenaGameMode_eventSetAllowBots_Parms), 0x0000000000000080, CPP_BOOL_PROPERTY_BITMASK(bInAllowBots, TheArenaGameMode_eventSetAllowBots_Parms), sizeof(bool), true);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
 #if WITH_METADATA
 			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
 			MetaData->SetValue(ReturnFunction, TEXT("CPP_Default_InMaxBots"), TEXT("8"));
-			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_InMaxBots, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_bInAllowBots, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+			MetaData->SetValue(NewProp_InMaxBots, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+			MetaData->SetValue(NewProp_bInAllowBots, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
 #endif
 		}
 		return ReturnFunction;
@@ -2956,57 +4582,90 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			Z_Construct_UClass_AGameMode();
 			Z_Construct_UPackage_TheArena();
 			OuterClass = ATheArenaGameMode::StaticClass();
-			UObjectForceRegistration(OuterClass);
-			OuterClass->ClassFlags |= 0x008002A4;
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x208002AC;
 
-			OuterClass->LinkChild(Z_Construct_UFunction_ATheArenaGameMode_FinishMatch());
-			OuterClass->LinkChild(Z_Construct_UFunction_ATheArenaGameMode_SetAllowBots());
+				OuterClass->LinkChild(Z_Construct_UFunction_ATheArenaGameMode_FinishMatch());
+				OuterClass->LinkChild(Z_Construct_UFunction_ATheArenaGameMode_SetAllowBots());
 
-			UProperty* NewProp_BotControllers = new(OuterClass, TEXT("BotControllers"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(BotControllers, ATheArenaGameMode), 0x0000080000000000);
-			UProperty* NewProp_BotControllers_Inner = new(NewProp_BotControllers, TEXT("BotControllers"), RF_Public|RF_Transient|RF_Native) UObjectProperty(FPostConstructInitializeProperties(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UClass_AArenaAIController_NoRegister());
-			UProperty* NewProp_MaxBots = new(OuterClass, TEXT("MaxBots"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(MaxBots, ATheArenaGameMode), 0x0000080000004000);
-			UProperty* NewProp_DamageSelfScale = new(OuterClass, TEXT("DamageSelfScale"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(DamageSelfScale, ATheArenaGameMode), 0x0000080000004000);
-			UProperty* NewProp_DeathScore = new(OuterClass, TEXT("DeathScore"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(DeathScore, ATheArenaGameMode), 0x0000080000004000);
-			UProperty* NewProp_KillScore = new(OuterClass, TEXT("KillScore"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(KillScore, ATheArenaGameMode), 0x0000080000004000);
-			UProperty* NewProp_TimeBetweenMatches = new(OuterClass, TEXT("TimeBetweenMatches"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(TimeBetweenMatches, ATheArenaGameMode), 0x0000080000004000);
-			UProperty* NewProp_RoundTime = new(OuterClass, TEXT("RoundTime"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(RoundTime, ATheArenaGameMode), 0x0000080000004000);
-			UProperty* NewProp_WarmupTime = new(OuterClass, TEXT("WarmupTime"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(WarmupTime, ATheArenaGameMode), 0x0000080000004000);
-			UProperty* NewProp_ArenaHUD = new(OuterClass, TEXT("ArenaHUD"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(ArenaHUD, ATheArenaGameMode), 0x0000000000010015, Z_Construct_UClass_AHUD_NoRegister());
-			UProperty* NewProp_BotPawnClass = new(OuterClass, TEXT("BotPawnClass"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(BotPawnClass, ATheArenaGameMode), 0x0000000000000005, Z_Construct_UClass_APawn_NoRegister());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_ATheArenaGameMode_FinishMatch());
-			OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_ATheArenaGameMode_SetAllowBots());
-			OuterClass->ClassConfigName = FName(TEXT("Game"));
-			OuterClass->StaticLink();
+				UProperty* NewProp_BotControllers = new(OuterClass, TEXT("BotControllers"), RF_Public|RF_Transient|RF_Native) UArrayProperty(CPP_PROPERTY_BASE(BotControllers, ATheArenaGameMode), 0x0000080000000000);
+				UProperty* NewProp_BotControllers_Inner = new(NewProp_BotControllers, TEXT("BotControllers"), RF_Public|RF_Transient|RF_Native) UObjectProperty(FObjectInitializer(), EC_CppProperty, 0, 0x0000000000000000, Z_Construct_UClass_AArenaAIController_NoRegister());
+				UProperty* NewProp_MaxBots = new(OuterClass, TEXT("MaxBots"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(MaxBots, ATheArenaGameMode), 0x0000080000004000);
+				UProperty* NewProp_DamageSelfScale = new(OuterClass, TEXT("DamageSelfScale"), RF_Public|RF_Transient|RF_Native) UFloatProperty(CPP_PROPERTY_BASE(DamageSelfScale, ATheArenaGameMode), 0x0000080000004000);
+				UProperty* NewProp_DeathScore = new(OuterClass, TEXT("DeathScore"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(DeathScore, ATheArenaGameMode), 0x0000080000004000);
+				UProperty* NewProp_KillScore = new(OuterClass, TEXT("KillScore"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(KillScore, ATheArenaGameMode), 0x0000080000004000);
+				UProperty* NewProp_TimeBetweenMatches = new(OuterClass, TEXT("TimeBetweenMatches"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(TimeBetweenMatches, ATheArenaGameMode), 0x0000080000004000);
+				UProperty* NewProp_RoundTime = new(OuterClass, TEXT("RoundTime"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(RoundTime, ATheArenaGameMode), 0x0000080000004000);
+				UProperty* NewProp_WarmupTime = new(OuterClass, TEXT("WarmupTime"), RF_Public|RF_Transient|RF_Native) UIntProperty(CPP_PROPERTY_BASE(WarmupTime, ATheArenaGameMode), 0x0000080000004000);
+				UProperty* NewProp_BotPawnClass = new(OuterClass, TEXT("BotPawnClass"), RF_Public|RF_Transient|RF_Native) UClassProperty(CPP_PROPERTY_BASE(BotPawnClass, ATheArenaGameMode), 0x0000000000000005, Z_Construct_UClass_APawn_NoRegister());
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_ATheArenaGameMode_FinishMatch()); // 2553096411
+				OuterClass->AddFunctionToFunctionMap(Z_Construct_UFunction_ATheArenaGameMode_SetAllowBots()); // 617028099
+				OuterClass->ClassConfigName = FName(TEXT("Game"));
+				OuterClass->StaticLink();
 #if WITH_METADATA
-			UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
-			MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation Info MovementReplication Replication Actor"));
-			MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("TheArenaGameMode.h"));
-			MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
-			MetaData->SetValue(NewProp_BotControllers, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_MaxBots, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_DamageSelfScale, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_DamageSelfScale, TEXT("ToolTip"), TEXT("scale for self instigated damage"));
-			MetaData->SetValue(NewProp_DeathScore, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_DeathScore, TEXT("ToolTip"), TEXT("score for death"));
-			MetaData->SetValue(NewProp_KillScore, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_KillScore, TEXT("ToolTip"), TEXT("score for kill"));
-			MetaData->SetValue(NewProp_TimeBetweenMatches, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_RoundTime, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_RoundTime, TEXT("ToolTip"), TEXT("match duration"));
-			MetaData->SetValue(NewProp_WarmupTime, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_WarmupTime, TEXT("ToolTip"), TEXT("delay between first player login and starting match"));
-			MetaData->SetValue(NewProp_ArenaHUD, TEXT("Category"), TEXT("BPClasses"));
-			MetaData->SetValue(NewProp_ArenaHUD, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_BotPawnClass, TEXT("Category"), TEXT("GameMode"));
-			MetaData->SetValue(NewProp_BotPawnClass, TEXT("ModuleRelativePath"), TEXT("Public/TheArenaGameMode.h"));
-			MetaData->SetValue(NewProp_BotPawnClass, TEXT("ToolTip"), TEXT("The bot pawn class"));
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation Info MovementReplication Replication Actor"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/TheArenaGameMode.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
+				MetaData->SetValue(NewProp_BotControllers, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(NewProp_MaxBots, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(NewProp_DamageSelfScale, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(NewProp_DamageSelfScale, TEXT("ToolTip"), TEXT("scale for self instigated damage"));
+				MetaData->SetValue(NewProp_DeathScore, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(NewProp_DeathScore, TEXT("ToolTip"), TEXT("score for death"));
+				MetaData->SetValue(NewProp_KillScore, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(NewProp_KillScore, TEXT("ToolTip"), TEXT("score for kill"));
+				MetaData->SetValue(NewProp_TimeBetweenMatches, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(NewProp_RoundTime, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(NewProp_RoundTime, TEXT("ToolTip"), TEXT("match duration"));
+				MetaData->SetValue(NewProp_WarmupTime, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(NewProp_WarmupTime, TEXT("ToolTip"), TEXT("delay between first player login and starting match"));
+				MetaData->SetValue(NewProp_BotPawnClass, TEXT("Category"), TEXT("GameMode"));
+				MetaData->SetValue(NewProp_BotPawnClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/TheArenaGameMode.h"));
+				MetaData->SetValue(NewProp_BotPawnClass, TEXT("ToolTip"), TEXT("The bot pawn class"));
 #endif
+			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ATheArenaGameMode(Z_Construct_UClass_ATheArenaGameMode, TEXT("ATheArenaGameMode"));
+	UClass* Z_Construct_UClass_AArena_TeamDeathMatch_NoRegister()
+	{
+		return AArena_TeamDeathMatch::StaticClass();
+	}
+	UClass* Z_Construct_UClass_AArena_TeamDeathMatch()
+	{
+		static UClass* OuterClass = NULL;
+		if (!OuterClass)
+		{
+			Z_Construct_UClass_ATheArenaGameMode();
+			Z_Construct_UPackage_TheArena();
+			OuterClass = AArena_TeamDeathMatch::StaticClass();
+			if (!(OuterClass->ClassFlags & CLASS_Constructed))
+			{
+				UObjectForceRegistration(OuterClass);
+				OuterClass->ClassFlags |= 0x209002AC;
+
+
+				OuterClass->ClassConfigName = FName(TEXT("Game"));
+				OuterClass->StaticLink();
+#if WITH_METADATA
+				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
+				MetaData->SetValue(OuterClass, TEXT("HideCategories"), TEXT("Input Movement Collision Rendering Utilities|Transformation Info MovementReplication Replication Actor"));
+				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("Online/Arena_TeamDeathMatch.h"));
+				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("Public/Online/Arena_TeamDeathMatch.h"));
+				MetaData->SetValue(OuterClass, TEXT("ShowCategories"), TEXT("Input|MouseInput Input|TouchInput"));
+#endif
+			}
+		}
+		check(OuterClass->GetClass());
+		return OuterClass;
+	}
+	static FCompiledInDefer Z_CompiledInDefer_UClass_AArena_TeamDeathMatch(Z_Construct_UClass_AArena_TeamDeathMatch, TEXT("AArena_TeamDeathMatch"));
 	UPackage* Z_Construct_UPackage_TheArena()
 	{
 		static UPackage* ReturnPackage = NULL;
@@ -3015,8 +4674,8 @@ FName THEARENA_ServerSuicide = FName(TEXT("ServerSuicide"));
 			ReturnPackage = CastChecked<UPackage>(StaticFindObjectFast(UPackage::StaticClass(), NULL, FName(TEXT("/Script/TheArena")), false, false));
 			ReturnPackage->PackageFlags |= PKG_CompiledIn | 0x00000000;
 			FGuid Guid;
-			Guid.A = 0x87AD10DD;
-			Guid.B = 0xFA41BB6F;
+			Guid.A = 0x9C85CF12;
+			Guid.B = 0x88D43A43;
 			Guid.C = 0x00000000;
 			Guid.D = 0x00000000;
 			ReturnPackage->SetGuid(Guid);

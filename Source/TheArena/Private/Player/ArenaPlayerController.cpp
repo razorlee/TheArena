@@ -205,24 +205,18 @@ void AArenaPlayerController::OnToggleInGameMenu()
 {
 	if (OpenMenu == true)
 	{
-		SetOpenMenu(false);
+		SetMenu(false);
 		bAllowGameActions = true;
 	}
 	else
 	{
-		SetOpenMenu(true);
+		SetMenu(true);
 		bAllowGameActions = false;
 	}
-}
-
-void AArenaPlayerController::ShowFriendsList()
-{
-
-}
-
-void AArenaPlayerController::ShowFriendsList()
-{
-
+	if (OpenFriendsList == true)
+	{
+		SetFriendsList(false);
+	}
 }
 
 void AArenaPlayerController::SetInfiniteAmmo(bool bEnable)
@@ -245,9 +239,19 @@ void AArenaPlayerController::SetGodMode(bool bEnable)
 	bGodMode = bEnable;
 }
 
-void AArenaPlayerController::SetOpenMenu(bool bEnable)
+void AArenaPlayerController::SetMenu(bool bEnable)
 {
 	this->OpenMenu = bEnable;
+}
+
+void AArenaPlayerController::SetFriendsList(bool bEnable)
+{
+	this->OpenFriendsList = bEnable;
+}
+
+void AArenaPlayerController::SetHUD(bool bEnable)
+{
+	this->OpenHUD = bEnable;
 }
 
 void AArenaPlayerController::SetAllowGameActions(bool bEnable)
@@ -545,9 +549,19 @@ bool AArenaPlayerController::IsGameInputAllowed() const
 	return bAllowGameActions && !bCinematicMode;
 }
 
-bool AArenaPlayerController::GetOpenMenu() const
+bool AArenaPlayerController::IsMenuOpen() const
 {
 	return this->OpenMenu;
+}
+
+bool AArenaPlayerController::IsFriendsListOpen() const
+{
+	return this->OpenFriendsList;
+}
+
+bool AArenaPlayerController::IsHUDOpen() const
+{
+	return this->OpenHUD;
 }
 
 bool AArenaPlayerController::GetAllowGameActions() const

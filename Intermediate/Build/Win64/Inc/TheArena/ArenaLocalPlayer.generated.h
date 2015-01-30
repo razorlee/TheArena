@@ -21,11 +21,31 @@
 	friend THEARENA_API class UClass* Z_Construct_UClass_UArenaLocalPlayer(); \
 	public: \
 	DECLARE_CLASS(UArenaLocalPlayer, ULocalPlayer, COMPILED_IN_FLAGS(0 | CLASS_Transient | CLASS_Config), 0, TheArena, NO_API) \
-	/** Standard constructor, called after all reflected properties have been initialized */    NO_API UArenaLocalPlayer(const class FPostConstructInitializeProperties& PCIP); \
 	DECLARE_SERIALIZER(UArenaLocalPlayer) \
 	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC}; \
 	static const TCHAR* StaticConfigName() {return TEXT("game");} \
+ \
+	UObject* _getUObject() const { return const_cast<UArenaLocalPlayer*>(this); }
 
+
+#define UArenaLocalPlayer_STANDARD_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API UArenaLocalPlayer(const class FObjectInitializer& ObjectInitializer); \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(UArenaLocalPlayer) \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API UArenaLocalPlayer(const UArenaLocalPlayer& InCopy); \
+public:
+
+
+#define UArenaLocalPlayer_ENHANCED_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API UArenaLocalPlayer(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) { }; \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API UArenaLocalPlayer(const UArenaLocalPlayer& InCopy); \
+public: \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(UArenaLocalPlayer)
 
 
 #undef UCLASS_CURRENT_FILE_NAME
@@ -43,12 +63,27 @@ UArenaLocalPlayer_EVENTPARMS
 
 
 #undef GENERATED_UCLASS_BODY
+#undef GENERATED_BODY
 #undef GENERATED_IINTERFACE_BODY
 #define GENERATED_UCLASS_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	UArenaLocalPlayer_RPC_WRAPPERS \
 	UArenaLocalPlayer_CALLBACK_WRAPPERS \
 	UArenaLocalPlayer_INCLASS \
-public:
+	UArenaLocalPlayer_STANDARD_CONSTRUCTORS \
+public: \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
+
+
+#define GENERATED_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
+public: \
+	UArenaLocalPlayer_RPC_WRAPPERS \
+	UArenaLocalPlayer_CALLBACK_WRAPPERS \
+	UArenaLocalPlayer_INCLASS \
+	UArenaLocalPlayer_ENHANCED_CONSTRUCTORS \
+static_assert(false, "Unknown access specifier for GENERATED_BODY() macro in class ArenaLocalPlayer."); \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 

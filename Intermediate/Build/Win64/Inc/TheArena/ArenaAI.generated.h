@@ -21,9 +21,29 @@
 	friend THEARENA_API class UClass* Z_Construct_UClass_AArenaAI(); \
 	public: \
 	DECLARE_CLASS(AArenaAI, AArenaCharacter, COMPILED_IN_FLAGS(0), 0, TheArena, NO_API) \
-	/** Standard constructor, called after all reflected properties have been initialized */    NO_API AArenaAI(const class FPostConstructInitializeProperties& PCIP); \
 	DECLARE_SERIALIZER(AArenaAI) \
-	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC};
+	/** Indicates whether the class is compiled into the engine */    enum {IsIntrinsic=COMPILED_IN_INTRINSIC}; \
+	UObject* _getUObject() const { return const_cast<AArenaAI*>(this); }
+
+
+#define AArenaAI_STANDARD_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API AArenaAI(const class FObjectInitializer& ObjectInitializer); \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaAI) \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaAI(const AArenaAI& InCopy); \
+public:
+
+
+#define AArenaAI_ENHANCED_CONSTRUCTORS \
+	/** Standard constructor, called after all reflected properties have been initialized */ \
+	NO_API AArenaAI(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) { }; \
+private: \
+	/** Private copy-constructor, should never be used */ \
+	NO_API AArenaAI(const AArenaAI& InCopy); \
+public: \
+	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(AArenaAI)
 
 
 #undef UCLASS_CURRENT_FILE_NAME
@@ -41,12 +61,27 @@ AArenaAI_EVENTPARMS
 
 
 #undef GENERATED_UCLASS_BODY
+#undef GENERATED_BODY
 #undef GENERATED_IINTERFACE_BODY
 #define GENERATED_UCLASS_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
 	AArenaAI_RPC_WRAPPERS \
 	AArenaAI_CALLBACK_WRAPPERS \
 	AArenaAI_INCLASS \
-public:
+	AArenaAI_STANDARD_CONSTRUCTORS \
+public: \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
+
+
+#define GENERATED_BODY() \
+PRAGMA_DISABLE_DEPRECATION_WARNINGS \
+public: \
+	AArenaAI_RPC_WRAPPERS \
+	AArenaAI_CALLBACK_WRAPPERS \
+	AArenaAI_INCLASS \
+	AArenaAI_ENHANCED_CONSTRUCTORS \
+static_assert(false, "Unknown access specifier for GENERATED_BODY() macro in class ArenaAI."); \
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 

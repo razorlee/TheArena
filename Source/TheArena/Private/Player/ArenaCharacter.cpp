@@ -26,7 +26,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 
 	// rotate when the controller rotates
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 	
 	//Mesh = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("PawnMesh"));
@@ -78,6 +78,7 @@ void AArenaCharacter::PostInitializeComponents()
 	if (Role == ROLE_Authority)
 	{
 		IdleTime = 0.0f;
+		bInCombat = false;
 		PlayerConfig.Health = GetMaxHealth();
 		PlayerConfig.Stamina = GetMaxStamina();
 		PlayerConfig.Energy = GetMaxEnergy();
@@ -194,7 +195,7 @@ void AArenaCharacter::PawnClientRestart()
 	UpdatePawnMeshes();
 
 	// reattach weapon if needed
-	SetCurrentWeapon(CurrentWeapon);
+	//SetCurrentWeapon(CurrentWeapon);
 
 	// set team colors for 1st person view
 	UMaterialInstanceDynamic* Mesh3PMID = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
@@ -220,6 +221,11 @@ void AArenaCharacter::CameraUpdate()
 	{
 		CameraBoom->TargetArmLength = 50.0f;
 		CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+	}
+	else if (GetCombat() == false)
+	{
+		CameraBoom->TargetArmLength = 250.0f;
+		CameraBoom->SocketOffset = FVector(0.0f, 0.0f, 0.0f);
 	}
 	else
 	{
@@ -265,7 +271,7 @@ bool AArenaCharacter::IsEnemyFor(AController* TestPC) const
 
 void AArenaCharacter::AddWeapon(AArenaRangedWeapon* Weapon)
 {
-	if (Weapon && Role == ROLE_Authority)
+	if (Weapon && Role == ROLE_Authority && Inventory.Num() < 2)
 	{
 		Weapon->OnEnterInventory(this);
 		Inventory.AddUnique(Weapon);
@@ -301,6 +307,7 @@ void AArenaCharacter::EquipWeapon(AArenaRangedWeapon* Weapon)
 		if (Role == ROLE_Authority)
 		{
 			SetCurrentWeapon(Weapon);
+			//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::SetCurrentWeapon, 1.5f, false);
 		}
 		else
 		{
@@ -309,12 +316,40 @@ void AArenaCharacter::EquipWeapon(AArenaRangedWeapon* Weapon)
 	}
 }
 
+void AArenaCharacter::UnEquipWeapon(AArenaRangedWeapon* Weapon)
+{
+	if (Weapon)
+	{
+		if (Role == ROLE_Authority)
+		{
+			SetCurrentWeaponOne(Weapon);
+		}
+		else
+		{
+			ServerUnEquipWeapon(Weapon);
+		}
+	}
+}
+
+void AArenaCharacter::InitializeWeapons(AArenaRangedWeapon* mainWeapon, AArenaRangedWeapon* offWeapon)
+{
+	if (Role == ROLE_Authority)
+	{
+		mainWeapon->OnHolster(true);
+		offWeapon->OnHolster(false);
+	}
+	else
+	{
+		ServerInitializeWeapons(mainWeapon, offWeapon);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Weapon usage
 
 void AArenaCharacter::StartWeaponFire()
 {
-	if (!bWantsToFire)
+	if (!bWantsToFire && bInCombat)
 	{
 		bWantsToFire = true;
 		if (CurrentWeapon)
@@ -363,6 +398,42 @@ void AArenaCharacter::SetTargeting(bool bNewTargeting)
 	if (Role < ROLE_Authority)
 	{
 		ServerSetTargeting(bNewTargeting);
+	}
+}
+
+void AArenaCharacter::SetCombat(bool bNewCombatState)
+{
+	bInCombat = bNewCombatState;
+
+	if (Role == ROLE_Authority)
+	{
+		UpdateCombatState();
+	}
+	else
+	{
+		ServerSetCombat(bNewCombatState);
+	}
+	
+}
+
+void AArenaCharacter::UpdateCombatState()
+{
+	if (bInCombat == true)
+	{
+		bUseControllerRotationYaw = true;
+		EquipWeapon(PrimaryWeapon);
+	}
+	else
+	{
+		bUseControllerRotationYaw = false;
+		if (CurrentWeapon->GetIsPrimaryWeapon() == true)
+		{
+			PrimaryWeapon->OnUnEquip(true);
+		}
+		else
+		{
+			SecondaryWeapon->OnUnEquip(false);
+		}
 	}
 }
 
@@ -613,7 +684,7 @@ float AArenaCharacter::PlayWeaponAnimation(UAnimMontage* Animation)
 void AArenaCharacter::OnStartTargeting()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
 	{
 		IdleTime = 0.0f;
 		if (IsRunning())
@@ -644,12 +715,13 @@ void AArenaCharacter::OnExitCover()
 void AArenaCharacter::OnNextWeapon()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
 	{
 		if (Inventory.Num() >= 2 && (CurrentWeapon == NULL || CurrentWeapon->GetCurrentState() != EWeaponState::Equipping))
 		{
 			const int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
 			AArenaRangedWeapon* NextWeapon = Inventory[(CurrentWeaponIdx + 1) % Inventory.Num()];
+			UnEquipWeapon(CurrentWeapon);
 			EquipWeapon(NextWeapon);
 		}
 	}
@@ -658,12 +730,13 @@ void AArenaCharacter::OnNextWeapon()
 void AArenaCharacter::OnPrevWeapon()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
 	{
 		if (Inventory.Num() >= 2 && (CurrentWeapon == NULL || CurrentWeapon->GetCurrentState() != EWeaponState::Equipping))
 		{
 			const int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
 			AArenaRangedWeapon* PrevWeapon = Inventory[(CurrentWeaponIdx - 1 + Inventory.Num()) % Inventory.Num()];
+			UnEquipWeapon(CurrentWeapon);
 			EquipWeapon(PrevWeapon);
 		}
 	}
@@ -672,7 +745,7 @@ void AArenaCharacter::OnPrevWeapon()
 void AArenaCharacter::OnReload()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
 	{
 		IdleTime = 0.0f;
 		if (CurrentWeapon)
@@ -685,7 +758,7 @@ void AArenaCharacter::OnReload()
 void AArenaCharacter::OnMelee()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
 	{
 		IdleTime = 0.0f;
 		if (CurrentWeapon)
@@ -730,7 +803,7 @@ void AArenaCharacter::OnDodge()
 void AArenaCharacter::OnThrow()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && PlayerConfig.Energy >= 500)
+	if (MyPC && MyPC->IsGameInputAllowed() && PlayerConfig.Energy >= 500 && bInCombat)
 	{
 		IdleTime = 0.0f;
 		StartThrow();
@@ -768,11 +841,14 @@ void AArenaCharacter::OnStopJump()
 
 void AArenaCharacter::OnStartCrouching()
 {
-	GetCharacterMovement()->MaxWalkSpeed = CrouchedMovementSpeed;
-	IdleTime = 0.0f;
-	SetRunning(false, false);
-	SetCrouched(true, false);
-	Crouch();
+	if (bInCombat)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = CrouchedMovementSpeed;
+		IdleTime = 0.0f;
+		SetRunning(false, false);
+		SetCrouched(true, false);
+		Crouch();
+	}
 }
 
 void AArenaCharacter::OnStopCrouching()
@@ -786,7 +862,7 @@ void AArenaCharacter::OnStopCrouching()
 void AArenaCharacter::OnStartRunning()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !GetCharacterMovement()->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost)
+	if (MyPC && MyPC->IsGameInputAllowed() && !GetCharacterMovement()->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost && bInCombat)
 	{
 		IdleTime = 0.0f;
 		if (IsTargeting())
@@ -836,6 +912,16 @@ FName AArenaCharacter::GetWeaponAttachPoint() const
 FName AArenaCharacter::GetOffHandAttachPoint() const
 {
 	return OffHandAttachPoint;
+}
+
+FName AArenaCharacter::GetOffWeaponAttachPoint() const
+{
+	return OffWeaponAttachPoint;
+}
+
+FName AArenaCharacter::GetMainWeaponAttachPoint() const
+{
+	return MainWeaponAttachPoint;
 }
 
 int32 AArenaCharacter::GetInventoryCount() const
@@ -935,6 +1021,11 @@ float AArenaCharacter::GetLowHealthPercentage() const
 float AArenaCharacter::GetIdleTime() const
 {
 	return IdleTime;
+}
+
+bool AArenaCharacter::GetCombat() const
+{
+	return bInCombat;
 }
 
 void AArenaCharacter::UpdateTeamColorsAllMIDs()
@@ -1344,15 +1435,15 @@ void AArenaCharacter::OnRep_LastTakeHitInfo()
 //////////////////////////////////////////////////////////////////////////
 // Inventory
 
-void AArenaCharacter::SetCurrentWeapon(class AArenaRangedWeapon* NewWeapon, class AArenaRangedWeapon* LastWeapon)
+void AArenaCharacter::SetCurrentWeapon(class AArenaRangedWeapon* NextWeapon, class AArenaRangedWeapon* PrevWeapon)
 {
 	AArenaRangedWeapon* LocalLastWeapon = NULL;
 
-	if (LastWeapon != NULL)
+	if (PrevWeapon != NULL)
 	{
-		LocalLastWeapon = LastWeapon;
+		LocalLastWeapon = PrevWeapon;
 	}
-	else if (NewWeapon != CurrentWeapon)
+	else if (NextWeapon != CurrentWeapon)
 	{
 		LocalLastWeapon = CurrentWeapon;
 	}
@@ -1360,17 +1451,33 @@ void AArenaCharacter::SetCurrentWeapon(class AArenaRangedWeapon* NewWeapon, clas
 	// unequip previous
 	if (LocalLastWeapon)
 	{
-		LocalLastWeapon->OnUnEquip();
+		if (LocalLastWeapon->GetIsPrimaryWeapon() == true)
+		{
+			//LocalLastWeapon->OnUnEquip(true);
+		}
+		else
+		{
+			//LocalLastWeapon->OnUnEquip(false);
+		}
 	}
 
-	CurrentWeapon = NewWeapon;
+	CurrentWeapon = NextWeapon;
 
-	// equip new one
-	if (NewWeapon)
+	if (CurrentWeapon->GetIsPrimaryWeapon() == true)
 	{
-		NewWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
-		NewWeapon->OnEquip();
+		//CurrentWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
+		//CurrentWeapon->OnEquip(true);
 	}
+	else
+	{
+		//CurrentWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
+		//CurrentWeapon->OnEquip(false);
+	}
+}
+
+void AArenaCharacter::SetCurrentWeaponOne(class AArenaRangedWeapon* NewWeapon, class AArenaRangedWeapon* LastWeapon)
+{
+	
 }
 
 void AArenaCharacter::OnRep_Throw()
@@ -1390,6 +1497,16 @@ void AArenaCharacter::OnRep_CurrentWeapon(AArenaRangedWeapon* LastWeapon)
 	SetCurrentWeapon(CurrentWeapon, LastWeapon);
 }
 
+void AArenaCharacter::OnRep_PrimaryWeapon(AArenaRangedWeapon* NewWeapon)
+{
+	SetCurrentWeapon(NewWeapon, PrimaryWeapon);
+}
+
+void AArenaCharacter::OnRep_SecondaryWeapon(AArenaRangedWeapon* NewWeapon)
+{
+	SetCurrentWeapon(NewWeapon, SecondaryWeapon);
+}
+
 void AArenaCharacter::SpawnDefaultInventory()
 {
 	if (Role < ROLE_Authority)
@@ -1397,7 +1514,7 @@ void AArenaCharacter::SpawnDefaultInventory()
 		return;
 	}
 
-	int32 NumWeaponClasses = DefaultInventoryClasses.Num();
+	int32 NumWeaponClasses = 2; //DefaultInventoryClasses.Num();
 	for (int32 i = 0; i < NumWeaponClasses; i++)
 	{
 		if (DefaultInventoryClasses[i])
@@ -1412,7 +1529,11 @@ void AArenaCharacter::SpawnDefaultInventory()
 	// equip first weapon in inventory
 	if (Inventory.Num() > 0)
 	{
-		EquipWeapon(Inventory[0]);
+		PrimaryWeapon = Inventory[0];
+		SecondaryWeapon = Inventory[1];
+		PrimaryWeapon->SetIsPrimaryWeapon(true);
+		//CurrentWeapon = Inventory[0]; //eventually we will read in from a database what current weapon is
+		InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
 	}
 }
 
@@ -1444,6 +1565,26 @@ bool AArenaCharacter::ServerEquipWeapon_Validate(AArenaRangedWeapon* Weapon)
 void AArenaCharacter::ServerEquipWeapon_Implementation(AArenaRangedWeapon* Weapon)
 {
 	EquipWeapon(Weapon);
+}
+
+bool AArenaCharacter::ServerUnEquipWeapon_Validate(AArenaRangedWeapon* Weapon)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerUnEquipWeapon_Implementation(AArenaRangedWeapon* Weapon)
+{
+	UnEquipWeapon(Weapon);
+}
+
+bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaRangedWeapon* mainWeapon, AArenaRangedWeapon* offWeapon)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerInitializeWeapons_Implementation(AArenaRangedWeapon* mainWeapon, AArenaRangedWeapon* offWeapon)
+{
+	InitializeWeapons(offWeapon, mainWeapon);
 }
 
 bool AArenaCharacter::ServerSetTargeting_Validate(bool bNewTargeting)
@@ -1516,6 +1657,16 @@ void AArenaCharacter::ServerIdleTimer_Implementation(const float idleTimer, clas
 	client->IdleTime = idleTimer;
 }
 
+bool AArenaCharacter::ServerSetCombat_Validate(bool bNewCombatState)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerSetCombat_Implementation(bool bNewCombatState)
+{
+	bInCombat = bNewCombatState;
+}
+
 
 void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
@@ -1533,6 +1684,9 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 
 	// everyone
 	DOREPLIFETIME(AArenaCharacter, IdleTime);
+	DOREPLIFETIME(AArenaCharacter, bInCombat);
 	DOREPLIFETIME(AArenaCharacter, CurrentWeapon);
+	DOREPLIFETIME(AArenaCharacter, PrimaryWeapon);
+	DOREPLIFETIME(AArenaCharacter, SecondaryWeapon);
 	DOREPLIFETIME(AArenaCharacter, PlayerConfig);
 }

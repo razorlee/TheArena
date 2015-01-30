@@ -5,6 +5,9 @@
 	DO NOT modify this manually! Edit the corresponding .h files instead!
 ===========================================================================*/
 
+#ifndef THEARENA_Arena_Menu_generated_h
+	#include "Public/Online/Arena_Menu.h"
+#endif
 #ifndef THEARENA_TemporaryUHTHeader_ArenaTypes_generated_h
 	#include "Public/ArenaTypes.h"
 #endif
@@ -19,6 +22,21 @@
 #endif
 #ifndef THEARENA_ArenaAIController_generated_h
 	#include "Public/AI/ArenaAIController.h"
+#endif
+#ifndef THEARENA_ArenaCharacterMovement_generated_h
+	#include "Public/Player/ArenaCharacterMovement.h"
+#endif
+#ifndef THEARENA_ArenaExplosionEffect_generated_h
+	#include "Public/Effects/ArenaExplosionEffect.h"
+#endif
+#ifndef THEARENA_ArenaFragGrenade_generated_h
+	#include "Public/Weapons/ArenaFragGrenade.h"
+#endif
+#ifndef THEARENA_ArenaFriendsList_generated_h
+	#include "Public/UI/ArenaFriendsList.h"
+#endif
+#ifndef THEARENA_ArenaGameInstance_generated_h
+	#include "Public/ArenaGameInstance.h"
 #endif
 #ifndef THEARENA_ArenaGameSession_generated_h
 	#include "Public/Online/ArenaGameSession.h"
@@ -41,6 +59,9 @@
 #ifndef THEARENA_ArenaPlayerController_generated_h
 	#include "Public/Player/ArenaPlayerController.h"
 #endif
+#ifndef THEARENA_ArenaPlayerController_Menu_generated_h
+	#include "Public/Player/ArenaPlayerController_Menu.h"
+#endif
 #ifndef THEARENA_ArenaRangedWeapon_generated_h
 	#include "Public/Weapons/ArenaRangedWeapon.h"
 #endif
@@ -53,6 +74,18 @@
 #ifndef THEARENA_ArenaRangedWeapon_Instant_generated_h
 	#include "Public/Weapons/ArenaRangedWeapon_Instant.h"
 #endif
+#ifndef THEARENA_ArenaShotgun_generated_h
+	#include "Public/Weapons/ArenaShotgun.h"
+#endif
+#ifndef THEARENA_ArenaSniperRifle_generated_h
+	#include "Public/Weapons/ArenaSniperRifle.h"
+#endif
+#ifndef THEARENA_ArenaStartMenu_generated_h
+	#include "Public/UI/ArenaStartMenu.h"
+#endif
+#ifndef THEARENA_ArenaTeamStart_generated_h
+	#include "Public/Online/ArenaTeamStart.h"
+#endif
 #ifndef THEARENA_BTTask_FindPointNearEnemy_generated_h
 	#include "Public/AI/BTTask_FindPointNearEnemy.h"
 #endif
@@ -60,5 +93,8 @@
 	#include "Public/AI/BTTask_HasLosTo.h"
 #endif
 #ifndef THEARENA_TheArenaGameMode_generated_h
-	#include "Public/TheArenaGameMode.h"
+	#include "Public/Online/TheArenaGameMode.h"
+#endif
+#ifndef THEARENA_Arena_TeamDeathMatch_generated_h
+	#include "Public/Online/Arena_TeamDeathMatch.h"
 #endif

@@ -13,6 +13,10 @@
 #  Use ! to negate a previous pattern.  But it doesn't work if the parent sub-folder was masked out already.
 # 
 
+/Binaries
+/DerivedDataCache
+/Intermediate
+/Saved
 
 # Ignore project files in the root
 /*.sln
@@ -33,8 +37,8 @@
 /*/Plugins/**/Intermediate/**
 
 # NOTE: For now, we'll commit executable binaries too (game DLLs)
-#/*/Binaries/**
-#/*/Plugins/**/Binaries/**
+/*/Binaries/**
+/*/Plugins/**/Binaries/**
 
 # Ignore any saved local files
 /*/Saved/**

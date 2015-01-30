@@ -10,7 +10,7 @@
 
 #define LOCTEXT_NAMESPACE "TheArena.UMG.Menu"
 
-static const FString MapNames[] = { TEXT("Testing") };
+static const FString MapNames[] = { TEXT("StagingArea") };
 
 UArenaStartMenu::~UArenaStartMenu()
 {
@@ -27,7 +27,7 @@ void UArenaStartMenu::SetUp(UArenaGameInstance* _GameInstance, ULocalPlayer* _Pl
 void UArenaStartMenu::HostGame(const FString& GameType)
 {
 	AArenaGameSession* const GameSession = GetGameSession();
-	GameSession->HostSession(PlayerOwner->GetPreferredUniqueNetId(), GameSessionName, "TDM", "Testing", false, true, 12);
+	GameSession->HostSession(PlayerOwner->GetPreferredUniqueNetId(), GameSessionName, "TDM", "StagingArea", false, true, 12);
 }
 
 void UArenaStartMenu::HostTeamDeathMatch()

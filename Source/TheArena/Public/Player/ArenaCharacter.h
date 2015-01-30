@@ -126,6 +126,8 @@ class AArenaCharacter : public ACharacter
 
 	void CameraUpdate();
 
+	void UpdateCombatState();
+
 	/** set the default movement speed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pawn)
 	float BaseMovementSpeed;
@@ -154,9 +156,13 @@ class AArenaCharacter : public ACharacter
 	UPROPERTY(EditDefaultsOnly, Category = "Game|Weapon")
 	float TargetingMovementSpeed;
 
-	/** replaces max movement speed */
+	/** Afk Timer */
 	UPROPERTY(Transient, Replicated)
 	float IdleTime;
+
+	/** current targeting state */
+	UPROPERTY(Transient, Replicated)
+	uint8 bInCombat : 1;
 
 	/** get aim offsets */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
@@ -174,6 +180,10 @@ class AArenaCharacter : public ACharacter
 	class AArenaRangedWeapon* FindWeapon(TSubclassOf<class AArenaRangedWeapon> WeaponClass);
 
 	void EquipWeapon(class AArenaRangedWeapon* Weapon);
+
+	void UnEquipWeapon(class AArenaRangedWeapon* Weapon);
+
+	void InitializeWeapons(class AArenaRangedWeapon* mainWeapon, class AArenaRangedWeapon* offWeapon);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Weapon usage
@@ -326,6 +336,12 @@ class AArenaCharacter : public ACharacter
 	/** get weapon attach point */
 	FName GetOffHandAttachPoint() const;
 
+	/** get weapon attach point */
+	FName GetOffWeaponAttachPoint() const;
+
+	/** get weapon attach point */
+	FName GetMainWeaponAttachPoint() const;
+
 	/** get total number of inventory items */
 	int32 GetInventoryCount() const;
 
@@ -405,6 +421,14 @@ class AArenaCharacter : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = Pawn)
 	float GetIdleTime() const;
 
+	/** get current combat state  */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	bool GetCombat() const;
+
+	/** [server + local] change targeting state !currently only local! */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	void SetCombat(bool bNewCombatState);
+
 	/** Update the team color of all player meshes. */
 	void UpdateTeamColorsAllMIDs();
 
@@ -422,6 +446,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FName OffHandAttachPoint;
 
+	/** socket or bone name for attaching Utility mesh */
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	FName OffWeaponAttachPoint;
+
+	/** socket or bone name for attaching Utility mesh */
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	FName MainWeaponAttachPoint;
+
 	/** default inventory list */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	TArray<TSubclassOf<class AArenaRangedWeapon>> DefaultInventoryClasses;
@@ -436,6 +468,18 @@ protected:
 	/** currently equipped weapon */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
 	class AArenaRangedWeapon* CurrentWeapon;
+
+	class AArenaRangedWeapon* LastWeapon;
+
+	class AArenaRangedWeapon* NewWeapon;
+
+	/** currently equipped weapon */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_PrimaryWeapon)
+	class AArenaRangedWeapon* PrimaryWeapon;
+
+	/** currently equipped weapon */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_SecondaryWeapon)
+	class AArenaRangedWeapon* SecondaryWeapon;
 
 	/** Replicate where this pawn was last hit and damaged */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_LastTakeHitInfo)
@@ -656,9 +700,20 @@ protected:
 	/** updates current weapon */
 	void SetCurrentWeapon(class AArenaRangedWeapon* NewWeapon, class AArenaRangedWeapon* LastWeapon = NULL);
 
+	/** updates current weapon */
+	void SetCurrentWeaponOne(class AArenaRangedWeapon* NewWeapon, class AArenaRangedWeapon* LastWeapon = NULL);
+
 	/** current weapon rep handler */
 	UFUNCTION()
 	void OnRep_CurrentWeapon(class AArenaRangedWeapon* LastWeapon);
+
+	/** primary weapon rep handler */
+	UFUNCTION()
+	void OnRep_PrimaryWeapon(class AArenaRangedWeapon* NewWeapon);
+
+	/** secondary weapon rep handler */
+	UFUNCTION()
+	void OnRep_SecondaryWeapon(class AArenaRangedWeapon* NewWeapon);
 
 	void SpawnDefaultInventory();
 
@@ -668,6 +723,14 @@ protected:
 	/** equip weapon */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon(class AArenaRangedWeapon* NewWeapon);
+
+	/** equip weapon */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerUnEquipWeapon(class AArenaRangedWeapon* NewWeapon);
+
+	/** equip weapon */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerInitializeWeapons(class AArenaRangedWeapon* mainWeapon, class AArenaRangedWeapon* offWeapon);
 
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)
@@ -699,4 +762,8 @@ protected:
 	/** reset idle timer on server */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerIdleTimer(const float idleTimer, class AArenaCharacter* client);
+
+	/** update combat state */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetCombat(bool bNewCombatState);
 };
