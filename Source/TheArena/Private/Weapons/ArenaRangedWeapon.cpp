@@ -193,7 +193,7 @@ void AArenaRangedWeapon::OnHolster(bool IsPrimary)
 	{
 		// For locally controller players we attach both weapons and let the bOnlyOwnerSee, bOwnerNoSee flags deal with visibility.
 		FName AttachPoint;
-		if (IsPrimary == true)
+		if (IsPrimary == true && bPendingHolster == false)
 		{
 			bPendingHolster = true;
 
@@ -205,7 +205,7 @@ void AArenaRangedWeapon::OnHolster(bool IsPrimary)
 
 			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnHolsterPrimary, FMath::Max(0.1f, Duration - 0.70f), false);
 		}
-		else
+		if (IsPrimary == false && bPendingHolster == false)
 		{
 			bPendingHolster = true;
 
@@ -252,6 +252,7 @@ void AArenaRangedWeapon::OnUnEquip(bool IsPrimary)
 	}
 
 	DetermineWeaponState();
+	bPendingHolster = false;
 }
 
 void AArenaRangedWeapon::OnEnterInventory(AArenaCharacter* NewOwner)

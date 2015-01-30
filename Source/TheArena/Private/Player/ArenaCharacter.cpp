@@ -518,8 +518,7 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 	InputComponent->BindAction("Cover", IE_Pressed, this, &AArenaCharacter::OnEnterCover);
 	InputComponent->BindAction("Cover", IE_Released, this, &AArenaCharacter::OnExitCover);
 
-	InputComponent->BindAction("NextWeapon", IE_Pressed, this, &AArenaCharacter::OnNextWeapon);
-	InputComponent->BindAction("PrevWeapon", IE_Pressed, this, &AArenaCharacter::OnPrevWeapon);
+	InputComponent->BindAction("SwapWeapon", IE_Pressed, this, &AArenaCharacter::OnSwapWeapon);
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &AArenaCharacter::OnReload);
 
@@ -707,21 +706,7 @@ void AArenaCharacter::OnExitCover()
 
 }
 
-void AArenaCharacter::OnNextWeapon()
-{
-	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
-	{
-		if (Inventory.Num() >= 2 && (CurrentWeapon == NULL || CurrentWeapon->GetCurrentState() != EWeaponState::Equipping))
-		{
-			const int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
-			AArenaRangedWeapon* NextWeapon = Inventory[(CurrentWeaponIdx + 1) % Inventory.Num()];
-			EquipWeapon(NextWeapon, false);
-		}
-	}
-}
-
-void AArenaCharacter::OnPrevWeapon()
+void AArenaCharacter::OnSwapWeapon()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
