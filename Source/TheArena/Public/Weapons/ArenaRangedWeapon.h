@@ -471,6 +471,8 @@ protected:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopMelee();
 
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerHolster(bool IsPrimary);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Replication & effects

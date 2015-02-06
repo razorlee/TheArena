@@ -84,7 +84,7 @@ void AArenaCharacter::PostInitializeComponents()
 		PlayerConfig.Energy = GetMaxEnergy();
 		SpawnDefaultInventory();
 	}
-	
+
 	// set initial mesh visibility (3rd person view)
 	UpdatePawnMeshes();
 
@@ -300,29 +300,29 @@ AArenaRangedWeapon* AArenaCharacter::FindWeapon(TSubclassOf<AArenaRangedWeapon> 
 	return NULL;
 }
 
-void AArenaCharacter::EquipWeapon(AArenaRangedWeapon* Weapon, bool IsEnteringCombat)
+void AArenaCharacter::EquipWeapon(AArenaRangedWeapon* ToEquip, AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat)
 {
-	if (Weapon)
+	if (ToEquip)
 	{
 		if (Role == ROLE_Authority)
 		{
 			if (IsEnteringCombat == true)
 			{
-				SetCurrentWeapon(Weapon);
+				SetCurrentWeapon(ToEquip, ToUnEquip);
 				FinishEquipWeapon();
 			}
 			else
 			{
-				SetCurrentWeapon(Weapon);
+				SetCurrentWeapon(ToEquip, ToUnEquip);
 				StartEquipWeapon();
 				GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
 			}
-			
-		}
+		}	
 		else
 		{
-			ServerEquipWeapon(Weapon, IsEnteringCombat);
+			ServerEquipWeapon(ToEquip, ToUnEquip, IsEnteringCombat);
 		}
+		IsEnteringCombat = false;
 	}
 }
 
@@ -398,16 +398,14 @@ void AArenaCharacter::SetTargeting(bool bNewTargeting)
 
 void AArenaCharacter::SetCombat(bool bNewCombatState)
 {
-	bInCombat = bNewCombatState;
+	this->bInCombat = bNewCombatState;
 
-	if (Role == ROLE_Authority)
-	{
-		UpdateCombatState();
-	}
-	else
+	if (Role < ROLE_Authority)
 	{
 		ServerSetCombat(bNewCombatState);
 	}
+	
+	UpdateCombatState();
 	
 }
 
@@ -416,7 +414,7 @@ void AArenaCharacter::UpdateCombatState()
 	if (bInCombat == true)
 	{
 		bUseControllerRotationYaw = true;
-		EquipWeapon(PrimaryWeapon, true);
+		OnSwapWeapon();
 	}
 	else
 	{
@@ -429,6 +427,7 @@ void AArenaCharacter::UpdateCombatState()
 		{
 			SecondaryWeapon->OnUnEquip(false);
 		}
+		CurrentWeapon = NULL;
 	}
 }
 
@@ -678,7 +677,7 @@ float AArenaCharacter::PlayWeaponAnimation(UAnimMontage* Animation)
 void AArenaCharacter::OnStartTargeting()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat == true)
 	{
 		IdleTime = 0.0f;
 		if (IsRunning())
@@ -692,8 +691,11 @@ void AArenaCharacter::OnStartTargeting()
 
 void AArenaCharacter::OnStopTargeting()
 {
-	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
-	SetTargeting(false);
+	if (bInCombat == true)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
+		SetTargeting(false);
+	}
 }
 
 void AArenaCharacter::OnEnterCover()
@@ -709,13 +711,25 @@ void AArenaCharacter::OnExitCover()
 void AArenaCharacter::OnSwapWeapon()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat == true)
 	{
 		if (Inventory.Num() >= 2 && (CurrentWeapon == NULL || CurrentWeapon->GetCurrentState() != EWeaponState::Equipping))
 		{
-			const int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
-			AArenaRangedWeapon* PrevWeapon = Inventory[(CurrentWeaponIdx - 1 + Inventory.Num()) % Inventory.Num()];
-			EquipWeapon(PrevWeapon, false);
+			if (CurrentWeapon == NULL)
+			{
+				EquipWeapon(PrimaryWeapon, NULL, true);
+			}
+			else if (CurrentWeapon == PrimaryWeapon)
+			{
+				EquipWeapon(SecondaryWeapon, PrimaryWeapon, false);
+			}
+			else
+			{
+				EquipWeapon(PrimaryWeapon, SecondaryWeapon, false);
+			}
+			/*const int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
+			AArenaRangedWeapon* NextWeapon = Inventory[(CurrentWeaponIdx + 1) % Inventory.Num()];
+			EquipWeapon(NextWeapon, false);*/
 		}
 	}
 }
@@ -723,7 +737,7 @@ void AArenaCharacter::OnSwapWeapon()
 void AArenaCharacter::OnReload()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat == true)
 	{
 		IdleTime = 0.0f;
 		if (CurrentWeapon)
@@ -736,7 +750,7 @@ void AArenaCharacter::OnReload()
 void AArenaCharacter::OnMelee()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat)
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat ==  true)
 	{
 		IdleTime = 0.0f;
 		if (CurrentWeapon)
@@ -781,7 +795,7 @@ void AArenaCharacter::OnDodge()
 void AArenaCharacter::OnThrow()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && PlayerConfig.Energy >= 500 && bInCombat)
+	if (MyPC && MyPC->IsGameInputAllowed() && PlayerConfig.Energy >= 500 && bInCombat == true)
 	{
 		IdleTime = 0.0f;
 		StartThrow();
@@ -819,7 +833,7 @@ void AArenaCharacter::OnStopJump()
 
 void AArenaCharacter::OnStartCrouching()
 {
-	if (bInCombat)
+	if (bInCombat == true)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = CrouchedMovementSpeed;
 		IdleTime = 0.0f;
@@ -840,7 +854,7 @@ void AArenaCharacter::OnStopCrouching()
 void AArenaCharacter::OnStartRunning()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && !GetCharacterMovement()->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost && bInCombat)
+	if (MyPC && MyPC->IsGameInputAllowed() && !GetCharacterMovement()->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost && bInCombat == true)
 	{
 		IdleTime = 0.0f;
 		if (IsTargeting())
@@ -950,11 +964,6 @@ bool AArenaCharacter::IsThrowing() const
 {
 	return bWantsToThrow;
 }
-
-/*bool AArenaCharacter::IsCrouched() const
-{
-	return bWantsToCrouch;
-}*/
 
 int32 AArenaCharacter::GetMaxHealth() const
 {
@@ -1415,15 +1424,9 @@ void AArenaCharacter::OnRep_LastTakeHitInfo()
 
 void AArenaCharacter::SetCurrentWeapon(class AArenaRangedWeapon* NextWeapon, class AArenaRangedWeapon* PrevWeapon)
 {
-	AArenaRangedWeapon* LocalLastWeapon = NULL;
-
 	if (PrevWeapon != NULL)
 	{
 		LastWeapon = PrevWeapon;
-	}
-	else if (NextWeapon != CurrentWeapon)
-	{
-		LastWeapon = CurrentWeapon;
 	}
 
 	NewWeapon = NextWeapon;
@@ -1435,10 +1438,12 @@ void AArenaCharacter::StartEquipWeapon()
 	{
 		if (LastWeapon->GetIsPrimaryWeapon() == true)
 		{
+			LastWeapon->SetOwningPawn(this);
 			LastWeapon->OnUnEquip(true);
 		}
 		else
 		{
+			LastWeapon->SetOwningPawn(this);
 			LastWeapon->OnUnEquip(false);
 		}
 	}
@@ -1474,26 +1479,55 @@ void AArenaCharacter::OnRep_Throw()
 
 void AArenaCharacter::OnRep_CurrentWeapon(AArenaRangedWeapon* LastWeapon)//recall
 {
-	//SetCurrentWeapon(CurrentWeapon, LastWeapon);
-	//StartEquipWeapon();
-	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
+	SetCurrentWeapon(CurrentWeapon, LastWeapon);
+	StartEquipWeapon();
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
 
 }
 
 void AArenaCharacter::OnRep_PrimaryWeapon(AArenaRangedWeapon* NewWeapon)
 {
-	/*SetCurrentWeapon(NewWeapon, PrimaryWeapon);
-	StartEquipWeapon();
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);*/
-
+	PrimaryWeapon->SetIsPrimaryWeapon(true);
+	if (PrimaryWeapon == CurrentWeapon)
+	{
+		SetCurrentWeapon(PrimaryWeapon, LastWeapon);
+		StartEquipWeapon();
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
+	}
+	else
+	{
+		PrimaryWeapon->SetOwningPawn(this);
+		PrimaryWeapon->OnUnEquip(true);
+	}
 }
 
 void AArenaCharacter::OnRep_SecondaryWeapon(AArenaRangedWeapon* NewWeapon)
 {
-	/*SetCurrentWeapon(NewWeapon, SecondaryWeapon);
-	StartEquipWeapon();
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);*/
+	if (SecondaryWeapon == CurrentWeapon)
+	{
+		SetCurrentWeapon(SecondaryWeapon, LastWeapon);
+		StartEquipWeapon();
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
+	}
+	else
+	{
+		SecondaryWeapon->SetOwningPawn(this);
+		SecondaryWeapon->OnUnEquip(false);
+	}
+}
 
+void AArenaCharacter::OnRep_CombatState(bool bOldCombatState)
+{
+	if (bOldCombatState == false)
+	{
+		this->bInCombat = true;
+	}
+	else
+	{
+		this->bInCombat = false;
+	}
+
+	UpdateCombatState();
 }
 
 void AArenaCharacter::SpawnDefaultInventory()
@@ -1519,9 +1553,8 @@ void AArenaCharacter::SpawnDefaultInventory()
 	if (Inventory.Num() > 0)
 	{
 		PrimaryWeapon = Inventory[0];
-		SecondaryWeapon = Inventory[1];
 		PrimaryWeapon->SetIsPrimaryWeapon(true);
-		//CurrentWeapon = Inventory[0]; //eventually we will read in from a database what current weapon is
+		SecondaryWeapon = Inventory[1];
 		InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
 	}
 }
@@ -1546,14 +1579,14 @@ void AArenaCharacter::DestroyInventory()
 }
 
 
-bool AArenaCharacter::ServerEquipWeapon_Validate(AArenaRangedWeapon* Weapon, bool IsEnteringCombat)
+bool AArenaCharacter::ServerEquipWeapon_Validate(AArenaRangedWeapon* ToEquip, AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat)
 {
 	return true;
 }
 
-void AArenaCharacter::ServerEquipWeapon_Implementation(AArenaRangedWeapon* Weapon, bool IsEnteringCombat)
+void AArenaCharacter::ServerEquipWeapon_Implementation(AArenaRangedWeapon* ToEquip, AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat)
 {
-	EquipWeapon(Weapon, IsEnteringCombat);
+	EquipWeapon(ToEquip, ToUnEquip, IsEnteringCombat);
 }
 
 bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaRangedWeapon* mainWeapon, AArenaRangedWeapon* offWeapon)
@@ -1563,7 +1596,7 @@ bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaRangedWeapon* mainW
 
 void AArenaCharacter::ServerInitializeWeapons_Implementation(AArenaRangedWeapon* mainWeapon, AArenaRangedWeapon* offWeapon)
 {
-	InitializeWeapons(offWeapon, mainWeapon);
+	InitializeWeapons(mainWeapon, offWeapon);
 }
 
 bool AArenaCharacter::ServerSetTargeting_Validate(bool bNewTargeting)
@@ -1644,6 +1677,8 @@ bool AArenaCharacter::ServerSetCombat_Validate(bool bNewCombatState)
 void AArenaCharacter::ServerSetCombat_Implementation(bool bNewCombatState)
 {
 	bInCombat = bNewCombatState;
+
+	UpdateCombatState();
 }
 
 

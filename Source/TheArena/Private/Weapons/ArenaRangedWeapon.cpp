@@ -63,8 +63,7 @@ void AArenaRangedWeapon::Destroyed()
 
 void AArenaRangedWeapon::OnEquip(bool IsPrimary)
 {
-	DetachMeshFromPawn();
-	AttachMeshToPawn();
+	//AttachMeshToPawn();
 
 	bPendingEquip = true;
 	DetermineWeaponState();
@@ -79,7 +78,7 @@ void AArenaRangedWeapon::OnEquip(bool IsPrimary)
 		EquipStartedTime = GetWorld()->GetTimeSeconds();
 		EquipDuration = Duration;
 
-		GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnEquipFinished, Duration, false);
+		GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnEquipFinished, (Duration - (Duration*0.75f)), false);
 
 		if (MyPawn && MyPawn->IsLocallyControlled())
 		{
@@ -97,7 +96,7 @@ void AArenaRangedWeapon::OnEquip(bool IsPrimary)
 		EquipStartedTime = GetWorld()->GetTimeSeconds();
 		EquipDuration = Duration;
 
-		GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnEquipFinished, Duration, false);
+		GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnEquipFinished, (Duration - (Duration*0.75f)), false);
 
 		if (MyPawn && MyPawn->IsLocallyControlled())
 		{
@@ -108,6 +107,7 @@ void AArenaRangedWeapon::OnEquip(bool IsPrimary)
 
 void AArenaRangedWeapon::OnEquipFinished()
 {
+	DetachMeshFromPawn();
 	AttachMeshToPawn();
 
 	bIsEquipped = true;
@@ -135,7 +135,7 @@ void AArenaRangedWeapon::OnHolsterPrimary()
 	if (MyPawn)
 	{
 		// Remove and hide both first and third person meshes
-		DetachMeshFromPawn();
+		//DetachMeshFromPawn();
 
 		FName AttachPoint = MyPawn->GetMainWeaponAttachPoint();
 
@@ -144,14 +144,16 @@ void AArenaRangedWeapon::OnHolsterPrimary()
 		{
 			USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();
 			Mesh3P->SetHiddenInGame(false);
-			Mesh3P->AttachTo(PawnMesh3p, AttachPoint);
+			Mesh3P->AttachTo(PawnMesh3p, AttachPoint, EAttachLocation::SnapToTarget, true);
+			AttachRootComponentTo(PawnMesh3p);
 		}
 		else
 		{
 			USkeletalMeshComponent* UseWeaponMesh = GetWeaponMesh();
 			USkeletalMeshComponent* UsePawnMesh = MyPawn->GetPawnMesh();
-			UseWeaponMesh->AttachTo(UsePawnMesh, AttachPoint);
 			UseWeaponMesh->SetHiddenInGame(false);
+			UseWeaponMesh->AttachTo(UsePawnMesh, AttachPoint, EAttachLocation::SnapToTarget, true);
+			AttachRootComponentTo(UsePawnMesh);
 		}
 	}
 
@@ -163,7 +165,7 @@ void AArenaRangedWeapon::OnHolsterSecondary()
 {
 	if (MyPawn)
 	{
-		DetachMeshFromPawn();
+		//DetachMeshFromPawn();
 
 		FName AttachPoint = MyPawn->GetOffWeaponAttachPoint();
 
@@ -172,14 +174,14 @@ void AArenaRangedWeapon::OnHolsterSecondary()
 		{
 			USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();
 			Mesh3P->SetHiddenInGame(false);
-			Mesh3P->AttachTo(PawnMesh3p, AttachPoint);
+			Mesh3P->AttachTo(PawnMesh3p, AttachPoint, EAttachLocation::SnapToTarget, true);
 		}
 		else
 		{
 			USkeletalMeshComponent* UseWeaponMesh = GetWeaponMesh();
 			USkeletalMeshComponent* UsePawnMesh = MyPawn->GetPawnMesh();
-			UseWeaponMesh->AttachTo(UsePawnMesh, AttachPoint);
 			UseWeaponMesh->SetHiddenInGame(false);
+			UseWeaponMesh->AttachTo(UsePawnMesh, AttachPoint, EAttachLocation::SnapToTarget, true);
 		}
 	}
 
@@ -193,7 +195,7 @@ void AArenaRangedWeapon::OnHolster(bool IsPrimary)
 	{
 		// For locally controller players we attach both weapons and let the bOnlyOwnerSee, bOwnerNoSee flags deal with visibility.
 		FName AttachPoint;
-		if (IsPrimary == true && bPendingHolster == false)
+		if (IsPrimary == true)
 		{
 			bPendingHolster = true;
 
@@ -202,10 +204,9 @@ void AArenaRangedWeapon::OnHolster(bool IsPrimary)
 			{
 				Duration = 0.5f;
 			}
-
 			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnHolsterPrimary, FMath::Max(0.1f, Duration - 0.70f), false);
 		}
-		if (IsPrimary == false && bPendingHolster == false)
+		if (IsPrimary == false)
 		{
 			bPendingHolster = true;
 
@@ -214,7 +215,6 @@ void AArenaRangedWeapon::OnHolster(bool IsPrimary)
 			{
 				Duration = 0.5f;
 			}
-
 			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnHolsterSecondary, FMath::Max(0.1f, Duration - 0.70f), false);
 		}
 	}
@@ -482,6 +482,16 @@ bool AArenaRangedWeapon::ServerStopMelee_Validate()
 void AArenaRangedWeapon::ServerStopMelee_Implementation()
 {
 	StopMelee();
+}
+
+bool AArenaRangedWeapon::ServerHolster_Validate(bool IsPrimary)
+{
+	return true;
+}
+
+void AArenaRangedWeapon::ServerHolster_Implementation(bool IsPrimary)
+{
+	OnHolster(IsPrimary);
 }
 
 //////////////////////////////////////////////////////////////////////////

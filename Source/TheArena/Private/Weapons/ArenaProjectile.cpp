@@ -89,7 +89,15 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 	{
 		if (WeaponConfig.HitDamage > 0 && WeaponConfig.DamageType)
 		{
-			UGameplayStatics::ApplyPointDamage(Impact.GetActor(), WeaponConfig.HitDamage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, WeaponConfig.DamageType);
+			FString critical = "head";
+			if (Impact.BoneName.ToString() == critical)
+			{
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), (WeaponConfig.HitDamage * 2), Impact.ImpactPoint, Impact, MyPawn->Controller, this, WeaponConfig.DamageType);
+			}
+			else
+			{
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), WeaponConfig.HitDamage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, WeaponConfig.DamageType);
+			}
 		}
 	}
 	if (ImpactTemplate)

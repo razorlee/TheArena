@@ -126,6 +126,7 @@ class AArenaCharacter : public ACharacter
 
 	void CameraUpdate();
 
+	UFUNCTION()
 	void UpdateCombatState();
 
 	/** set the default movement speed */
@@ -161,7 +162,7 @@ class AArenaCharacter : public ACharacter
 	float IdleTime;
 
 	/** current targeting state */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CombatState)
 	uint8 bInCombat : 1;
 
 	/** get aim offsets */
@@ -179,10 +180,11 @@ class AArenaCharacter : public ACharacter
 
 	class AArenaRangedWeapon* FindWeapon(TSubclassOf<class AArenaRangedWeapon> WeaponClass);
 
-	void EquipWeapon(class AArenaRangedWeapon* Weapon, bool IsEnteringCombat);
+	void EquipWeapon(class AArenaRangedWeapon* ToEquip, class AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat);
 
 	void UnEquipWeapon(class AArenaRangedWeapon* Weapon);
 
+	UFUNCTION()
 	void InitializeWeapons(class AArenaRangedWeapon* mainWeapon, class AArenaRangedWeapon* offWeapon);
 
 	//////////////////////////////////////////////////////////////////////////
@@ -471,11 +473,11 @@ protected:
 	class AArenaRangedWeapon* NewWeapon;
 
 	/** currently equipped weapon */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_PrimaryWeapon)
+	UPROPERTY(ReplicatedUsing = OnRep_PrimaryWeapon)
 	class AArenaRangedWeapon* PrimaryWeapon;
 
 	/** currently equipped weapon */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_SecondaryWeapon)
+	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeapon)
 	class AArenaRangedWeapon* SecondaryWeapon;
 
 	/** Replicate where this pawn was last hit and damaged */
@@ -715,6 +717,9 @@ protected:
 	UFUNCTION()
 	void OnRep_SecondaryWeapon(class AArenaRangedWeapon* NewWeapon);
 
+	UFUNCTION()
+	void OnRep_CombatState(bool bNewCombatState);
+
 	void SpawnDefaultInventory();
 
 	/** [server] remove all weapons from inventory and destroy them */
@@ -722,11 +727,7 @@ protected:
 
 	/** equip weapon */
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerEquipWeapon(class AArenaRangedWeapon* NewWeapon, bool IsEnteringCombat);
-
-	/** equip weapon */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerInitializeWeapons(class AArenaRangedWeapon* mainWeapon, class AArenaRangedWeapon* offWeapon);
+	void ServerEquipWeapon(class AArenaRangedWeapon* ToEquip, class AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat);
 
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)
@@ -737,6 +738,9 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopThrow();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerInitializeWeapons(AArenaRangedWeapon* mainWeapon, AArenaRangedWeapon* offWeapon);
 
 	/*UFUNCTION(reliable, server, WithValidation) //tut1
 	void ServerStartStagger();
