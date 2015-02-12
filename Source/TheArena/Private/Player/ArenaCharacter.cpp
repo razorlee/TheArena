@@ -11,6 +11,9 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	bWantsToRun = false;
 	bWantsToFire = false;
 	bWantsToThrow = false;
+	bWantsToVault = false;
+	bWantsToFaceLeft = false;
+	bWantsToFaceRight = true;
 	bPressedDodgeRight = false;
 	bPressedDodgeLeft = false;
 	bPressedDodgeForward = false;
@@ -42,6 +45,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	//GetMesh()->SetCollisionResponseToChannel(COLLISION_COVERHI, ECR_Overlap);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 
 	// Configure character movement
@@ -219,18 +223,58 @@ void AArenaCharacter::CameraUpdate()
 	}
 	else if (IsTargeting())
 	{
-		CameraBoom->TargetArmLength = 50.0f;
-		CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+		if (bOnLeftEdge)
+		{
+			if (bWantsToFaceLeft)
+			{
+				CameraBoom->TargetArmLength = 50.0f;
+				CameraBoom->SocketOffset = FVector(0.0f, -50.0f, 50.0f);
+			}
+		}
+		else
+		{
+			CameraBoom->TargetArmLength = 50.0f;
+			CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+		}
 	}
 	else if (GetCombat() == false)
 	{
 		CameraBoom->TargetArmLength = 250.0f;
 		CameraBoom->SocketOffset = FVector(0.0f, 0.0f, 0.0f);
 	}
+	else if (IsLoCovering() == true && IsCovering() == true)
+	{
+		if (bWantsToFaceLeft)
+		{
+			CameraBoom->TargetArmLength = 150.0f;
+			CameraBoom->SocketOffset = FVector(0.0f, -50.0f, -20.0f);
+		}
+		else
+		{
+			CameraBoom->TargetArmLength = 150.0f;
+			CameraBoom->SocketOffset = FVector(0.0f, 50.0f, -20.0f);
+		}
+	}
 	else
 	{
-		CameraBoom->TargetArmLength = 150.0f;
-		CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+		if (IsHiCovering() == true && IsCovering() == true)
+		{
+			if (bWantsToFaceLeft)
+			{
+				CameraBoom->TargetArmLength = 150.0f;
+				CameraBoom->SocketOffset = FVector(0.0f, -50.0f, 50.0f);
+			}
+			else
+			{
+				CameraBoom->TargetArmLength = 150.0f;
+				CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+			}
+		}
+		else
+		{
+			CameraBoom->TargetArmLength = 150.0f;
+			CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+		}
 	}
 }
 
@@ -409,6 +453,26 @@ void AArenaCharacter::SetCombat(bool bNewCombatState)
 	
 }
 
+void AArenaCharacter::SetRight(bool left, bool right)
+{
+	bWantsToFaceLeft = left;
+	bWantsToFaceRight = right;
+	if (Role < ROLE_Authority)
+	{
+		ServerSetRight(left, right);
+	}
+}
+
+void AArenaCharacter::SetLeft(bool left, bool right)
+{
+	bWantsToFaceLeft = left;
+	bWantsToFaceRight = right;
+	if (Role < ROLE_Authority)
+	{
+		ServerSetLeft(left, right);
+	}
+}
+
 void AArenaCharacter::UpdateCombatState()
 {
 	if (bInCombat == true)
@@ -455,6 +519,52 @@ void AArenaCharacter::SetCrouched(bool bNewCrouched, bool bToggle)
 	}
 }
 
+void AArenaCharacter::SetCover(bool bNewCover)
+{
+	bWantsToCover = bNewCover;
+	SetCrouched(bNewCover, false);
+	if (Role < ROLE_Authority)
+	{
+		ServerSetCover(bNewCover);
+	}
+}
+
+void AArenaCharacter::SetHiCover(bool bNewCover)
+{
+	bWantsToCoverHi = bNewCover;
+	if (Role < ROLE_Authority)
+	{
+		ServerSetHiCover(bNewCover);
+	}
+}
+
+void AArenaCharacter::SetLoCover(bool bNewCover)
+{
+	bWantsToCoverLo = bNewCover;
+	if (Role < ROLE_Authority)
+	{
+		ServerSetLoCover(bNewCover);
+	}
+}
+
+void AArenaCharacter::SetRightEdge(bool bNewEdge)
+{
+	bOnRightEdge = bNewEdge;
+	if (Role < ROLE_Authority)
+	{
+		ServerSetRightEdge(bNewEdge);
+	}
+}
+
+void AArenaCharacter::SetLeftEdge(bool bNewEdge)
+{
+	bOnLeftEdge = bNewEdge;
+	if (Role < ROLE_Authority)
+	{
+		ServerSetLeftEdge(bNewEdge);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Animations
 
@@ -497,16 +607,16 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 	check(InputComponent);
 	InputComponent->BindAxis("MoveForward", this, &AArenaCharacter::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &AArenaCharacter::MoveRight);
-	InputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	InputComponent->BindAxis("TurnRate", this, &AArenaCharacter::TurnAtRate);
+	InputComponent->BindAxis("Turn", this, &AArenaCharacter::TurnAtRate);
 	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	InputComponent->BindAxis("LookUpRate", this, &AArenaCharacter::LookUpAtRate);
+
+	//InputComponent->BindAction("HeadUtility", IE_)
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AArenaCharacter::OnStartJump);
 	InputComponent->BindAction("Jump", IE_Released, this, &AArenaCharacter::OnStopJump);
 
 	InputComponent->BindAction("Crouch", IE_Pressed, this, &AArenaCharacter::OnStartCrouching);
-	InputComponent->BindAction("Crouch", IE_Released, this, &AArenaCharacter::OnStopCrouching);
 
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AArenaCharacter::OnStartRunning);
 	InputComponent->BindAction("Sprint", IE_Released, this, &AArenaCharacter::OnStopRunning);
@@ -514,8 +624,7 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 	InputComponent->BindAction("Targeting", IE_Pressed, this, &AArenaCharacter::OnStartTargeting);
 	InputComponent->BindAction("Targeting", IE_Released, this, &AArenaCharacter::OnStopTargeting);
 
-	InputComponent->BindAction("Cover", IE_Pressed, this, &AArenaCharacter::OnEnterCover);
-	InputComponent->BindAction("Cover", IE_Released, this, &AArenaCharacter::OnExitCover);
+	InputComponent->BindAction("Cover", IE_Pressed, this, &AArenaCharacter::ToggleCover);
 
 	InputComponent->BindAction("SwapWeapon", IE_Pressed, this, &AArenaCharacter::OnSwapWeapon);
 
@@ -542,14 +651,26 @@ void AArenaCharacter::MoveForward(float Value)
 
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		MovementForwardAxis = Value;
-		AddMovementInput(Direction, Value);
+
+		if (!bWantsToCoverHi && !bWantsToCoverLo)
+		{
+			MovementForwardAxis = Value;
+			AddMovementInput(Direction, Value);
+		}
+		else
+		{
+			if (Value < 0)
+			{
+				MovementForwardAxis = Value;
+				AddMovementInput(Direction, Value);
+			}
+		}
 	}
 }
 
 void AArenaCharacter::MoveRight(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f) && (!bWantsToRun))
+	if ((Controller != NULL) && (Value != 0.0f) && (!bWantsToRun) /*&& (!bIsTargeting && !bWantsToCoverHi && !bWantsToCoverLo)*/)
 	{
 		IdleTime = 0.0f;
 		// find out which way is right
@@ -558,8 +679,34 @@ void AArenaCharacter::MoveRight(float Value)
 
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		if (Value > 0)
+		{
+			SetRight(false, true);
+
+		}
+		else if (Value < 0)
+		{
+			SetLeft(true, false);
+		}
 		MovementStrafeAxis = Value;
-		AddMovementInput(Direction, Value);
+		if (bOnLeftEdge)
+		{
+			if (Value > 0)
+			{
+				AddMovementInput(Direction, Value);
+			}
+		}
+		else if (bOnRightEdge)
+		{
+			if (Value < 0)
+			{
+				AddMovementInput(Direction, Value);
+			}
+		}
+		else
+		{
+			AddMovementInput(Direction, Value);
+		}
 	}
 }
 
@@ -586,7 +733,7 @@ void AArenaCharacter::LookUpAtRate(float Rate)
 void AArenaCharacter::OnStartFire()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed())
+	if (MyPC && MyPC->IsGameInputAllowed() && !bWantsToRun)
 	{
 		IdleTime = 0.0f;
 		if (IsRunning())
@@ -686,6 +833,7 @@ void AArenaCharacter::OnStartTargeting()
 		}
 		GetCharacterMovement()->MaxWalkSpeed = TargetingMovementSpeed;
 		SetTargeting(true);
+		//PlayAnimMontage(AimHiLeftAnimation);
 	}
 }
 
@@ -695,17 +843,30 @@ void AArenaCharacter::OnStopTargeting()
 	{
 		GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 		SetTargeting(false);
+		//StopAnimMontage(AimHiLeftAnimation);
 	}
 }
 
-void AArenaCharacter::OnEnterCover()
+void AArenaCharacter::ToggleCover()
 {
-
-}
-
-void AArenaCharacter::OnExitCover()
-{
-
+	if (bInCombat == true)
+	{
+		if (bWantsToCoverHi == false)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = CrouchedMovementSpeed;
+			IdleTime = 0.0f;
+			SetRunning(false, false);
+			SetHiCover(true);
+			return;
+		}
+		if (bWantsToCoverHi == true)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = RunningMovementSpeed;
+			IdleTime = 0.0f;
+			SetHiCover(false);
+			return;
+		}
+	}
 }
 
 void AArenaCharacter::OnSwapWeapon()
@@ -812,15 +973,22 @@ void AArenaCharacter::OnStartJump()
 		{	
 			SetRunning(false, false);
 			SetCrouched(false, false);
-			if (Role < ROLE_Authority)
+			if (!bWantsToCoverLo)
 			{
-				ServerJump(this);
+				if (Role < ROLE_Authority)
+				{
+					ServerJump(this);
+				}
+				else
+				{
+					this->PlayerConfig.Stamina -= JumpCost;
+				}
+				bPressedJump = true;
 			}
 			else
 			{
-				this->PlayerConfig.Stamina -= JumpCost;
+				OnStartVault();
 			}
-			bPressedJump = true;
 		}
 	}
 }
@@ -835,19 +1003,36 @@ void AArenaCharacter::OnStartCrouching()
 {
 	if (bInCombat == true)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = CrouchedMovementSpeed;
-		IdleTime = 0.0f;
-		SetRunning(false, false);
-		SetCrouched(true, false);
-		Crouch();
+		if (bWantsToCrouch == true)
+		{
+			SetCover(false);
+			SetCrouched(false, false);
+			OnStopCrouching();
+		}
+		else
+		{
+			if (IsHiCovering() == true || IsLoCovering() == true)
+			{
+				SetCover(true);
+				SetCrouched(true, false);
+				bWantsToCrouch = true;
+			}
+			else
+			{
+				GetCharacterMovement()->MaxWalkSpeed = CrouchedMovementSpeed;
+				IdleTime = 0.0f;
+				SetCover(true);
+				SetRunning(false, false);
+				SetCrouched(true, false);
+				Crouch();
+			}
+		}
 	}
 }
 
 void AArenaCharacter::OnStopCrouching()
 {
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
-
-	SetCrouched(false, false);
 	UnCrouch();
 }
 
@@ -873,9 +1058,43 @@ void AArenaCharacter::OnStopRunning()
 {
 	GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 	SetRunning(false, false);
-	// move a little bit
-	//TimeLine->SetTimelineLength = 0.5f;
-	//TimeLine->CallFunction = MoveForward(400.0f);
+}
+
+void AArenaCharacter::OnStartVault(bool bFromReplication)
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (!bFromReplication && Role < ROLE_Authority)
+	{
+		ServerStartVault();
+	}
+
+	if (bFromReplication || true)
+	{
+		bWantsToVault = true;
+		bWantsToCover = false;
+		GetCapsuleComponent()->SetCapsuleSize(0, 0);
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+		float AnimDuration = PlayAnimMontage(VaultAnimation);
+		if (AnimDuration <= 0.0f)
+		{
+			AnimDuration = 0.3f;
+		}
+
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::OnStopVault, AnimDuration, false);
+
+		if (MyPC)
+		{
+			//PlayWeaponSound(MeleeSound);
+		}
+	}
+}
+
+void AArenaCharacter::OnStopVault()
+{
+	GetCapsuleComponent()->SetCapsuleSize(42.f, 96.0f);
+	bWantsToVault = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	StopAnimMontage(VaultAnimation);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -936,6 +1155,16 @@ bool AArenaCharacter::IsTargeting() const
 	return bIsTargeting;
 }
 
+bool AArenaCharacter::IsCovering() const
+{
+	return bWantsToCover;
+}
+
+bool AArenaCharacter::IsCrouching() const
+{
+	return bWantsToCrouch;
+}
+
 bool AArenaCharacter::IsFiring() const
 {
 	return bWantsToFire;
@@ -958,6 +1187,44 @@ bool AArenaCharacter::IsRunning() const
 		return false;
 	}
 	return (bWantsToRun) && !GetVelocity().IsZero() && (GetVelocity().SafeNormal2D() | GetActorRotation().Vector()) > -0.1;
+}
+
+bool AArenaCharacter::IsHiCovering() const
+{
+	if (!GetCharacterMovement())
+	{
+		return false;
+	}
+	return bWantsToCoverHi;
+}
+
+bool AArenaCharacter::IsLoCovering() const
+{
+	if (!GetCharacterMovement())
+	{
+		return false;
+	}
+	return bWantsToCoverLo;
+}
+
+bool AArenaCharacter::IsRight() const
+{
+	return bWantsToFaceRight;
+}
+
+bool AArenaCharacter::IsLeft() const
+{
+	return bWantsToFaceLeft;
+}
+
+bool AArenaCharacter::IsRightEdge() const
+{
+	return bOnRightEdge;
+}
+
+bool AArenaCharacter::IsLeftEdge() const
+{
+	return bOnLeftEdge;
 }
 
 bool AArenaCharacter::IsThrowing() const
@@ -1477,10 +1744,23 @@ void AArenaCharacter::OnRep_Throw()
 	}
 }
 
-void AArenaCharacter::OnRep_CurrentWeapon(AArenaRangedWeapon* LastWeapon)//recall
+void AArenaCharacter::OnRep_Vault()
+{
+	if (bWantsToVault)
+	{
+		OnStartVault(true);
+	}
+	else
+	{
+		OnStopVault();
+	}
+}
+
+void AArenaCharacter::OnRep_CurrentWeapon(AArenaRangedWeapon* LastWeapon)
 {
 	SetCurrentWeapon(CurrentWeapon, LastWeapon);
 	StartEquipWeapon();
+	FinishEquipWeapon();
 	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
 
 }
@@ -1492,6 +1772,7 @@ void AArenaCharacter::OnRep_PrimaryWeapon(AArenaRangedWeapon* NewWeapon)
 	{
 		SetCurrentWeapon(PrimaryWeapon, LastWeapon);
 		StartEquipWeapon();
+		FinishEquipWeapon();
 		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
 	}
 	else
@@ -1507,6 +1788,7 @@ void AArenaCharacter::OnRep_SecondaryWeapon(AArenaRangedWeapon* NewWeapon)
 	{
 		SetCurrentWeapon(SecondaryWeapon, LastWeapon);
 		StartEquipWeapon();
+		FinishEquipWeapon();
 		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
 	}
 	else
@@ -1629,6 +1911,76 @@ void AArenaCharacter::ServerSetCrouched_Implementation(bool bNewCrouched, bool b
 	SetCrouched(bNewCrouched, bToggle);
 }
 
+bool AArenaCharacter::ServerSetCover_Validate(bool bNewCover)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerSetCover_Implementation(bool bNewCover)
+{
+	SetCover(bNewCover);
+}
+
+bool AArenaCharacter::ServerSetHiCover_Validate(bool bNewCover)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerSetHiCover_Implementation(bool bNewCover)
+{
+	SetHiCover(bNewCover);
+}
+
+bool AArenaCharacter::ServerSetLoCover_Validate(bool bNewCover)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerSetLoCover_Implementation(bool bNewCover)
+{
+	SetLoCover(bNewCover);
+}
+
+bool AArenaCharacter::ServerSetRight_Validate(bool left, bool right)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerSetRight_Implementation(bool left, bool right)
+{
+	SetRight(left, right);
+}
+
+bool AArenaCharacter::ServerSetLeft_Validate(bool left, bool right)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerSetLeft_Implementation(bool left, bool right)
+{
+	SetLeft(left, right);
+}
+//
+bool AArenaCharacter::ServerSetRightEdge_Validate(bool bNewEdge)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerSetRightEdge_Implementation(bool bNewEdge)
+{
+	SetRightEdge(bNewEdge);
+}
+
+bool AArenaCharacter::ServerSetLeftEdge_Validate(bool bNewEdge)
+{
+	return true;
+}
+
+void AArenaCharacter::ServerSetLeftEdge_Implementation(bool bNewEdge)
+{
+	SetLeftEdge(bNewEdge);
+}
+
 bool AArenaCharacter::ServerJump_Validate(class AArenaCharacter* client)
 {
 	return true;
@@ -1637,6 +1989,26 @@ bool AArenaCharacter::ServerJump_Validate(class AArenaCharacter* client)
 void AArenaCharacter::ServerJump_Implementation(class AArenaCharacter* client)
 {
 	client->PlayerConfig.Stamina -= JumpCost;
+}
+
+bool AArenaCharacter::ServerStartVault_Validate()
+{
+	return true;
+}
+
+void AArenaCharacter::ServerStartVault_Implementation()
+{
+	OnStartVault();
+}
+
+bool AArenaCharacter::ServerStopVault_Validate()
+{
+	return true;
+}
+
+void AArenaCharacter::ServerStopVault_Implementation()
+{
+	OnStopVault();
 }
 
 bool AArenaCharacter::ServerStartThrow_Validate()
@@ -1699,6 +2071,14 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	// everyone
 	DOREPLIFETIME(AArenaCharacter, IdleTime);
 	DOREPLIFETIME(AArenaCharacter, bInCombat);
+	DOREPLIFETIME(AArenaCharacter, bWantsToCover);
+	DOREPLIFETIME(AArenaCharacter, bWantsToCoverHi);
+	DOREPLIFETIME(AArenaCharacter, bWantsToCoverLo);
+	DOREPLIFETIME(AArenaCharacter, bWantsToFaceRight);
+	DOREPLIFETIME(AArenaCharacter, bWantsToFaceLeft);
+	DOREPLIFETIME(AArenaCharacter, bWantsToVault);
+	DOREPLIFETIME(AArenaCharacter, bOnRightEdge);
+	DOREPLIFETIME(AArenaCharacter, bOnLeftEdge);
 	DOREPLIFETIME(AArenaCharacter, CurrentWeapon);
 	DOREPLIFETIME(AArenaCharacter, PrimaryWeapon);
 	DOREPLIFETIME(AArenaCharacter, SecondaryWeapon);

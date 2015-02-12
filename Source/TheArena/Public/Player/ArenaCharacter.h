@@ -215,7 +215,26 @@ class AArenaCharacter : public ACharacter
 	void SetRunning(bool bNewRunning, bool bToggle);
 
 	/** [server + local] change running state !currently only local! */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
 	void SetCrouched(bool bNewChrouched, bool bToggle);
+
+	/** [server + local] change running state !currently only local! */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	void SetHiCover(bool bNewCover);
+
+	/** [server + local] change running state !currently only local! */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	void SetCover(bool bNewCover);
+
+	/** [server + local] change running state !currently only local! */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	void SetLoCover(bool bNewCover);
+	
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	void SetRightEdge(bool bNewEdge);
+
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	void SetLeftEdge(bool bNewEdge);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Animations
@@ -232,6 +251,14 @@ class AArenaCharacter : public ACharacter
 	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* ThrowAnimation;
+
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* VaultAnimation;
+
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimHiLeftAnimation;
 
 	/** animation played on pawn (3rd person view) */
 	/*UPROPERTY(EditDefaultsOnly, Category = Animation) //tut1
@@ -281,10 +308,7 @@ class AArenaCharacter : public ACharacter
 	void OnStopTargeting();
 
 	/** player pressed cover action */
-	void OnEnterCover();
-
-	/** player released cover action */
-	void OnExitCover();
+	void ToggleCover();
 
 	/** player pressed prev weapon action */
 	void OnSwapWeapon();
@@ -308,6 +332,7 @@ class AArenaCharacter : public ACharacter
 	void OnStartCrouching();
 
 	/** player released crouch action */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
 	void OnStopCrouching();
 
 	/** player pressed run action */
@@ -315,6 +340,12 @@ class AArenaCharacter : public ACharacter
 
 	/** player released run action */
 	void OnStopRunning();
+
+	/** player press vault action */
+	void OnStartVault(bool bFromReplication = false);
+
+	/** player release vault action */
+	void OnStopVault();
 
 	//////////////////////////////////////////////////////////////////////////
 	// Reading data
@@ -354,6 +385,14 @@ class AArenaCharacter : public ACharacter
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	bool IsTargeting() const;
 
+	/** get targeting state */
+	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
+	bool IsCovering() const;
+
+	/** get crouching state */
+	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
+	bool IsCrouching() const;
+
 	/** get firing state */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	bool IsFiring() const;
@@ -369,6 +408,14 @@ class AArenaCharacter : public ACharacter
 	/** get running state */
 	UFUNCTION(BlueprintCallable, Category = Pawn)
 	bool IsRunning() const;
+
+	/** get cover state */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	bool IsHiCovering() const;
+
+	/** get cover state */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	bool IsLoCovering() const;
 
 	/** get running state */
 	UFUNCTION(BlueprintCallable, Category = Pawn)
@@ -423,6 +470,28 @@ class AArenaCharacter : public ACharacter
 	/** get current combat state  */
 	UFUNCTION(BlueprintCallable, Category = Pawn)
 	bool GetCombat() const;
+
+	/** get current direction state  */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	bool IsLeft() const;
+
+	/** get current direction state  */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	bool IsRight() const;
+
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	bool IsRightEdge() const;
+
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	bool IsLeftEdge() const;
+
+	/** set current direction state  */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	void SetLeft(bool left, bool right);
+
+	/** set current direction state  */
+	UFUNCTION(BlueprintCallable, Category = Pawn)
+	void SetRight(bool left, bool right);
 
 	/** [server + local] change targeting state !currently only local! */
 	UFUNCTION(BlueprintCallable, Category = Pawn)
@@ -506,9 +575,41 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	uint8 bWantsToRun : 1;
 
+	/** is weapon fire active? */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_Vault)
+	uint32 bWantsToVault : 1;
+
 	/** current crouch state */
 	UPROPERTY(Transient, Replicated)
 	uint8 bWantsToCrouch : 1;
+
+	/** current crouch state */
+	UPROPERTY(Transient, Replicated)
+	uint8 bWantsToCover : 1;
+
+	/** current crouch state */
+	UPROPERTY(Transient, Replicated)
+	uint8 bWantsToCoverHi : 1;
+
+	/** current crouch state */
+	UPROPERTY(Transient, Replicated)
+	uint8 bWantsToCoverLo : 1;
+
+	/** current crouch state */
+	UPROPERTY(Transient, Replicated)
+	uint8 bWantsToFaceLeft : 1;
+
+	/** current crouch state */
+	UPROPERTY(Transient, Replicated)
+	uint8 bWantsToFaceRight : 1;
+
+	/** current crouch state */
+	UPROPERTY(Transient, Replicated)
+	uint8 bOnLeftEdge : 1;
+
+	/** current crouch state */
+	UPROPERTY(Transient, Replicated)
+	uint8 bOnRightEdge : 1;
 
 	/** current firing state */
 	uint8 bWantsToFire : 1;
@@ -619,6 +720,10 @@ protected:
 
 	UFUNCTION()
 	void OnRep_Throw();
+
+
+	UFUNCTION()
+	void OnRep_Vault();
 
 	/*UFUNCTION()//tut1
 	void OnRep_Stagger();*/
@@ -758,6 +863,40 @@ protected:
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetCrouched(bool bNewCrouched, bool bToggle);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartVault();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopVault();
+
+	/** update targeting state */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetCover(bool bNewCover);
+
+	/** update targeting state */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetHiCover(bool bNewCover);
+
+	/** update targeting state */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetLoCover(bool bNewCover);
+
+	/** update targeting state */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetRight(bool left, bool right);
+
+	/** update targeting state */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetLeft(bool left, bool right);
+
+	/** update targeting state */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetRightEdge(bool bNewEdge);
+
+	/** update targeting state */
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetLeftEdge(bool bNewEdge);
 
 	/** reset idle timer on server */
 	UFUNCTION(reliable, server, WithValidation)
