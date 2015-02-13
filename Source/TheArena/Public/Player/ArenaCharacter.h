@@ -261,6 +261,18 @@ class AArenaCharacter : public ACharacter
 	UAnimMontage* AimHiLeftAnimation;
 
 	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimHiRightAnimation;
+
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimLoLeftAnimation;
+
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimLoRightAnimation;
+
+	/** animation played on pawn (3rd person view) */
 	/*UPROPERTY(EditDefaultsOnly, Category = Animation) //tut1
 	UAnimMontage* StaggerAnimation;*/
 
@@ -384,6 +396,10 @@ class AArenaCharacter : public ACharacter
 	/** get targeting state */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	bool IsTargeting() const;
+
+	/** get vaulting state */
+	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
+	bool IsVaulting() const;
 
 	/** get targeting state */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")

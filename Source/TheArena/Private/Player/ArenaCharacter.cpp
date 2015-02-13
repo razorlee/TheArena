@@ -659,7 +659,7 @@ void AArenaCharacter::MoveForward(float Value)
 		}
 		else
 		{
-			if (Value < 0)
+			if (Value < 0 || !bWantsToCover)
 			{
 				MovementForwardAxis = Value;
 				AddMovementInput(Direction, Value);
@@ -831,9 +831,31 @@ void AArenaCharacter::OnStartTargeting()
 		{
 			SetRunning(false, false);
 		}
-		GetCharacterMovement()->MaxWalkSpeed = TargetingMovementSpeed;
-		SetTargeting(true);
-		//PlayAnimMontage(AimHiLeftAnimation);
+		if (IsLeftEdge() && IsHiCovering())
+		{
+			PlayAnimMontage(AimHiLeftAnimation);
+			SetTargeting(true);
+		}
+		else if (IsRightEdge() && IsHiCovering())
+		{
+			PlayAnimMontage(AimHiRightAnimation);
+			SetTargeting(true);
+		}
+		else if (IsLeftEdge() && IsLoCovering())
+		{
+			PlayAnimMontage(AimLoLeftAnimation);
+			SetTargeting(true);
+		}
+		else if (IsRightEdge() && IsLoCovering())
+		{
+			PlayAnimMontage(AimLoRightAnimation);
+			SetTargeting(true);
+		}
+		else
+		{
+			GetCharacterMovement()->MaxWalkSpeed = TargetingMovementSpeed;
+			SetTargeting(true);
+		}
 	}
 }
 
@@ -844,6 +866,8 @@ void AArenaCharacter::OnStopTargeting()
 		GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 		SetTargeting(false);
 		//StopAnimMontage(AimHiLeftAnimation);
+
+		//FAnimMontageInstance MontageInstance = Cast<FAnimMontageInstance>(AimHiLeftAnimation);
 	}
 }
 
@@ -1158,6 +1182,11 @@ bool AArenaCharacter::IsTargeting() const
 bool AArenaCharacter::IsCovering() const
 {
 	return bWantsToCover;
+}
+
+bool AArenaCharacter::IsVaulting() const
+{
+	return bWantsToVault;
 }
 
 bool AArenaCharacter::IsCrouching() const
