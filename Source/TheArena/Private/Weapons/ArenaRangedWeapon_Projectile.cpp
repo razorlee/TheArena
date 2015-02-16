@@ -20,14 +20,10 @@ void AArenaRangedWeapon_Projectile::FireWeapon()
 		const float ConeHalfAngle = FMath::DegreesToRadians(CurrentSpread * 0.5f);
 
 		const FVector AimDir = GetAdjustedAim();
+		
 		const FVector StartTrace = GetCameraDamageStartLocation(AimDir);
 		ShootDir = WeaponRandomStream.VRandCone(AimDir, ConeHalfAngle, ConeHalfAngle);
 		const FVector EndTrace = StartTrace + ShootDir * ProjectileAdjustRange;
-
-		// trace from camera to check what's under crosshair
-		//const float ProjectileAdjustRange = 10000.0f;
-		//const FVector StartTrace = GetCameraDamageStartLocation(ShootDir);
-		//const FVector EndTrace = StartTrace + ShootDir * ProjectileAdjustRange;
 
 		FHitResult Impact = WeaponTrace(StartTrace, EndTrace);
 
@@ -66,7 +62,7 @@ void AArenaRangedWeapon_Projectile::FireWeapon()
 			else
 			{
 				// adjust direction to hit
-				ShootDir = AdjustedDir;
+				//ShootDir = AdjustedDir;
 			}
 		}
 

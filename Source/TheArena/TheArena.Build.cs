@@ -9,6 +9,7 @@ public class TheArena : ModuleRules
         PrivateIncludePaths.AddRange(
             new string[] { 
 				"TheArena/Private/Player",
+                "TheArena/Private/Online",
 				"TheArena/Private",
             }
         );
@@ -23,6 +24,7 @@ public class TheArena : ModuleRules
                 "Sockets",
                 "Networking",
 				"AssetRegistry",
+                "MoviePlayer",
                 "AIModule",
                 "UMG", 
                 "Slate", 

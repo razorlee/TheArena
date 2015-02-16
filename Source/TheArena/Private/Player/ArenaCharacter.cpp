@@ -608,8 +608,7 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 	InputComponent->BindAxis("MoveForward", this, &AArenaCharacter::MoveForward);
 	InputComponent->BindAxis("MoveRight", this, &AArenaCharacter::MoveRight);
 	InputComponent->BindAxis("Turn", this, &AArenaCharacter::TurnAtRate);
-	InputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	InputComponent->BindAxis("LookUpRate", this, &AArenaCharacter::LookUpAtRate);
+	InputComponent->BindAxis("LookUp", this, &AArenaCharacter::LookUpAtRate);
 
 	//InputComponent->BindAction("HeadUtility", IE_)
 

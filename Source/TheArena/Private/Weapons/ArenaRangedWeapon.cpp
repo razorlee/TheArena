@@ -874,10 +874,33 @@ FVector AArenaRangedWeapon::GetCameraAim() const
 
 FVector AArenaRangedWeapon::GetAdjustedAim() const
 {
+	AArenaPlayerController* const PlayerController = Instigator ? Cast<AArenaPlayerController>(Instigator->Controller) : NULL;
 	FVector FinalAim = FVector::ZeroVector;
-	
-	FinalAim = Instigator->GetBaseAimRotation().Vector();
+	// If we have a player controller use it for the aim
+	if (PlayerController)
+	{
+		FVector CamLoc;
+		FRotator CamRot;
+		PlayerController->GetPlayerViewPoint(CamLoc, CamRot);
+		//FinalAim = PlayerController->Camera.GetActorForwardVector();
+		FinalAim = CamRot.Vector();
+	}
+	else if (Instigator)
+	{
+		// Now see if we have an AI controller - we will want to get the aim from there if we do
+		AArenaAIController* AIController = MyPawn ? Cast<AArenaAIController>(MyPawn->Controller) : NULL;
+		if (AIController != NULL)
+		{
+			FinalAim = AIController->GetControlRotation().Vector();
+		}
+		else
+		{
+			FinalAim = Instigator->GetBaseAimRotation().Vector();
+		}
+	}
+
 	return FinalAim;
+
 }
 
 FVector AArenaRangedWeapon::GetCameraDamageStartLocation(const FVector& AimDir) const
