@@ -73,6 +73,8 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
+
+	LoadGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 }
 
 void AArenaCharacter::PostInitializeComponents()
@@ -1068,6 +1070,7 @@ void AArenaCharacter::OnStartRunning()
 		if (IsTargeting())
 		{
 			SetTargeting(false);
+			SetCrouched(false, false);
 		}
 
 		GetCharacterMovement()->MaxWalkSpeed = RunningMovementSpeed;
@@ -1156,6 +1159,11 @@ FName AArenaCharacter::GetOffWeaponAttachPoint() const
 FName AArenaCharacter::GetMainWeaponAttachPoint() const
 {
 	return MainWeaponAttachPoint;
+}
+
+FName AArenaCharacter::GetWristOneAttachPoint() const
+{
+	return WristOneAttachPoint;
 }
 
 int32 AArenaCharacter::GetInventoryCount() const
@@ -1859,14 +1867,28 @@ void AArenaCharacter::SpawnDefaultInventory()
 		}
 	}
 
-	// equip first weapon in inventory
-	if (Inventory.Num() > 0)
+	LoadGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->SaveSlotName, LoadGameInstance->UserIndex));
+
+	if (LoadGameInstance == NULL)
 	{
-		PrimaryWeapon = Inventory[0];
+		// equip first weapon in inventory
+		if (Inventory.Num() > 0)
+		{
+			PrimaryWeapon = Inventory[0];
+			PrimaryWeapon->SetIsPrimaryWeapon(true);
+			SecondaryWeapon = Inventory[1];
+
+			InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
+		}
+	}
+	else
+	{
+		PrimaryWeapon = LoadGameInstance->PrimaryWeapon;
 		PrimaryWeapon->SetIsPrimaryWeapon(true);
-		SecondaryWeapon = Inventory[1];
+		SecondaryWeapon = LoadGameInstance->SecondaryWeapon;
 		InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
 	}
+	
 }
 
 void AArenaCharacter::DestroyInventory()

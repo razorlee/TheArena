@@ -113,6 +113,8 @@ class AArenaCharacter : public ACharacter
 	UPROPERTY()
 	class UCameraComponent* FollowCamera;
 
+	class UArenaSaveGame* LoadGameInstance;
+
 	virtual void Tick(float DeltaSeconds) override;
 
 	/** cleanup inventory */
@@ -384,6 +386,9 @@ class AArenaCharacter : public ACharacter
 	/** get weapon attach point */
 	FName GetMainWeaponAttachPoint() const;
 
+	/** get weapon attach point */
+	FName GetWristOneAttachPoint() const;
+
 	/** get total number of inventory items */
 	int32 GetInventoryCount() const;
 
@@ -538,6 +543,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	FName MainWeaponAttachPoint;
 
+	/** socket or bone name for attaching Utility mesh */
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	FName WristOneAttachPoint;
+
 	/** default inventory list */
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 	TArray<TSubclassOf<class AArenaRangedWeapon>> DefaultInventoryClasses;
@@ -557,11 +566,11 @@ protected:
 
 	class AArenaRangedWeapon* NewWeapon;
 
-	/** currently equipped weapon */
+	/** main weapon */
 	UPROPERTY(ReplicatedUsing = OnRep_PrimaryWeapon)
 	class AArenaRangedWeapon* PrimaryWeapon;
 
-	/** currently equipped weapon */
+	/** secondary weapon */
 	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeapon)
 	class AArenaRangedWeapon* SecondaryWeapon;
 

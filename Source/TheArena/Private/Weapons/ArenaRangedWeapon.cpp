@@ -709,6 +709,7 @@ void AArenaRangedWeapon::Melee()
 
 	//Create the box and get the overlapping actors
 	CollisionHitShape = FCollisionShape::MakeBox(FVector(60.0f, 60.0f, 0.5f));
+	//CollisionHitShape = FCollisionShape::Cone
 	GetWorld()->OverlapMulti(OutOverlaps, Start, Rotation, CollisionHitShape, CollisionParams, CollisionObjectTypes);
 
 	//Process all hit actors

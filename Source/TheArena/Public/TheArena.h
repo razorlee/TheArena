@@ -13,6 +13,7 @@
 #include "Runtime/UMG/Public/Slate/SObjectWidget.h"
 #include "Runtime/UMG/Public/IUMGModule.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // The Arena Classes
@@ -33,6 +34,7 @@
 #include "Public/Player/ArenaPlayerController.h"
 #include "Public/Player/ArenaPlayerController_Menu.h"
 #include "Public/Player/ArenaLocalPlayer.h"
+#include "Public/Player/ArenaSaveGame.h"
 #include "Public/Online/ArenaGameSession.h"
 #include "Public/Online/ArenaGameState.h"
 #include "Public/Online/ArenaOnlineGameSettings.h"
