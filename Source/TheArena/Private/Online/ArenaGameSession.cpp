@@ -16,10 +16,8 @@ AArenaGameSession::AArenaGameSession(const FObjectInitializer& ObjectInitializer
 	{
 		OnCreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnCreateSessionComplete);
 		OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnDestroySessionComplete);
-
 		OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnFindSessionsComplete);
 		OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnJoinSessionComplete);
-
 		OnStartSessionCompleteDelegate = FOnStartSessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnStartOnlineGameComplete);
 	}
 }
@@ -41,7 +39,6 @@ void AArenaGameSession::OnStartOnlineGameComplete(FName SessionName, bool bWasSu
 			Sessions->ClearOnStartSessionCompleteDelegate(OnStartSessionCompleteDelegate);
 		}
 	}
-
 	if (bWasSuccessful)
 	{
 		// tell non-local players to start online game

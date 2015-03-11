@@ -115,7 +115,7 @@ void AArenaPlayerController::GameHasEnded(class AActor* EndGameFocus, bool bIsWi
 				IOnlineIdentityPtr Identity = OnlineSub->GetIdentityInterface();
 				if (Identity.IsValid())
 				{
-					TSharedPtr<FUniqueNetId> UserId = Identity->GetUniquePlayerId(LocalPlayer->ControllerId);
+					TSharedPtr<FUniqueNetId> UserId = Identity->GetUniquePlayerId(LocalPlayer->GetControllerId());
 					if (UserId.IsValid())
 					{
 						IOnlineLeaderboardsPtr Leaderboards = OnlineSub->GetLeaderboardsInterface();
@@ -168,7 +168,7 @@ void AArenaPlayerController::OnKill()
 		ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
 		if (LocalPlayer)
 		{
-			int32 UserIndex = LocalPlayer->ControllerId;
+			int32 UserIndex = LocalPlayer->GetControllerId();
 			TSharedPtr<FUniqueNetId> UniqueID = Identity->GetUniquePlayerId(UserIndex);
 			if (UniqueID.IsValid())
 			{

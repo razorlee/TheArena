@@ -51,5 +51,8 @@ protected:
 
 	/** lan game? */
 	bool bIsLanMatch;
+
+	/** Common cleanup code for any Privilege task delegate */
+	void CleanupOnlinePrivilegeTask();
 	
 };

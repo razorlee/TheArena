@@ -74,7 +74,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
 
-	LoadGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+	//LoadGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 }
 
 void AArenaCharacter::PostInitializeComponents()
@@ -90,6 +90,8 @@ void AArenaCharacter::PostInitializeComponents()
 		PlayerConfig.Energy = GetMaxEnergy();
 		SpawnDefaultInventory();
 	}
+
+	
 
 	// set initial mesh visibility (3rd person view)
 	UpdatePawnMeshes();
@@ -1867,7 +1869,7 @@ void AArenaCharacter::SpawnDefaultInventory()
 		}
 	}
 
-	LoadGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->SaveSlotName, LoadGameInstance->UserIndex));
+	//LoadGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->SaveSlotName, LoadGameInstance->UserIndex));
 
 	if (LoadGameInstance == NULL)
 	{
@@ -1883,10 +1885,19 @@ void AArenaCharacter::SpawnDefaultInventory()
 	}
 	else
 	{
-		PrimaryWeapon = LoadGameInstance->PrimaryWeapon;
-		PrimaryWeapon->SetIsPrimaryWeapon(true);
-		SecondaryWeapon = LoadGameInstance->SecondaryWeapon;
-		InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
+		if (Inventory.Num() > 0)
+		{
+			PrimaryWeapon = Inventory[0];
+			PrimaryWeapon->SetIsPrimaryWeapon(true);
+			SecondaryWeapon = Inventory[1];
+
+			InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
+		}
+
+		//PrimaryWeapon = LoadGameInstance->PrimaryWeapon;
+		//PrimaryWeapon->SetIsPrimaryWeapon(true);
+		//SecondaryWeapon = LoadGameInstance->SecondaryWeapon;
+		//InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
 	}
 	
 }

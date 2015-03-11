@@ -39,7 +39,3 @@ FArenaOnlineSearchSettings(bSearchingLAN, bSearchingPresence)
 	QuerySettings.Set(SEARCH_DEDICATED_ONLY, true, EOnlineComparisonOp::Equals);
 	QuerySettings.Set(SEARCH_EMPTY_SERVERS_ONLY, true, EOnlineComparisonOp::Equals);
 }
-
-
-
-

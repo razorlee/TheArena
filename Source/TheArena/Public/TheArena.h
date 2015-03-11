@@ -41,6 +41,8 @@
 #include "Public/Online/ArenaPlayerState.h"
 #include "Public/Online/Arena_TeamDeathMatch.h"
 #include "Public/Online/ArenaTeamStart.h"
+#include "Public/UI/ArenaFriendsList.h"
+#include "Public/UI/ArenaStartMenu.h"
 #include "Public/Weapons/ArenaRangedWeapon.h"
 #include "Public/Weapons/ArenaRangedWeapon_Projectile.h"
 #include "Public/Weapons/ArenaShotgun.h"

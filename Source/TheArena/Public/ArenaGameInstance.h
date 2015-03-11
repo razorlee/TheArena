@@ -30,8 +30,16 @@ public:
 
 	class AArenaGameSession* GetGameSession() const;
 
-	virtual void JoinSession();
+	/** Sets the online mode of the game */
+	void SetIsOnline(bool bInIsOnline);
+
 	bool HostGame(ULocalPlayer* LocalPlayer, const FString& GameType, const FString& InTravelURL);
+
+	bool JoinSession(ULocalPlayer* LocalPlayer, int32 SessionIndexInSearchResults);
+	bool JoinSession(ULocalPlayer* LocalPlayer, const FOnlineSessionSearchResult& SearchResult);
+
+	/** Initiates the session searching */
+	bool FindSessions(ULocalPlayer* PlayerOwner, bool bLANMatch);
 
 	/** Returns true if the game is in online mode */
 	bool GetIsOnline() const { return bIsOnline; }
@@ -39,6 +47,12 @@ public:
 
 	/** Sends the game to the specified state. */
 	void GotoState(FName NewState);
+
+	/** Start task to get user privileges. */
+	void StartOnlinePrivilegeTask(const IOnlineIdentity::FOnGetUserPrivilegeCompleteDelegate& Delegate, EUserPrivileges::Type Privilege, TSharedPtr< FUniqueNetId > UserId);
+
+	/** Common cleanup code for any Privilege task delegate */
+	void CleanupOnlinePrivilegeTask();
 
 private:
 	FName CurrentState;
@@ -57,13 +71,19 @@ private:
 	void FinishSessionCreation(EOnJoinSessionCompleteResult::Type Result);
 
 	/** Callback which is intended to be called upon joining session */
-	void OnJoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	void OnJoinSessionComplete(EOnJoinSessionCompleteResult::Type Result);
 
 	/** Callback which is intended to be called upon session creation */
 	void OnCreatePresenceSessionComplete(FName SessionName, bool bWasSuccessful);
 
+	/** Callback which is called after adding local users to a session we're joining */
+	void OnRegisterJoiningLocalPlayerComplete(const FUniqueNetId& PlayerId, EOnJoinSessionCompleteResult::Type Result);
+
 	/** Called after all the local players are registered in a session we're joining */
 	void FinishJoinSession(EOnJoinSessionCompleteResult::Type Result);
+
+	/** Callback which is intended to be called upon finding sessions */
+	void OnSearchSessionsComplete(bool bWasSuccessful);
 
 	/** URL to travel to after pending network operations */
 	FString TravelURL;

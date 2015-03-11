@@ -22,7 +22,7 @@ void AArenaAIController::Possess(APawn* InPawn)
 	// start behavior
 	if (Bot && Bot->BotBehavior)
 	{
-		BlackboardComp->InitializeBlackboard(Bot->BotBehavior->BlackboardAsset);
+		//BlackboardComp->InitializeBlackboard(Bot->BotBehavior->BlackboardAsset);
 
 		EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
 		NeedAmmoKeyID = BlackboardComp->GetKeyID("NeedAmmo");

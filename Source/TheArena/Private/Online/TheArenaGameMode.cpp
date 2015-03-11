@@ -160,7 +160,7 @@ void ATheArenaGameMode::TriggerRoundStartForLocalPlayers()
 			ULocalPlayer* LocalPlayer = PC ? Cast<ULocalPlayer>(PC->Player) : nullptr;
 			if (LocalPlayer)
 			{
-				int32 UserIndex = LocalPlayer->ControllerId;
+				int32 UserIndex = LocalPlayer->GetControllerId();
 				if (UserIndex != -1)
 				{
 					FOnlineEventParms Params;
@@ -195,7 +195,7 @@ void ATheArenaGameMode::TriggerRoundEndForLocalPlayers()
 			ULocalPlayer* LocalPlayer = PC ? Cast<ULocalPlayer>(PC->Player) : nullptr;
 			if (LocalPlayer)
 			{
-				int32 UserIndex = LocalPlayer->ControllerId;
+				int32 UserIndex = LocalPlayer->GetControllerId();
 				if (UserIndex != -1)
 				{
 					// round end

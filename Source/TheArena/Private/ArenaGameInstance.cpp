@@ -28,6 +28,7 @@ bool UArenaGameInstance::HostGame(ULocalPlayer* LocalPlayer, const FString& Game
 	if (GameSession)
 	{
 		// add callback delegate for completion
+		//IOnlineSession::CreateSession(LocalPlayer->GetUniqueID, "test", )
 		GameSession->OnCreatePresenceSessionComplete().AddUObject(this, &UArenaGameInstance::OnCreatePresenceSessionComplete);
 
 		TravelURL = InTravelURL;
@@ -55,22 +56,57 @@ bool UArenaGameInstance::HostGame(ULocalPlayer* LocalPlayer, const FString& Game
 	return false;
 }
 
-void UArenaGameInstance::JoinSession()
+bool UArenaGameInstance::JoinSession(ULocalPlayer* LocalPlayer, int32 SessionIndexInSearchResults)
 {
-	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
-	if (OnlineSub)
+	// needs to tear anything down based on current state?
+
+	AArenaGameSession* const GameSession = GetGameSession();
+	if (GameSession)
 	{
-		IOnlineSessionPtr SessionInt = OnlineSub->GetSessionInterface();
-		if (SessionInt.IsValid())
+		AddNetworkFailureHandlers();
+
+		GameSession->OnJoinSessionComplete().AddUObject(this, &UArenaGameInstance::OnJoinSessionComplete);
+		if (GameSession->JoinSession(LocalPlayer->GetPreferredUniqueNetId(), GameSessionName, SessionIndexInSearchResults))
 		{
-			int32 ControllerId = 0;
-			if (ControllerId != 255)
+			// If any error occured in the above, pending state would be set
+			if ((PendingState == CurrentState) || (PendingState == ArenaGameInstanceState::None))
 			{
-				FOnJoinSessionCompleteDelegate joinDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UArenaGameInstance::OnJoinSessionCompleted);
-				SessionInt->AddOnJoinSessionCompleteDelegate(joinDelegate);
+				// Go ahead and go into loading state now
+				// If we fail, the delegate will handle showing the proper messaging and move to the correct state
+				//ShowLoadingScreen();
+				GotoState(ArenaGameInstanceState::Playing);
+				return true;
 			}
 		}
 	}
+
+	return false;
+}
+
+bool UArenaGameInstance::JoinSession(ULocalPlayer* LocalPlayer, const FOnlineSessionSearchResult& SearchResult)
+{
+	// needs to tear anything down based on current state?
+	AArenaGameSession* const GameSession = GetGameSession();
+	if (GameSession)
+	{
+		AddNetworkFailureHandlers();
+
+		GameSession->OnJoinSessionComplete().AddUObject(this, &UArenaGameInstance::OnJoinSessionComplete);
+		if (GameSession->JoinSession(LocalPlayer->GetPreferredUniqueNetId(), GameSessionName, SearchResult))
+		{
+			// If any error occured in the above, pending state would be set
+			if ((PendingState == CurrentState) || (PendingState == ArenaGameInstanceState::None))
+			{
+				// Go ahead and go into loading state now
+				// If we fail, the delegate will handle showing the proper messaging and move to the correct state
+				//ShowLoadingScreen();
+				GotoState(ArenaGameInstanceState::Playing);
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 void UArenaGameInstance::TravelLocalSessionFailure(UWorld *World, ETravelFailure::Type FailureType, const FString& ReasonString)
@@ -90,23 +126,30 @@ void UArenaGameInstance::TravelLocalSessionFailure(UWorld *World, ETravelFailure
 	}
 }
 
-void UArenaGameInstance::OnJoinSessionCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+
+void UArenaGameInstance::OnJoinSessionComplete(EOnJoinSessionCompleteResult::Type Result)
 {
-	UE_LOG(LogOnline, Verbose, TEXT("JoinSessionCompleted"));
-	IOnlineSessionPtr Sessions = IOnlineSubsystem::Get()->GetSessionInterface();
-	if (Sessions.IsValid())
+	// unhook the delegate
+	AArenaGameSession* const GameSession = GetGameSession();
+	if (GameSession)
 	{
-		UE_LOG(LogOnline, Verbose, TEXT("Sessions Valid"));
-		if (Result == EOnJoinSessionCompleteResult::Success)
+		GameSession->OnJoinSessionComplete().RemoveUObject(this, &UArenaGameInstance::OnJoinSessionComplete);
+	}
+
+	// Add the splitscreen player if one exists
+	if (Result == EOnJoinSessionCompleteResult::Success && LocalPlayers.Num() > 1)
+	{
+		auto Sessions = Online::GetSessionInterface();
+		if (Sessions.IsValid() && LocalPlayers[1]->GetPreferredUniqueNetId().IsValid())
 		{
-			// Client travel to the server
-			FString ConnectString;
-			if (Sessions->GetResolvedConnectString(GameSessionName, ConnectString))
-			{
-				UE_LOG(LogOnline, Log, TEXT("Join session: traveling to %s"), *ConnectString);
-				GetFirstLocalPlayerController()->ClientTravel(ConnectString, TRAVEL_Absolute);
-			}
+			Sessions->RegisterLocalPlayer(*LocalPlayers[1]->GetPreferredUniqueNetId(), GameSessionName,
+				FOnRegisterLocalPlayerCompleteDelegate::CreateUObject(this, &UArenaGameInstance::OnRegisterJoiningLocalPlayerComplete));
 		}
+	}
+	else
+	{
+		// We either failed or there is only a single local user
+		FinishJoinSession(Result);
 	}
 }
 
@@ -117,10 +160,10 @@ void UArenaGameInstance::FinishJoinSession(EOnJoinSessionCompleteResult::Type Re
 		FString ReturnReason;
 		switch (Result)
 		{
-		case EOnJoinSessionCompleteResult::RoomIsFull:
+		case EOnJoinSessionCompleteResult::SessionIsFull:
 			ReturnReason = NSLOCTEXT("NetworkErrors", "JoinSessionFailed", "Game is full.").ToString();
 			break;
-		case EOnJoinSessionCompleteResult::RoomDoesNotExist:
+		case EOnJoinSessionCompleteResult::SessionDoesNotExist:
 			ReturnReason = NSLOCTEXT("NetworkErrors", "JoinSessionFailed", "Game no longer exists.").ToString();
 			break;
 		default:
@@ -135,6 +178,11 @@ void UArenaGameInstance::FinishJoinSession(EOnJoinSessionCompleteResult::Type Re
 	}
 
 	//InternalTravelToSession(GameSessionName);
+}
+
+void UArenaGameInstance::OnRegisterJoiningLocalPlayerComplete(const FUniqueNetId& PlayerId, EOnJoinSessionCompleteResult::Type Result)
+{
+	FinishJoinSession(Result);
 }
 
 void UArenaGameInstance::OnCreatePresenceSessionComplete(FName SessionName, bool bWasSuccessful)
@@ -179,6 +227,37 @@ AArenaGameSession* UArenaGameInstance::GetGameSession() const
 	return nullptr;
 }
 
+bool UArenaGameInstance::FindSessions(ULocalPlayer* PlayerOwner, bool bFindLAN)
+{
+	bool bResult = false;
+
+	check(PlayerOwner != nullptr);
+	if (PlayerOwner)
+	{
+		AArenaGameSession* const GameSession = GetGameSession();
+		if (GameSession)
+		{
+			GameSession->OnFindSessionsComplete().RemoveAll(this);
+			GameSession->OnFindSessionsComplete().AddUObject(this, &UArenaGameInstance::OnSearchSessionsComplete);
+
+			GameSession->FindSessions(PlayerOwner->GetPreferredUniqueNetId(), GameSessionName, bFindLAN, true);
+
+			bResult = true;
+		}
+	}
+
+	return bResult;
+}
+
+void UArenaGameInstance::OnSearchSessionsComplete(bool bWasSuccessful)
+{
+	AArenaGameSession* const Session = GetGameSession();
+	if (Session)
+	{
+		Session->OnFindSessionsComplete().RemoveUObject(this, &UArenaGameInstance::OnSearchSessionsComplete);
+	}
+}
+
 void UArenaGameInstance::GotoState(FName NewState)
 {
 	UE_LOG(LogOnline, Log, TEXT("GotoState: NewState: %s"), *NewState.ToString());
@@ -204,7 +283,53 @@ void UArenaGameInstance::AddNetworkFailureHandlers()
 	}
 }
 
+void UArenaGameInstance::SetIsOnline(bool bInIsOnline)
+{
+	bIsOnline = bInIsOnline;
+	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 
+	if (OnlineSub)
+	{
+		for (int32 i = 0; i < LocalPlayers.Num(); ++i)
+		{
+			ULocalPlayer* LocalPlayer = LocalPlayers[i];
 
+			TSharedPtr<FUniqueNetId> PlayerId = LocalPlayer->GetPreferredUniqueNetId();
+			if (PlayerId.IsValid())
+			{
+				OnlineSub->SetUsingMultiplayerFeatures(*PlayerId, bIsOnline);
+			}
+		}
+	}
+}
+
+void UArenaGameInstance::StartOnlinePrivilegeTask(const IOnlineIdentity::FOnGetUserPrivilegeCompleteDelegate& Delegate, EUserPrivileges::Type Privilege, TSharedPtr< FUniqueNetId > UserId)
+{
+	if (GEngine && GEngine->GameViewport)
+	{
+		UGameViewportClient* const GVC = GEngine->GameViewport;
+		//GVC->AddViewportWidgetContent(WaitMessageWidget.ToSharedRef());
+	}
+
+	auto Identity = Online::GetIdentityInterface();
+	if (Identity.IsValid() && UserId.IsValid())
+	{
+		Identity->GetUserPrivilege(*UserId, Privilege, Delegate);
+	}
+	else
+	{
+		// Can only get away with faking the UniqueNetId here because the delegates don't use it
+		Delegate.ExecuteIfBound(FUniqueNetIdString(), Privilege, (uint32)IOnlineIdentity::EPrivilegeResults::NoFailures);
+	}
+}
+
+void UArenaGameInstance::CleanupOnlinePrivilegeTask()
+{
+	if (GEngine && GEngine->GameViewport)
+	{
+		UGameViewportClient* const GVC = GEngine->GameViewport;
+		//GVC->RemoveViewportWidgetContent(WaitMessageWidget.ToSharedRef());
+	}
+}
 
 

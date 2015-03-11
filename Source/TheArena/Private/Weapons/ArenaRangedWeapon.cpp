@@ -34,7 +34,7 @@ AArenaRangedWeapon::AArenaRangedWeapon(const class FObjectInitializer& PCIP)
 	PrimaryActorTick.TickGroup = TG_PrePhysics;
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
-	bReplicateInstigator = true;
+	//bReplicateInstigator = true;
 	bNetUseOwnerRelevancy = true;
 }
 

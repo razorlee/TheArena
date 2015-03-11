@@ -49,7 +49,6 @@ protected:
 	FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
 	/** Delegate after joining a session */
 	FOnJoinSessionCompleteDelegate OnJoinSessionCompleteDelegate;
-
 	/** Transient properties of a session during game creation/matchmaking */
 	FArenaGameSessionParams CurrentSessionParams;
 	/** Current host settings */
