@@ -16,7 +16,6 @@ void UArenaFriendsList::SetUp(UArenaGameInstance* _GameInstance, ULocalPlayer* _
 	bSearchingForServers = true;
 	bLANMatchSearch = false;
 	StatusText = FString();
-	//BoxWidth = 125;
 }
 
 /** Updates current search status */
@@ -118,7 +117,7 @@ void UArenaFriendsList::OnServerSearchFinished()
 }
 
 
-void UArenaFriendsList::ConnectToServer()
+void UArenaFriendsList::ConnectToServer()	
 {
 	if (bSearchingForServers)
 	{
@@ -255,6 +254,11 @@ void UArenaFriendsList::Search()
 	{
 		UpdateSearchStatus();
 	}
+}
+
+void UArenaFriendsList::EntrySelectionChanged(int32 index)
+{
+	SelectedItem = ServerList[index];
 }
 
 #undef LOCTEXT_NAMESPACE

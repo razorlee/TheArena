@@ -66,14 +66,18 @@ public:
 	void BeginServerSearch(bool bLANMatch, const FString& InMapFilterName); //
 
 	/** Called when server search is finished */
-	void OnServerSearchFinished(); //
+	void OnServerSearchFinished();
 
 	/** fill/update server list, should be called before showing this control */
 	void UpdateServerList();
 
+	/** selection changed handler */
+	UFUNCTION(BlueprintCallable, Category = Online)
+	void EntrySelectionChanged(int32 index);
+
 	/** connect to chosen server */
 	UFUNCTION(BlueprintCallable, Category = Online)
-	void ConnectToServer(); //
+	void ConnectToServer(); 
 
 	UFUNCTION(BlueprintCallable, Category = Online)
 	TArray<FServerEntry> GetServerList();

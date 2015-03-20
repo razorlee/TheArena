@@ -20,6 +20,7 @@ UArenaStartMenu::~UArenaStartMenu()
 
 void UArenaStartMenu::SetUp(UArenaGameInstance* _GameInstance, ULocalPlayer* _PlayerOwner)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Initiate Set Up");
 	bIsLanMatch = false;
 	GameInstance = _GameInstance;
 	PlayerOwner = _PlayerOwner;
@@ -29,7 +30,8 @@ void UArenaStartMenu::HostGame(const FString& GameType)
 {
 	if (ensure(GameInstance.IsValid()) && GetPlayerOwner() != NULL)
 	{
-		FString const StartURL = FString::Printf(TEXT("/Game/Levels/%s?game=%s%s%s?%s=%d"), TEXT("StagingArea"), *GameType, GameInstance->GetIsOnline() ? TEXT("?listen") : TEXT(""), bIsLanMatch ? TEXT("?bIsLanMatch") : TEXT(""), TEXT("Bots"), 0);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Instance and Owner Valid");
+		FString const StartURL = FString::Printf(TEXT("/Game/Maps/%s?game=%s%s%s?%s=%d"), TEXT("StagingArea"), *GameType, GameInstance->GetIsOnline() ? TEXT("?listen") : TEXT(""), bIsLanMatch ? TEXT("?bIsLanMatch") : TEXT(""), TEXT("Bots"), 0);
 
 		GameInstance->HostGame(GetPlayerOwner(), GameType, StartURL);
 	}

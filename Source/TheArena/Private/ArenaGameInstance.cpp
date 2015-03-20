@@ -27,6 +27,7 @@ bool UArenaGameInstance::HostGame(ULocalPlayer* LocalPlayer, const FString& Game
 	AArenaGameSession* const GameSession = GetGameSession();
 	if (GameSession)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Session Valid");
 		// add callback delegate for completion
 		//IOnlineSession::CreateSession(LocalPlayer->GetUniqueID, "test", )
 		GameSession->OnCreatePresenceSessionComplete().AddUObject(this, &UArenaGameInstance::OnCreatePresenceSessionComplete);
@@ -35,12 +36,13 @@ bool UArenaGameInstance::HostGame(ULocalPlayer* LocalPlayer, const FString& Game
 		bool const bIsLanMatch = InTravelURL.Contains(TEXT("?bIsLanMatch"));
 
 		//determine the map name from the travelURL
-		const FString& MapNameSubStr = "/Game/Levels/";
+		const FString& MapNameSubStr = "/Game/Mapss/";
 		const FString& ChoppedMapName = TravelURL.RightChop(MapNameSubStr.Len());
 		const FString& MapName = ChoppedMapName.LeftChop(ChoppedMapName.Len() - ChoppedMapName.Find("?game"));
 
 		if (GameSession->HostSession(LocalPlayer->GetPreferredUniqueNetId(), GameSessionName, GameType, MapName, bIsLanMatch, true, AArenaGameSession::DEFAULT_NUM_PLAYERS))
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Host Session Successful!");
 			// If any error occured in the above, pending state would be set
 			if ((PendingState == CurrentState) || (PendingState == ArenaGameInstanceState::None))
 			{
