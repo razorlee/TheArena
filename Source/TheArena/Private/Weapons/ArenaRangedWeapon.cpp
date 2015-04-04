@@ -873,19 +873,32 @@ FVector AArenaRangedWeapon::GetCameraAim() const
 	return FinalAim;
 }
 
-FVector AArenaRangedWeapon::GetAdjustedAim() const
+FHitResult AArenaRangedWeapon::GetAdjustedAim() const
 {
 	AArenaPlayerController* const PlayerController = Instigator ? Cast<AArenaPlayerController>(Instigator->Controller) : NULL;
-	FVector FinalAim = FVector::ZeroVector;
+	FHitResult Hit(ForceInit);
 	// If we have a player controller use it for the aim
 	if (PlayerController)
 	{
-		FVector CamLoc;
-		FRotator CamRot;
-		PlayerController->GetPlayerViewPoint(CamLoc, CamRot);
-		//FinalAim = PlayerController->Camera.GetActorForwardVector();
-		FinalAim = CamRot.Vector();
+		UCameraComponent* Camera = GetPawnOwner()->FollowCamera;
+		FVector StartTrace = Camera->GetComponentLocation();
+		FVector EndTrace = StartTrace + (Camera->GetForwardVector() * 10000.0f);
+
+		static FName CameraFireTag = FName(TEXT("CameraTrace"));
+
+		//GetWorld()->DebugDrawTraceTag = CameraFireTag;
+
+		FCollisionQueryParams TraceParams(CameraFireTag, true, PlayerController);
+		TraceParams.bTraceAsyncScene = true;
+		TraceParams.bReturnPhysicalMaterial = true;
+
+		
+		GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, COLLISION_WEAPON, TraceParams);
+
+		return Hit;// .ImpactPoint;//Camera->GetForwardVector();
 	}
+	return Hit;
+	/*
 	else if (Instigator)
 	{
 		// Now see if we have an AI controller - we will want to get the aim from there if we do
@@ -901,7 +914,7 @@ FVector AArenaRangedWeapon::GetAdjustedAim() const
 	}
 
 	return FinalAim;
-
+	*/
 }
 
 FVector AArenaRangedWeapon::GetCameraDamageStartLocation(const FVector& AimDir) const
@@ -929,6 +942,8 @@ FHitResult AArenaRangedWeapon::WeaponTrace(const FVector& StartTrace, const FVec
 	static FName WeaponFireTag = FName(TEXT("WeaponTrace"));
 
 	// Perform trace to retrieve hit info
+
+	//GetWorld()->DebugDrawTraceTag = WeaponFireTag;
 	FCollisionQueryParams TraceParams(WeaponFireTag, true, Instigator);
 	TraceParams.bTraceAsyncScene = true;
 	TraceParams.bReturnPhysicalMaterial = true;

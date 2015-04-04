@@ -68,7 +68,7 @@ void ATheArenaGameMode::DefaultTimer()
 	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
 	if (MyGameState && MyGameState->RemainingTime > 0 && !MyGameState->bTimerPaused)
 	{
-		MyGameState->RemainingTime--;
+		MyGameState->RemainingTime;//--;
 
 		if (MyGameState->RemainingTime <= 0)
 		{

@@ -101,19 +101,59 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 			}
 		}
 	}
-	if (ImpactTemplate)
+	/*if (ImpactTemplate)
 	{
-		const FRotator SpawnRotation = Impact.ImpactNormal.Rotation();
+	const FRotator SpawnRotation = Impact.ImpactNormal.Rotation();
 
-		AArenaImpactEffect* EffectActor = GetWorld()->SpawnActorDeferred<AArenaImpactEffect>(ImpactTemplate, NudgedImpactLocation, SpawnRotation);
-		if (EffectActor)
-		{
-			EffectActor->SurfaceHit = Impact;
-			UGameplayStatics::FinishSpawningActor(EffectActor, FTransform(SpawnRotation, NudgedImpactLocation));
-		}
+	AArenaImpactEffect* EffectActor = GetWorld()->SpawnActorDeferred<AArenaImpactEffect>(ImpactTemplate, NudgedImpactLocation, SpawnRotation);
+	if (EffectActor)
+	{
+	EffectActor->SurfaceHit = Impact;
+	UGameplayStatics::FinishSpawningActor(EffectActor, FTransform(SpawnRotation, NudgedImpactLocation));
 	}
+	}*/
+	SpawnImpactEffects(Impact);
 	bExploded = true;
 }
+
+void AArenaProjectile::SpawnImpactEffects(const FHitResult& Impact)
+{
+	if (ImpactTemplate && Impact.bBlockingHit)
+	{
+		FHitResult UseImpact = Impact;
+		// trace again to find component lost during replication
+
+		const FVector StartTrace = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
+		const FVector EndTrace = Impact.ImpactPoint - Impact.ImpactNormal * 10.0f;
+		FHitResult Hit = ProjectileTrace(StartTrace, EndTrace);
+		UseImpact = Hit;
+
+		AArenaImpactEffect* EffectActor = GetWorld()->SpawnActorDeferred<AArenaImpactEffect>(ImpactTemplate, Impact.ImpactPoint, Impact.ImpactNormal.Rotation());
+		if (EffectActor)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Black, FString::Printf(TEXT("Material: %s"), UseImpact.PhysMaterial));
+			EffectActor->SurfaceHit = UseImpact;
+			UGameplayStatics::FinishSpawningActor(EffectActor, FTransform(Impact.ImpactNormal.Rotation(), Impact.ImpactPoint));
+		}
+	}
+}
+
+FHitResult AArenaProjectile::ProjectileTrace(const FVector& StartTrace, const FVector& EndTrace) const
+{
+	static FName WeaponFireTag = FName(TEXT("WeaponTrace"));
+
+	// Perform trace to retrieve hit info
+
+	FCollisionQueryParams TraceParams(WeaponFireTag, true, Instigator);
+	TraceParams.bTraceAsyncScene = true;
+	TraceParams.bReturnPhysicalMaterial = true;
+
+	FHitResult Hit(ForceInit);
+	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, COLLISION_WEAPON, TraceParams);
+
+	return Hit;
+}
+
 
 void AArenaProjectile::DisableAndDestroy()
 {
@@ -133,11 +173,21 @@ void AArenaProjectile::OnRep_Exploded()
 {
 	FVector ProjDirection = GetActorRotation().Vector();
 
+
+	static FName ProjClient = FName(TEXT("ProjClient"));
+	// Perform trace to retrieve hit info
+	FCollisionQueryParams TraceParams(ProjClient, true, Instigator);
+	TraceParams.bTraceAsyncScene = true;
+	TraceParams.bReturnPhysicalMaterial = true;
+	FHitResult Impact(ForceInit);
+	GetWorld()->DebugDrawTraceTag = ProjClient;
+
+
 	const FVector StartTrace = GetActorLocation() - ProjDirection * 200;
 	const FVector EndTrace = GetActorLocation() + ProjDirection * 150;
-	FHitResult Impact;
 
-	if (!GetWorld()->LineTraceSingle(Impact, StartTrace, EndTrace, COLLISION_PROJECTILE, FCollisionQueryParams(TEXT("ProjClient"), true, Instigator)))
+	GetWorld()->LineTraceSingle(Impact, StartTrace, EndTrace, COLLISION_WEAPON, TraceParams);
+	if (!GetWorld()->LineTraceSingle(Impact, StartTrace, EndTrace, COLLISION_WEAPON, TraceParams))
 	{
 		// failsafe
 		Impact.ImpactPoint = GetActorLocation();
@@ -153,6 +203,11 @@ void AArenaProjectile::SetPawnOwner(class AArenaCharacter* NewOwner)
 	{
 		MyPawn = NewOwner;
 	}
+}
+
+void AArenaProjectile::SetHitResults(const FHitResult& Impact)
+{
+	HitResults = Impact;
 }
 
 void AArenaProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)

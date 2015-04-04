@@ -26,6 +26,8 @@ class THEARENA_API AArenaProjectile : public AActor
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	void SetPawnOwner(class AArenaCharacter* MyPawn);
 
+	void SetHitResults(const FHitResult& Impact);
+
 private:
 
 	/** movement component */
@@ -44,6 +46,8 @@ protected:
 	/** pawn owner */
 	UPROPERTY(Transient)
 	class AArenaCharacter* MyPawn;
+
+	FHitResult HitResults;
 
 	/** effects for impact */
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
@@ -65,6 +69,12 @@ protected:
 
 	/** trigger explosion */
 	void Explode(const FHitResult& Impact);
+
+	/** spawn effects for impact */
+	void SpawnImpactEffects(const FHitResult& Impact);
+
+	/** find physical material */
+	FHitResult ProjectileTrace(const FVector& TraceFrom, const FVector& TraceTo) const;
 
 	/** shutdown projectile and prepare for destruction */
 	void DisableAndDestroy();

@@ -15,7 +15,7 @@ void AArenaRangedWeapon_Instant::FireWeapon()
 	const float CurrentSpread = GetCurrentSpread();
 	const float ConeHalfAngle = FMath::DegreesToRadians(CurrentSpread * 0.5f);
 
-	const FVector AimDir = GetAdjustedAim();
+	const FVector AimDir = GetAdjustedAim().ImpactPoint;
 	const FVector StartTrace = GetCameraDamageStartLocation(AimDir);
 	const FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, ConeHalfAngle, ConeHalfAngle);
 	const FVector EndTrace = StartTrace + ShootDir * InstantConfig.WeaponRange;
@@ -39,7 +39,7 @@ void AArenaRangedWeapon_Instant::ServerNotifyHit_Implementation(const FHitResult
 	if (Instigator && (Impact.GetActor() || Impact.bBlockingHit))
 	{
 		const FVector Origin = GetMuzzleLocation();
-		const FVector ViewDir = (Impact.Location - Origin).SafeNormal();
+		const FVector ViewDir = (Impact.Location - Origin).GetSafeNormal();
 
 		// is the angle between the hit and the view within allowed limits (limit + weapon max angle)
 		const float ViewDotHitDir = FVector::DotProduct(Instigator->GetViewRotation().Vector(), ViewDir);
@@ -244,7 +244,7 @@ void AArenaRangedWeapon_Instant::SimulateInstantHit(const FVector& ShotOrigin, i
 	const float ConeHalfAngle = FMath::DegreesToRadians(ReticleSpread * 0.5f);
 
 	const FVector StartTrace = ShotOrigin;
-	const FVector AimDir = GetAdjustedAim();
+	const FVector AimDir = GetAdjustedAim().ImpactPoint;
 	const FVector ShootDir = WeaponRandomStream.VRandCone(AimDir, ConeHalfAngle, ConeHalfAngle);
 	const FVector EndTrace = StartTrace + ShootDir * InstantConfig.WeaponRange;
 

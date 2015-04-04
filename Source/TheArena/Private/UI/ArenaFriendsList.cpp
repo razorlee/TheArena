@@ -22,11 +22,12 @@ void UArenaFriendsList::SetUp(UArenaGameInstance* _GameInstance, ULocalPlayer* _
 void UArenaFriendsList::UpdateSearchStatus()
 {
 	check(bSearchingForServers); // should not be called otherwise
-
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Notice: Update Search Status");
 	bool bFinishSearch = true;
 	AArenaGameSession* ArenaSession = GetGameSession();
 	if (ArenaSession)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Notice: Valid Arena Session");
 		int32 CurrentSearchIdx, NumSearchResults;
 		EOnlineAsyncTaskState::Type SearchState = ArenaSession->GetSearchResultStatus(CurrentSearchIdx, NumSearchResults);
 
@@ -35,6 +36,7 @@ void UArenaFriendsList::UpdateSearchStatus()
 		switch (SearchState)
 		{
 		case EOnlineAsyncTaskState::InProgress:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Notice: Searching for Servers");
 			StatusText = LOCTEXT("Searching", "SEARCHING...").ToString();
 			bFinishSearch = false;
 			break;
@@ -47,10 +49,12 @@ void UArenaFriendsList::UpdateSearchStatus()
 			check(SearchResults.Num() == NumSearchResults);
 			if (NumSearchResults == 0)
 			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Success: No Friends Online");
 				StatusText = LOCTEXT("NoServersFound", "NO FRIENDS ONLINE, PRESS SPACE TO REFRESH").ToString();
 			}
 			else
 			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Success: Found Friend(s) Online");
 				StatusText = LOCTEXT("ServersRefresh", "PRESS SPACE TO REFRESH").ToString();
 			}
 
@@ -79,6 +83,7 @@ void UArenaFriendsList::UpdateSearchStatus()
 		break;
 
 		case EOnlineAsyncTaskState::Failed:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Abort: Search Failed");
 			// intended fall-through
 		case EOnlineAsyncTaskState::NotStarted:
 			StatusText = "";
@@ -99,6 +104,7 @@ void UArenaFriendsList::BeginServerSearch(bool bLANMatch, const FString& InMapFi
 	bLANMatchSearch = bLANMatch;
 	MapFilterName = InMapFilterName;
 	bSearchingForServers = true;
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Notice: bSearchingForServers = true");
 	ServerList.Empty();
 
 	UArenaGameInstance* const GI = Cast<UArenaGameInstance>(PlayerOwner->GetGameInstance());
@@ -112,7 +118,7 @@ void UArenaFriendsList::BeginServerSearch(bool bLANMatch, const FString& InMapFi
 void UArenaFriendsList::OnServerSearchFinished()
 {
 	bSearchingForServers = false;
-
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Notice: bSearchingForServers = false");
 	UpdateServerList();
 }
 
@@ -121,17 +127,19 @@ void UArenaFriendsList::ConnectToServer()
 {
 	if (bSearchingForServers)
 	{
-		// unsafe
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Abort: Searching for Servers");
 		return;
 	}
 #if WITH_EDITOR
 	if (GIsEditor == true)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Abort: In Editor");
 		return;
 	}
 #endif
 	if (SelectedItem.IsValid())
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Success: Selected Server");
 		int ServerToJoin = SelectedItem->SearchResultsIndex;
 
 		if (GEngine && GEngine->GameViewport)
@@ -142,6 +150,7 @@ void UArenaFriendsList::ConnectToServer()
 		UArenaGameInstance* const GI = Cast<UArenaGameInstance>(PlayerOwner->GetGameInstance());
 		if (GI)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Notice: Attempting to Join Server");
 			GI->JoinSession(PlayerOwner.Get(), ServerToJoin);
 		}
 	}

@@ -4,35 +4,43 @@ using UnrealBuildTool;
 
 public class TheArena : ModuleRules
 {
-	public TheArena(TargetInfo Target)
-	{
+    public TheArena(TargetInfo Target)
+    {
         PrivateIncludePaths.AddRange(
             new string[] { 
-				"TheArena/Private/Player",
+		        "TheArena/Private/Player",
                 "TheArena/Private/Online",
-				"TheArena/Private",
+		        "TheArena/Private"
             }
         );
 
         PublicDependencyModuleNames.AddRange(
-           new string[] {
-				"Core",
-				"CoreUObject",
-				"Engine",
-				"OnlineSubsystem",
-				"OnlineSubsystemUtils",
+            new string[] {
+		        "Core",
+		        "CoreUObject",
+		        "Engine",
+                "InputCore",
+		        "OnlineSubsystem",
+                "OnlineSubsystemNull",
+		        "OnlineSubsystemUtils",
                 "Sockets",
                 "Networking",
-				"AssetRegistry",
+		        "AssetRegistry",
                 "MoviePlayer",
                 "AIModule",
                 "UMG", 
                 "Slate", 
                 "SlateCore"
-			}
-       );
+	        }
+        );
 
-       DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
+        PrivateDependencyModuleNames.AddRange(
+            new string[] { 
+                "OnlineSubsystem" 
+            }
+        );
+
+        DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
 
     }
 }

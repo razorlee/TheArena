@@ -45,7 +45,6 @@
 #include "Public/UI/ArenaStartMenu.h"
 #include "Public/Weapons/ArenaRangedWeapon.h"
 #include "Public/Weapons/ArenaRangedWeapon_Projectile.h"
-#include "Public/Weapons/ArenaShotgun.h"
 #include "Public/Weapons/ArenaProjectile.h"
 #include "Public/Weapons/ArenaFragGrenade.h"
 #include "Public/Weapons/ArenaRangedWeapon_Instant.h"

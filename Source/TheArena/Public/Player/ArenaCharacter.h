@@ -260,19 +260,43 @@ class AArenaCharacter : public ACharacter
 
 	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
-	UAnimMontage* AimHiLeftAnimation;
+	UAnimMontage* AimHiLeftAnimStart;
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimHiLeftAnimLoop;
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimHiLeftAnimEnd;
 
 	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
-	UAnimMontage* AimHiRightAnimation;
+	UAnimMontage* AimHiRightAnimStart;
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimHiRightAnimLoop;
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimHiRightAnimEnd;
 
 	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
-	UAnimMontage* AimLoLeftAnimation;
+	UAnimMontage* AimLoLeftAnimStart;
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimLoLeftAnimLoop;
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimLoLeftAnimEnd;
 
 	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
-	UAnimMontage* AimLoRightAnimation;
+	UAnimMontage* AimLoRightAnimStart;
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimLoRightAnimLoop;
+	/** animation played on pawn (3rd person view) */
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* AimLoRightAnimEnd;
 
 	/** animation played on pawn (3rd person view) */
 	/*UPROPERTY(EditDefaultsOnly, Category = Animation) //tut1
@@ -317,6 +341,12 @@ class AArenaCharacter : public ACharacter
 
 	/** player pressed targeting action */
 	void OnStartTargeting();
+
+	/** player pressed targeting action */
+	void StartTargeting(bool bFromReplication = false);
+
+	/** player loop targeting action */
+	void OnLoopTargeting();
 
 	/** player released targeting action */
 	void OnStopTargeting();
@@ -405,6 +435,10 @@ class AArenaCharacter : public ACharacter
 	/** get vaulting state */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	bool IsVaulting() const;
+
+	/** get aiming state */
+	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
+	bool IsAiming() const;
 
 	/** get targeting state */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
@@ -604,6 +638,10 @@ protected:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Vault)
 	uint32 bWantsToVault : 1;
 
+	/** is weapon fire active? */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_Aim)
+	uint32 bWantsToAim : 1;
+
 	/** current crouch state */
 	UPROPERTY(Transient, Replicated)
 	uint8 bWantsToCrouch : 1;
@@ -746,9 +784,11 @@ protected:
 	UFUNCTION()
 	void OnRep_Throw();
 
-
 	UFUNCTION()
 	void OnRep_Vault();
+
+	UFUNCTION()
+	void OnRep_Aim();
 
 	/*UFUNCTION()//tut1
 	void OnRep_Stagger();*/
@@ -894,6 +934,12 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopVault();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartTargeting();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopTargeting();
 
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)

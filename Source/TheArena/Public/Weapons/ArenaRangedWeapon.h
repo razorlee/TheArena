@@ -545,7 +545,7 @@ protected:
 	void StopWeaponAnimation(const FWeaponAnim& Animation);
 
 	/** get the aim of the weapon, allowing for adjustments to be made by the weapon */
-	virtual FVector GetAdjustedAim() const;
+	virtual FHitResult GetAdjustedAim() const;
 
 	/** Get the aim of the camera */
 	FVector GetCameraAim() const;

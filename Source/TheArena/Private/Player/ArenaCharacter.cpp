@@ -9,6 +9,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	: Super(PCIP.SetDefaultSubobjectClass<UArenaCharacterMovement>(ACharacter::CharacterMovementComponentName))
 {
 	bWantsToRun = false;
+	bWantsToAim = false;
 	bWantsToFire = false;
 	bWantsToThrow = false;
 	bWantsToVault = false;
@@ -25,7 +26,9 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_MAX);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 
 	// rotate when the controller rotates
 	bUseControllerRotationPitch = false;
@@ -225,20 +228,84 @@ void AArenaCharacter::CameraUpdate()
 		CameraBoom->TargetArmLength = 175.0f;
 		CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 0.0f);
 	}
-	else if (IsTargeting())
+	else if (IsLoCovering() == true && IsCovering() == true)
 	{
-		if (bOnLeftEdge)
+		if (bWantsToFaceLeft)
 		{
-			if (bWantsToFaceLeft)
+			if (IsTargeting())
 			{
-				CameraBoom->TargetArmLength = 50.0f;
+				if (bOnLeftEdge)
+				{
+					CameraBoom->TargetArmLength = 50.0f;
+					CameraBoom->SocketOffset = FVector(0.0f, -50.0f, -20.0f);
+				}
+				else
+				{
+					CameraBoom->TargetArmLength = 50.0f;
+					CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+				}
+			}
+			else
+			{
+				CameraBoom->TargetArmLength = 150.0f;
+				CameraBoom->SocketOffset = FVector(0.0f, -50.0f, -20.0f);
+			}
+		}
+		else
+		{
+			if (IsTargeting())
+			{
+				if (bOnRightEdge)
+				{
+					CameraBoom->TargetArmLength = 50.0f;
+					CameraBoom->SocketOffset = FVector(0.0f, 50.0f, -20.0f);
+				}
+				else
+				{
+					CameraBoom->TargetArmLength = 50.0f;
+					CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+				}
+			}
+			else
+			{
+				CameraBoom->TargetArmLength = 150.0f;
+				CameraBoom->SocketOffset = FVector(0.0f, 50.0f, -20.0f);
+			}
+		}
+	}
+	else if (IsHiCovering() == true && IsCovering() == true)
+	{
+		if (bWantsToFaceLeft)
+		{
+			if (IsTargeting())
+			{
+				if (bOnLeftEdge)
+				{
+					CameraBoom->TargetArmLength = 50.0f;
+					CameraBoom->SocketOffset = FVector(0.0f, -50.0f, 50.0f);
+				}
+			}
+			else
+			{
+				CameraBoom->TargetArmLength = 150.0f;
 				CameraBoom->SocketOffset = FVector(0.0f, -50.0f, 50.0f);
 			}
 		}
 		else
 		{
-			CameraBoom->TargetArmLength = 50.0f;
-			CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+			if (IsTargeting())
+			{
+				if (bOnRightEdge)
+				{
+					CameraBoom->TargetArmLength = 50.0f;
+					CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+				}
+			}
+			else
+			{
+				CameraBoom->TargetArmLength = 150.0f;
+				CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
+			}
 		}
 	}
 	else if (GetCombat() == false)
@@ -246,33 +313,12 @@ void AArenaCharacter::CameraUpdate()
 		CameraBoom->TargetArmLength = 250.0f;
 		CameraBoom->SocketOffset = FVector(0.0f, 0.0f, 0.0f);
 	}
-	else if (IsLoCovering() == true && IsCovering() == true)
-	{
-		if (bWantsToFaceLeft)
-		{
-			CameraBoom->TargetArmLength = 150.0f;
-			CameraBoom->SocketOffset = FVector(0.0f, -50.0f, -20.0f);
-		}
-		else
-		{
-			CameraBoom->TargetArmLength = 150.0f;
-			CameraBoom->SocketOffset = FVector(0.0f, 50.0f, -20.0f);
-		}
-	}
 	else
 	{
-		if (IsHiCovering() == true && IsCovering() == true)
+		if (IsTargeting())
 		{
-			if (bWantsToFaceLeft)
-			{
-				CameraBoom->TargetArmLength = 150.0f;
-				CameraBoom->SocketOffset = FVector(0.0f, -50.0f, 50.0f);
-			}
-			else
-			{
-				CameraBoom->TargetArmLength = 150.0f;
-				CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
-			}
+			CameraBoom->TargetArmLength = 50.0f;
+			CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
 		}
 		else
 		{
@@ -827,38 +873,71 @@ float AArenaCharacter::PlayWeaponAnimation(UAnimMontage* Animation)
 void AArenaCharacter::OnStartTargeting()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat == true)
+	if (MyPC && MyPC->IsGameInputAllowed() && PlayerConfig.Energy >= 500 && bInCombat == true)
 	{
 		IdleTime = 0.0f;
+		StartTargeting();
+	}
+}
+
+void AArenaCharacter::StartTargeting(bool bFromReplication)//recall3
+{
+	if (!bFromReplication && Role < ROLE_Authority)
+	{
+		ServerStartTargeting();
+	}
+
+	if (bFromReplication || true)
+	{
+		IdleTime = 0.0f;
+		float Duration = 0.0f;
+		bWantsToAim = true;
+		SetTargeting(true);
 		if (IsRunning())
 		{
 			SetRunning(false, false);
 		}
+		GetCharacterMovement()->MaxWalkSpeed = TargetingMovementSpeed;
 		if (IsLeftEdge() && IsHiCovering())
 		{
-			PlayAnimMontage(AimHiLeftAnimation);
-			SetTargeting(true);
+			Duration = PlayAnimMontage(AimHiLeftAnimStart);
 		}
 		else if (IsRightEdge() && IsHiCovering())
 		{
-			PlayAnimMontage(AimHiRightAnimation);
-			SetTargeting(true);
+			Duration = PlayAnimMontage(AimHiRightAnimStart);
 		}
 		else if (IsLeftEdge() && IsLoCovering())
 		{
-			PlayAnimMontage(AimLoLeftAnimation);
-			SetTargeting(true);
+			Duration = PlayAnimMontage(AimLoLeftAnimStart);
 		}
 		else if (IsRightEdge() && IsLoCovering())
 		{
-			PlayAnimMontage(AimLoRightAnimation);
-			SetTargeting(true);
+			Duration = PlayAnimMontage(AimLoRightAnimStart);
 		}
-		else
-		{
-			GetCharacterMovement()->MaxWalkSpeed = TargetingMovementSpeed;
-			SetTargeting(true);
-		}
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::OnLoopTargeting, 0.6f, IsTargeting());
+	}
+}
+
+void AArenaCharacter::OnLoopTargeting()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Is Left Edge: %s"), IsLeftEdge() ? TEXT("true") : TEXT("false")));
+	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Is High Cover: %s"), IsHiCovering() ? TEXT("true") : TEXT("false")));
+	if (IsLeftEdge() && IsHiCovering())
+	{
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Playing Animation");
+		PlayAnimMontage(AimHiLeftAnimLoop);
+	}
+	else if (IsRightEdge() && IsHiCovering())
+	{
+		PlayAnimMontage(AimHiRightAnimLoop);
+	}
+	else if (IsLeftEdge() && IsLoCovering())
+	{
+		PlayAnimMontage(AimLoLeftAnimLoop);
+	}
+	else if (IsRightEdge() && IsLoCovering())
+	{
+		PlayAnimMontage(AimLoRightAnimLoop);
 	}
 }
 
@@ -868,9 +947,24 @@ void AArenaCharacter::OnStopTargeting()
 	{
 		GetCharacterMovement()->MaxWalkSpeed = BaseMovementSpeed;
 		SetTargeting(false);
-		//StopAnimMontage(AimHiLeftAnimation);
-
-		//FAnimMontageInstance MontageInstance = Cast<FAnimMontageInstance>(AimHiLeftAnimation);
+		bWantsToAim = false;
+		GetWorldTimerManager().ClearTimer(this, &AArenaCharacter::OnLoopTargeting);
+		if (IsLeftEdge() && IsHiCovering())
+		{
+			PlayAnimMontage(AimHiLeftAnimEnd);
+		}
+		else if (IsRightEdge() && IsHiCovering())
+		{
+			PlayAnimMontage(AimHiRightAnimEnd);
+		}
+		else if (IsLeftEdge() && IsLoCovering())
+		{
+			PlayAnimMontage(AimLoLeftAnimEnd);
+		}
+		else if (IsRightEdge() && IsLoCovering())
+		{
+			PlayAnimMontage(AimLoRightAnimEnd);
+		}
 	}
 }
 
@@ -998,7 +1092,7 @@ void AArenaCharacter::OnStartJump()
 		IdleTime = 0.0f;
 		if (this->PlayerConfig.Stamina >= JumpCost)
 		{	
-			SetRunning(false, false);
+			OnStopRunning();
 			SetCrouched(false, false);
 			if (!bWantsToCoverLo)
 			{
@@ -1068,6 +1162,7 @@ void AArenaCharacter::OnStartRunning()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (MyPC && MyPC->IsGameInputAllowed() && !GetCharacterMovement()->IsFalling() && !GetVelocity().IsZero() && PlayerConfig.Stamina > SprintCost && bInCombat == true)
 	{
+		OnStopCrouching();
 		IdleTime = 0.0f;
 		if (IsTargeting())
 		{
@@ -1088,7 +1183,7 @@ void AArenaCharacter::OnStopRunning()
 	SetRunning(false, false);
 }
 
-void AArenaCharacter::OnStartVault(bool bFromReplication)
+void AArenaCharacter::OnStartVault(bool bFromReplication)//recall3
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (!bFromReplication && Role < ROLE_Authority)
@@ -1196,6 +1291,11 @@ bool AArenaCharacter::IsCovering() const
 bool AArenaCharacter::IsVaulting() const
 {
 	return bWantsToVault;
+}
+
+bool AArenaCharacter::IsAiming() const
+{
+	return bWantsToAim;
 }
 
 bool AArenaCharacter::IsCrouching() const
@@ -1794,6 +1894,18 @@ void AArenaCharacter::OnRep_Vault()
 	}
 }
 
+void AArenaCharacter::OnRep_Aim()
+{
+	if (bWantsToAim)
+	{
+		StartTargeting();
+	}
+	else
+	{
+		OnStopTargeting();
+	}
+}
+
 void AArenaCharacter::OnRep_CurrentWeapon(AArenaRangedWeapon* LastWeapon)
 {
 	SetCurrentWeapon(CurrentWeapon, LastWeapon);
@@ -2072,6 +2184,26 @@ void AArenaCharacter::ServerStopVault_Implementation()
 	OnStopVault();
 }
 
+bool AArenaCharacter::ServerStartTargeting_Validate()
+{
+	return true;
+}
+
+void AArenaCharacter::ServerStartTargeting_Implementation()
+{
+	StartTargeting();
+}
+
+bool AArenaCharacter::ServerStopTargeting_Validate()
+{
+	return true;
+}
+
+void AArenaCharacter::ServerStopTargeting_Implementation()
+{
+	OnStopTargeting();
+}
+
 bool AArenaCharacter::ServerStartThrow_Validate()
 {
 	return true;
@@ -2132,6 +2264,7 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	// everyone
 	DOREPLIFETIME(AArenaCharacter, IdleTime);
 	DOREPLIFETIME(AArenaCharacter, bInCombat);
+	DOREPLIFETIME(AArenaCharacter, bWantsToAim);
 	DOREPLIFETIME(AArenaCharacter, bWantsToCover);
 	DOREPLIFETIME(AArenaCharacter, bWantsToCoverHi);
 	DOREPLIFETIME(AArenaCharacter, bWantsToCoverLo);

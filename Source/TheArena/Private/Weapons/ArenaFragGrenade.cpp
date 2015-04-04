@@ -45,7 +45,7 @@ void AArenaFragGrenade::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	MovementComp->OnProjectileStop.AddDynamic(this, &AArenaFragGrenade::OnImpact);
 
-	SetLifeSpan(GrenadeConfig.ProjectileLife);
+	SetLifeSpan(GrenadeConfig.ProjectileLife+2);
 	MyController = GetInstigatorController();
 }
 
