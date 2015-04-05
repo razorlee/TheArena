@@ -7,6 +7,18 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "ArenaProjectile.generated.h"
 
+USTRUCT()
+struct FProjectileHitInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	bool bExploded;
+
+	UPROPERTY()
+	FHitResult Hit;
+};
+
 UCLASS(Abstract, Blueprintable)
 class THEARENA_API AArenaProjectile : public AActor
 {
@@ -62,6 +74,10 @@ protected:
 	/** did it explode? */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Exploded)
 	bool bExploded;
+
+	/** explode hit notify for replication */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_Exploded)
+	FProjectileHitInfo ExplodeNotify;
 
 	/** [client] explosion happened */
 	UFUNCTION()
