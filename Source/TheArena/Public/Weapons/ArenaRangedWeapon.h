@@ -250,6 +250,9 @@ class THEARENA_API AArenaRangedWeapon : public AActor
 	UPROPERTY(EditDefaultsOnly)
 	bool IsPrimaryWeapon;
 
+	UPROPERTY(EditDefaultsOnly)
+	bool IsEnteringComabt;
+
 	/** crosshair parts icons (left, top, right, bottom and center) */
 	UPROPERTY(EditDefaultsOnly, Category = HUD)
 	FCanvasIcon Crosshair[5];
@@ -294,6 +297,10 @@ class THEARENA_API AArenaRangedWeapon : public AActor
 
 	/** sets the weapons as the players primary weapon*/
 	void SetIsPrimaryWeapon(bool bNewWeaponPriority);
+
+	void SetIsEnteringCombat(bool bEntertingCombat);
+
+	bool GetIsEnteringCombat();
 
 protected:
 

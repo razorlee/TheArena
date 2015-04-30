@@ -1115,6 +1115,16 @@ void AArenaRangedWeapon::SetIsPrimaryWeapon(bool bNewWeaponPriority)
 	IsPrimaryWeapon = bNewWeaponPriority;
 }
 
+bool AArenaRangedWeapon::GetIsEnteringCombat()
+{
+	return IsEnteringComabt;
+}
+
+void AArenaRangedWeapon::SetIsEnteringCombat(bool bEnteringCombat)
+{
+	IsEnteringComabt = bEnteringCombat;
+}
+
 void AArenaRangedWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

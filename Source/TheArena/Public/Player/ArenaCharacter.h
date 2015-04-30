@@ -167,6 +167,9 @@ class AArenaCharacter : public ACharacter
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CombatState)
 	uint8 bInCombat : 1;
 
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_EnteringCombat)
+	uint8 IsEnteringCombat : 1;
+
 	/** get aim offsets */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	FRotator GetAimOffsets() const;
@@ -182,7 +185,7 @@ class AArenaCharacter : public ACharacter
 
 	class AArenaRangedWeapon* FindWeapon(TSubclassOf<class AArenaRangedWeapon> WeaponClass);
 
-	void EquipWeapon(class AArenaRangedWeapon* ToEquip, class AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat);
+	void EquipWeapon(class AArenaRangedWeapon* ToEquip, bool IsEnteringCombat);
 
 	void UnEquipWeapon(class AArenaRangedWeapon* Weapon);
 
@@ -593,7 +596,7 @@ protected:
 	float PlayWeaponAnimation(UAnimMontage* Animation);
 
 	/** currently equipped weapon */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentWeapon)
 	class AArenaRangedWeapon* CurrentWeapon;
 
 	class AArenaRangedWeapon* LastWeapon;
@@ -867,7 +870,8 @@ protected:
 	// Inventory
 
 	/** updates current weapon */
-	void SetCurrentWeapon(class AArenaRangedWeapon* NewWeapon, class AArenaRangedWeapon* LastWeapon = NULL);
+	UFUNCTION()
+	void SetCurrentWeapon(class AArenaRangedWeapon* NewWeapon, bool EnteringCombat);
 
 	/** holsters current weapon */
 	void StartEquipWeapon();
@@ -877,7 +881,7 @@ protected:
 
 	/** current weapon rep handler */
 	UFUNCTION()
-	void OnRep_CurrentWeapon(class AArenaRangedWeapon* LastWeapon);
+	void OnRep_CurrentWeapon();
 
 	/** primary weapon rep handler */
 	UFUNCTION()
@@ -890,6 +894,9 @@ protected:
 	UFUNCTION()
 	void OnRep_CombatState(bool bNewCombatState);
 
+	UFUNCTION()
+	void OnRep_EnteringCombat();
+
 	void SpawnDefaultInventory();
 
 	/** [server] remove all weapons from inventory and destroy them */
@@ -897,7 +904,7 @@ protected:
 
 	/** equip weapon */
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerEquipWeapon(class AArenaRangedWeapon* ToEquip, class AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat);
+	void ServerEquipWeapon(class AArenaRangedWeapon* ToEquip, bool EnteringCombat);
 
 	/** update targeting state */
 	UFUNCTION(reliable, server, WithValidation)

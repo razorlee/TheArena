@@ -74,8 +74,8 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// set our turn rates for input
-	BaseTurnRate = 45.f;
-	BaseLookUpRate = 45.f;
+	BaseTurnRate = 25.f;
+	BaseLookUpRate = 25.f;
 
 	//LoadGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 }
@@ -88,6 +88,7 @@ void AArenaCharacter::PostInitializeComponents()
 	{
 		IdleTime = 0.0f;
 		bInCombat = false;
+		IsEnteringCombat = false;
 		PlayerConfig.Health = GetMaxHealth();
 		PlayerConfig.Stamina = GetMaxStamina();
 		PlayerConfig.Energy = GetMaxEnergy();
@@ -394,29 +395,27 @@ AArenaRangedWeapon* AArenaCharacter::FindWeapon(TSubclassOf<AArenaRangedWeapon> 
 	return NULL;
 }
 
-void AArenaCharacter::EquipWeapon(AArenaRangedWeapon* ToEquip, AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat)
+void AArenaCharacter::EquipWeapon(AArenaRangedWeapon* ToEquip, bool IsEnteringCombat)//recll1
 {
-	if (ToEquip)
+	if (Role == ROLE_Authority)
 	{
-		if (Role == ROLE_Authority)
+		if (IsEnteringCombat == true)
 		{
-			if (IsEnteringCombat == true)
-			{
-				SetCurrentWeapon(ToEquip, ToUnEquip);
-				FinishEquipWeapon();
-			}
-			else
-			{
-				SetCurrentWeapon(ToEquip, ToUnEquip);
-				StartEquipWeapon();
-				GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
-			}
-		}	
+			this->IsEnteringCombat = true;
+			SetCurrentWeapon(ToEquip, true);
+			FinishEquipWeapon();//do in onrep
+		}
 		else
 		{
-			ServerEquipWeapon(ToEquip, ToUnEquip, IsEnteringCombat);
+			this->IsEnteringCombat = false;
+			SetCurrentWeapon(ToEquip, false);
+			StartEquipWeapon();//do in onrep
+			GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
 		}
-		IsEnteringCombat = false;
+	}	
+	else
+	{
+		ServerEquipWeapon(ToEquip, IsEnteringCombat);
 	}
 }
 
@@ -424,8 +423,8 @@ void AArenaCharacter::InitializeWeapons(AArenaRangedWeapon* mainWeapon, AArenaRa
 {
 	if (Role == ROLE_Authority)
 	{
-		mainWeapon->OnHolster(true);
-		offWeapon->OnHolster(false);
+		mainWeapon->OnHolsterPrimary();
+		offWeapon->OnHolsterSecondary();
 	}
 	else
 	{
@@ -873,7 +872,7 @@ float AArenaCharacter::PlayWeaponAnimation(UAnimMontage* Animation)
 void AArenaCharacter::OnStartTargeting()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC && MyPC->IsGameInputAllowed() && PlayerConfig.Energy >= 500 && bInCombat == true)
+	if (MyPC && MyPC->IsGameInputAllowed() && bInCombat == true)
 	{
 		IdleTime = 0.0f;
 		StartTargeting();
@@ -884,6 +883,7 @@ void AArenaCharacter::StartTargeting(bool bFromReplication)//recall3
 {
 	if (!bFromReplication && Role < ROLE_Authority)
 	{
+		GetCharacterMovement()->MaxWalkSpeed = TargetingMovementSpeed;
 		ServerStartTargeting();
 	}
 
@@ -897,7 +897,6 @@ void AArenaCharacter::StartTargeting(bool bFromReplication)//recall3
 		{
 			SetRunning(false, false);
 		}
-		GetCharacterMovement()->MaxWalkSpeed = TargetingMovementSpeed;
 		if (IsLeftEdge() && IsHiCovering())
 		{
 			Duration = PlayAnimMontage(AimHiLeftAnimStart);
@@ -920,11 +919,8 @@ void AArenaCharacter::StartTargeting(bool bFromReplication)//recall3
 
 void AArenaCharacter::OnLoopTargeting()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Is Left Edge: %s"), IsLeftEdge() ? TEXT("true") : TEXT("false")));
-	//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Is High Cover: %s"), IsHiCovering() ? TEXT("true") : TEXT("false")));
 	if (IsLeftEdge() && IsHiCovering())
 	{
-		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "Playing Animation");
 		PlayAnimMontage(AimHiLeftAnimLoop);
 	}
 	else if (IsRightEdge() && IsHiCovering())
@@ -999,19 +995,19 @@ void AArenaCharacter::OnSwapWeapon()
 		{
 			if (CurrentWeapon == NULL)
 			{
-				EquipWeapon(PrimaryWeapon, NULL, true);
+				IsEnteringCombat = true;
+				EquipWeapon(PrimaryWeapon, true);
 			}
 			else if (CurrentWeapon == PrimaryWeapon)
 			{
-				EquipWeapon(SecondaryWeapon, PrimaryWeapon, false);
+				IsEnteringCombat = false;
+				EquipWeapon(SecondaryWeapon, false);
 			}
 			else
 			{
-				EquipWeapon(PrimaryWeapon, SecondaryWeapon, false);
+				IsEnteringCombat = false;
+				EquipWeapon(PrimaryWeapon, false);
 			}
-			/*const int32 CurrentWeaponIdx = Inventory.IndexOfByKey(CurrentWeapon);
-			AArenaRangedWeapon* NextWeapon = Inventory[(CurrentWeaponIdx + 1) % Inventory.Num()];
-			EquipWeapon(NextWeapon, false);*/
 		}
 	}
 }
@@ -1168,6 +1164,9 @@ void AArenaCharacter::OnStartRunning()
 		{
 			SetTargeting(false);
 			SetCrouched(false, false);
+			SetCover(false);
+			SetCrouched(false, false);
+			OnStopCrouching();
 		}
 
 		GetCharacterMovement()->MaxWalkSpeed = RunningMovementSpeed;
@@ -1827,46 +1826,50 @@ void AArenaCharacter::OnRep_LastTakeHitInfo()
 //////////////////////////////////////////////////////////////////////////
 // Inventory
 
-void AArenaCharacter::SetCurrentWeapon(class AArenaRangedWeapon* NextWeapon, class AArenaRangedWeapon* PrevWeapon)
+void AArenaCharacter::SetCurrentWeapon(class AArenaRangedWeapon* NewWeapon, bool IsEnteringCombat)
 {
-	if (PrevWeapon != NULL)
+	if (IsEnteringCombat == true)
 	{
-		LastWeapon = PrevWeapon;
+		PrimaryWeapon->SetIsEnteringCombat(true);
+		SecondaryWeapon->SetIsEnteringCombat(true);
 	}
-
-	NewWeapon = NextWeapon;
+	else
+	{
+		PrimaryWeapon->SetIsEnteringCombat(false);
+		SecondaryWeapon->SetIsEnteringCombat(false);
+	}
+	CurrentWeapon = NewWeapon;
+	CurrentWeapon->SetIsEnteringCombat(IsEnteringCombat);
 }
 
 void AArenaCharacter::StartEquipWeapon()
 {
-	if (LastWeapon)
+	if (CurrentWeapon->GetIsEnteringCombat() == false)
 	{
-		if (LastWeapon->GetIsPrimaryWeapon() == true)
+		if (CurrentWeapon->GetIsPrimaryWeapon() == true)
 		{
-			LastWeapon->SetOwningPawn(this);
-			LastWeapon->OnUnEquip(true);
+			SecondaryWeapon->SetOwningPawn(this);
+			SecondaryWeapon->OnUnEquip(false);
 		}
 		else
 		{
-			LastWeapon->SetOwningPawn(this);
-			LastWeapon->OnUnEquip(false);
+			PrimaryWeapon->SetOwningPawn(this);
+			PrimaryWeapon->OnUnEquip(true);
 		}
 	}
 }
 
 void AArenaCharacter::FinishEquipWeapon()
 {
-	CurrentWeapon = NewWeapon;
-
 	if (CurrentWeapon->GetIsPrimaryWeapon() == true)
 	{
-		NewWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
-		NewWeapon->OnEquip(true);
+		PrimaryWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
+		PrimaryWeapon->OnEquip(true);
 	}
 	else
 	{
-		NewWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
-		NewWeapon->OnEquip(false);
+		SecondaryWeapon->SetOwningPawn(this);	// Make sure weapon's MyPawn is pointing back to us. During replication, we can't guarantee APawn::CurrentWeapon will rep after AWeapon::MyPawn!
+		SecondaryWeapon->OnEquip(false);
 	}
 }
 
@@ -1906,46 +1909,31 @@ void AArenaCharacter::OnRep_Aim()
 	}
 }
 
-void AArenaCharacter::OnRep_CurrentWeapon(AArenaRangedWeapon* LastWeapon)
+void AArenaCharacter::OnRep_CurrentWeapon()
 {
-	SetCurrentWeapon(CurrentWeapon, LastWeapon);
-	StartEquipWeapon();
-	FinishEquipWeapon();
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
-
+	this->PrimaryWeapon;
+	if (this->IsEnteringCombat == true)
+	{
+		FinishEquipWeapon();//do in onrep
+	}
+	else
+	{
+		StartEquipWeapon();//do in onrep
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
+	}
 }
 
 void AArenaCharacter::OnRep_PrimaryWeapon(AArenaRangedWeapon* NewWeapon)
 {
 	PrimaryWeapon->SetIsPrimaryWeapon(true);
-	if (PrimaryWeapon == CurrentWeapon)
-	{
-		SetCurrentWeapon(PrimaryWeapon, LastWeapon);
-		StartEquipWeapon();
-		FinishEquipWeapon();
-		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
-	}
-	else
-	{
-		PrimaryWeapon->SetOwningPawn(this);
-		PrimaryWeapon->OnUnEquip(true);
-	}
+	PrimaryWeapon->SetOwningPawn(this);
+	PrimaryWeapon->OnHolsterPrimary();
 }
 
 void AArenaCharacter::OnRep_SecondaryWeapon(AArenaRangedWeapon* NewWeapon)
 {
-	if (SecondaryWeapon == CurrentWeapon)
-	{
-		SetCurrentWeapon(SecondaryWeapon, LastWeapon);
-		StartEquipWeapon();
-		FinishEquipWeapon();
-		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::FinishEquipWeapon, 1.5f, false);
-	}
-	else
-	{
-		SecondaryWeapon->SetOwningPawn(this);
-		SecondaryWeapon->OnUnEquip(false);
-	}
+	SecondaryWeapon->SetOwningPawn(this);
+	SecondaryWeapon->OnHolsterSecondary();
 }
 
 void AArenaCharacter::OnRep_CombatState(bool bOldCombatState)
@@ -1960,6 +1948,12 @@ void AArenaCharacter::OnRep_CombatState(bool bOldCombatState)
 	}
 
 	UpdateCombatState();
+}
+
+void AArenaCharacter::OnRep_EnteringCombat()
+{
+	PrimaryWeapon->SetIsEnteringCombat(IsEnteringCombat);
+	SecondaryWeapon->SetIsEnteringCombat(IsEnteringCombat);
 }
 
 void AArenaCharacter::SpawnDefaultInventory()
@@ -2034,14 +2028,14 @@ void AArenaCharacter::DestroyInventory()
 }
 
 
-bool AArenaCharacter::ServerEquipWeapon_Validate(AArenaRangedWeapon* ToEquip, AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat)
+bool AArenaCharacter::ServerEquipWeapon_Validate(AArenaRangedWeapon* ToEquip, bool IsEnteringCombat)
 {
 	return true;
 }
 
-void AArenaCharacter::ServerEquipWeapon_Implementation(AArenaRangedWeapon* ToEquip, AArenaRangedWeapon* ToUnEquip, bool IsEnteringCombat)
+void AArenaCharacter::ServerEquipWeapon_Implementation(AArenaRangedWeapon* ToEquip, bool IsEnteringCombat)
 {
-	EquipWeapon(ToEquip, ToUnEquip, IsEnteringCombat);
+	EquipWeapon(ToEquip, IsEnteringCombat);
 }
 
 bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaRangedWeapon* mainWeapon, AArenaRangedWeapon* offWeapon)
@@ -2264,6 +2258,7 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	// everyone
 	DOREPLIFETIME(AArenaCharacter, IdleTime);
 	DOREPLIFETIME(AArenaCharacter, bInCombat);
+	DOREPLIFETIME(AArenaCharacter, IsEnteringCombat);
 	DOREPLIFETIME(AArenaCharacter, bWantsToAim);
 	DOREPLIFETIME(AArenaCharacter, bWantsToCover);
 	DOREPLIFETIME(AArenaCharacter, bWantsToCoverHi);
