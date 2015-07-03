@@ -5,14 +5,13 @@
 ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnOb(TEXT("/Game/Blueprints/Pawns/ArenaCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnOb(TEXT("/Game/Blueprints/Pawns/BP_ArenaCharacter"));
 	DefaultPawnClass = PlayerPawnOb.Class;
 
 	//static ConstructorHelpers::FClassFinder<APawn> BotPawnOb(TEXT("/Game/Blueprints/Pawns/ArenaAI"));
 	//BotPawnClass = BotPawnOb.Class;
 
 	static ConstructorHelpers::FClassFinder<AHUD> ArenaHUD(TEXT("/Game/UI/HUD/Blueprints/Arena_HUD"));
-	//static ConstructorHelpers::FClassFinder<UUserWidget> ArenaHUD(TEXT("/Game/UI/Menu/ArenaHUD"));
 	HUDClass = ArenaHUD.Class;
 
 	PlayerControllerClass = AArenaPlayerController::StaticClass();
@@ -52,7 +51,7 @@ TSubclassOf<AGameSession> ATheArenaGameMode::GetGameSessionClass() const
 
 void ATheArenaGameMode::DefaultTimer()
 {
-	Super::DefaultTimer();
+	//SSuper::DefaultTimer();
 
 	// don't update timers for Play In Editor mode, it's not real match
 	if (GetWorld()->IsPlayInEditor())
@@ -302,13 +301,13 @@ void ATheArenaGameMode::Killed(AController* Killer, AController* KilledPlayer, A
 
 	if (KillerPlayerState && KillerPlayerState != VictimPlayerState)
 	{
-		KillerPlayerState->ScoreKill(VictimPlayerState, KillScore);
-		KillerPlayerState->InformAboutKill(KillerPlayerState, DamageType, VictimPlayerState);
+		//KillerPlayerState->ScoreKill(VictimPlayerState, KillScore);
+		//KillerPlayerState->InformAboutKill(KillerPlayerState, DamageType, VictimPlayerState);
 	}
 
 	if (VictimPlayerState)
 	{
-		VictimPlayerState->ScoreDeath(KillerPlayerState, DeathScore);
+		//VictimPlayerState->ScoreDeath(KillerPlayerState, DeathScore);
 	}
 }
 
@@ -355,11 +354,6 @@ bool ATheArenaGameMode::ShouldSpawnAtStartSpot(AController* Player)
 
 UClass* ATheArenaGameMode::GetDefaultPawnClassForController(AController* InController)
 {
-	if (Cast<AArenaAIController>(InController))
-	{
-		return BotPawnClass;
-	}
-
 	return Super::GetDefaultPawnClassForController(InController);
 }
 
@@ -368,21 +362,21 @@ AActor* ATheArenaGameMode::ChoosePlayerStart(AController* Player)
 	TArray<APlayerStart*> PreferredSpawns;
 	TArray<APlayerStart*> FallbackSpawns;
 
-	for (int32 i = 0; i < PlayerStarts.Num(); i++)
-	{
-		APlayerStart* TestSpawn = PlayerStarts[i];
-		if (IsSpawnpointAllowed(TestSpawn, Player))
-		{
-			if (IsSpawnpointPreferred(TestSpawn, Player))
-			{
-				PreferredSpawns.Add(TestSpawn);
-			}
-			else
-			{
-				FallbackSpawns.Add(TestSpawn);
-			}
-		}
-	}
+	//for (int32 i = 0; i < PlayerStarts.Num(); i++)
+	//{
+	//	APlayerStart* TestSpawn = PlayerStarts[i];
+	//	if (IsSpawnpointAllowed(TestSpawn, Player))
+	//	{
+	//		if (IsSpawnpointPreferred(TestSpawn, Player))
+	//		{
+	//			PreferredSpawns.Add(TestSpawn);
+	//		}
+	//		else
+	//		{
+	//			FallbackSpawns.Add(TestSpawn);
+	//		}
+	//	}
+	//}
 
 	APlayerStart* BestStart = NULL;
 	if (PreferredSpawns.Num() > 0)
@@ -446,18 +440,6 @@ bool ATheArenaGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AControl
 
 class AArenaAI* ATheArenaGameMode::SpawnBot(FVector SpawnLocation, FRotator SpawnRotation)
 {
-	if (BotPawnClass)
-	{
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.bNoCollisionFail = true;
-		AArenaAI* Bot = GetWorld()->SpawnActor<AArenaAI>(BotPawnClass, SpawnLocation, SpawnRotation, SpawnInfo);
-		if (Bot)
-		{
-			Bot->SpawnDefaultController();
-			return Bot;
-		}
-	}
-
 	return NULL;
 }
 
@@ -480,33 +462,9 @@ void ATheArenaGameMode::SpawnBotsForGame()
 			++NumPlayers;
 		}
 	}
-
-	// adding bots
-	BotControllers.Empty();
-	int32 NumBots = 0;
-	while (NumPlayers < MaxPlayers && NumBots < MaxBots)
-	{
-		AArenaAI* Bot = SpawnBot(FVector(ForceInitToZero), FRotator(ForceInitToZero));
-		if (Bot)
-		{
-			InitBot(Bot, NumBots + 1);
-			++NumBots;
-		}
-	}
 }
 
 void ATheArenaGameMode::InitBot(AArenaAI* Bot, int BotNumber)
 {
-	AArenaAIController* AIPC = Bot ? Cast<AArenaAIController>(Bot->GetController()) : NULL;
-	if (AIPC)
-	{
-		if (AIPC->PlayerState)
-		{
-			FString BotName = FString::Printf(TEXT("Bot %d"), BotNumber);
-			AIPC->PlayerState->PlayerName = BotName;
-		}
-		AActor* BestStart = ChoosePlayerStart(AIPC);
-
-		Bot->TeleportTo(BestStart->GetActorLocation(), BestStart->GetActorRotation(), false, true);
-	}
+	
 }

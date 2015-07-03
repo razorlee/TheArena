@@ -2,7 +2,6 @@
 
 #include "GameFramework/Actor.h"
 #include "ArenaRangedWeapon.h"
-#include "ArenaRangedWeapon_Projectile.h"
 #include "Player/ArenaCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "ArenaProjectile.generated.h"
@@ -55,6 +54,9 @@ private:
 
 protected:
 
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	bool IsExplosive;
+
 	/** pawn owner */
 	UPROPERTY(Transient)
 	class AArenaCharacter* MyPawn;
@@ -67,9 +69,6 @@ protected:
 
 	/** controller that fired me (cache for damage calculations) */
 	TWeakObjectPtr<AController> MyController;
-
-	/** projectile data */
-	struct FProjectileWeaponData WeaponConfig;
 
 	/** did it explode? */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Exploded)

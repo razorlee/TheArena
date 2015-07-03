@@ -31,13 +31,13 @@ class ATheArenaGameMode : public AGameMode
 	//TSubclassOf<class AHUD> ArenaHUD;
 
 	/** select best spawn point for player */
-	virtual AActor* ChoosePlayerStart(AController* Player) override;
+	virtual AActor* ChoosePlayerStart(AController* Player);
 
 	/** always pick new random spawn */
 	virtual bool ShouldSpawnAtStartSpot(AController* Player) override;
 
 	/** returns default pawn class for given controller */
-	virtual UClass* GetDefaultPawnClassForController(AController* InController) override;
+	virtual UClass* GetDefaultPawnClassForController(AController* InController);
 
 	/** prevents friendly fire */
 	virtual float ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const;
@@ -52,7 +52,7 @@ class ATheArenaGameMode : public AGameMode
 	virtual bool AllowCheats(APlayerController* P) override;
 
 	/** update remaining time */
-	virtual void DefaultTimer() override;
+	virtual void DefaultTimer();
 
 	/** starts new match */
 	virtual void HandleMatchHasStarted() override;
@@ -88,8 +88,8 @@ protected:
 	UPROPERTY(config)
 	int32 MaxBots;
 
-	UPROPERTY()
-	TArray<AArenaAIController*> BotControllers;
+	//UPROPERTY()
+	//TArray<AArenaAIController*> BotControllers;
 
 	bool bAllowBots;
 

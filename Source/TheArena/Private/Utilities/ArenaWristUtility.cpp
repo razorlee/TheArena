@@ -42,7 +42,7 @@ void AArenaWristUtility::AttachMeshToPawn()
 		DetachMeshFromPawn();
 
 		// For locally controller players we attach both weapons and let the bOnlyOwnerSee, bOwnerNoSee flags deal with visibility.
-		FName AttachPoint = MyPawn->GetWristOneAttachPoint();
+		FName AttachPoint = MyPawn->GetCharacterEquipment()->GetWristOneAttachPoint();
 		if (MyPawn->IsLocallyControlled() == true)
 		{
 			USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();

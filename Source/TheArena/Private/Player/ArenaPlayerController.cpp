@@ -97,14 +97,14 @@ void AArenaPlayerController::GameHasEnded(class AActor* EndGameFocus, bool bIsWi
 	ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
 	if (LocalPlayer)
 	{
-		AArenaPlayerState* ArenaPlayerState = Cast<AArenaPlayerState>(PlayerState);
-		if (ArenaPlayerState)
+		AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PlayerState);
+		if (CharacterState)
 		{
 			// update local saved profile
 			/*UArenaPersistentUser* const PersistentUser = GetPersistentUser();
 			if (PersistentUser)
 			{
-				PersistentUser->AddMatchResult(ArenaPlayerState->GetKills(), ArenaPlayerState->GetDeaths(), ArenaPlayerState->GetNumBulletsFired(), ArenaPlayerState->GetNumRocketsFired(), bIsWinner);
+				PersistentUser->AddMatchResult(CharacterState->GetKills(), CharacterState->GetDeaths(), CharacterState->GetNumBulletsFired(), CharacterState->GetNumRocketsFired(), bIsWinner);
 				PersistentUser->SaveIfDirty();
 			}*/
 
@@ -123,13 +123,13 @@ void AArenaPlayerController::GameHasEnded(class AActor* EndGameFocus, bool bIsWi
 						{
 							/*FArenaAllTimeMatchResultsWrite WriteObject;
 
-							WriteObject.SetIntStat(LEADERBOARD_STAT_SCORE, ArenaPlayerState->GetKills());
-							WriteObject.SetIntStat(LEADERBOARD_STAT_KILLS, ArenaPlayerState->GetKills());
-							WriteObject.SetIntStat(LEADERBOARD_STAT_DEATHS, ArenaPlayerState->GetDeaths());
+							WriteObject.SetIntStat(LEADERBOARD_STAT_SCORE, CharacterState->GetKills());
+							WriteObject.SetIntStat(LEADERBOARD_STAT_KILLS, CharacterState->GetKills());
+							WriteObject.SetIntStat(LEADERBOARD_STAT_DEATHS, CharacterState->GetDeaths());
 							WriteObject.SetIntStat(LEADERBOARD_STAT_MATCHESPLAYED, 1);
 
 							// the call will copy the user id and write object to its own memory
-							Leaderboards->WriteLeaderboards(ArenaPlayerState->SessionName, *UserId, WriteObject);*/
+							Leaderboards->WriteLeaderboards(CharacterState->SessionName, *UserId, WriteObject);*/
 						}
 					}
 				}
@@ -254,6 +254,11 @@ void AArenaPlayerController::SetHUD(bool bEnable)
 	this->OpenHUD = bEnable;
 }
 
+void AArenaPlayerController::SetSettings(bool bEnable)
+{
+	this->OpenSettings = bEnable;
+}
+
 void AArenaPlayerController::SetAllowGameActions(bool bEnable)
 {
 	bAllowGameActions = bEnable;
@@ -276,8 +281,8 @@ void AArenaPlayerController::ClientStartOnlineGame_Implementation()
 	if (!IsPrimaryPlayer())
 		return;
 
-	AArenaPlayerState* ArenaPlayerState = Cast<AArenaPlayerState>(PlayerState);
-	if (ArenaPlayerState)
+	AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PlayerState);
+	if (CharacterState)
 	{
 		IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 		if (OnlineSub)
@@ -285,8 +290,8 @@ void AArenaPlayerController::ClientStartOnlineGame_Implementation()
 			IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 			if (Sessions.IsValid())
 			{
-				UE_LOG(LogOnline, Log, TEXT("Starting session %s on client"), *ArenaPlayerState->SessionName.ToString());
-				Sessions->StartSession(ArenaPlayerState->SessionName);
+				UE_LOG(LogOnline, Log, TEXT("Starting session %s on client"), *CharacterState->SessionName.ToString());
+				Sessions->StartSession(CharacterState->SessionName);
 			}
 		}
 	}
@@ -303,8 +308,8 @@ void AArenaPlayerController::ClientEndOnlineGame_Implementation()
 	if (!IsPrimaryPlayer())
 		return;
 
-	AArenaPlayerState* ArenaPlayerState = Cast<AArenaPlayerState>(PlayerState);
-	if (ArenaPlayerState)
+	AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PlayerState);
+	if (CharacterState)
 	{
 		IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 		if (OnlineSub)
@@ -312,8 +317,8 @@ void AArenaPlayerController::ClientEndOnlineGame_Implementation()
 			IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 			if (Sessions.IsValid())
 			{
-				UE_LOG(LogOnline, Log, TEXT("Ending session %s on client"), *ArenaPlayerState->SessionName.ToString());
-				Sessions->EndSession(ArenaPlayerState->SessionName);
+				UE_LOG(LogOnline, Log, TEXT("Ending session %s on client"), *CharacterState->SessionName.ToString());
+				Sessions->EndSession(CharacterState->SessionName);
 			}
 		}
 	}
@@ -330,8 +335,8 @@ void AArenaPlayerController::CleanupSessionOnReturnToMenu()
 	bool bPendingOnlineOp = false;
 
 	// end online game and then destroy it
-	AArenaPlayerState* ArenaPlayerState = Cast<AArenaPlayerState>(PlayerState);
-	if (ArenaPlayerState)
+	AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PlayerState);
+	if (CharacterState)
 	{
 		IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 		if (OnlineSub)
@@ -339,33 +344,33 @@ void AArenaPlayerController::CleanupSessionOnReturnToMenu()
 			IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 			if (Sessions.IsValid())
 			{
-				EOnlineSessionState::Type SessionState = Sessions->GetSessionState(ArenaPlayerState->SessionName);
-				UE_LOG(LogOnline, Log, TEXT("Session %s is '%s'"), *ArenaPlayerState->SessionName.ToString(), EOnlineSessionState::ToString(SessionState));
+				EOnlineSessionState::Type SessionState = Sessions->GetSessionState(CharacterState->SessionName);
+				UE_LOG(LogOnline, Log, TEXT("Session %s is '%s'"), *CharacterState->SessionName.ToString(), EOnlineSessionState::ToString(SessionState));
 
 				if (EOnlineSessionState::InProgress == SessionState)
 				{
-					UE_LOG(LogOnline, Log, TEXT("Ending session %s on return to main menu"), *ArenaPlayerState->SessionName.ToString());
+					UE_LOG(LogOnline, Log, TEXT("Ending session %s on return to main menu"), *CharacterState->SessionName.ToString());
 					Sessions->AddOnEndSessionCompleteDelegate(OnEndSessionCompleteDelegate);
-					Sessions->EndSession(ArenaPlayerState->SessionName);
+					Sessions->EndSession(CharacterState->SessionName);
 					bPendingOnlineOp = true;
 				}
 				else if (EOnlineSessionState::Ending == SessionState)
 				{
-					UE_LOG(LogOnline, Log, TEXT("Waiting for session %s to end on return to main menu"), *ArenaPlayerState->SessionName.ToString());
+					UE_LOG(LogOnline, Log, TEXT("Waiting for session %s to end on return to main menu"), *CharacterState->SessionName.ToString());
 					Sessions->AddOnEndSessionCompleteDelegate(OnEndSessionCompleteDelegate);
 					bPendingOnlineOp = true;
 				}
 				else if (EOnlineSessionState::Ended == SessionState ||
 					EOnlineSessionState::Pending == SessionState)
 				{
-					UE_LOG(LogOnline, Log, TEXT("Destroying session %s on return to main menu"), *ArenaPlayerState->SessionName.ToString());
+					UE_LOG(LogOnline, Log, TEXT("Destroying session %s on return to main menu"), *CharacterState->SessionName.ToString());
 					Sessions->AddOnDestroySessionCompleteDelegate(OnDestroySessionCompleteDelegate);
-					Sessions->DestroySession(ArenaPlayerState->SessionName);
+					Sessions->DestroySession(CharacterState->SessionName);
 					bPendingOnlineOp = true;
 				}
 				else if (EOnlineSessionState::Starting == SessionState)
 				{
-					UE_LOG(LogOnline, Log, TEXT("Waiting for session %s to start, and then we will end it to return to main menu"), *ArenaPlayerState->SessionName.ToString());
+					UE_LOG(LogOnline, Log, TEXT("Waiting for session %s to start, and then we will end it to return to main menu"), *CharacterState->SessionName.ToString());
 					Sessions->AddOnStartSessionCompleteDelegate(OnStartSessionCompleteEndItDelegate);
 					bPendingOnlineOp = true;
 				}
@@ -466,7 +471,7 @@ void AArenaPlayerController::SetCinematicMode(bool bInCinematicMode, bool bHideP
 
 	// If we have a pawn we need to determine if we should show/hide the weapon
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
-	AArenaRangedWeapon* MyWeapon = MyPawn ? MyPawn->GetWeapon() : NULL;
+	AArenaWeapon* MyWeapon = MyPawn ? MyPawn->GetCharacterEquipment()->GetCurrentWeapon() : NULL;
 	if (MyWeapon)
 	{
 		if (bInCinematicMode && bHidePlayer)
@@ -562,6 +567,11 @@ bool AArenaPlayerController::IsFriendsListOpen() const
 bool AArenaPlayerController::IsHUDOpen() const
 {
 	return this->OpenHUD;
+}
+
+bool AArenaPlayerController::IsSettingsOpen() const
+{
+	return this->OpenSettings;
 }
 
 bool AArenaPlayerController::GetAllowGameActions() const

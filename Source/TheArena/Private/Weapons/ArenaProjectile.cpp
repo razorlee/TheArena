@@ -13,7 +13,7 @@ AArenaProjectile::AArenaProjectile(const class FObjectInitializer& PCIP)
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
-	//CollisionComp->SetCollisionResponseToChannel(ECC)
+	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	RootComponent = CollisionComp;
 
@@ -43,13 +43,13 @@ void AArenaProjectile::PostInitializeComponents()
 	MovementComp->OnProjectileStop.AddDynamic(this, &AArenaProjectile::OnImpact);
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
 
-	AArenaRangedWeapon_Projectile* OwnerWeapon = Cast<AArenaRangedWeapon_Projectile>(GetOwner());
+	AArenaRangedWeapon* OwnerWeapon = Cast<AArenaRangedWeapon>(GetOwner());
 	if (OwnerWeapon)
 	{
-		OwnerWeapon->ApplyWeaponConfig(WeaponConfig);
+		//OwnerWeapon->ApplyWeaponConfig(WeaponConfig);
 	}
 
-	SetLifeSpan(WeaponConfig.ProjectileLife);
+	SetLifeSpan(3.0f);
 	MyController = GetInstigatorController();
 }
 
@@ -79,25 +79,28 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 
 	// effects and damage origin shouldn't be placed inside mesh at impact point
 	const FVector NudgedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
-	if (this->WeaponConfig.IsExplosive == true)
+	if (IsExplosive == true)
 	{
-		if (WeaponConfig.ExplosionDamage > 0 && WeaponConfig.ExplosionRadius > 0 && WeaponConfig.DamageType)
+		if (MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() > 0 
+			&& MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetExplosionRadius() > 0
+			&& UDamageType::StaticClass())
 		{
-			UGameplayStatics::ApplyRadialDamage(this, WeaponConfig.ExplosionDamage, NudgedImpactLocation, WeaponConfig.ExplosionRadius, WeaponConfig.DamageType, TArray<AActor*>(), this, MyController.Get());
+			UGameplayStatics::ApplyRadialDamage(this, MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage(), NudgedImpactLocation, MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetExplosionRadius(), MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType(), TArray<AActor*>(), this, MyController.Get());
 		}
 	}
 	else
 	{
-		if (WeaponConfig.HitDamage > 0 && WeaponConfig.DamageType)
+		if (MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() > 0 
+			&& UDamageType::StaticClass())
 		{
 			FString critical = "head";
 			if (Impact.BoneName.ToString() == critical)
 			{
-				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), (WeaponConfig.HitDamage * 2), Impact.ImpactPoint, Impact, MyPawn->Controller, this, WeaponConfig.DamageType);
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), (MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() * 2), Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
 			}
 			else
 			{
-				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), WeaponConfig.HitDamage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, WeaponConfig.DamageType);
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage(), Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
 			}
 		}
 	}

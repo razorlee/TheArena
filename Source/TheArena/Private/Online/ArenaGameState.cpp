@@ -32,7 +32,7 @@ void AArenaGameState::GetRankedMap(int32 TeamIndex, RankedPlayerMap& OutRankedMa
 	{
 		int32 Score = 0;
 		AArenaPlayerState* CurPlayerState = Cast<AArenaPlayerState>(PlayerArray[i]);
-		if (CurPlayerState && (CurPlayerState->GetTeamNum() == TeamIndex))
+		if (CurPlayerState && (1.0f == TeamIndex))
 		{
 			SortedMap.Add(FMath::TruncToInt(CurPlayerState->Score), CurPlayerState);
 		}

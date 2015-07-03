@@ -76,6 +76,10 @@ public:
 
 	/** set open menu */
 	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetSettings(bool bEnable);
+
+	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetAllowGameActions(bool bEnable);
 
 	/** get infinite ammo cheat */
@@ -108,6 +112,10 @@ public:
 	/** Returns whether the HUD is open */
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool IsHUDOpen() const;
+
+	/** Returns whether the HUD is open */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsSettingsOpen() const;
 
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool GetAllowGameActions() const;
@@ -166,6 +174,10 @@ protected:
 	/** informs the HUD if the menu is open */
 	UPROPERTY(Transient, Replicated)
 	uint8 OpenHUD : 1;
+
+	/** informs the HUD if the menu is open */
+	UPROPERTY(Transient, Replicated)
+	uint8 OpenSettings : 1;
 
 	/** infinite ammo cheat */
 	UPROPERTY(Transient, Replicated)
