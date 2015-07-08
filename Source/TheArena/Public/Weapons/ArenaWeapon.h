@@ -61,7 +61,7 @@ public:
 	void FinishEquip();
 
 	/** weapon is unequipped by owner pawn */
-	void UnEquip();
+	float UnEquip();
 
 	/** weapon is now equipped by owner pawn */
 	void FinishUnEquip();
@@ -155,5 +155,5 @@ protected:
 	/** holster animations */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* UnEquipAnim;
-	
+
 };

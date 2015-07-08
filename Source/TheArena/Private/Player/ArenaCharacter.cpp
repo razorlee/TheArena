@@ -12,6 +12,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	CharacterAttributes = PCIP.CreateDefaultSubobject<UArenaCharacterAttributes>(this, TEXT("CharacterAttributes"));
 	CharacterEquipment = PCIP.CreateDefaultSubobject<UArenaCharacterEquipment>(this, TEXT("CharacterEquipment"));
 	CharacterState = PCIP.CreateDefaultSubobject<UArenaCharacterState>(this, TEXT("CharacterState"));
+	//Server = ConstructObject<UServer_ArenaCharacter>(UServer_ArenaCharacter::StaticClass());
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -506,29 +507,33 @@ void AArenaCharacter::FinishEquipWeapon(class AArenaWeapon* Weapon)
 	}
 }
 
-void AArenaCharacter::UnEquipWeapon()
+float AArenaCharacter::UnEquipWeapon()
 {
+	float Duration;
 	if (Role == ROLE_Authority)
 	{
-		FinishUnEquipWeapon(CharacterEquipment->GetCurrentWeapon());
+		Duration = FinishUnEquipWeapon(CharacterEquipment->GetCurrentWeapon());
 	}
 	else
 	{
 		ServerUnEquipWeapon();
 	}
+	return Duration;
 }
-void AArenaCharacter::FinishUnEquipWeapon(class AArenaWeapon* Weapon)
+float AArenaCharacter::FinishUnEquipWeapon(class AArenaWeapon* Weapon)
 {
+	float Duration;
 	if (Weapon->IsPrimary() == true)
 	{
 		Weapon->SetOwningPawn(this);
-		Weapon->UnEquip();
+		Duration = Weapon->UnEquip();
 	}
 	else
 	{
 		Weapon->SetOwningPawn(this);
-		Weapon->UnEquip();
+		Duration = Weapon->UnEquip();
 	}
+	return Duration;
 }
 
 void AArenaCharacter::StartTargeting(bool bFromReplication)//recall3
@@ -596,8 +601,8 @@ void AArenaCharacter::LoopTargeting()
 
 void AArenaCharacter::SwapWeapon()
 {
-	UnEquipWeapon();
-	GetWorldTimerManager().SetTimer(TimerHandle_SwapWeapon, this, &AArenaCharacter::EquipWeapon, 1.5f, false);
+	float Duration = UnEquipWeapon();
+	GetWorldTimerManager().SetTimer(TimerHandle_SwapWeapon, this, &AArenaCharacter::EquipWeapon, Duration * 0.75f, false);
 }
 
 void AArenaCharacter::StartWeaponFire()
@@ -1058,76 +1063,6 @@ bool AArenaCharacter::ServerSetCrouched_Validate(bool bNewCrouched, bool bToggle
 void AArenaCharacter::ServerSetCrouched_Implementation(bool bNewCrouched, bool bToggle)
 {
 	//SetCrouched(bNewCrouched, bToggle);
-}
-
-bool AArenaCharacter::ServerSetCover_Validate(bool bNewCover)
-{
-	return true;
-}
-
-void AArenaCharacter::ServerSetCover_Implementation(bool bNewCover)
-{
-	//SetCover(bNewCover);
-}
-
-bool AArenaCharacter::ServerSetHiCover_Validate(bool bNewCover)
-{
-	return true;
-}
-
-void AArenaCharacter::ServerSetHiCover_Implementation(bool bNewCover)
-{
-	//SetHiCover(bNewCover);
-}
-
-bool AArenaCharacter::ServerSetLoCover_Validate(bool bNewCover)
-{
-	return true;
-}
-
-void AArenaCharacter::ServerSetLoCover_Implementation(bool bNewCover)
-{
-	//SetLoCover(bNewCover);
-}
-
-bool AArenaCharacter::ServerSetRight_Validate(bool left, bool right)
-{
-	return true;
-}
-
-void AArenaCharacter::ServerSetRight_Implementation(bool left, bool right)
-{
-	//SetRight(left, right);
-}
-
-bool AArenaCharacter::ServerSetLeft_Validate(bool left, bool right)
-{
-	return true;
-}
-
-void AArenaCharacter::ServerSetLeft_Implementation(bool left, bool right)
-{
-	//SetLeft(left, right);
-}
-
-bool AArenaCharacter::ServerSetRightEdge_Validate(bool bNewEdge)
-{
-	return true;
-}
-
-void AArenaCharacter::ServerSetRightEdge_Implementation(bool bNewEdge)
-{
-	//SetRightEdge(bNewEdge);
-}
-
-bool AArenaCharacter::ServerSetLeftEdge_Validate(bool bNewEdge)
-{
-	return true;
-}
-
-void AArenaCharacter::ServerSetLeftEdge_Implementation(bool bNewEdge)
-{
-	//SetLeftEdge(bNewEdge);
 }
 
 bool AArenaCharacter::ServerJump_Validate(class AArenaCharacter* client)

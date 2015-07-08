@@ -3,8 +3,6 @@
 #include "TheArena.h"
 #include "ArenaWeapon.h"
 
-
-// Sets default values
 AArenaWeapon::AArenaWeapon(const class FObjectInitializer& PCIP)
 {
 	//PrimaryComponentTick.bCanEverTick = true;
@@ -21,7 +19,6 @@ AArenaWeapon::AArenaWeapon(const class FObjectInitializer& PCIP)
 	Mesh3P->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
 }
 
-// Called when the game starts or when spawned
 void AArenaWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -35,6 +32,8 @@ void AArenaWeapon::Destroyed()
 
 	StopAttack();
 }
+
+////////////////////////////////////////// Input handlers //////////////////////////////////////////
 
 void AArenaWeapon::StartAttack()
 {
@@ -89,14 +88,15 @@ void AArenaWeapon::FinishEquip()
 	GetWeaponState()->SetWeaponState(EWeaponState::Default);
 }
 
-void AArenaWeapon::UnEquip()
+float AArenaWeapon::UnEquip()
 {
+	float Duration = 0;
 	if (ArenaWeaponCan::UnEquip(MyPawn, this))
 	{
 		StopAttack();
 		GetWeaponState()->SetWeaponState(EWeaponState::Holstering);
 
-		float Duration = PlayWeaponAnimation(UnEquipAnim);
+		Duration = PlayWeaponAnimation(UnEquipAnim);
 		//if (WeaponState->GetWeaponState() == EWeaponState::Reloading)
 		//{
 		//	StopWeaponAnimation(ReloadAnim);
@@ -110,8 +110,9 @@ void AArenaWeapon::UnEquip()
 		{
 			PlayWeaponSound(UnEquipSound);
 		}
-		//FinishUnEquip();
+		return Duration;
 	}
+	return Duration;
 }
 
 void AArenaWeapon::FinishUnEquip()
@@ -136,6 +137,8 @@ void AArenaWeapon::FinishUnEquip()
 	GetWeaponState()->SetWeaponState(EWeaponState::Default);
 }
 
+////////////////////////////////////////// Sound Controls //////////////////////////////////////////
+
 UAudioComponent* AArenaWeapon::PlayWeaponSound(USoundCue* Sound)
 {
 	UAudioComponent* AC = NULL;
@@ -146,6 +149,8 @@ UAudioComponent* AArenaWeapon::PlayWeaponSound(USoundCue* Sound)
 
 	return AC;
 }
+
+//////////////////////////////////////// Animation Controls ////////////////////////////////////////
 
 float AArenaWeapon::PlayWeaponAnimation(class UAnimMontage* Animation, float InPlayRate)
 {
@@ -173,6 +178,8 @@ void AArenaWeapon::StopWeaponAnimation(class UAnimMontage* Animation)
 		}
 	}
 }
+
+///////////////////////////////////////// Socket Controls /////////////////////////////////////////
 
 void AArenaWeapon::AttachMeshToPawn()
 {
@@ -204,11 +211,13 @@ void AArenaWeapon::DetachMeshFromPawn()
 	Mesh3P->DetachFromParent();
 	Mesh3P->SetHiddenInGame(true);
 }
+
+/////////////////////////////////////// Getters and Setters ///////////////////////////////////////
+
 class AArenaCharacter* AArenaWeapon::GetPawnOwner() const
 {
 	return MyPawn;
 }
-
 void AArenaWeapon::SetOwningPawn(AArenaCharacter* Character)
 {
 	Instigator = Character;

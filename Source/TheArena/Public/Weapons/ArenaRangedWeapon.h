@@ -86,4 +86,19 @@ protected:
 	FTimerHandle BurstFire;
 
 	uint32 bRefiring;
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartAttack();
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopAttack();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerHandleFiring();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartReload();
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopReload();
 };

@@ -46,15 +46,22 @@ void AArenaRangedWeapon::StartAttack()
 	}
 	else
 	{
-		//ServerStartFire();
+		ServerStartAttack();
 	}
 }
 void AArenaRangedWeapon::StopAttack()
 {
-	if (WeaponState->GetWeaponState() == EWeaponState::Firing)
+	if (Role == ROLE_Authority)
 	{
-		WeaponState->SetWeaponState(EWeaponState::Default);
-		OnBurstFinished();
+		if (WeaponState->GetWeaponState() == EWeaponState::Firing)
+		{
+			WeaponState->SetWeaponState(EWeaponState::Default);
+			OnBurstFinished();
+		}
+	}
+	else
+	{
+		ServerStopAttack();
 	}
 }
 
@@ -85,15 +92,22 @@ void AArenaRangedWeapon::StartReload()
 	}
 	else
 	{
-		//ServerStartReload();
+		ServerStartReload();
 	}
 }
 void AArenaRangedWeapon::StopReload()
 {
-	if (WeaponState->GetWeaponState() == EWeaponState::Reloading)
+	if (Role == ROLE_Authority)
 	{
-		WeaponState->SetWeaponState(EWeaponState::Default);
-		StopWeaponAnimation(WeaponEffects->GetReloadAnim());
+		if (WeaponState->GetWeaponState() == EWeaponState::Reloading)
+		{
+			WeaponState->SetWeaponState(EWeaponState::Default);
+			StopWeaponAnimation(WeaponEffects->GetReloadAnim());
+		}
+	}
+	else
+	{
+		ServerStopReload();
 	}
 }
 
@@ -220,6 +234,11 @@ void AArenaRangedWeapon::HandleFiring()
 
 	if (MyPawn && MyPawn->IsLocallyControlled())
 	{
+		if (Role < ROLE_Authority)
+		{
+			ServerHandleFiring();
+		}
+
 		// reload if possible
 		if (WeaponAttributes->CurrentClip <= 0 && ArenaWeaponCan::Reload(MyPawn, this))
 		{
@@ -566,4 +585,59 @@ UArenaRangedWeaponState* AArenaRangedWeapon::GetWeaponState()
 UArenaRangedWeaponAttributes* AArenaRangedWeapon::GetWeaponAttributes()
 {
 	return WeaponAttributes;
+}
+
+////////////////////////////////////////////// Server //////////////////////////////////////////////
+
+bool AArenaRangedWeapon::ServerStartAttack_Validate()
+{
+	return true;
+}
+void AArenaRangedWeapon::ServerStartAttack_Implementation()
+{
+	StartAttack();
+}
+
+bool AArenaRangedWeapon::ServerStopAttack_Validate()
+{
+	return true;
+}
+void AArenaRangedWeapon::ServerStopAttack_Implementation()
+{
+	StopAttack();
+}
+
+bool AArenaRangedWeapon::ServerHandleFiring_Validate()
+{
+	return true;
+}
+void AArenaRangedWeapon::ServerHandleFiring_Implementation()
+{
+	const bool bShouldUpdateAmmo = (WeaponAttributes->CurrentClip > 0 && ArenaWeaponCan::Fire(MyPawn, this));
+
+	HandleFiring();
+
+	if (bShouldUpdateAmmo)
+	{
+		WeaponAttributes->CurrentClip--;
+		WeaponAttributes->BurstCounter++;
+	}
+}
+
+bool AArenaRangedWeapon::ServerStartReload_Validate()
+{
+	return true;
+}
+void AArenaRangedWeapon::ServerStartReload_Implementation()
+{
+	StartReload();
+}
+
+bool AArenaRangedWeapon::ServerStopReload_Validate()
+{
+	return true;
+}
+void AArenaRangedWeapon::ServerStopReload_Implementation()
+{
+	StopReload();
 }

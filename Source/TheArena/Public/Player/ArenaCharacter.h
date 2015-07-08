@@ -116,8 +116,8 @@ public:
 	void FinishEquipWeapon(class AArenaWeapon* Weapon);
 
 	/** equips next weapon */
-	void UnEquipWeapon();
-	void FinishUnEquipWeapon(class AArenaWeapon* Weapon);
+	float UnEquipWeapon();
+	float FinishUnEquipWeapon(class AArenaWeapon* Weapon);
 
 	/** [server + local] change targeting state !currently only local! */
 	void SetTargeting(bool bNewTargeting);
@@ -197,6 +197,8 @@ protected:
 	class UArenaCharacterMovement* CharacterMovementComponent;
 
 	class UArenaSaveGame* LoadGameInstance;
+
+	//class UServer_ArenaCharacter* Server;
 
 	/** Handle for efficient management of StopReload timer */
 	FTimerHandle TimerHandle_SwapWeapon;
@@ -290,31 +292,4 @@ protected:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopTargeting();
 
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetCover(bool bNewCover);
-
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetHiCover(bool bNewCover);
-
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetLoCover(bool bNewCover);
-
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetRight(bool left, bool right);
-
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetLeft(bool left, bool right);
-
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetRightEdge(bool bNewEdge);
-
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetLeftEdge(bool bNewEdge);
 };
