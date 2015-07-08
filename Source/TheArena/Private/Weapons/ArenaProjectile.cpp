@@ -25,7 +25,7 @@ AArenaProjectile::AArenaProjectile(const class FObjectInitializer& PCIP)
 	MovementComp = PCIP.CreateDefaultSubobject<UProjectileMovementComponent>(this, TEXT("ProjectileComp"));
 	MovementComp->UpdatedComponent = CollisionComp;
 	MovementComp->InitialSpeed = 2000.0f;
-	MovementComp->MaxSpeed = 2000.0f;
+	MovementComp->MaxSpeed = 100000.0f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->ProjectileGravityScale = 0.f;
 
@@ -79,7 +79,7 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 
 	// effects and damage origin shouldn't be placed inside mesh at impact point
 	const FVector NudgedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
-	if (IsExplosive == true)
+	if (MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetIsExplosive() == true)
 	{
 		if (MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() > 0 
 			&& MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetExplosionRadius() > 0
@@ -148,7 +148,6 @@ FHitResult AArenaProjectile::ProjectileTrace(const FVector& StartTrace, const FV
 	return Hit;
 }
 
-
 void AArenaProjectile::DisableAndDestroy()
 {
 	UAudioComponent* ProjAudioComp = FindComponentByClass<UAudioComponent>();
@@ -166,6 +165,11 @@ void AArenaProjectile::DisableAndDestroy()
 void AArenaProjectile::OnRep_Exploded()
 {
 	Explode(ExplodeNotify.Hit);
+}
+
+void AArenaProjectile::SetInitialSpeed(float Speed)
+{
+	MovementComp->InitialSpeed = Speed;
 }
 
 void AArenaProjectile::SetPawnOwner(class AArenaCharacter* NewOwner)

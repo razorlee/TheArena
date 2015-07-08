@@ -11,27 +11,27 @@ struct FWeaponStats
 	GENERATED_USTRUCT_BODY()
 
 	/** The damage dealt to player before defense mitigation */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditDefaultsOnly, Category = Stats, meta = (ClampMin = "1", ClampMax = "1000", UIMin = "1", UIMax = "1000"))
 	int32 Damage;
 
-	/** The amount of joules the kickback produces */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	/** The precent of the by which recoil is reduced*/
+	UPROPERTY(EditDefaultsOnly, Category = Stats, meta = (ClampMin = "0", ClampMax = "100", UIMin = "0", UIMax = "100"))
 	float Stability;
 
-	/** The time it takes to perform weapon handeling */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	/** The rate at which weapon handling is performed */
+	UPROPERTY(EditDefaultsOnly, Category = Stats, meta = (ClampMin = "0.5", ClampMax = "2", UIMin = "0.5", UIMax = "2"))
 	float Motility;
 
-	/** The velocity of the projectile */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	/** The velocity of the projectile in Unreal Units */
+	UPROPERTY(EditDefaultsOnly, Category = Stats, meta = (ClampMin = "5000", ClampMax = "45000", UIMin = "5000", UIMax = "45000"))
 	float Velocity;
 
 	/** The spread of weapon fire */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditDefaultsOnly, Category = Stats, meta = (ClampMin = "0", ClampMax = "25", UIMin = "0", UIMax = "25"))
 	float Accuracy;
 
 	/** The time between two consecutive shots */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditDefaultsOnly, Category = Stats, meta = (ClampMin = "0.01", ClampMax = "2", UIMin = "0.01", UIMax = "2"))
 	float AttackSpeed;
 
 	/** Increases the speed of dodging*/
@@ -39,7 +39,7 @@ struct FWeaponStats
 	float Mobility;
 
 	/** The number of rounds in a clip */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditDefaultsOnly, Category = Stats, meta = (ClampMin = "1", ClampMax = "100", UIMin = "1", UIMax = "100"))
 	int32 Capacity;
 
 	/** defaults */
@@ -62,7 +62,7 @@ namespace EFireMode
 	enum Type 
 	{
 		Automatic	UMETA(DisplayName = "Automatic"),
-		SemiAut		UMETA(DisplayName = "Semi-Automatic"),
+		SemiAuto	UMETA(DisplayName = "Semi-Automatic"),
 		Burst		UMETA(DisplayName = "Burst Fire")
 	};
 }

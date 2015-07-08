@@ -5,94 +5,115 @@
 #include "GameFramework/PlayerState.h"
 #include "ArenaPlayerState.generated.h"
 
-UENUM(BlueprintCallable, BlueprintType, Category = Character)
-namespace EPlayerState
-{
-	enum Type
-	{
-		Idle,
-		Jumping,
-		Running,
-		Crouching,
-		Covering,
-		Vaulting,
-		Default
-	};
-}
-
-UENUM(BlueprintCallable, BlueprintType, Category = Character)
-namespace ECoverState
-{
-	enum Type
-	{
-		HighLeft,
-		HighRight,
-		HighMiddle,
-		LowLeft,
-		LowRight,
-		LowMiddle,
-		Default
-	};
-}
-
-UENUM(BlueprintCallable, BlueprintType, Category = Character)
-namespace ECombatState
-{
-	enum Type
-	{
-		Aggressive,
-		Passive,
-		Default
-	};
-}
 
 UCLASS()
 class THEARENA_API AArenaPlayerState : public APlayerState
 {
 	GENERATED_UCLASS_BODY()
 
-	/** clears everything */
+	// Begin APlayerState interface
+	/** clear scores */
 	virtual void Reset() override;
 
 	/**
 	* Set the team
 	*
-	* @param InController The controller to initialize state with
+	* @param	InController	The controller to initialize state with
 	*/
 	virtual void ClientInitialize(class AController* InController) override;
 
-	/** get current weapon state */
-	UFUNCTION(BlueprintCallable, Category = Character)
-	EPlayerState::Type GetPlayerState() const;
+	virtual void UnregisterPlayerWithSession() override;
 
-	/** update weapon state */
-	UFUNCTION(BlueprintCallable, Category = Character)
-	void SetPlayerState(EPlayerState::Type NewState);
+	// End APlayerState interface
 
-	/** get current weapon state */
-	UFUNCTION(BlueprintCallable, Category = Character)
-	ECoverState::Type GetCoverState() const;
+	/**
+	* Set new team and update pawn. Also updates player character team colors.
+	*
+	* @param	NewTeamNumber	Team we want to be on.
+	*/
+	void SetTeamNum(int32 NewTeamNumber);
 
-	/** update weapon state */
-	UFUNCTION(BlueprintCallable, Category = Character)
-	void SetCoverState(ECoverState::Type NewState);
+	/** player killed someone */
+	void ScoreKill(AArenaPlayerState* Victim, int32 Points);
 
-	/** get current weapon state */
-	UFUNCTION(BlueprintCallable, Category = Character)
-	ECombatState::Type GetCombatState() const;
+	/** player died */
+	void ScoreDeath(AArenaPlayerState* KilledBy, int32 Points);
 
-	/** update weapon state */
-	UFUNCTION(BlueprintCallable, Category = Character)
-	void SetCombatState(ECombatState::Type NewState);
+	/** get current team */
+	int32 GetTeamNum() const;
+
+	/** get number of kills */
+	int32 GetKills() const;
+
+	/** get number of deaths */
+	int32 GetDeaths() const;
+
+	/** get number of points */
+	float GetScore() const;
+
+	/** get number of bullets fired this match */
+	int32 GetNumBulletsFired() const;
+
+	/** get number of rockets fired this match */
+	int32 GetNumRocketsFired() const;
+
+	/** get whether the player quit the match */
+	bool IsQuitter() const;
+
+	/** gets truncated player name to fit in death log and scoreboards */
+	FString GetShortPlayerName() const;
+
+	/** Sends kill (excluding self) to clients */
+	UFUNCTION(Reliable, Client)
+	void InformAboutKill(class AArenaPlayerState* KillerPlayerState, const UDamageType* KillerDamageType, class AArenaPlayerState* KilledPlayerState);
+
+	/** broadcast death to local clients */
+	UFUNCTION(Reliable, NetMulticast)
+	void BroadcastDeath(class AArenaPlayerState* KillerPlayerState, const UDamageType* KillerDamageType, class AArenaPlayerState* KilledPlayerState);
+
+	/** replicate team colors. Updated the players mesh colors appropriately */
+	UFUNCTION()
+	void OnRep_TeamColor();
+
+	//We don't need stats about amount of ammo fired to be server authenticated, so just increment these with local functions
+	void AddBulletsFired(int32 NumBullets);
+	void AddRocketsFired(int32 NumRockets);
+
+	/** Set whether the player is a quitter */
+	void SetQuitter(bool bInQuitter);
+
+	//virtual void CopyProperties(class APlayerState* PlayerState) override;
 
 protected:
 
-	/** current weapon state */
-	EPlayerState::Type PlayerState;
+	/** Set the mesh colors based on the current teamnum variable */
+	void UpdateTeamColors();
 
-	/** current cover state */
-	ECoverState::Type CoverState;
+	/** team number */
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_TeamColor)
+	int32 TeamNumber;
 
-	/** current cover state */
-	ECombatState::Type CombatState;
+	/** number of kills */
+	UPROPERTY(Transient, Replicated)
+	int32 NumKills;
+
+	/** number of deaths */
+	UPROPERTY(Transient, Replicated)
+	int32 NumDeaths;
+
+	/** number of bullets fired this match */
+	UPROPERTY()
+	int32 NumBulletsFired;
+
+	/** number of rockets fired this match */
+	UPROPERTY()
+	int32 NumRocketsFired;
+
+	/** whether the user quit the match */
+	UPROPERTY()
+	uint8 bQuitter : 1;
+
+	/** helper for scoring points */
+	void ScorePoints(int32 Points);
+
 };

@@ -33,7 +33,7 @@ bool ArenaCharacterCan::MoveForward(AArenaCharacter* character, AArenaPlayerCont
 {
 	if (controller
 		&& controller->IsGameInputAllowed()
-		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Covering
+		//&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Covering
 		&& Value != 0.0f)
 	{
 		return true;

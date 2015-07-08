@@ -85,7 +85,7 @@ public:
 	class UArenaCharacterMovement* GetPlayerMovement();
 
 	UFUNCTION(BlueprintCallable, Category = Character)
-	class AArenaPlayerState* GetPlayerState() const;
+	class UArenaCharacterState* GetPlayerState() const;
 
 	UFUNCTION(BlueprintCallable, Category = Character)
 	class UArenaCharacterAttributes* GetCharacterAttributes();
@@ -191,10 +191,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Equipment)
 	class UArenaCharacterEquipment* CharacterEquipment;
 
-	class UArenaSaveGame* LoadGameInstance;
+	UPROPERTY()
+	class UArenaCharacterState* CharacterState;
 
 	class UArenaCharacterMovement* CharacterMovementComponent;
-	class AArenaPlayerState* CharacterState;
+
+	class UArenaSaveGame* LoadGameInstance;
 
 	/** Handle for efficient management of StopReload timer */
 	FTimerHandle TimerHandle_SwapWeapon;

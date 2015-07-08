@@ -12,6 +12,8 @@ class THEARENA_API AArenaRangedWeapon : public AArenaWeapon
 
 	AArenaRangedWeapon(const FObjectInitializer& ObjectInitializer);
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	virtual void Destroyed() override;
 
 ////////////////////////////////////////// Input handlers //////////////////////////////////////////
@@ -27,7 +29,10 @@ class THEARENA_API AArenaRangedWeapon : public AArenaWeapon
 
 	void HandleFiring();
 	void FireWeapon();
-	
+
+	void HandleRecoil(float DeltaSeconds);
+	void FinishRecoil(float DeltaSeconds);
+
 	void Reload();
 
 	void Melee();
@@ -73,6 +78,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	FName MuzzleAttachPoint;
 	
+	float RecoilCounter;
+
+	bool IsRecoiling;
+
 	/** Handle for efficient management of StopReload timer */
 	FTimerHandle BurstFire;
 

@@ -33,6 +33,9 @@ class THEARENA_API AArenaProjectile : public AActor
 	UFUNCTION()
 	void OnImpact(const FHitResult& HitResult);
 
+	UFUNCTION()
+	void SetInitialSpeed(float Speed);
+
 	/** get pawn owner */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	void SetPawnOwner(class AArenaCharacter* MyPawn);

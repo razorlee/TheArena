@@ -41,15 +41,23 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Sockets)
 	FName GetWeaponAttachPoint();
-
 	UFUNCTION(BlueprintCallable, Category = Sockets)
 	FName GetOffHandAttachPoint();
 
 	UFUNCTION(BlueprintCallable, Category = Sockets)
 	FName GetMainWeaponAttachPoint();
-
 	UFUNCTION(BlueprintCallable, Category = Sockets)
 	FName GetOffWeaponAttachPoint();
+
+	UFUNCTION(BlueprintCallable, Category = Sockets)
+	FName GetMainHeavyAttachPoint();
+	UFUNCTION(BlueprintCallable, Category = Sockets)
+	FName GetOffHeavyAttachPoint();
+
+	UFUNCTION(BlueprintCallable, Category = Sockets)
+	FName GetMainPistolAttachPoint();
+	UFUNCTION(BlueprintCallable, Category = Sockets)
+	FName GetOffPistolAttachPoint();
 
 	UFUNCTION(BlueprintCallable, Category = Sockets)
 	FName GetWristOneAttachPoint();
@@ -84,12 +92,28 @@ private:
 	/** socket or bone name for attaching Utility mesh */
 	UPROPERTY(EditDefaultsOnly, Category = Sockets)
 	FName OffHandAttachPoint;
+
 	/** socket or bone name for attaching Utility mesh */
 	UPROPERTY(EditDefaultsOnly, Category = Sockets)
 	FName MainWeaponAttachPoint;
 	/** socket or bone name for attaching Utility mesh */
 	UPROPERTY(EditDefaultsOnly, Category = Sockets)
 	FName OffWeaponAttachPoint;
+
+	/** socket or bone name for attaching Utility mesh */
+	UPROPERTY(EditDefaultsOnly, Category = Sockets)
+	FName MainHeavyAttachPoint;
+	/** socket or bone name for attaching Utility mesh */
+	UPROPERTY(EditDefaultsOnly, Category = Sockets)
+	FName OffHeavyAttachPoint;
+
+	/** socket or bone name for attaching Utility mesh */
+	UPROPERTY(EditDefaultsOnly, Category = Sockets)
+	FName MainPistolAttachPoint;
+	/** socket or bone name for attaching Utility mesh */
+	UPROPERTY(EditDefaultsOnly, Category = Sockets)
+	FName OffPistolAttachPoint;
+
 	/** socket or bone name for attaching Utility mesh */
 	UPROPERTY(EditDefaultsOnly, Category = Sockets)
 	FName WristOneAttachPoint;

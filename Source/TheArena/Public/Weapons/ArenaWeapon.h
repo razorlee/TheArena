@@ -5,6 +5,20 @@
 #include "GameFramework/Actor.h"
 #include "ArenaWeapon.generated.h"
 
+UENUM(BlueprintCallable, BlueprintType, Category = Weapon)
+namespace EWeaponClass
+{
+	enum Type
+	{
+		AssaultRifle	UMETA(DisplayName = "Assault Rifle"),
+		MarksmenRifle	UMETA(DisplayName = "Marksmen Rifle"),
+		Shotgun			UMETA(DisplayName = "Shotgun"),
+		HeavyWeapon		UMETA(DisplayName = "Heavy Weapon"),
+		Pistol			UMETA(DisplayName = "Pistol")
+	};
+}
+
+
 UCLASS()
 class THEARENA_API AArenaWeapon : public AActor
 {
@@ -60,7 +74,7 @@ public:
 //////////////////////////////////////// Animation Controls ////////////////////////////////////////
 
 	/** play weapon animations */
-	float PlayWeaponAnimation(class UAnimMontage* Animation);
+	float PlayWeaponAnimation(class UAnimMontage* Animation, float InPlayRate = 1.f);
 
 	/** stop playing weapon animations */
 	void StopWeaponAnimation(class UAnimMontage* Animation);
@@ -84,6 +98,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void SetOwningPawn(AArenaCharacter* AArenaCharacter);
 
+	UFUNCTION(BlueprintCallable, Category = Config)
+	EWeaponClass::Type GetWeaponClass();
+	UFUNCTION(BlueprintCallable, Category = Config)
+	void SetWeaponClass(EWeaponClass::Type NewClass);
+
 	UFUNCTION(BlueprintCallable, Category = WeaponInfo)
 	bool IsPrimary();
 	UFUNCTION(BlueprintCallable, Category = WeaponInfo)
@@ -106,6 +125,9 @@ public:
 protected:
 
 	AArenaCharacter* MyPawn;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	TEnumAsByte<EWeaponClass::Type> WeaponClass;
 
 	UPROPERTY(VisibleAnywhere, Category = WeaponInfo)
 	bool PrimaryWeapon;

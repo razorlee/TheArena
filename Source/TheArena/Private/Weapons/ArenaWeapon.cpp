@@ -7,6 +7,8 @@
 // Sets default values
 AArenaWeapon::AArenaWeapon(const class FObjectInitializer& PCIP)
 {
+	//PrimaryComponentTick.bCanEverTick = true;
+
 	Mesh3P = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("WeaponMesh3P"));
 	Mesh3P->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
 	Mesh3P->bChartDistanceFactor = true;
@@ -114,13 +116,24 @@ void AArenaWeapon::UnEquip()
 
 void AArenaWeapon::FinishUnEquip()
 {
-	FName AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainWeaponAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffWeaponAttachPoint();
+	FName AttachPoint;
+	if (WeaponClass == EWeaponClass::HeavyWeapon)
+	{
+		AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainHeavyAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffHeavyAttachPoint();
+	}
+	else if (WeaponClass == EWeaponClass::Pistol)
+	{
+		AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainPistolAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffPistolAttachPoint();
+	}
+	else
+	{
+		AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainWeaponAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffWeaponAttachPoint();
+	}
 
 	USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();
 	Mesh3P->SetHiddenInGame(false);
 	Mesh3P->AttachTo(PawnMesh3p, AttachPoint, EAttachLocation::SnapToTarget, true);
 	GetWeaponState()->SetWeaponState(EWeaponState::Default);
-	//AttachRootComponentTo(PawnMesh3p);
 }
 
 UAudioComponent* AArenaWeapon::PlayWeaponSound(USoundCue* Sound)
@@ -134,7 +147,7 @@ UAudioComponent* AArenaWeapon::PlayWeaponSound(USoundCue* Sound)
 	return AC;
 }
 
-float AArenaWeapon::PlayWeaponAnimation(class UAnimMontage* Animation)
+float AArenaWeapon::PlayWeaponAnimation(class UAnimMontage* Animation, float InPlayRate)
 {
 	float Duration = 0.0f;
 	if (MyPawn)
@@ -142,7 +155,7 @@ float AArenaWeapon::PlayWeaponAnimation(class UAnimMontage* Animation)
 		UAnimMontage* UseAnim = Animation;
 		if (UseAnim)
 		{
-			Duration = MyPawn->PlayAnimMontage(UseAnim);
+			Duration = MyPawn->PlayAnimMontage(UseAnim, InPlayRate);
 		}
 	}
 
@@ -191,7 +204,6 @@ void AArenaWeapon::DetachMeshFromPawn()
 	Mesh3P->DetachFromParent();
 	Mesh3P->SetHiddenInGame(true);
 }
-
 class AArenaCharacter* AArenaWeapon::GetPawnOwner() const
 {
 	return MyPawn;
@@ -204,11 +216,19 @@ void AArenaWeapon::SetOwningPawn(AArenaCharacter* Character)
 	SetOwner(Character);
 }
 
+EWeaponClass::Type AArenaWeapon::GetWeaponClass()
+{
+	return WeaponClass;
+}
+void AArenaWeapon::SetWeaponClass(EWeaponClass::Type NewClass)
+{
+	WeaponClass = NewClass;
+}
+
 bool AArenaWeapon::IsPrimary()
 {
 	return PrimaryWeapon;
 }
-
 void AArenaWeapon::SetPrimary(bool Status)
 {
 	PrimaryWeapon = Status;

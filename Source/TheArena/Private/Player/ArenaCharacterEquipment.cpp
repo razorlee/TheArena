@@ -22,15 +22,17 @@ void UArenaCharacterEquipment::InitializeComponent()
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
 
-	PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(PrimaryWeaponBP, SpawnInfo);
-	PrimaryWeapon->SetOwningPawn(Cast<AArenaCharacter>(GetOwner()));
-	PrimaryWeapon->SetPrimary(true);
-	PrimaryWeapon->UnEquip();
 
-	SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(SecondaryWeaponBP, SpawnInfo);
-	SecondaryWeapon->SetOwningPawn(Cast<AArenaCharacter>(GetOwner()));
-	SecondaryWeapon->SetPrimary(false);
-	SecondaryWeapon->UnEquip();
+		PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(PrimaryWeaponBP, SpawnInfo);
+		PrimaryWeapon->SetOwningPawn(Cast<AArenaCharacter>(GetOwner()));
+		PrimaryWeapon->SetPrimary(true);
+		PrimaryWeapon->UnEquip();
+
+		SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(SecondaryWeaponBP, SpawnInfo);
+		SecondaryWeapon->SetOwningPawn(Cast<AArenaCharacter>(GetOwner()));
+		SecondaryWeapon->SetPrimary(false);
+		SecondaryWeapon->UnEquip();
+
 }
 
 void UArenaCharacterEquipment::Reset()
@@ -83,7 +85,6 @@ FName UArenaCharacterEquipment::GetWeaponAttachPoint()
 {
 	return WeaponAttachPoint;
 }
-
 FName UArenaCharacterEquipment::GetOffHandAttachPoint()
 {
 	return OffHandAttachPoint;
@@ -93,10 +94,27 @@ FName UArenaCharacterEquipment::GetMainWeaponAttachPoint()
 {
 	return MainWeaponAttachPoint;
 }
-
 FName UArenaCharacterEquipment::GetOffWeaponAttachPoint()
 {
 	return OffWeaponAttachPoint;
+}
+
+FName UArenaCharacterEquipment::GetMainHeavyAttachPoint()
+{
+	return MainHeavyAttachPoint;
+}
+FName UArenaCharacterEquipment::GetOffHeavyAttachPoint()
+{
+	return OffHeavyAttachPoint;
+}
+
+FName UArenaCharacterEquipment::GetMainPistolAttachPoint()
+{
+	return MainPistolAttachPoint;
+}
+FName UArenaCharacterEquipment::GetOffPistolAttachPoint()
+{
+	return OffPistolAttachPoint;
 }
 
 FName UArenaCharacterEquipment::GetWristOneAttachPoint()

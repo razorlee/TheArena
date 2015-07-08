@@ -11,6 +11,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	CharacterMovementComponent = Cast<UArenaCharacterMovement>(GetCharacterMovement());
 	CharacterAttributes = PCIP.CreateDefaultSubobject<UArenaCharacterAttributes>(this, TEXT("CharacterAttributes"));
 	CharacterEquipment = PCIP.CreateDefaultSubobject<UArenaCharacterEquipment>(this, TEXT("CharacterEquipment"));
+	CharacterState = PCIP.CreateDefaultSubobject<UArenaCharacterState>(this, TEXT("CharacterState"));
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -372,7 +373,6 @@ void AArenaCharacter::PossessedBy(class AController* InController)
 {
 	Super::PossessedBy(InController);
 
-	CharacterState = Cast<AArenaPlayerState>(PlayerState);
 }
 
 FRotator AArenaCharacter::GetAimOffsets() const
@@ -396,7 +396,7 @@ UArenaCharacterMovement* AArenaCharacter::GetPlayerMovement()
 	return CharacterMovementComponent;
 }
 
-AArenaPlayerState* AArenaCharacter::GetPlayerState() const
+UArenaCharacterState* AArenaCharacter::GetPlayerState() const
 {
 	return CharacterState;
 }

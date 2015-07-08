@@ -5,9 +5,28 @@
 
 AArenaRangedWeapon::AArenaRangedWeapon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = true;	
+
 	WeaponAttributes = ObjectInitializer.CreateDefaultSubobject<UArenaRangedWeaponAttributes>(this, TEXT("WeaponAttributes"));
 	WeaponEffects = ObjectInitializer.CreateDefaultSubobject<UArenaRangedWeaponEffects>(this, TEXT("WeaponEffects"));
 	WeaponState = ObjectInitializer.CreateDefaultSubobject<UArenaRangedWeaponState>(this, TEXT("WeaponState"));
+
+	RecoilCounter = 0;
+	IsRecoiling = false;
+}
+
+void AArenaRangedWeapon::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (IsRecoiling)
+	{
+		HandleRecoil(DeltaSeconds);
+	}
+	else
+	{
+		FinishRecoil(DeltaSeconds);
+	}
 }
 
 void AArenaRangedWeapon::Destroyed()
@@ -46,7 +65,7 @@ void AArenaRangedWeapon::StartReload()
 		if (ArenaWeaponCan::Reload(MyPawn, this))
 		{
 			WeaponState->SetWeaponState(EWeaponState::Reloading);
-			float AnimDuration = PlayWeaponAnimation(WeaponEffects->GetReloadAnim());
+			float AnimDuration = PlayWeaponAnimation(WeaponEffects->GetReloadAnim(), WeaponAttributes->GetMotility()) * (1.0f / WeaponAttributes->GetMotility());
 			if (AnimDuration <= 0.0f)
 			{
 				AnimDuration = 3.0f;
@@ -117,8 +136,9 @@ void AArenaRangedWeapon::StopMelee()
 
 void AArenaRangedWeapon::OnBurstStarted()
 {
-	// start firing, can be delayed to satisfy TimeBetweenShots
+	IsRecoiling = true;
 	const float GameTime = GetWorld()->GetTimeSeconds();
+
 	if (WeaponAttributes->LastFireTime > 0 && WeaponAttributes->GetAttackSpeed() > 0.0f && WeaponAttributes->LastFireTime + WeaponAttributes->GetAttackSpeed() > GameTime)
 	{
 		if (WeaponAttributes->GetFireMode() == EFireMode::Burst)
@@ -161,6 +181,8 @@ void AArenaRangedWeapon::OnBurstFinished()
 		WeaponAttributes->BurstCounter = 0;
 		StopAttackFX();
 	}
+	
+	IsRecoiling = false;
 	bRefiring = false;
 }
 
@@ -169,7 +191,8 @@ void AArenaRangedWeapon::HandleFiring()
 	if (ArenaWeaponCan::Fire(MyPawn, this))
 	{
 		WeaponState->SetWeaponState(EWeaponState::Firing);
-		if (GetNetMode() != NM_DedicatedServer && WeaponAttributes->BurstCounter < 1)
+
+		if (GetNetMode() != NM_DedicatedServer)// && WeaponAttributes->BurstCounter < 1)
 		{
 			PlayAttackFX();
 		}
@@ -251,10 +274,38 @@ void AArenaRangedWeapon::SpawnProjectile(FVector Origin, FVector ShootDir, FHitR
 		Projectile->SetPawnOwner(MyPawn);
 		Projectile->Instigator = Instigator;
 		Projectile->SetOwner(this);
+		Projectile->SetInitialSpeed(WeaponAttributes->GetVelocity());
 		Projectile->InitVelocity(ShootDir);
 		Projectile->SetHitResults(Hit);
 
 		UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
+	}
+}
+
+void AArenaRangedWeapon::HandleRecoil(float DeltaSeconds)
+{
+	float Stability = 1 - (WeaponAttributes->GetStability() * 0.01);
+	if (RecoilCounter < Stability * 7)
+	{
+		RecoilCounter += Stability;
+
+		float Recoil = FMath::FInterpTo(0.0f, -Stability, DeltaSeconds, 100.0f);
+
+		MyPawn->AddControllerPitchInput(Recoil);
+	}
+}
+
+void AArenaRangedWeapon::FinishRecoil(float DeltaSeconds)
+{
+	if (RecoilCounter > 0)
+	{
+		float Recoil = FMath::FInterpTo(0.0f, RecoilCounter, DeltaSeconds, 5.0f);
+		MyPawn->AddControllerPitchInput(Recoil);
+		RecoilCounter -= Recoil;
+	}
+	else
+	{
+		RecoilCounter = 0;
 	}
 }
 
@@ -429,9 +480,9 @@ void AArenaRangedWeapon::PlayAttackFX()
 	if (WeaponEffects->GetMuzzleFX())
 	{
 		USkeletalMeshComponent* UseWeaponMesh = GetWeaponMesh();
-		if (WeaponAttributes->GetFireMode() != EFireMode::Automatic || WeaponEffects->GetMuzzlePSC() == NULL)
+		if (WeaponAttributes->BurstCounter < 1 || WeaponEffects->GetMuzzlePSC() == NULL)
 		{
-			// Split screen requires we create 2 effects. One that we see and one that the other player sees.
+			 //Split screen requires we create 2 effects. One that we see and one that the other player sees.
 			if (MyPawn && MyPawn->IsLocallyControlled())
 			{
 				AController* PlayerCon = MyPawn->GetController();

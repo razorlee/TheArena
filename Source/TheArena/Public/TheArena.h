@@ -27,6 +27,7 @@
 #include "Public/Effects/ArenaExplosionEffect.h"
 #include "Public/Player/ArenaPlayerCameraManager.h"
 #include "Public/Player/ArenaCharacterMovement.h"
+#include "Public/Player/ArenaCharacterState.h"
 #include "Public/Player/ArenaCharacterAttributes.h"
 #include "Public/Player/ArenaCharacterEquipment.h"
 #include "Public/Player/ArenaPlayerController.h"
