@@ -11,35 +11,35 @@ struct FPlayerStats
 	GENERATED_USTRUCT_BODY()
 
 	/** Rate of health regeneration */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditAnywhere, Category = Stats)
 	float HealthRegen;
 
 	/**Rate of stamina regeneration */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditAnywhere, Category = Stats)
 	float StaminaRegen;
 
 	/** Rate of energy regeneration */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditAnywhere, Category = Stats)
 	float EnergyRegen;
 
 	/** Rate of shield regeneration */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditAnywhere, Category = Stats)
 	float ShieldRegen;
 
 	/** Increases the amount of damage mitigated */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditAnywhere, Category = Stats)
 	float Protection;
 
 	/** Reduces stamina cunsumption and increase stamina regeneration */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditAnywhere, Category = Stats)
 	float Mobility;
 
 	/** Decreases movement speed reduction */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditAnywhere, Category = Stats)
 	float Speed;
 
 	/** Increases the players rate of recovery from negative effects */
-	UPROPERTY(EditDefaultsOnly, Category = Stats)
+	UPROPERTY(EditAnywhere, Category = Stats)
 	float Recovery;
 
 	///** defaults */
@@ -62,19 +62,19 @@ struct FPlayerResources
 	GENERATED_USTRUCT_BODY()
 
 	/** Current health of the Pawn */
-	UPROPERTY(EditDefaultsOnly, Category = Resources)
+	UPROPERTY(EditAnywhere, Category = Resources)
 	float Health;
 
 	/** Current Stamina of the Pawn */
-	UPROPERTY(EditDefaultsOnly, Category = Resources)
+	UPROPERTY(EditAnywhere, Category = Resources)
 	float Stamina;
 
 	/** Current Energy of the Pawn */
-	UPROPERTY(EditDefaultsOnly, Category = Resources)
+	UPROPERTY(EditAnywhere, Category = Resources)
 	float Energy;
 
 	/** Current Shield of the Pawn */
-	UPROPERTY(EditDefaultsOnly, Category = Resources)
+	UPROPERTY(EditAnywhere, Category = Resources)
 	float Shield;
 
 	/** The percentage of health when low health effects should start */

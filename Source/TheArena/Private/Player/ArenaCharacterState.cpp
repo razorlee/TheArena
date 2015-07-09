@@ -13,7 +13,9 @@ UArenaCharacterState::UArenaCharacterState(const class FObjectInitializer& PCIP)
 
 void UArenaCharacterState::Reset()
 {
-	
+	PlayerState = EPlayerState::Default;
+	CoverState = ECoverState::Default;
+	CombatState = ECombatState::Passive;
 }
 
 EPlayerState::Type UArenaCharacterState::GetPlayerState() const

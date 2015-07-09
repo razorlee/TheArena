@@ -185,13 +185,13 @@ protected:
 
 ////////////////////////////////////////// Private Properties //////////////////////////////////////////
 
-	UPROPERTY(EditDefaultsOnly, Category = Attributes)
+	UPROPERTY(EditAnywhere, Category = Attributes)
 	class UArenaCharacterAttributes* CharacterAttributes;
 
-	UPROPERTY(EditDefaultsOnly, Category = Equipment)
+	UPROPERTY(EditAnywhere, Category = Equipment)
 	class UArenaCharacterEquipment* CharacterEquipment;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = State)
 	class UArenaCharacterState* CharacterState;
 
 	class UArenaCharacterMovement* CharacterMovementComponent;

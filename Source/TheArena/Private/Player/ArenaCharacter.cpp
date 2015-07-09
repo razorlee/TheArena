@@ -72,7 +72,7 @@ void AArenaCharacter::PostInitializeComponents()
 	{
 		//initialize components
 	}
-
+	CharacterState->Reset();
 	// set initial mesh visibility (3rd person view)
 	UpdatePawnMeshes();
 
