@@ -33,6 +33,8 @@ class THEARENA_API AArenaRangedWeapon : public AArenaWeapon
 	void HandleRecoil(float DeltaSeconds);
 	void FinishRecoil(float DeltaSeconds);
 
+	void HandleBurst();
+
 	void Reload();
 
 	void Melee();

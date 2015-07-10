@@ -23,6 +23,7 @@ void AArenaWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	RotateWeapon();
 	DetachMeshFromPawn();
 }
 
@@ -69,6 +70,7 @@ void AArenaWeapon::Equip()
 {
 	if (ArenaWeaponCan::Equip(MyPawn, this))
 	{
+		RotateWeapon();
 		GetWeaponState()->SetWeaponState(EWeaponState::Equipping);
 		float Duration = PlayWeaponAnimation(EquipAnim);
 
@@ -93,6 +95,7 @@ float AArenaWeapon::UnEquip()
 	float Duration = 0;
 	if (ArenaWeaponCan::UnEquip(MyPawn, this))
 	{
+		RotateWeapon();
 		StopAttack();
 		GetWeaponState()->SetWeaponState(EWeaponState::Holstering);
 

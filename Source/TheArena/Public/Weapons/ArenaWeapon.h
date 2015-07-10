@@ -122,6 +122,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	virtual class UArenaRangedWeaponAttributes* GetWeaponAttributes(); //PURE_VIRTUAL(AArenaWeapon::GetWeaponAttributes, );
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
+	void RotateWeapon();
+
 protected:
 
 	AArenaCharacter* MyPawn;

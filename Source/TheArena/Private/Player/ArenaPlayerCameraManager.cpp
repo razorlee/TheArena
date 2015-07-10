@@ -4,6 +4,13 @@ AArenaPlayerCameraManager::AArenaPlayerCameraManager(const FObjectInitializer& O
 {
 	MyPawn = NULL;
 	Speed = 20.0f;
+
+	CurrentArm = 250.0f;
+	CurrentOffset = FVector(0.0f, 0.0f, 0.0f);
+
+	TargetArm = 250.0f;
+	TargetOffset = FVector(0.0f, 0.0f, 0.0f);
+
 	bAlwaysApplyModifiers = true;
 }
 
@@ -30,15 +37,12 @@ void AArenaPlayerCameraManager::UpdateCamera(float DeltaTime)
 
 void AArenaPlayerCameraManager::UpdateCurrents(float DeltaTime)
 {
-	if (TargetArm == MyPawn->CameraBoom->TargetArmLength && TargetOffset == MyPawn->CameraBoom->SocketOffset)
+	if (TargetArm != CurrentArm || TargetOffset != CurrentOffset)
 	{
-		CurrentArm = TargetArm;
-		CurrentOffset = TargetOffset;
-	}
-	else
-	{
-		MyPawn->CameraBoom->TargetArmLength = FMath::FInterpTo(CurrentArm, TargetArm, DeltaTime, Speed);
-		MyPawn->CameraBoom->SocketOffset = FMath::VInterpTo(CurrentOffset, TargetOffset, DeltaTime, Speed);
+		CurrentArm = FMath::FInterpTo(CurrentArm, TargetArm, DeltaTime, Speed);
+		CurrentOffset = FMath::VInterpTo(CurrentOffset, TargetOffset, DeltaTime, Speed);
+		MyPawn->CameraBoom->TargetArmLength = CurrentArm;
+		MyPawn->CameraBoom->SocketOffset = CurrentOffset;
 	}
 }
 
@@ -47,6 +51,7 @@ void AArenaPlayerCameraManager::UpdateCurrents(float DeltaTime)
 void AArenaPlayerCameraManager::HandlePassiveCamera()
 {
 	MyPawn->bUseControllerRotationYaw = false;
+	Speed = 20.0f;
 	TargetArm = 250.0f;
 	TargetOffset = FVector(0.0f, 0.0f, 0.0f);
 }

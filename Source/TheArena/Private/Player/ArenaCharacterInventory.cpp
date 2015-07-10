@@ -21,7 +21,7 @@ void UArenaCharacterInventory::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	// ...
+	SpawnDefaultInventory();
 	
 }
 
@@ -34,3 +34,22 @@ void UArenaCharacterInventory::TickComponent( float DeltaTime, ELevelTick TickTy
 	// ...
 }
 
+void UArenaCharacterInventory::SpawnDefaultInventory()
+{
+	int32 NumWeaponClasses = DefaultInventoryClasses.Num();
+	for (int32 i = 0; i < NumWeaponClasses; i++)
+	{
+		if (DefaultInventoryClasses[i])
+		{
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.bNoCollisionFail = true;
+			AArenaWeapon* NewWeapon = GetWorld()->SpawnActor<AArenaWeapon>(DefaultInventoryClasses[i], SpawnInfo);
+			Inventory.AddUnique(NewWeapon);
+		}
+	}
+}
+
+TArray<class AArenaWeapon*> UArenaCharacterInventory::GetInventory()
+{
+	return Inventory;
+}

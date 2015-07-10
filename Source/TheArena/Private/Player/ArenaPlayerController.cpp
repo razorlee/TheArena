@@ -249,6 +249,11 @@ void AArenaPlayerController::SetFriendsList(bool bEnable)
 	this->OpenFriendsList = bEnable;
 }
 
+void AArenaPlayerController::SetInventory(bool bEnable)
+{
+	this->OpenInventory = bEnable;
+}
+
 void AArenaPlayerController::SetHUD(bool bEnable)
 {
 	this->OpenHUD = bEnable;
@@ -562,6 +567,11 @@ bool AArenaPlayerController::IsMenuOpen() const
 bool AArenaPlayerController::IsFriendsListOpen() const
 {
 	return this->OpenFriendsList;
+}
+
+bool AArenaPlayerController::IsInventoryOpen() const
+{
+	return this->OpenInventory;
 }
 
 bool AArenaPlayerController::IsHUDOpen() const

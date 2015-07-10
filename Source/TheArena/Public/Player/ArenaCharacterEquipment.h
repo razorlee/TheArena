@@ -67,21 +67,21 @@ private:
 /////////////////////////////////////////////// Weapons ///////////////////////////////////////////////
 
 	/** currently equipped weapon */
-	UPROPERTY(/*ReplicatedUsing = OnRep_CurrentWeapon*/)
+	UPROPERTY(EditAnywhere/*ReplicatedUsing = OnRep_CurrentWeapon*/)
 	class AArenaWeapon* CurrentWeapon;
 	/** main weapon */
 
-	UPROPERTY(/*ReplicatedUsing = OnRep_PrimaryWeapon*/)
+	UPROPERTY(EditAnywhere/*ReplicatedUsing = OnRep_PrimaryWeapon*/)
 	class AArenaWeapon* PrimaryWeapon;
 	/** secondary weapon */
-	UPROPERTY(EditDefaultsOnly, Category = Weapons)
+	UPROPERTY(EditAnywhere, Category = Weapons)
 	TSubclassOf<class AArenaWeapon> PrimaryWeaponBP;
 
 	/** secondary weapon */
 	UPROPERTY(/*ReplicatedUsing = OnRep_SecondaryWeapon*/)
 	class AArenaWeapon* SecondaryWeapon;
 	/** secondary weapon */
-	UPROPERTY(EditDefaultsOnly, Category = Weapons)
+	UPROPERTY(EditAnywhere, Category = Weapons)
 	TSubclassOf<class AArenaWeapon> SecondaryWeaponBP;
 
 /////////////////////////////////////////////// Sockets ///////////////////////////////////////////////

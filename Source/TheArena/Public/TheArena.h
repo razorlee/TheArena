@@ -34,6 +34,7 @@
 #include "Public/Player/ArenaLocalPlayer.h"
 #include "Public/Player/ArenaSaveGame.h"
 #include "Public/Player/ArenaCharacterCan.h"
+#include "Public/Props/ArenaEquipmentLocker.h"
 #include "Public/Online/ArenaGameSession.h"
 #include "Public/Online/ArenaGameState.h"
 #include "Public/Online/ArenaOnlineGameSettings.h"

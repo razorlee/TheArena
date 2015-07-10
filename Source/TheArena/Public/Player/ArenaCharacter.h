@@ -93,6 +93,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	class UArenaCharacterEquipment* GetCharacterEquipment();
 
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	class UArenaCharacterInventory* GetCharacterInventory();
+
 ////////////////////////////////////////// Animation Controls //////////////////////////////////////////
 
 	/** play anim montage */
@@ -185,14 +188,17 @@ protected:
 
 ////////////////////////////////////////// Private Properties //////////////////////////////////////////
 
+	UPROPERTY(EditAnywhere, Category = State)
+	class UArenaCharacterState* CharacterState;
+
 	UPROPERTY(EditAnywhere, Category = Attributes)
 	class UArenaCharacterAttributes* CharacterAttributes;
 
 	UPROPERTY(EditAnywhere, Category = Equipment)
 	class UArenaCharacterEquipment* CharacterEquipment;
 
-	UPROPERTY(EditAnywhere, Category = State)
-	class UArenaCharacterState* CharacterState;
+	UPROPERTY(EditAnywhere, Category = Inventory)
+	class UArenaCharacterInventory* CharacterInventory;
 
 	class UArenaCharacterMovement* CharacterMovementComponent;
 
@@ -206,13 +212,6 @@ protected:
 	/** Identifies if pawn is in its dying state */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Resources)
 	uint32 bIsDying : 1;
-
-	/** default inventory list */
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	TArray<TSubclassOf<class AArenaWeapon>> DefaultInventoryClasses;
-	/** weapons in inventory */
-	UPROPERTY(Transient, Replicated)
-	TArray<class AArenaWeapon*> Inventory;
 
 	/** Replicate where this pawn was last hit and damaged */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_LastTakeHitInfo)

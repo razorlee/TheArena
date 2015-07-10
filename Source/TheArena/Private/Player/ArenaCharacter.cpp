@@ -8,11 +8,11 @@
 AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	: Super(PCIP.SetDefaultSubobjectClass<UArenaCharacterMovement>(ACharacter::CharacterMovementComponentName))
 {
-	CharacterMovementComponent = Cast<UArenaCharacterMovement>(GetCharacterMovement());
+	CharacterState = PCIP.CreateDefaultSubobject<UArenaCharacterState>(this, TEXT("CharacterState"));
 	CharacterAttributes = PCIP.CreateDefaultSubobject<UArenaCharacterAttributes>(this, TEXT("CharacterAttributes"));
 	CharacterEquipment = PCIP.CreateDefaultSubobject<UArenaCharacterEquipment>(this, TEXT("CharacterEquipment"));
-	CharacterState = PCIP.CreateDefaultSubobject<UArenaCharacterState>(this, TEXT("CharacterState"));
-	//Server = ConstructObject<UServer_ArenaCharacter>(UServer_ArenaCharacter::StaticClass());
+	CharacterInventory = PCIP.CreateDefaultSubobject<UArenaCharacterInventory>(this, TEXT("CharacterInventory"));
+	CharacterMovementComponent = Cast<UArenaCharacterMovement>(GetCharacterMovement());
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -410,6 +410,11 @@ UArenaCharacterAttributes* AArenaCharacter::GetCharacterAttributes()
 UArenaCharacterEquipment* AArenaCharacter::GetCharacterEquipment()
 {
 	return CharacterEquipment;
+}
+
+UArenaCharacterInventory* AArenaCharacter::GetCharacterInventory()
+{
+	return CharacterInventory;
 }
 
 ////////////////////////////////////////// Animation Controls //////////////////////////////////////////
@@ -1009,7 +1014,6 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(AArenaCharacter, Inventory, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(AArenaCharacter, LastTakeHitInfo, COND_Custom);
 }
 

@@ -157,7 +157,7 @@ void AArenaRangedWeapon::OnBurstStarted()
 	{
 		if (WeaponAttributes->GetFireMode() == EFireMode::Burst)
 		{
-			GetWorldTimerManager().SetTimer(BurstFire, this, &AArenaRangedWeapon::HandleFiring, 0.05f, true);
+			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::HandleBurst, WeaponAttributes->LastFireTime + WeaponAttributes->GetAttackSpeed() - GameTime, false);
 		}
 		else
 		{
@@ -299,6 +299,11 @@ void AArenaRangedWeapon::SpawnProjectile(FVector Origin, FVector ShootDir, FHitR
 
 		UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
 	}
+}
+
+void AArenaRangedWeapon::HandleBurst()
+{
+	GetWorldTimerManager().SetTimer(BurstFire, this, &AArenaRangedWeapon::HandleFiring, 0.05f, true);
 }
 
 void AArenaRangedWeapon::HandleRecoil(float DeltaSeconds)

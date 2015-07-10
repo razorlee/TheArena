@@ -72,6 +72,10 @@ public:
 
 	/** set open menu */
 	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetInventory(bool bEnable);
+
+	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetHUD(bool bEnable);
 
 	/** set open menu */
@@ -108,6 +112,10 @@ public:
 	/** Returns whether the friends list is open */
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool IsFriendsListOpen() const;
+
+	/** Returns whether the friends list is open */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsInventoryOpen() const;
 
 	/** Returns whether the HUD is open */
 	UFUNCTION(BlueprintCallable, Category = Menu)
@@ -170,6 +178,10 @@ protected:
 	/** informs the HUD if the menu is open */
 	UPROPERTY(Transient, Replicated)
 	uint8 OpenFriendsList : 1;
+
+	/** informs the HUD if the menu is open */
+	UPROPERTY(Transient, Replicated)
+	uint8 OpenInventory : 1;
 
 	/** informs the HUD if the menu is open */
 	UPROPERTY(Transient, Replicated)

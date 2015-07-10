@@ -12,15 +12,23 @@ class THEARENA_API UArenaCharacterInventory : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
 	UArenaCharacterInventory();
 
-	// Called when the game starts
 	virtual void InitializeComponent() override;
 	
-	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
-		
-	
+	void SpawnDefaultInventory();
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	TArray<class AArenaWeapon*> GetInventory();
+
+protected:
+
+	UPROPERTY(EditAnywhere, Category = Inventory)
+	TArray<TSubclassOf<class AArenaWeapon>> DefaultInventoryClasses;
+
+	UPROPERTY()
+	TArray<class AArenaWeapon*> Inventory;
 };
