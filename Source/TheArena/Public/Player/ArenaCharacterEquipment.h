@@ -20,9 +20,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Default)
 	void Reset();
-	
-	// Called every frame
-	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
+
+	UFUNCTION(BlueprintCallable, Category = Character)
+	class AArenaCharacter* GetMyPawn() const;
+	UFUNCTION(BlueprintCallable, Category = Character)
+	void SetMyPawn(AArenaCharacter* Pawn);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	AArenaWeapon* GetCurrentWeapon();
@@ -32,12 +34,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	AArenaWeapon* GetPrimaryWeapon();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	void SetPrimaryWeapon(AArenaWeapon* Weapon);
+	void SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	AArenaWeapon* GetSecondaryWeapon();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	void SetSecondaryWeapon(AArenaWeapon* Weapon);
+	void SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	bool GetDrawCrosshair();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetDrawCrosshair(bool Allow);
 
 	UFUNCTION(BlueprintCallable, Category = Sockets)
 	FName GetWeaponAttachPoint();
@@ -66,23 +73,26 @@ private:
 
 /////////////////////////////////////////////// Weapons ///////////////////////////////////////////////
 
-	/** currently equipped weapon */
-	UPROPERTY(EditAnywhere/*ReplicatedUsing = OnRep_CurrentWeapon*/)
-	class AArenaWeapon* CurrentWeapon;
-	/** main weapon */
+	UPROPERTY()
+	AArenaCharacter* MyPawn;
 
-	UPROPERTY(EditAnywhere/*ReplicatedUsing = OnRep_PrimaryWeapon*/)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
+	class AArenaWeapon* CurrentWeapon;
+
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_PrimaryWeapon)
 	class AArenaWeapon* PrimaryWeapon;
-	/** secondary weapon */
 	UPROPERTY(EditAnywhere, Category = Weapons)
 	TSubclassOf<class AArenaWeapon> PrimaryWeaponBP;
 
-	/** secondary weapon */
-	UPROPERTY(/*ReplicatedUsing = OnRep_SecondaryWeapon*/)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_SecondaryWeapon)
 	class AArenaWeapon* SecondaryWeapon;
-	/** secondary weapon */
 	UPROPERTY(EditAnywhere, Category = Weapons)
 	TSubclassOf<class AArenaWeapon> SecondaryWeaponBP;
+
+/////////////////////////////////////////////// Booleans ///////////////////////////////////////////////
+
+	UPROPERTY(EditAnywhere, Category = Weapons)
+	bool DrawCrosshair;
 
 /////////////////////////////////////////////// Sockets ///////////////////////////////////////////////
 
@@ -118,4 +128,14 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Sockets)
 	FName WristOneAttachPoint;
 	
+/////////////////////////////////////////////// Server ///////////////////////////////////////////////
+
+	UFUNCTION()
+	void OnRep_CurrentWeapon();
+
+	UFUNCTION()
+	void OnRep_PrimaryWeapon();
+
+	UFUNCTION()
+	void OnRep_SecondaryWeapon();
 };

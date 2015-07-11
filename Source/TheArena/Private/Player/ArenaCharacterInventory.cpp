@@ -7,31 +7,18 @@
 // Sets default values for this component's properties
 UArenaCharacterInventory::UArenaCharacterInventory()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	bWantsInitializeComponent = true;
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
-
-// Called when the game starts
 void UArenaCharacterInventory::InitializeComponent()
 {
 	Super::InitializeComponent();
 
+	Owner = Cast<AArenaCharacter>(GetOwner());
 	SpawnDefaultInventory();
-	
-}
 
-
-// Called every frame
-void UArenaCharacterInventory::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
-{
-	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
-
-	// ...
+	PrimarySelected = false;
+	SecondarySelected = false;
 }
 
 void UArenaCharacterInventory::SpawnDefaultInventory()
@@ -49,7 +36,51 @@ void UArenaCharacterInventory::SpawnDefaultInventory()
 	}
 }
 
+void UArenaCharacterInventory::SwitchWeapon()
+{
+	if (PrimarySelected)
+	{
+		Owner->GetCharacterEquipment()->SetPrimaryWeapon(NewWeapon);
+	}
+	else if (SecondarySelected)
+	{
+		Owner->GetCharacterEquipment()->SetSecondaryWeapon(NewWeapon);
+	}
+}
+
+TArray<TSubclassOf<class AArenaWeapon>> UArenaCharacterInventory::GetInventoryBP()
+{
+	return DefaultInventoryClasses;
+}
+
 TArray<class AArenaWeapon*> UArenaCharacterInventory::GetInventory()
 {
 	return Inventory;
+}
+
+TSubclassOf<class AArenaWeapon> UArenaCharacterInventory::GetNewWeapon()
+{
+	return NewWeapon;
+}
+void UArenaCharacterInventory::SetNewWeapon(TSubclassOf<class AArenaWeapon> Weapon)
+{
+	NewWeapon = Weapon;
+}
+
+bool UArenaCharacterInventory::GetPrimarySelected()
+{
+	return PrimarySelected;
+}
+void UArenaCharacterInventory::SetPrimarySelected(bool Selected)
+{
+	PrimarySelected = Selected;
+}
+
+bool UArenaCharacterInventory::GetSecondarySelected()
+{
+	return SecondarySelected;
+}
+void UArenaCharacterInventory::SetSecondarySelected(bool Selected)
+{
+	SecondarySelected = Selected;
 }

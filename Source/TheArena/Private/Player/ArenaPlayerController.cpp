@@ -49,6 +49,7 @@ void AArenaPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("InGameMenu", IE_Pressed, this, &AArenaPlayerController::OnToggleInGameMenu);
+	InputComponent->BindAction("Inventory", IE_Pressed, this, &AArenaPlayerController::OnToggleInventory);
 
 	// voice chat
 	InputComponent->BindAction("PushToTalk", IE_Pressed, this, &APlayerController::StartTalking);
@@ -140,24 +141,6 @@ void AArenaPlayerController::GameHasEnded(class AActor* EndGameFocus, bool bIsWi
 	Super::GameHasEnded(EndGameFocus, bIsWinner);
 }
 
-/*bool AArenaPlayerController::ServerCheat_Validate(const FString& Msg)
-{
-	return true;
-}
-
-void AArenaPlayerController::ServerCheat_Implementation(const FString& Msg)
-{
-	if (CheatManager)
-	{
-		ClientMessage(ConsoleCommand(Msg));
-	}
-}*/
-
-/*void AArenaPlayerController::SimulateInputKey(FKey Key, bool bPressed)
-{
-	InputKey(Key, bPressed ? IE_Pressed : IE_Released, 1, false);
-}*/
-
 void AArenaPlayerController::OnKill()
 {
 	const auto Events = Online::GetEventsInterface();
@@ -201,6 +184,8 @@ void AArenaPlayerController::OnKill()
 	}
 }
 
+
+
 void AArenaPlayerController::OnToggleInGameMenu()
 {
 	if (OpenMenu == true)
@@ -219,55 +204,149 @@ void AArenaPlayerController::OnToggleInGameMenu()
 	}
 }
 
+void AArenaPlayerController::OnToggleInventory()
+{
+	if (OpenFriendsList == false && OpenMenu == false)
+	{
+		if (IsNearbyInventory())
+		{
+			if (IsInventoryOpen())
+			{
+				SetInventory(false);
+				return;
+			}
+			else
+			{
+				SetInventory(true);
+				return;
+			}
+		}
+		SetInventory(false);
+		return;
+	}
+	SetInventory(false);
+	return;
+}
+
+
+
+FText AArenaPlayerController::GetInteractiveMessage()
+{
+	return InteractiveMessage;
+}
+void AArenaPlayerController::SetInteractiveMessage(FText Message)
+{
+	InteractiveMessage = Message;
+}
+
+bool AArenaPlayerController::IsGameInputAllowed() const
+{
+	return bAllowGameActions && !bCinematicMode;
+}
+void AArenaPlayerController::SetAllowGameActions(bool bEnable)
+{
+	bAllowGameActions = bEnable;
+}
+
+bool AArenaPlayerController::HasInfiniteAmmo() const
+{
+	return bInfiniteAmmo;
+}
 void AArenaPlayerController::SetInfiniteAmmo(bool bEnable)
 {
 	bInfiniteAmmo = bEnable;
 }
 
+bool AArenaPlayerController::HasInfiniteClip() const
+{
+	return bInfiniteClip;
+}
 void AArenaPlayerController::SetInfiniteClip(bool bEnable)
 {
 	bInfiniteClip = bEnable;
 }
 
+bool AArenaPlayerController::HasHealthRegen() const
+{
+	return bHealthRegen;
+}
 void AArenaPlayerController::SetHealthRegen(bool bEnable)
 {
 	bHealthRegen = bEnable;
 }
 
+bool AArenaPlayerController::HasGodMode() const
+{
+	return bGodMode;
+}
 void AArenaPlayerController::SetGodMode(bool bEnable)
 {
 	bGodMode = bEnable;
 }
 
+bool AArenaPlayerController::IsMenuOpen() const
+{
+	return this->OpenMenu;
+}
 void AArenaPlayerController::SetMenu(bool bEnable)
 {
 	this->OpenMenu = bEnable;
 }
 
+bool AArenaPlayerController::IsFriendsListOpen() const
+{
+	return this->OpenFriendsList;
+}
 void AArenaPlayerController::SetFriendsList(bool bEnable)
 {
 	this->OpenFriendsList = bEnable;
 }
 
+bool AArenaPlayerController::IsInventoryOpen() const
+{
+	return this->OpenInventory;
+}
 void AArenaPlayerController::SetInventory(bool bEnable)
 {
 	this->OpenInventory = bEnable;
+	if (bEnable)
+	{
+		AArenaCharacter* Owner = Cast<AArenaCharacter>(GetPawnOrSpectator());
+		if (Owner->GetPlayerState()->GetCombatState() == ECombatState::Aggressive)
+		{
+			Owner->OnEnterCombat();
+		}
+	}
 }
 
+bool AArenaPlayerController::IsNearbyInventory() const
+{
+	return this->NearbyInventory;
+}
+void AArenaPlayerController::SetNearbyInventory(bool bEnable)
+{
+	NearbyInventory = bEnable;
+}
+
+bool AArenaPlayerController::IsHUDOpen() const
+{
+	return this->OpenHUD;
+}
 void AArenaPlayerController::SetHUD(bool bEnable)
 {
 	this->OpenHUD = bEnable;
 }
 
+bool AArenaPlayerController::IsSettingsOpen() const
+{
+	return this->OpenSettings;
+}
 void AArenaPlayerController::SetSettings(bool bEnable)
 {
 	this->OpenSettings = bEnable;
 }
 
-void AArenaPlayerController::SetAllowGameActions(bool bEnable)
-{
-	bAllowGameActions = bEnable;
-}
+
 
 void AArenaPlayerController::ClientGameStarted_Implementation()
 {
@@ -280,7 +359,6 @@ void AArenaPlayerController::ClientGameStarted_Implementation()
 	QueryAchievements();*/
 }
 
-/** Starts the online game using the session name in the PlayerState */
 void AArenaPlayerController::ClientStartOnlineGame_Implementation()
 {
 	if (!IsPrimaryPlayer())
@@ -307,7 +385,6 @@ void AArenaPlayerController::ClientStartOnlineGame_Implementation()
 	}
 }
 
-/** Ends the online game using the session name in the PlayerState */
 void AArenaPlayerController::ClientEndOnlineGame_Implementation()
 {
 	if (!IsPrimaryPlayer())
@@ -334,7 +411,6 @@ void AArenaPlayerController::ClientReturnToMainMenu_Implementation(const FString
 	CleanupSessionOnReturnToMenu();
 }
 
-/** Ends and/or destroys game session */
 void AArenaPlayerController::CleanupSessionOnReturnToMenu()
 {
 	bool bPendingOnlineOp = false;
@@ -407,12 +483,6 @@ void AArenaPlayerController::OnStartSessionCompleteEndIt(FName SessionName, bool
 	CleanupSessionOnReturnToMenu();
 }
 
-/**
-* Delegate fired when ending an online session has completed
-*
-* @param SessionName the name of the session this callback is for
-* @param bWasSuccessful true if the async action completed without error, false if there was an error
-*/
 void AArenaPlayerController::OnEndSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	UE_LOG(LogOnline, Log, TEXT("OnEndSessionComplete: Session=%s bWasSuccessful=%s"), *SessionName.ToString(), bWasSuccessful ? TEXT("true") : TEXT("false"));
@@ -431,12 +501,6 @@ void AArenaPlayerController::OnEndSessionComplete(FName SessionName, bool bWasSu
 	CleanupSessionOnReturnToMenu();
 }
 
-/**
-* Delegate fired when destroying an online session has completed
-*
-* @param SessionName the name of the session this callback is for
-* @param bWasSuccessful true if the async action completed without error, false if there was an error
-*/
 void AArenaPlayerController::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	UE_LOG(LogOnline, Log, TEXT("OnDestroySessionComplete: Session=%s bWasSuccessful=%s"), *SessionName.ToString(), bWasSuccessful ? TEXT("true") : TEXT("false"));
@@ -534,59 +598,10 @@ void AArenaPlayerController::ServerSuicide_Implementation()
 	}
 }
 
-bool AArenaPlayerController::HasInfiniteAmmo() const
-{
-	return bInfiniteAmmo;
-}
-
-bool AArenaPlayerController::HasInfiniteClip() const
-{
-	return bInfiniteClip;
-}
-
-bool AArenaPlayerController::HasHealthRegen() const
-{
-	return bHealthRegen;
-}
-
-bool AArenaPlayerController::HasGodMode() const
-{
-	return bGodMode;
-}
-
-bool AArenaPlayerController::IsGameInputAllowed() const
-{
-	return bAllowGameActions && !bCinematicMode;
-}
-
-bool AArenaPlayerController::IsMenuOpen() const
-{
-	return this->OpenMenu;
-}
-
-bool AArenaPlayerController::IsFriendsListOpen() const
-{
-	return this->OpenFriendsList;
-}
-
-bool AArenaPlayerController::IsInventoryOpen() const
-{
-	return this->OpenInventory;
-}
-
-bool AArenaPlayerController::IsHUDOpen() const
-{
-	return this->OpenHUD;
-}
-
-bool AArenaPlayerController::IsSettingsOpen() const
-{
-	return this->OpenSettings;
-}
-
 bool AArenaPlayerController::GetAllowGameActions() const
 {
 	return bAllowGameActions;
 }
+
 
 

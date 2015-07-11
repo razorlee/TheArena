@@ -32,144 +32,87 @@ public:
 	UFUNCTION(reliable, client)
 	void ClientEndOnlineGame();
 
-	/** notify player about finished match */
 	virtual void ClientGameEnded_Implementation(class AActor* EndGameFocus, bool bIsWinner);
 
-	/** used for input simulation from blueprint (for automatic perf tests) */
-	//UFUNCTION(BlueprintCallable, Category = "Input")
-	//void SimulateInputKey(FKey Key, bool bPressed = true);
-
-	/* Overriden Message implementation. */
-	//virtual void ClientTeamMessage_Implementation(APlayerState* SenderPlayerState, const FString& S, FName Type, float MsgLifeTime) override;
-
-	/** Local function run an emote */
-	// 	UFUNCTION(exec)
-	// 	virtual void Emote(const FString& Msg);
-
-	/** toggle InGameMenu handler */
 	void OnToggleInGameMenu();
 
-	/** set infinite ammo cheat */
-	void SetInfiniteAmmo(bool bEnable);
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void OnToggleInventory();
 
-	/** set infinite clip cheat */
-	void SetInfiniteClip(bool bEnable);
+	UFUNCTION(BlueprintCallable, Category = HUD)
+	FText GetInteractiveMessage();
+	UFUNCTION(BlueprintCallable, Category = HUD)
+	void SetInteractiveMessage(FText Message);
 
-	/** set health regen cheat */
-	void SetHealthRegen(bool bEnable);
-
-	/** set god mode cheat */
+	bool HasGodMode() const;
 	UFUNCTION(exec)
 	void SetGodMode(bool bEnable);
 
-	/** set open menu */
+	bool HasInfiniteAmmo() const;
+	void SetInfiniteAmmo(bool bEnable);
+
+	bool HasInfiniteClip() const;
+	void SetInfiniteClip(bool bEnable);
+
+	bool HasHealthRegen() const;
+	void SetHealthRegen(bool bEnable);
+
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsMenuOpen() const;
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetMenu(bool bEnable);
 
-	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsFriendsListOpen() const;
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetFriendsList(bool bEnable);
 
-	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsInventoryOpen() const;
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetInventory(bool bEnable);
 
-	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsNearbyInventory() const;
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetNearbyInventory(bool bEnable);
+
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsHUDOpen() const;
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetHUD(bool bEnable);
 
-	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsSettingsOpen() const;
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetSettings(bool bEnable);
 
-	/** set open menu */
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsGameInputAllowed() const;
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetAllowGameActions(bool bEnable);
 
-	/** get infinite ammo cheat */
-	bool HasInfiniteAmmo() const;
-
-	/** get infinite clip cheat */
-	bool HasInfiniteClip() const;
-
-	/** get health regen cheat */
-	bool HasHealthRegen() const;
-
-	/** get gode mode cheat */
-	bool HasGodMode() const;
-
-	/** check if gameplay related actions (movement, weapon usage, etc) are allowed right now */
-	UFUNCTION(BlueprintCallable, Category = Menu)
-	bool IsGameInputAllowed() const;
-
-	/** Ends and/or destroys game session */
 	void CleanupSessionOnReturnToMenu();
-
-	/** Returns whether the menu is open */
-	UFUNCTION(BlueprintCallable, Category = Menu)
-	bool IsMenuOpen() const;
-
-	/** Returns whether the friends list is open */
-	UFUNCTION(BlueprintCallable, Category = Menu)
-	bool IsFriendsListOpen() const;
-
-	/** Returns whether the friends list is open */
-	UFUNCTION(BlueprintCallable, Category = Menu)
-	bool IsInventoryOpen() const;
-
-	/** Returns whether the HUD is open */
-	UFUNCTION(BlueprintCallable, Category = Menu)
-	bool IsHUDOpen() const;
-
-	/** Returns whether the HUD is open */
-	UFUNCTION(BlueprintCallable, Category = Menu)
-	bool IsSettingsOpen() const;
 
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool GetAllowGameActions() const;
 
-	/**
-	* Delegate fired when starting an online session has completed (intends to end it, but has to wait for the start to complete first)
-	*
-	* @param SessionName the name of the session this callback is for
-	* @param bWasSuccessful true if the async action completed without error, false if there was an error
-	*/
 	virtual void OnStartSessionCompleteEndIt(FName SessionName, bool bWasSuccessful);
 
-	/**
-	* Delegate fired when ending an online session has completed
-	*
-	* @param SessionName the name of the session this callback is for
-	* @param bWasSuccessful true if the async action completed without error, false if there was an error
-	*/
 	virtual void OnEndSessionComplete(FName SessionName, bool bWasSuccessful);
 
-	/**
-	* Delegate fired when destroying an online session has completed
-	*
-	* @param SessionName the name of the session this callback is for
-	* @param bWasSuccessful true if the async action completed without error, false if there was an error
-	*/
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 
-	// Begin APlayerController interface
-
-	/** handle weapon visibility */
 	virtual void SetCinematicMode(bool bInCinematicMode, bool bHidePlayer, bool bAffectsHUD, bool bAffectsMovement, bool bAffectsTurning) override;
 
-	/** initialize the input system from the player settings */
 	virtual void InitInputSystem() override;
 
-	// End APlayerController interface
-
-	// begin AArenaPlayerController-specific
-
-	/** Informs that player fragged someone */
 	void OnKill();
 
-	// end AArenaPlayerController-specific
-
 protected:
+
+	UPROPERTY()
+	FText InteractiveMessage;
 
 	/** informs the HUD if the menu is open */
 	UPROPERTY(Transient, Replicated)
@@ -182,6 +125,9 @@ protected:
 	/** informs the HUD if the menu is open */
 	UPROPERTY(Transient, Replicated)
 	uint8 OpenInventory : 1;
+
+	UPROPERTY(Transient, Replicated)
+	uint8 NearbyInventory : 1;
 
 	/** informs the HUD if the menu is open */
 	UPROPERTY(Transient, Replicated)

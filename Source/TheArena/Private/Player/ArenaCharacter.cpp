@@ -14,6 +14,15 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	CharacterInventory = PCIP.CreateDefaultSubobject<UArenaCharacterInventory>(this, TEXT("CharacterInventory"));
 	CharacterMovementComponent = Cast<UArenaCharacterMovement>(GetCharacterMovement());
 
+	//CharacterState->SetNetAddressable();
+	CharacterState->SetIsReplicated(true);
+
+	//CharacterAttributes->SetNetAddressable();
+	CharacterAttributes->SetIsReplicated(true);
+
+	//CharacterEquipment->SetNetAddressable();
+	CharacterEquipment->SetIsReplicated(true);
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
@@ -70,7 +79,8 @@ void AArenaCharacter::PostInitializeComponents()
 
 	if (Role == ROLE_Authority)
 	{
-		//initialize components
+		CharacterState->SetMyPawn(this);
+		CharacterEquipment->SetMyPawn(this);
 	}
 	CharacterState->Reset();
 	// set initial mesh visibility (3rd person view)
@@ -242,6 +252,7 @@ void AArenaCharacter::OnStartTargeting()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (ArenaCharacterCan::Target(this, MyPC))
 	{
+		CharacterEquipment->SetDrawCrosshair(true);
 		CharacterEquipment->GetCurrentWeapon()->GetWeaponState()->SetTargetingState(ETargetingState::Targeting);
 		StartTargeting();
 	}
@@ -250,6 +261,7 @@ void AArenaCharacter::OnStopTargeting()
 {
    	if (CharacterEquipment->GetCurrentWeapon())
 	{
+		CharacterEquipment->SetDrawCrosshair(false);
 		GetWorldTimerManager().ClearTimer(this, &AArenaCharacter::LoopTargeting);
 		CharacterEquipment->GetCurrentWeapon()->GetWeaponState()->SetTargetingState(ETargetingState::Default);
 	}
@@ -275,16 +287,13 @@ void AArenaCharacter::OnEnterCombat()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (ArenaCharacterCan::Jump(this, MyPC))
 	{
-		if (CharacterState->GetCombatState() == ECombatState::Passive)
+		if (Role == ROLE_Authority)
 		{
-			CharacterState->SetCombatState(ECombatState::Aggressive);
-			CharacterEquipment->SetCurrentWeapon();
-			EquipWeapon();
+			EnterCombat();
 		}
 		else
 		{
-			CharacterState->SetCombatState(ECombatState::Passive);
-			UnEquipWeapon();
+			ServerEnterCombat();
 		}
 	}
 }
@@ -451,96 +460,6 @@ void AArenaCharacter::StopAllAnimMontages()
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
-void AArenaCharacter::OnStartVault(bool bFromReplication)//recall3
-{
-	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (!bFromReplication && Role < ROLE_Authority)
-	{
-		ServerStartVault();
-	}
-
-	if (bFromReplication || true)
-	{
-		CharacterState->SetPlayerState(EPlayerState::Vaulting);
-		GetCapsuleComponent()->SetCapsuleSize(0, 0);
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
-		float AnimDuration = PlayAnimMontage(CharacterMovementComponent->GetVaultAnimation());
-		if (AnimDuration <= 0.0f)
-		{
-			AnimDuration = 0.3f;
-		}
-
-		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::OnStopVault, AnimDuration, false);
-
-		if (MyPC)
-		{
-			//PlayWeaponSound(MeleeSound);
-		}
-	}
-}
-void AArenaCharacter::OnStopVault()
-{
-	CharacterState->SetPlayerState(EPlayerState::Default);
-	GetCapsuleComponent()->SetCapsuleSize(42.f, 96.0f);
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	StopAnimMontage(CharacterMovementComponent->GetVaultAnimation());
-}
-
-void AArenaCharacter::EquipWeapon()
-{
-	if (Role == ROLE_Authority)
-	{
-		CharacterEquipment->SetCurrentWeapon();
-		FinishEquipWeapon(CharacterEquipment->GetCurrentWeapon());
-	}
-	else
-	{
-		ServerEquipWeapon();
-	}
-}
-void AArenaCharacter::FinishEquipWeapon(class AArenaWeapon* Weapon)
-{
-	if (Weapon->IsPrimary() == true)
-	{
-		Weapon->SetOwningPawn(this);
-		Weapon->Equip();
-	}
-	else
-	{
-		Weapon->SetOwningPawn(this);
-		Weapon->Equip();
-	}
-}
-
-float AArenaCharacter::UnEquipWeapon()
-{
-	float Duration;
-	if (Role == ROLE_Authority)
-	{
-		Duration = FinishUnEquipWeapon(CharacterEquipment->GetCurrentWeapon());
-	}
-	else
-	{
-		ServerUnEquipWeapon();
-	}
-	return Duration;
-}
-float AArenaCharacter::FinishUnEquipWeapon(class AArenaWeapon* Weapon)
-{
-	float Duration;
-	if (Weapon->IsPrimary() == true)
-	{
-		Weapon->SetOwningPawn(this);
-		Duration = Weapon->UnEquip();
-	}
-	else
-	{
-		Weapon->SetOwningPawn(this);
-		Duration = Weapon->UnEquip();
-	}
-	return Duration;
-}
-
 void AArenaCharacter::StartTargeting(bool bFromReplication)//recall3
 {
 	if (!bFromReplication && Role < ROLE_Authority)
@@ -604,10 +523,115 @@ void AArenaCharacter::LoopTargeting()
 	}*/
 }
 
+void AArenaCharacter::EnterCombat()
+{
+	if (CharacterState->GetCombatState() == ECombatState::Passive)
+	{
+		CharacterState->SetCombatState(ECombatState::Aggressive, this);
+		CharacterEquipment->SetCurrentWeapon();
+		EquipWeapon();
+	}
+	else
+	{
+		CharacterState->SetCombatState(ECombatState::Passive, this);
+		UnEquipWeapon();
+	}
+}
+
 void AArenaCharacter::SwapWeapon()
 {
 	float Duration = UnEquipWeapon();
-	GetWorldTimerManager().SetTimer(TimerHandle_SwapWeapon, this, &AArenaCharacter::EquipWeapon, Duration * 0.75f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_SwapWeapon, this, &AArenaCharacter::EquipWeapon, Duration * 0.70f, false);
+}
+
+void AArenaCharacter::EquipWeapon()
+{
+	if (Role == ROLE_Authority)
+	{
+		CharacterEquipment->SetCurrentWeapon();
+		FinishEquipWeapon(CharacterEquipment->GetCurrentWeapon());
+	}
+	else
+	{
+		ServerEquipWeapon();
+	}
+}
+void AArenaCharacter::FinishEquipWeapon(class AArenaWeapon* Weapon)
+{
+	if (Weapon->IsPrimary() == true)
+	{
+		Weapon->SetOwningPawn(this);
+		Weapon->Equip();
+	}
+	else
+	{
+		Weapon->SetOwningPawn(this);
+		Weapon->Equip();
+	}
+}
+
+float AArenaCharacter::UnEquipWeapon()
+{
+	float Duration;
+	if (Role == ROLE_Authority)
+	{
+		Duration = FinishUnEquipWeapon(CharacterEquipment->GetCurrentWeapon());
+	}
+	else
+	{
+		ServerUnEquipWeapon();
+	}
+	return Duration;
+}
+float AArenaCharacter::FinishUnEquipWeapon(class AArenaWeapon* Weapon)
+{
+	float Duration;
+	if (Weapon->IsPrimary() == true)
+	{
+		Weapon->SetOwningPawn(this);
+		Duration = Weapon->UnEquip();
+	}
+	else
+	{
+		Weapon->SetOwningPawn(this);
+		Duration = Weapon->UnEquip();
+	}
+	return Duration;
+}
+
+void AArenaCharacter::OnStartVault(bool bFromReplication)//recall3
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (!bFromReplication && Role < ROLE_Authority)
+	{
+		ServerStartVault();
+	}
+
+	if (bFromReplication || true)
+	{
+		CharacterState->SetPlayerState(EPlayerState::Vaulting);
+		GetCapsuleComponent()->SetCapsuleSize(0, 0);
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+		float AnimDuration = PlayAnimMontage(CharacterMovementComponent->GetVaultAnimation());
+		if (AnimDuration <= 0.0f)
+		{
+			AnimDuration = 0.3f;
+		}
+
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::OnStopVault, AnimDuration, false);
+
+		if (MyPC)
+		{
+			//PlayWeaponSound(MeleeSound);
+		}
+	}
+}
+void AArenaCharacter::OnStopVault()
+{
+	CharacterState->SetPlayerState(EPlayerState::Default);
+	GetCapsuleComponent()->SetCapsuleSize(42.f, 96.0f);
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	StopAnimMontage(CharacterMovementComponent->GetVaultAnimation());
 }
 
 void AArenaCharacter::StartWeaponFire()
@@ -1015,6 +1039,7 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AArenaCharacter, LastTakeHitInfo, COND_Custom);
+	//DOREPLIFETIME_CONDITION(AArenaCharacter, CharacterState, COND_Custom);
 }
 
 ////////////////////////////////////////////// Server //////////////////////////////////////////////
@@ -1023,7 +1048,6 @@ bool AArenaCharacter::ServerEquipWeapon_Validate()
 {
 	return true;
 }
-
 void AArenaCharacter::ServerEquipWeapon_Implementation()
 {
 	EquipWeapon();
@@ -1033,7 +1057,6 @@ bool AArenaCharacter::ServerUnEquipWeapon_Validate()
 {
 	return true;
 }
-
 void AArenaCharacter::ServerUnEquipWeapon_Implementation()
 {
 	UnEquipWeapon();
@@ -1043,7 +1066,6 @@ bool AArenaCharacter::ServerSetTargeting_Validate(bool bNewTargeting)
 {
 	return true;
 }
-
 void AArenaCharacter::ServerSetTargeting_Implementation(bool bNewTargeting)
 {
 	SetTargeting(bNewTargeting);
@@ -1053,7 +1075,6 @@ bool AArenaCharacter::ServerSetRunning_Validate(bool bNewRunning, bool bToggle)
 {
 	return true;
 }
-
 void AArenaCharacter::ServerSetRunning_Implementation(bool bNewRunning, bool bToggle)
 {
 	//SetRunning(bNewRunning, bToggle);
@@ -1063,7 +1084,6 @@ bool AArenaCharacter::ServerSetCrouched_Validate(bool bNewCrouched, bool bToggle
 {
 	return true;
 }
-
 void AArenaCharacter::ServerSetCrouched_Implementation(bool bNewCrouched, bool bToggle)
 {
 	//SetCrouched(bNewCrouched, bToggle);
@@ -1073,7 +1093,6 @@ bool AArenaCharacter::ServerJump_Validate(class AArenaCharacter* client)
 {
 	return true;
 }
-
 void AArenaCharacter::ServerJump_Implementation(class AArenaCharacter* client)
 {
 	//client->PlayerConfig.Stamina -= JumpCost;
@@ -1083,7 +1102,6 @@ bool AArenaCharacter::ServerStartVault_Validate()
 {
 	return true;
 }
-
 void AArenaCharacter::ServerStartVault_Implementation()
 {
 	OnStartVault();
@@ -1093,7 +1111,6 @@ bool AArenaCharacter::ServerStopVault_Validate()
 {
 	return true;
 }
-
 void AArenaCharacter::ServerStopVault_Implementation()
 {
 	OnStopVault();
@@ -1103,7 +1120,6 @@ bool AArenaCharacter::ServerStartTargeting_Validate()
 {
 	return true;
 }
-
 void AArenaCharacter::ServerStartTargeting_Implementation()
 {
 	StartTargeting();
@@ -1113,9 +1129,17 @@ bool AArenaCharacter::ServerStopTargeting_Validate()
 {
 	return true;
 }
-
 void AArenaCharacter::ServerStopTargeting_Implementation()
 {
 	OnStopTargeting();
+}
+
+bool AArenaCharacter::ServerEnterCombat_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerEnterCombat_Implementation()
+{
+	OnEnterCombat();
 }
 

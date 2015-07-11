@@ -68,18 +68,25 @@ void AArenaWeapon::StopMelee()
 
 void AArenaWeapon::Equip()
 {
-	if (ArenaWeaponCan::Equip(MyPawn, this))
+	if (Role == ROLE_Authority)
 	{
-		RotateWeapon();
-		GetWeaponState()->SetWeaponState(EWeaponState::Equipping);
-		float Duration = PlayWeaponAnimation(EquipAnim);
-
-		GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishEquip, (Duration*0.25f), false);
-
-		if (MyPawn && MyPawn->IsLocallyControlled())
+		if (ArenaWeaponCan::Equip(MyPawn, this))
 		{
-			PlayWeaponSound(EquipSound);
+			RotateWeapon();
+			GetWeaponState()->SetWeaponState(EWeaponState::Equipping);
+			float Duration = PlayWeaponAnimation(EquipAnim);
+
+			GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishEquip, (Duration*0.25f), false);
+
+			if (MyPawn && MyPawn->IsLocallyControlled())
+			{
+				PlayWeaponSound(EquipSound);
+			}
 		}
+	}
+	else
+	{
+		ServerEquip();
 	}
 }
 
@@ -93,27 +100,36 @@ void AArenaWeapon::FinishEquip()
 float AArenaWeapon::UnEquip()
 {
 	float Duration = 0;
-	if (ArenaWeaponCan::UnEquip(MyPawn, this))
+	if (Role == ROLE_Authority)
 	{
-		RotateWeapon();
-		StopAttack();
-		GetWeaponState()->SetWeaponState(EWeaponState::Holstering);
-
-		Duration = PlayWeaponAnimation(UnEquipAnim);
-		//if (WeaponState->GetWeaponState() == EWeaponState::Reloading)
-		//{
-		//	StopWeaponAnimation(ReloadAnim);
-		GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishUnEquip, (Duration*0.5f), false);
-		//	GetWorldTimerManager().ClearTimer(this, &AArenaRangedWeapon::StopReload);
-		//	GetWorldTimerManager().ClearTimer(this, &AArenaRangedWeapon::ReloadWeapon);
-
-		//	WeaponState->SetWeaponState(EWeaponState::Default);
-		//}
-		if (MyPawn && MyPawn->IsLocallyControlled())
+		if (ArenaWeaponCan::UnEquip(MyPawn, this))
 		{
-			PlayWeaponSound(UnEquipSound);
+			RotateWeapon();
+			StopAttack();
+			GetWeaponState()->SetWeaponState(EWeaponState::Holstering);
+
+			Duration = PlayWeaponAnimation(UnEquipAnim);
+			//if (WeaponState->GetWeaponState() == EWeaponState::Reloading)
+			//{
+			//	StopWeaponAnimation(ReloadAnim);
+			GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishUnEquip, (Duration*0.5f), false);
+			//	GetWorldTimerManager().ClearTimer(this, &AArenaRangedWeapon::StopReload);
+			//	GetWorldTimerManager().ClearTimer(this, &AArenaRangedWeapon::ReloadWeapon);
+
+			//	WeaponState->SetWeaponState(EWeaponState::Default);
+			//}
+			if (MyPawn && MyPawn->IsLocallyControlled())
+			{
+				PlayWeaponSound(UnEquipSound);
+			}
+			return Duration;
 		}
 		return Duration;
+	}
+	else
+	{
+		ServerUnEquip();
+		//float Duration = 0;
 	}
 	return Duration;
 }
@@ -264,4 +280,25 @@ class UArenaRangedWeaponState* AArenaWeapon::GetWeaponState()
 class UArenaRangedWeaponAttributes* AArenaWeapon::GetWeaponAttributes()
 {
 	return NULL;
+}
+
+//////////////////////////////////////////// Server ////////////////////////////////////////////
+
+
+bool AArenaWeapon::ServerEquip_Validate()
+{
+	return true;
+}
+void AArenaWeapon::ServerEquip_Implementation()
+{
+	Equip();
+}
+
+bool AArenaWeapon::ServerUnEquip_Validate()
+{
+	return true;
+}
+void AArenaWeapon::ServerUnEquip_Implementation()
+{
+	UnEquip();
 }

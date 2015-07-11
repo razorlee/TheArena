@@ -159,4 +159,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* UnEquipAnim;
 
+///////////////////////////////////////////////////////////// Server ///////////////////////////////////////////////////////////////
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerEquip();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerUnEquip();
+
 };

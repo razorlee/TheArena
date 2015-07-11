@@ -11,6 +11,13 @@ AArenaRangedWeapon::AArenaRangedWeapon(const FObjectInitializer& ObjectInitializ
 	WeaponEffects = ObjectInitializer.CreateDefaultSubobject<UArenaRangedWeaponEffects>(this, TEXT("WeaponEffects"));
 	WeaponState = ObjectInitializer.CreateDefaultSubobject<UArenaRangedWeaponState>(this, TEXT("WeaponState"));
 
+	WeaponAttributes->SetNetAddressable();
+	WeaponAttributes->SetIsReplicated(true);
+	WeaponEffects->SetNetAddressable();
+	WeaponEffects->SetIsReplicated(true);
+	WeaponState->SetNetAddressable();
+	WeaponState->SetIsReplicated(true);
+
 	RecoilCounter = 0;
 	IsRecoiling = false;
 }

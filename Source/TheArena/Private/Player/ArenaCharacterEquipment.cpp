@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TheArena.h"
+#include "Net/UnrealNetwork.h"
 #include "ArenaCharacterEquipment.h"
 
 
 // Sets default values for this component's properties
 UArenaCharacterEquipment::UArenaCharacterEquipment(const FObjectInitializer& ObjectInitializer)
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
+	SetIsReplicated(true);
+	bReplicates = true;
+
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
-
-
 }
 
 void UArenaCharacterEquipment::InitializeComponent()
@@ -22,16 +22,15 @@ void UArenaCharacterEquipment::InitializeComponent()
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
 
+	PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(PrimaryWeaponBP, SpawnInfo);
+	PrimaryWeapon->SetOwningPawn(Cast<AArenaCharacter>(GetOwner()));
+	PrimaryWeapon->SetPrimary(true);
+	PrimaryWeapon->UnEquip();
 
-		PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(PrimaryWeaponBP, SpawnInfo);
-		PrimaryWeapon->SetOwningPawn(Cast<AArenaCharacter>(GetOwner()));
-		PrimaryWeapon->SetPrimary(true);
-		PrimaryWeapon->UnEquip();
-
-		SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(SecondaryWeaponBP, SpawnInfo);
-		SecondaryWeapon->SetOwningPawn(Cast<AArenaCharacter>(GetOwner()));
-		SecondaryWeapon->SetPrimary(false);
-		SecondaryWeapon->UnEquip();
+	SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(SecondaryWeaponBP, SpawnInfo);
+	SecondaryWeapon->SetOwningPawn(Cast<AArenaCharacter>(GetOwner()));
+	SecondaryWeapon->SetPrimary(false);
+	SecondaryWeapon->UnEquip();
 
 }
 
@@ -39,6 +38,16 @@ void UArenaCharacterEquipment::Reset()
 {
 
 }
+
+class AArenaCharacter* UArenaCharacterEquipment::GetMyPawn() const
+{
+	return MyPawn;
+}
+void UArenaCharacterEquipment::SetMyPawn(AArenaCharacter* Pawn)
+{
+	MyPawn = Pawn;
+}
+
 
 AArenaWeapon* UArenaCharacterEquipment::GetCurrentWeapon()
 {
@@ -67,18 +76,51 @@ AArenaWeapon* UArenaCharacterEquipment::GetPrimaryWeapon()
 {
 	return PrimaryWeapon;
 }
-void UArenaCharacterEquipment::SetPrimaryWeapon(AArenaWeapon* Weapon)
+void UArenaCharacterEquipment::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
-	PrimaryWeapon = Weapon;
+	CurrentWeapon = NULL;
+	PrimaryWeapon->Destroy();
+	//GetWorld()->DestroyActor(PrimaryWeapon);
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+
+	PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(Weapon, SpawnInfo);
+	PrimaryWeapon->SetOwningPawn(MyPawn);
+	PrimaryWeapon->SetPrimary(true);
+	PrimaryWeapon->UnEquip();
+
+	PrimaryWeaponBP = Weapon;
 }
 
 AArenaWeapon* UArenaCharacterEquipment::GetSecondaryWeapon()
 {
 	return SecondaryWeapon;
 }
-void UArenaCharacterEquipment::SetSecondaryWeapon(AArenaWeapon* Weapon)
+void UArenaCharacterEquipment::SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
-	SecondaryWeapon = Weapon;
+	CurrentWeapon = NULL;
+	SecondaryWeapon->Destroy();
+	//GetWorld()->DestroyActor(SecondaryWeapon);
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+
+	SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(Weapon, SpawnInfo);
+	SecondaryWeapon->SetOwningPawn(MyPawn);
+	SecondaryWeapon->SetPrimary(false);
+	SecondaryWeapon->UnEquip();
+
+	SecondaryWeaponBP = Weapon;
+}
+
+bool UArenaCharacterEquipment::GetDrawCrosshair()
+{
+	return DrawCrosshair;
+}
+void UArenaCharacterEquipment::SetDrawCrosshair(bool Allow)
+{
+	DrawCrosshair = Allow;
 }
 
 FName UArenaCharacterEquipment::GetWeaponAttachPoint()
@@ -122,11 +164,41 @@ FName UArenaCharacterEquipment::GetWristOneAttachPoint()
 	return WristOneAttachPoint;
 }
 
-// Called every frame
-void UArenaCharacterEquipment::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
-{
-	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+/////////////////////////////////////////////// Server ///////////////////////////////////////////////
 
-	// ...
+void UArenaCharacterEquipment::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UArenaCharacterEquipment, CurrentWeapon);
+	DOREPLIFETIME(UArenaCharacterEquipment, PrimaryWeapon);
+	DOREPLIFETIME(UArenaCharacterEquipment, SecondaryWeapon);
 }
 
+void UArenaCharacterEquipment::OnRep_CurrentWeapon()
+{
+/*	SetCurrentWeapon();
+	MyPawn->EquipWeapon();*/
+}
+
+void UArenaCharacterEquipment::OnRep_PrimaryWeapon()
+{
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+
+	PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(PrimaryWeaponBP, SpawnInfo);
+	PrimaryWeapon->SetOwningPawn(MyPawn);
+	PrimaryWeapon->SetPrimary(true);
+	PrimaryWeapon->UnEquip();
+}
+
+void UArenaCharacterEquipment::OnRep_SecondaryWeapon()
+{
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+
+	SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(SecondaryWeaponBP, SpawnInfo);
+	SecondaryWeapon->SetOwningPawn(MyPawn);
+	SecondaryWeapon->SetPrimary(false);
+	SecondaryWeapon->UnEquip();
+}

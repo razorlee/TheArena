@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "GameFramework/PlayerState.h"
+#include "Components/ActorComponent.h"
 #include "ArenaRangedWeaponState.generated.h"
 
 UENUM(BlueprintCallable, BlueprintType, Category = Weapon)
@@ -42,8 +42,8 @@ namespace EEquippedState
 	};
 }
 
-UCLASS()
-class THEARENA_API UArenaRangedWeaponState : public UObject
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class THEARENA_API UArenaRangedWeaponState : public UActorComponent
 {
 	GENERATED_BODY()
 

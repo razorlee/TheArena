@@ -109,31 +109,24 @@ public:
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
-	/** player press vault action */
-	void OnStartVault(bool bFromReplication = false);
-	/** player release vault action */
-	void OnStopVault();
-
-	/** equips next weapon */
-	void EquipWeapon();
-	void FinishEquipWeapon(class AArenaWeapon* Weapon);
-
-	/** equips next weapon */
-	float UnEquipWeapon();
-	float FinishUnEquipWeapon(class AArenaWeapon* Weapon);
-
-	/** [server + local] change targeting state !currently only local! */
 	void SetTargeting(bool bNewTargeting);
-	/** player pressed targeting action */
 	void StartTargeting(bool bFromReplication = false);
-	/** player loop targeting action */
 	void LoopTargeting();
+
+	void EnterCombat();
 
 	void SwapWeapon();
 
-	/** [local] starts weapon fire */
+	void EquipWeapon();
+	void FinishEquipWeapon(class AArenaWeapon* Weapon);
+
+	float UnEquipWeapon();
+	float FinishUnEquipWeapon(class AArenaWeapon* Weapon);
+
+	void OnStartVault(bool bFromReplication = false);
+	void OnStopVault();
+
 	void StartWeaponFire();
-	/** [local] stops weapon fire */
 	void StopWeaponFire();
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
@@ -249,6 +242,7 @@ protected:
 
 	UFUNCTION()
 	void OnRep_LastTakeHitInfo();
+
 	UFUNCTION()
 	void OnRep_Vault();
 	UFUNCTION()
@@ -290,5 +284,8 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopTargeting();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerEnterCombat();
 
 };

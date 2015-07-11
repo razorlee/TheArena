@@ -5,7 +5,7 @@ AArenaPlayerCameraManager::AArenaPlayerCameraManager(const FObjectInitializer& O
 	MyPawn = NULL;
 	Speed = 20.0f;
 
-	CurrentArm = 250.0f;
+	CurrentArm = 500.0f;
 	CurrentOffset = FVector(0.0f, 0.0f, 0.0f);
 
 	TargetArm = 250.0f;
