@@ -6,12 +6,17 @@
 // Sets default values for this component's properties
 UArenaRangedWeaponAttributes::UArenaRangedWeaponAttributes()
 {
+	SetIsReplicated(true);
+	bReplicates = true;
+
 	bWantsBeginPlay = true;
-	PrimaryComponentTick.bCanEverTick = true;
 
 	DamageType = UDamageType::StaticClass();
 
 	ShotgunPellets = 1;
+	HasScope = false;
+	ZoomDistance = 50.0f;
+	ZoomFOV = 90.0f;
 	IsExplosive = false;
 	ExplosionRadius = 0.0f;
 }
@@ -23,14 +28,7 @@ void UArenaRangedWeaponAttributes::BeginPlay()
 
 	TotalAmmo = GetCapacity() * 13;
 	CurrentClip = GetCapacity();
-	BurstCounter = 0;
 	LastFireTime = 0;
-}
-
-// Called every frame
-void UArenaRangedWeaponAttributes::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 }
 
 int32 UArenaRangedWeaponAttributes::GetDamage()
@@ -121,6 +119,33 @@ int32 UArenaRangedWeaponAttributes::GetShotgunPellets()
 void UArenaRangedWeaponAttributes::SetShotgunPellets(int32 Value)
 {
 	ShotgunPellets = Value;
+}
+
+bool UArenaRangedWeaponAttributes::GetHasScope()
+{
+	return HasScope;
+}
+void UArenaRangedWeaponAttributes::SetHasScope(bool Value)
+{
+	HasScope = Value;
+}
+
+float UArenaRangedWeaponAttributes::GetZoomDistance()
+{
+	return ZoomDistance;
+}
+void UArenaRangedWeaponAttributes::SetZoomDistance(float Value)
+{
+	ZoomDistance = Value;
+}
+
+float UArenaRangedWeaponAttributes::GetZoomFOV()
+{
+	return ZoomFOV;
+}
+void UArenaRangedWeaponAttributes::SetZoomFOV(float Value)
+{
+	ZoomFOV = Value;
 }
 
 bool UArenaRangedWeaponAttributes::GetIsExplosive()

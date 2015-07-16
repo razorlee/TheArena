@@ -61,7 +61,7 @@ protected:
 	bool IsExplosive;
 
 	/** pawn owner */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, Replicated)
 	class AArenaCharacter* MyPawn;
 
 	FHitResult HitResults;

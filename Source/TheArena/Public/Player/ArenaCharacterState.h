@@ -65,6 +65,13 @@ public:
 
 	/** get current weapon state */
 	UFUNCTION(BlueprintCallable, Category = Character)
+	bool GetIsNearCover() const;
+	/** update weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
+	void SetIsNearCover(bool Value);
+
+	/** get current weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
 	EPlayerState::Type GetPlayerState() const;
 	/** update weapon state */
 	UFUNCTION(BlueprintCallable, Category = Character)
@@ -82,29 +89,22 @@ public:
 	ECombatState::Type GetCombatState() const;
 	/** update weapon state */
 	UFUNCTION(BlueprintCallable, Category = Character)
-	void SetCombatState(ECombatState::Type NewState, class AArenaCharacter* Pawn);
+	void SetCombatState(ECombatState::Type NewState);
 
 protected:
 
 	UPROPERTY()
 	AArenaCharacter* MyPawn;
 
-	/** current weapon state */
-	UPROPERTY(ReplicatedUsing = OnRep_PlayerState)
+	UPROPERTY()
+	bool IsNearCover;
+
+	UPROPERTY()
 	TEnumAsByte<EPlayerState::Type> PlayerState;
 
-	/** current cover state */
-	ECoverState::Type CoverState;
+	UPROPERTY()
+	TEnumAsByte<ECoverState::Type> CoverState;
 
-	/** current cover state */
-	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
+	UPROPERTY()
 	TEnumAsByte<ECombatState::Type> CombatState;
-	
-	///////////////////////////////////////////// Replication /////////////////////////////////////////////
-
-	UFUNCTION()
-	void OnRep_PlayerState();
-
-	UFUNCTION()
-	void OnRep_CombatState(ECombatState::Type NewState);
 };

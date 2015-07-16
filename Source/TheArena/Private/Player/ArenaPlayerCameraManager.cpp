@@ -4,10 +4,13 @@ AArenaPlayerCameraManager::AArenaPlayerCameraManager(const FObjectInitializer& O
 {
 	MyPawn = NULL;
 	Speed = 20.0f;
+	NormalFOV = 90.0f;
 
+	CurrentFOV = 90.0;
 	CurrentArm = 500.0f;
 	CurrentOffset = FVector(0.0f, 0.0f, 0.0f);
 
+	TargetFOV = 90.0f;
 	TargetArm = 250.0f;
 	TargetOffset = FVector(0.0f, 0.0f, 0.0f);
 
@@ -37,10 +40,13 @@ void AArenaPlayerCameraManager::UpdateCamera(float DeltaTime)
 
 void AArenaPlayerCameraManager::UpdateCurrents(float DeltaTime)
 {
-	if (TargetArm != CurrentArm || TargetOffset != CurrentOffset)
+	if (TargetArm != CurrentArm || TargetOffset != CurrentOffset || TargetFOV != CurrentFOV)
 	{
+		CurrentFOV = FMath::FInterpTo(CurrentFOV, TargetFOV, DeltaTime, Speed);
 		CurrentArm = FMath::FInterpTo(CurrentArm, TargetArm, DeltaTime, Speed);
 		CurrentOffset = FMath::VInterpTo(CurrentOffset, TargetOffset, DeltaTime, Speed);
+
+		MyPawn->FollowCamera->FieldOfView = CurrentFOV;
 		MyPawn->CameraBoom->TargetArmLength = CurrentArm;
 		MyPawn->CameraBoom->SocketOffset = CurrentOffset;
 	}
@@ -52,6 +58,7 @@ void AArenaPlayerCameraManager::HandlePassiveCamera()
 {
 	MyPawn->bUseControllerRotationYaw = false;
 	Speed = 20.0f;
+	TargetFOV = NormalFOV;
 	TargetArm = 250.0f;
 	TargetOffset = FVector(0.0f, 0.0f, 0.0f);
 }
@@ -60,11 +67,11 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 {
 	EPlayerState::Type PlayerState = MyPawn->GetPlayerState()->GetPlayerState();
 
-	if (MyPawn->GetCharacterEquipment()->GetCurrentWeapon())
+	if (MyPawn->GetCurrentWeapon())
 	{
-		ETargetingState::Type TargetingState = MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
+		ETargetingState::Type TargetingState = MyPawn->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
 
-		Speed = 100 * MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetMotility();
+		Speed = 100 * MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetMotility();
 		MyPawn->bUseControllerRotationYaw = true;
 
 		if (TargetingState == ETargetingState::Targeting)
@@ -81,6 +88,7 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 		}
 		else
 		{
+			TargetFOV = NormalFOV;
 			TargetArm = 150.0f;
 			TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 		}
@@ -89,12 +97,14 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 
 void AArenaPlayerCameraManager::HandleTargetingCamera()
 {
-	TargetArm = 50.0f;
+	TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+	TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 	TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 }
 
 void AArenaPlayerCameraManager::HandleRunningCamera()
 {
+	TargetFOV = NormalFOV;
 	TargetArm = 175.0f;
 	TargetOffset = FVector(0.0f, 50.0f, 0.0f);
 }
@@ -117,7 +127,7 @@ void AArenaPlayerCameraManager::HandleCoverCamera()
 
 void AArenaPlayerCameraManager::HandleLowCoverCamera(ECoverState::Type CoverState)
 {
-	ETargetingState::Type TargetingState = MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
+	ETargetingState::Type TargetingState = MyPawn->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
 
 	if (MyPawn->GetPlayerMovement()->GetDirection() == FName(TEXT("Left")))
 	{
@@ -131,7 +141,7 @@ void AArenaPlayerCameraManager::HandleLowCoverCamera(ECoverState::Type CoverStat
 
 void AArenaPlayerCameraManager::HandleHighCoverCamera(ECoverState::Type CoverState)
 {
-	ETargetingState::Type TargetingState = MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
+	ETargetingState::Type TargetingState = MyPawn->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
 
 	if (MyPawn->GetPlayerMovement()->GetDirection() == FName(TEXT("Left")))
 	{
@@ -223,4 +233,15 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 			TargetOffset = FVector(0.0f, 50.0f, -20.0f);
 		}
 	}
+}
+
+////////////////////////////////////// Getters and Setters //////////////////////////////////////
+
+float AArenaPlayerCameraManager::GetNormalFOV()
+{
+	return NormalFOV;
+}
+void AArenaPlayerCameraManager::SetNormalFOV(float Value)
+{
+	NormalFOV = Value;
 }

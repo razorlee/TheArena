@@ -38,32 +38,31 @@ public:
 
 	/** starts the weapons attack */
 	virtual void StartAttack();
-
 	/** stops the weapons attack */
 	virtual void StopAttack();
 
 	/** starts the weapons reload */
 	virtual void StartReload();
-
 	/** stops the weapons reload */
 	virtual void StopReload();
 
 	/** starts the weapons reload */
-	virtual void StartMelee();
-
+	void StartMelee(bool bFromReplication = false);
 	/** stops the weapons reload */
-	virtual void StopMelee();
+	void StopMelee();
 
 	/** weapon is being equipped by owner pawn */
 	void Equip();
-
-	/** weapon is now equipped by owner pawn */
-	void FinishEquip();
-
 	/** weapon is unequipped by owner pawn */
 	float UnEquip();
 
-	/** weapon is now equipped by owner pawn */
+/////////////////////////////////////// Input Implementation ///////////////////////////////////////
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Melee();
+
+	void FinishEquip();
+
 	void FinishUnEquip();
 
 ////////////////////////////////////////// Sound Controls //////////////////////////////////////////
@@ -122,11 +121,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	virtual class UArenaRangedWeaponAttributes* GetWeaponAttributes(); //PURE_VIRTUAL(AArenaWeapon::GetWeaponAttributes, );
 
-	UFUNCTION(BlueprintImplementableEvent, Category = Weapon)
-	void RotateWeapon();
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	virtual class UArenaRangedWeaponEffects* GetWeaponEffects();
 
 protected:
 
+	UPROPERTY()
 	AArenaCharacter* MyPawn;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
@@ -142,6 +142,10 @@ protected:
 	/** weapon mesh: 3rd person view */
 	UPROPERTY(EditDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* Mesh3P;
+
+	FTimerHandle Reload_Timer;
+
+	FTimerHandle StopReload_Timer;
 
 	/** equip sound */
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
@@ -159,12 +163,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* UnEquipAnim;
 
-///////////////////////////////////////////////////////////// Server ///////////////////////////////////////////////////////////////
+	/////////////////////////////////////// Server ///////////////////////////////////////
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerEquip();
-
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerUnEquip();
-
+	void ServerMelee();
 };

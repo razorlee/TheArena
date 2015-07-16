@@ -78,19 +78,19 @@ struct FPlayerResources
 	float Shield;
 
 	/** The percentage of health when low health effects should start */
-	UPROPERTY(EditDefaultsOnly, Category = Resources)
+	UPROPERTY(EditAnywhere, Category = Resources)
 	float LowHealthPercentage;
 
 	/** The percentage of stamina when low stamina effects should start */
-	UPROPERTY(EditDefaultsOnly, Category = Resources)
+	UPROPERTY(EditAnywhere, Category = Resources)
 	float LowStaminaPercentage;
 
 	/** The percentage of energy when low energy effects should start */
-	UPROPERTY(EditDefaultsOnly, Category = Resources)
+	UPROPERTY(EditAnywhere, Category = Resources)
 	float LowEnergyPercentage;
 
 	/** The percentage of shield when low shield effects should start */
-	UPROPERTY(EditDefaultsOnly, Category = Resources)
+	UPROPERTY(EditAnywhere, Category = Resources)
 	float LowShieldPercentage;
 
 	/** defaults */
@@ -167,12 +167,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Resources)
 	void SetCurrentShields(float Value);
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Resources)
+	uint32 bIsDying : 1;
+
 private:
 
 	AArenaCharacter* Owner;
-	float MaxHealth;
-	float MaxEnergy;
-	float MaxStamina;
+
+	UPROPERTY(Transient, Replicated)
+	float CurrentHealth;
+	UPROPERTY(Transient, Replicated)
+	float CurrentEnergy;
+	UPROPERTY(Transient, Replicated)
+	float CurrentStamina;
 
 	/** stats data */
 	UPROPERTY(EditDefaultsOnly, Category = Config)

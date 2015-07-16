@@ -99,12 +99,6 @@ protected:
 	/** Triggers round end event for local players. Needs revising when shootergame goes multiplayer */
 	void TriggerRoundEndForLocalPlayers();
 
-	/** spawning all bots for this game */
-	void SpawnBotsForGame();
-
-	/** initialization for bot after spawning */
-	virtual void InitBot(AArenaAI* Bot, int BotNumber);
-
 	/** check who won */
 	virtual void DetermineMatchWinner();
 

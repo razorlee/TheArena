@@ -45,7 +45,7 @@ public:
 	/** player released targeting action */
 	void OnStopTargeting();
 	/** player enters combat */
-	void OnEnterCombat();
+	void OnToggleCombat();
 	/** player pressed prev weapon action */
 	void OnSwapWeapon();
 	/** player pressed reload action */
@@ -96,6 +96,25 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	class UArenaCharacterInventory* GetCharacterInventory();
 
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	AArenaWeapon* GetCurrentWeapon();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetCurrentWeapon();
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	AArenaWeapon* GetPrimaryWeapon();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void HandlePrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	AArenaWeapon* GetSecondaryWeapon();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void HandleSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+
 ////////////////////////////////////////// Animation Controls //////////////////////////////////////////
 
 	/** play anim montage */
@@ -109,12 +128,27 @@ public:
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
+	void SpawnDefaultEquipment();
+	UFUNCTION()
+	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon);
+
+	UFUNCTION(NetMultiCast, Unreliable)
+	void ToggleCrouch();
+
+	UFUNCTION(NetMultiCast, Unreliable)
+	void ToggleCover();
+
+	UFUNCTION(NetMultiCast, Unreliable)
+	void Running(bool IsRunning);
+
 	void SetTargeting(bool bNewTargeting);
 	void StartTargeting(bool bFromReplication = false);
 	void LoopTargeting();
 
-	void EnterCombat();
+	UFUNCTION(NetMultiCast, Unreliable)
+	void ToggleCombat();
 
+	UFUNCTION(NetMultiCast, Unreliable)
 	void SwapWeapon();
 
 	void EquipWeapon();
@@ -125,9 +159,6 @@ public:
 
 	void OnStartVault(bool bFromReplication = false);
 	void OnStopVault();
-
-	void StartWeaponFire();
-	void StopWeaponFire();
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
 
@@ -197,7 +228,25 @@ protected:
 
 	class UArenaSaveGame* LoadGameInstance;
 
-	//class UServer_ArenaCharacter* Server;
+////////////////////////////////////////// Weapons //////////////////////////////////////////
+
+	UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	TArray<TSubclassOf<class AArenaWeapon> > DefaultInventoryClasses;
+
+	/** weapons in inventory */
+	UPROPERTY(Transient, Replicated)
+	TArray<class AArenaWeapon*> Inventory;
+
+	UPROPERTY(Transient)
+	class AArenaWeapon* CurrentWeapon;
+
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_PrimaryWeapon)
+	class AArenaWeapon* PrimaryWeapon;
+
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_SecondaryWeapon)
+	class AArenaWeapon* SecondaryWeapon;
+
+////////////////////////////////////////// Private Properties //////////////////////////////////////////
 
 	/** Handle for efficient management of StopReload timer */
 	FTimerHandle TimerHandle_SwapWeapon;
@@ -244,6 +293,11 @@ protected:
 	void OnRep_LastTakeHitInfo();
 
 	UFUNCTION()
+	void OnRep_PrimaryWeapon(class AArenaWeapon* NewWeapon);
+	UFUNCTION()
+	void OnRep_SecondaryWeapon(class AArenaWeapon* NewWeapon);
+
+	UFUNCTION()
 	void OnRep_Vault();
 	UFUNCTION()
 	void OnRep_Aim();
@@ -265,14 +319,6 @@ protected:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerJump(class AArenaCharacter* client);
 
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetRunning(bool bNewRunning, bool bToggle);
-
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetCrouched(bool bNewCrouched, bool bToggle);
-
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStartVault();
 
@@ -285,7 +331,30 @@ protected:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopTargeting();
 
+/////////////////////////////////////////////////////////////////////////
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerToggleCrouch();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerToggleCover();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerRunning(bool IsRunning);
+
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEnterCombat();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSwapWeapon();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerInitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 
 };

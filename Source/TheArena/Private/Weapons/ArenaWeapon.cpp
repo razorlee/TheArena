@@ -5,8 +5,6 @@
 
 AArenaWeapon::AArenaWeapon(const class FObjectInitializer& PCIP)
 {
-	//PrimaryComponentTick.bCanEverTick = true;
-
 	Mesh3P = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("WeaponMesh3P"));
 	Mesh3P->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
 	Mesh3P->bChartDistanceFactor = true;
@@ -17,13 +15,19 @@ AArenaWeapon::AArenaWeapon(const class FObjectInitializer& PCIP)
 	Mesh3P->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
 	Mesh3P->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	Mesh3P->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = TG_PrePhysics;
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	bReplicates = true;
+	//bReplicateInstigator = true;
+	bNetUseOwnerRelevancy = true;
 }
 
 void AArenaWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	RotateWeapon();
 	DetachMeshFromPawn();
 }
 
@@ -56,37 +60,129 @@ void AArenaWeapon::StopReload()
 
 }
 
-void AArenaWeapon::StartMelee()
+void AArenaWeapon::StartMelee(bool bFromReplication)
 {
-
+	if (ArenaWeaponCan::Melee(MyPawn, this))
+	{
+		if (Role == ROLE_Authority)
+		{
+			Melee();
+		}
+		else
+		{
+			ServerMelee();
+		}
+	}
 }
 
 void AArenaWeapon::StopMelee()
 {
-
+	if (GetWeaponState()->GetWeaponState() == EWeaponState::Meleeing)
+	{
+		StopWeaponAnimation(GetWeaponEffects()->GetMeleeAnim());
+	}
 }
 
 void AArenaWeapon::Equip()
 {
-	if (Role == ROLE_Authority)
+	if (ArenaWeaponCan::Equip(MyPawn, this))
 	{
-		if (ArenaWeaponCan::Equip(MyPawn, this))
+		GetWeaponState()->SetWeaponState(EWeaponState::Equipping);
+		float Duration = PlayWeaponAnimation(EquipAnim, GetWeaponAttributes()->GetMotility()) / GetWeaponAttributes()->GetMotility();
+
+		GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishEquip, (Duration*0.25f), false);
+
+		if (MyPawn && MyPawn->IsLocallyControlled())
 		{
-			RotateWeapon();
-			GetWeaponState()->SetWeaponState(EWeaponState::Equipping);
-			float Duration = PlayWeaponAnimation(EquipAnim);
-
-			GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishEquip, (Duration*0.25f), false);
-
-			if (MyPawn && MyPawn->IsLocallyControlled())
-			{
-				PlayWeaponSound(EquipSound);
-			}
+			PlayWeaponSound(EquipSound);
 		}
 	}
-	else
+}
+
+float AArenaWeapon::UnEquip()
+{
+	float Duration = 0;
+	if (ArenaWeaponCan::UnEquip(MyPawn, this))
 	{
-		ServerEquip();
+		StopAttack();
+
+		Duration = PlayWeaponAnimation(UnEquipAnim, GetWeaponAttributes()->GetMotility()) / GetWeaponAttributes()->GetMotility();
+		if (GetWeaponState()->GetWeaponState() == EWeaponState::Reloading)
+		{
+			StopWeaponAnimation(GetWeaponEffects()->GetReloadAnim());
+			
+			GetWorldTimerManager().ClearTimer(Reload_Timer);
+			GetWorldTimerManager().ClearTimer(StopReload_Timer);
+		}
+
+		GetWeaponState()->SetWeaponState(EWeaponState::Holstering);
+		GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishUnEquip, (Duration*0.5f), false);
+		if (MyPawn && MyPawn->IsLocallyControlled())
+		{
+			PlayWeaponSound(UnEquipSound);
+		}
+		return Duration;
+	}
+	return Duration;
+}
+
+/////////////////////////////////////// Input Implementation ///////////////////////////////////////
+
+void AArenaWeapon::Melee_Implementation()
+{
+	float AnimDuration = PlayWeaponAnimation(GetWeaponEffects()->GetMeleeAnim());
+	if (AnimDuration <= 0.0f)
+	{
+		AnimDuration = 0.3f;
+	}
+
+	GetWorldTimerManager().SetTimer(this, &AArenaWeapon::StopMelee, AnimDuration, false);
+	if (Role == ROLE_Authority)
+	{
+		TArray<struct FOverlapResult> OutOverlaps;
+		TArray<AActor*> HitActors;
+
+		FQuat Rotation = Instigator->GetTransform().GetRotation();
+		FVector Start = Instigator->GetTransform().GetLocation() + Rotation.Rotator().Vector() * 100.0f;
+
+		FCollisionShape CollisionHitShape;
+		FCollisionQueryParams CollisionParams;
+
+		CollisionParams.AddIgnoredActor(Instigator);
+
+		FCollisionObjectQueryParams CollisionObjectTypes;
+		CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
+		CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+		CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+
+		CollisionHitShape = FCollisionShape::MakeBox(FVector(60.0f, 60.0f, 0.5f));
+		GetWorld()->OverlapMulti(OutOverlaps, Start, Rotation, CollisionHitShape, CollisionParams, CollisionObjectTypes);
+
+		for (int i = 0; i < OutOverlaps.Num(); ++i)
+		{
+			if (OutOverlaps[i].GetActor() && !HitActors.Contains(OutOverlaps[i].GetActor()))
+			{
+				if (!OutOverlaps[i].GetActor() || HitActors.Contains(OutOverlaps[i].GetActor()))
+				{
+					return;
+				}
+				HitActors.AddUnique(OutOverlaps[i].GetActor());
+				FHitResult AttackHitResult;
+				const FDamageEvent AttackDamageEvent;
+				AArenaCharacter* GameCharacter = Cast<AArenaCharacter>(OutOverlaps[i].GetActor());
+
+				if (GameCharacter)
+				{
+					UGameplayStatics::ApplyDamage(OutOverlaps[i].GetActor(), 200.0f, Instigator->GetController(), MyPawn->Controller, UDamageType::StaticClass());
+				}
+			}
+			OutOverlaps.Empty();
+		}
+	}
+
+	if (MyPawn && MyPawn->IsLocallyControlled())
+	{
+		PlayWeaponSound(GetWeaponEffects()->GetMeleeSound());
 	}
 }
 
@@ -95,43 +191,6 @@ void AArenaWeapon::FinishEquip()
 	DetachMeshFromPawn();
 	AttachMeshToPawn();
 	GetWeaponState()->SetWeaponState(EWeaponState::Default);
-}
-
-float AArenaWeapon::UnEquip()
-{
-	float Duration = 0;
-	if (Role == ROLE_Authority)
-	{
-		if (ArenaWeaponCan::UnEquip(MyPawn, this))
-		{
-			RotateWeapon();
-			StopAttack();
-			GetWeaponState()->SetWeaponState(EWeaponState::Holstering);
-
-			Duration = PlayWeaponAnimation(UnEquipAnim);
-			//if (WeaponState->GetWeaponState() == EWeaponState::Reloading)
-			//{
-			//	StopWeaponAnimation(ReloadAnim);
-			GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishUnEquip, (Duration*0.5f), false);
-			//	GetWorldTimerManager().ClearTimer(this, &AArenaRangedWeapon::StopReload);
-			//	GetWorldTimerManager().ClearTimer(this, &AArenaRangedWeapon::ReloadWeapon);
-
-			//	WeaponState->SetWeaponState(EWeaponState::Default);
-			//}
-			if (MyPawn && MyPawn->IsLocallyControlled())
-			{
-				PlayWeaponSound(UnEquipSound);
-			}
-			return Duration;
-		}
-		return Duration;
-	}
-	else
-	{
-		ServerUnEquip();
-		//float Duration = 0;
-	}
-	return Duration;
 }
 
 void AArenaWeapon::FinishUnEquip()
@@ -150,10 +209,26 @@ void AArenaWeapon::FinishUnEquip()
 		AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainWeaponAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffWeaponAttachPoint();
 	}
 
-	USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();
-	Mesh3P->SetHiddenInGame(false);
-	Mesh3P->AttachTo(PawnMesh3p, AttachPoint, EAttachLocation::SnapToTarget, true);
-	GetWeaponState()->SetWeaponState(EWeaponState::Default);
+	if (MyPawn->IsLocallyControlled() == true)
+	{
+		USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();
+		Mesh3P->SetHiddenInGame(false);
+		Mesh3P->AttachTo(PawnMesh3p, AttachPoint, EAttachLocation::SnapToTarget, true);
+		GetWeaponState()->SetWeaponState(EWeaponState::Default);
+	}
+	else
+	{
+		USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();
+		Mesh3P->SetHiddenInGame(false);
+		Mesh3P->AttachTo(PawnMesh3p, AttachPoint, EAttachLocation::SnapToTarget, true);
+		GetWeaponState()->SetWeaponState(EWeaponState::Default);
+	}
+
+
+	/*USkeletalMeshComponent* UseWeaponMesh = GetWeaponMesh();
+	USkeletalMeshComponent* UsePawnMesh = MyPawn->GetPawnMesh();
+	UseWeaponMesh->AttachTo(UsePawnMesh, AttachPoint);
+	UseWeaponMesh->SetHiddenInGame(false);*/
 }
 
 ////////////////////////////////////////// Sound Controls //////////////////////////////////////////
@@ -217,10 +292,9 @@ void AArenaWeapon::AttachMeshToPawn()
 		}
 		else
 		{
-			USkeletalMeshComponent* UseWeaponMesh = GetWeaponMesh();
-			USkeletalMeshComponent* UsePawnMesh = MyPawn->GetPawnMesh();
-			UseWeaponMesh->AttachTo(UsePawnMesh, AttachPoint);
-			UseWeaponMesh->SetHiddenInGame(false);
+			USkeletalMeshComponent* PawnMesh3p = MyPawn->GetPawnMesh();
+			Mesh3P->SetHiddenInGame(false);
+			Mesh3P->AttachTo(PawnMesh3p, AttachPoint);
 		}
 	}
 }
@@ -282,23 +356,18 @@ class UArenaRangedWeaponAttributes* AArenaWeapon::GetWeaponAttributes()
 	return NULL;
 }
 
-//////////////////////////////////////////// Server ////////////////////////////////////////////
+class UArenaRangedWeaponEffects* AArenaWeapon::GetWeaponEffects()
+{
+	return NULL;
+}
 
+///////////////////////////////////////////// Server /////////////////////////////////////////////
 
-bool AArenaWeapon::ServerEquip_Validate()
+bool AArenaWeapon::ServerMelee_Validate()
 {
 	return true;
 }
-void AArenaWeapon::ServerEquip_Implementation()
+void AArenaWeapon::ServerMelee_Implementation()
 {
-	Equip();
-}
-
-bool AArenaWeapon::ServerUnEquip_Validate()
-{
-	return true;
-}
-void AArenaWeapon::ServerUnEquip_Implementation()
-{
-	UnEquip();
+	Melee();
 }

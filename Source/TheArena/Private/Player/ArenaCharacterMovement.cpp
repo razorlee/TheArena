@@ -13,7 +13,7 @@ UArenaCharacterMovement::UArenaCharacterMovement(const FObjectInitializer& Objec
 	DodgeCost = 300.0f;
 
 	BaseMovementSpeed = 400.0f;
-	RunningMovementSpeed = 520.0f;
+	RunningMovementSpeed = 800.0f;
 	CrouchedMovementSpeed = 340.0f;
 	TargetingMovementSpeed = 280.0f;
 }
@@ -33,6 +33,13 @@ float UArenaCharacterMovement::GetMaxSpeed() const
 		{
 			MaxSpeed = CrouchedMovementSpeed;
 		}
+		/*if (ArenaCharacterOwner->GetCharacterEquipment()->GetCurrentWeapon())
+		{
+			if (ArenaCharacterOwner->GetCharacterEquipment->GetCurrentWeapon()->GetWeaponState()->GetTargetingState() == ETargetingState::Targeting)
+			{
+				MaxSpeed = TargetingMovementSpeed;
+			}
+		}*/
 	}
 
 	return MaxSpeed;
@@ -52,6 +59,7 @@ void UArenaCharacterMovement::ManageState(float DeltaSeconds)
 		{
 			ArenaCharacterOwner->GetCharacterAttributes()->SetCurrentStamina(ArenaCharacterOwner->GetCharacterAttributes()->GetCurrentStamina() - (SprintCost * DeltaSeconds));
 		}
+		ArenaCharacterOwner->GetCharacterAttributes()->SetCurrentHealth(ArenaCharacterOwner->GetCharacterAttributes()->GetCurrentHealth());
 	}
 }
 

@@ -7,6 +7,9 @@
 // Sets default values for this component's properties
 UArenaCharacterAttributes::UArenaCharacterAttributes(const FObjectInitializer& ObjectInitializer)
 {
+	SetIsReplicated(true);
+	bReplicates = true;
+
 	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -17,88 +20,88 @@ void UArenaCharacterAttributes::InitializeComponent()
 
 	Owner = Cast<AArenaCharacter>(GetOwner());
 
-	MaxHealth = ResourcesConfig.Health;
-	MaxStamina = ResourcesConfig.Stamina;
-	MaxEnergy = ResourcesConfig.Energy;
+	CurrentHealth = ResourcesConfig.Health;
+	CurrentEnergy = ResourcesConfig.Stamina;
+	CurrentStamina = ResourcesConfig.Energy;
 	
 }
 
 void UArenaCharacterAttributes::Reset(AArenaCharacter* Owner)
 {
-	ResourcesConfig.Health = GetMaxHealth();
-	ResourcesConfig.Energy = GetMaxEnergy();
-	ResourcesConfig.Stamina = GetMaxStamina();
+	CurrentHealth = ResourcesConfig.Health;
+	CurrentEnergy = ResourcesConfig.Energy;
+	CurrentStamina = ResourcesConfig.Stamina;
 }
 
 void UArenaCharacterAttributes::Regenerate(float DeltaSeconds)
 {
-	if (ResourcesConfig.Energy < GetMaxEnergy())
+	if (CurrentEnergy < ResourcesConfig.Energy)
 	{
-		ResourcesConfig.Energy += StatsConfig.EnergyRegen * DeltaSeconds;
-		if (ResourcesConfig.Energy > GetMaxEnergy())
+		CurrentEnergy += StatsConfig.EnergyRegen * DeltaSeconds;
+		if (CurrentEnergy > ResourcesConfig.Energy)
 		{
-			ResourcesConfig.Energy = this->GetMaxEnergy();
+			CurrentEnergy = this->GetMaxEnergy();
 		}
 	}
 
-	if (ResourcesConfig.Stamina < GetMaxStamina() && Owner->GetPlayerState()->GetPlayerState() != EPlayerState::Running)
+	if (CurrentStamina < ResourcesConfig.Stamina && Owner->GetPlayerState()->GetPlayerState() != EPlayerState::Running)
 	{
-		ResourcesConfig.Stamina += StatsConfig.StaminaRegen * DeltaSeconds;
-		if (ResourcesConfig.Stamina > GetMaxStamina())
+		CurrentStamina += StatsConfig.StaminaRegen * DeltaSeconds;
+		if (CurrentStamina > ResourcesConfig.Stamina)
 		{
-			ResourcesConfig.Stamina = GetMaxStamina();
+			CurrentStamina = GetMaxStamina();
 		}
 	}
 }
 
 int32 UArenaCharacterAttributes::GetMaxHealth() const
 {
-	return MaxHealth;
+	return ResourcesConfig.Health;
 }
 
 float UArenaCharacterAttributes::GetCurrentHealth() const
 {
-	return ResourcesConfig.Health;
+	return CurrentHealth;
 }
 
 void UArenaCharacterAttributes::SetCurrentHealth(float Value)
 {
-	ResourcesConfig.Health = Value;
+	CurrentHealth = Value;
 }
 
 int32 UArenaCharacterAttributes::GetMaxStamina() const
 {
-	return MaxStamina;
+	return ResourcesConfig.Stamina;
 }
 
 float UArenaCharacterAttributes::GetCurrentStamina() const
 {
-	return ResourcesConfig.Stamina;
+	return CurrentStamina;
 }
 
 void UArenaCharacterAttributes::SetCurrentStamina(float Value)
 {
-	ResourcesConfig.Stamina = Value;
+	CurrentStamina = Value;
 }
 
 int32 UArenaCharacterAttributes::GetMaxEnergy() const
 {
-	return MaxEnergy;
+	return ResourcesConfig.Energy;
 }
 
 float UArenaCharacterAttributes::GetCurrentEnergy() const
 {
-	return ResourcesConfig.Energy;
+	return CurrentEnergy;
 }
 
 void UArenaCharacterAttributes::SetCurrentEnergy(float Value)
 {
-	ResourcesConfig.Energy = Value;
+	CurrentEnergy = Value;
 }
 
 int32 UArenaCharacterAttributes::GetMaxShields() const
 {
-	return GetClass()->GetDefaultObject<UArenaCharacterAttributes>()->ResourcesConfig.Shield;
+	return ResourcesConfig.Shield;
 }
 
 float UArenaCharacterAttributes::GetCurrentShields() const
@@ -117,5 +120,14 @@ void UArenaCharacterAttributes::TickComponent( float DeltaTime, ELevelTick TickT
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
 	// ...
+}
+
+void UArenaCharacterAttributes::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UArenaCharacterAttributes, CurrentEnergy);
+	DOREPLIFETIME(UArenaCharacterAttributes, CurrentHealth);
+	DOREPLIFETIME(UArenaCharacterAttributes, CurrentStamina);
 }
 

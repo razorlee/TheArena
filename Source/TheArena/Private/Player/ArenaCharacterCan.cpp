@@ -83,7 +83,8 @@ bool ArenaCharacterCan::Crouch(AArenaCharacter* character, AArenaPlayerControlle
 		&& controller->IsGameInputAllowed()
 		&& !character->GetCharacterMovement()->IsFalling()
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Jumping
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& !character->GetPlayerState()->GetIsNearCover())
 	{
 		return true;
 	}
@@ -113,7 +114,8 @@ bool ArenaCharacterCan::Cover(AArenaCharacter* character, AArenaPlayerController
 	if (controller
 		&& controller->IsGameInputAllowed()
 		&& !character->GetCharacterMovement()->IsFalling()
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& character->GetPlayerState()->GetIsNearCover())
 	{
 		return true;
 	}
@@ -157,8 +159,8 @@ bool ArenaCharacterCan::Swap(AArenaCharacter* character, AArenaPlayerController*
 	if (controller
 		&& controller->IsGameInputAllowed()
 		&& character->GetPlayerState()->GetCombatState() == ECombatState::Aggressive
-		&& character->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() != EWeaponState::Equipping
-		&& character->GetCharacterEquipment()->GetCurrentWeapon() != NULL)
+		&& character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() != EWeaponState::Equipping
+		&& character->GetCurrentWeapon() != NULL)
 	{
 		return true;
 	}
@@ -226,7 +228,7 @@ bool ArenaCharacterCan::Melee(AArenaCharacter* character, AArenaPlayerController
 
 bool ArenaCharacterCan::Die(AArenaCharacter* character)
 {
-	if (character->GetCharacterAttributes()->GetCurrentHealth() <= 0
+	if (character->GetCharacterAttributes()->bIsDying
 		|| character->IsPendingKill()
 		|| character->Role != ROLE_Authority
 		|| character->GetWorld()->GetAuthGameMode() == NULL

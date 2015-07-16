@@ -21,9 +21,11 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	uint32 UserIndex;
 
-	/** Current health of the Pawn */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Basic)
-	float Health;
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	TSubclassOf<class AArenaWeapon> PrimaryWeapon;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	TSubclassOf<class AArenaWeapon> SecondaryWeapon;
 
 	UArenaSaveGame(const FObjectInitializer& ObjectInitializer);
 	

@@ -192,15 +192,27 @@ void AArenaPlayerController::OnToggleInGameMenu()
 	{
 		SetMenu(false);
 		bAllowGameActions = true;
+
+		bShowMouseCursor = false;
+		bEnableClickEvents = false;
+		bEnableMouseOverEvents = false;
 	}
 	else
 	{
 		SetMenu(true);
 		bAllowGameActions = false;
+
+		bShowMouseCursor = true;
+		bEnableClickEvents = true;
+		bEnableMouseOverEvents = true;
 	}
 	if (OpenFriendsList == true)
 	{
 		SetFriendsList(false);
+
+		bShowMouseCursor = false;
+		bEnableClickEvents = false;
+		bEnableMouseOverEvents = false;
 	}
 }
 
@@ -213,18 +225,30 @@ void AArenaPlayerController::OnToggleInventory()
 			if (IsInventoryOpen())
 			{
 				SetInventory(false);
+				bShowMouseCursor = false;
+				bEnableClickEvents = false;
+				bEnableMouseOverEvents = false;
 				return;
 			}
 			else
 			{
 				SetInventory(true);
+				bShowMouseCursor = true;
+				bEnableClickEvents = true;
+				bEnableMouseOverEvents = true;
 				return;
 			}
 		}
 		SetInventory(false);
+		bShowMouseCursor = false;
+		bEnableClickEvents = false;
+		bEnableMouseOverEvents = false;
 		return;
 	}
 	SetInventory(false);
+	bShowMouseCursor = false;
+	bEnableClickEvents = false;
+	bEnableMouseOverEvents = false;
 	return;
 }
 
@@ -314,7 +338,7 @@ void AArenaPlayerController::SetInventory(bool bEnable)
 		AArenaCharacter* Owner = Cast<AArenaCharacter>(GetPawnOrSpectator());
 		if (Owner->GetPlayerState()->GetCombatState() == ECombatState::Aggressive)
 		{
-			Owner->OnEnterCombat();
+			Owner->OnToggleCombat();
 		}
 	}
 }
@@ -540,7 +564,7 @@ void AArenaPlayerController::SetCinematicMode(bool bInCinematicMode, bool bHideP
 
 	// If we have a pawn we need to determine if we should show/hide the weapon
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
-	AArenaWeapon* MyWeapon = MyPawn ? MyPawn->GetCharacterEquipment()->GetCurrentWeapon() : NULL;
+	AArenaWeapon* MyWeapon = MyPawn ? MyPawn->GetCurrentWeapon() : NULL;
 	if (MyWeapon)
 	{
 		if (bInCinematicMode && bHidePlayer)

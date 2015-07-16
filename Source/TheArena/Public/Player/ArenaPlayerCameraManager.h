@@ -36,6 +36,13 @@ public:
 
 	void HandleFaceRightCamera(FString State, ETargetingState::Type TargetingState, ECoverState::Type CoverState);
 
+////////////////////////////////////////////////// Getter and Setters //////////////////////////////////////////////////
+
+	UFUNCTION(BlueprintCallable, Category = Camera)
+		float GetNormalFOV();
+	UFUNCTION(BlueprintCallable, Category = Camera)
+		void SetNormalFOV(float Value);
+
 private:
 
 	UPROPERTY()
@@ -43,6 +50,14 @@ private:
 
 	UPROPERTY()
 	float Speed;
+
+	UPROPERTY()
+		float NormalFOV;
+
+	UPROPERTY()
+	float CurrentFOV;
+	UPROPERTY()
+	float TargetFOV;
 
 	UPROPERTY()
 	float CurrentArm;

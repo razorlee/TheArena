@@ -3,9 +3,10 @@
 #include "TheArena.h"
 #include "ArenaRangedWeapon.h"
 
-AArenaRangedWeapon::AArenaRangedWeapon(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+AArenaRangedWeapon::AArenaRangedWeapon(const FObjectInitializer& ObjectInitializer) 
+	: Super(ObjectInitializer)
 {
-	PrimaryActorTick.bCanEverTick = true;	
+	PrimaryActorTick.bCanEverTick = true;
 
 	WeaponAttributes = ObjectInitializer.CreateDefaultSubobject<UArenaRangedWeaponAttributes>(this, TEXT("WeaponAttributes"));
 	WeaponEffects = ObjectInitializer.CreateDefaultSubobject<UArenaRangedWeaponEffects>(this, TEXT("WeaponEffects"));
@@ -18,6 +19,7 @@ AArenaRangedWeapon::AArenaRangedWeapon(const FObjectInitializer& ObjectInitializ
 	WeaponState->SetNetAddressable();
 	WeaponState->SetIsReplicated(true);
 
+	BurstCounter = 0;
 	RecoilCounter = 0;
 	IsRecoiling = false;
 }
@@ -43,121 +45,63 @@ void AArenaRangedWeapon::Destroyed()
 	StopAttackFX();
 }
 
-////////////////////////////////////////// Input handlers //////////////////////////////////////////
+/////////////////////////////////////////// Input handlers //////////////////////////////////////////
 
 void AArenaRangedWeapon::StartAttack()
 {
-	if (Role == ROLE_Authority)
-	{
-		OnBurstStarted();
-	}
-	else
+	if (Role < ROLE_Authority)
 	{
 		ServerStartAttack();
 	}
+
+	if (WeaponState->GetWeaponState() != EWeaponState::Firing)
+	{
+		WeaponState->SetWeaponState(EWeaponState::Firing);
+		OnBurstStarted();
+	}
+
 }
 void AArenaRangedWeapon::StopAttack()
 {
-	if (Role == ROLE_Authority)
-	{
-		if (WeaponState->GetWeaponState() == EWeaponState::Firing)
-		{
-			WeaponState->SetWeaponState(EWeaponState::Default);
-			OnBurstFinished();
-		}
-	}
-	else
+	if (Role < ROLE_Authority)
 	{
 		ServerStopAttack();
+	}
+
+	if (WeaponState->GetWeaponState() == EWeaponState::Firing)
+	{
+		WeaponState->SetWeaponState(EWeaponState::Default);
+		OnBurstFinished();
 	}
 }
 
 void AArenaRangedWeapon::StartReload()
 {
-	if (Role == ROLE_Authority)
+	if (ArenaWeaponCan::Reload(MyPawn, this))
 	{
-		if (ArenaWeaponCan::Reload(MyPawn, this))
+		if (Role == ROLE_Authority)
 		{
-			WeaponState->SetWeaponState(EWeaponState::Reloading);
-			float AnimDuration = PlayWeaponAnimation(WeaponEffects->GetReloadAnim(), WeaponAttributes->GetMotility()) * (1.0f / WeaponAttributes->GetMotility());
-			if (AnimDuration <= 0.0f)
-			{
-				AnimDuration = 3.0f;
-			}
-
-			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::StopReload, AnimDuration, false);
-			if (Role == ROLE_Authority)
-			{
-				GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::Reload, FMath::Max(0.1f, AnimDuration - 0.1f), false);
-			}
-
-			if (MyPawn && MyPawn->IsLocallyControlled())
-			{
-				PlayWeaponSound(WeaponEffects->GetReloadSound());
-			}
+			Reload();
+		}
+		else
+		{
+			ServerStartReload();
 		}
 	}
-	else
-	{
-		ServerStartReload();
-	}
 }
-void AArenaRangedWeapon::StopReload()
+void AArenaRangedWeapon::StopReload_Implementation()
 {
-	if (Role == ROLE_Authority)
-	{
 		if (WeaponState->GetWeaponState() == EWeaponState::Reloading)
 		{
 			WeaponState->SetWeaponState(EWeaponState::Default);
 			StopWeaponAnimation(WeaponEffects->GetReloadAnim());
 		}
-	}
-	else
-	{
-		ServerStopReload();
-	}
 }
 
-void AArenaRangedWeapon::StartMelee()
-{
-	if (Role == ROLE_Authority)
-	{
-		float AnimDuration = PlayWeaponAnimation(WeaponEffects->GetMeleeAnim());
-		if (AnimDuration <= 0.0f)
-		{
-			AnimDuration = 0.3f;
-		}
-
-		GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::StopMelee, AnimDuration, false);
-		if (Role == ROLE_Authority)
-		{
-			Melee();
-		}
-
-		if (MyPawn && MyPawn->IsLocallyControlled())
-		{
-			PlayWeaponSound(WeaponEffects->GetMeleeSound());
-		}
-	}
-	else
-	{
-		//ServerStartMelee();
-	}
-}
-void AArenaRangedWeapon::StopMelee()
-{
-	if (WeaponState->GetWeaponState() == EWeaponState::Meleeing)
-	{
-		StopWeaponAnimation(WeaponEffects->GetMeleeAnim());
-		//HitActors.Empty();
-	}
-}
-
-///////////////////////////////////////// Action Functions /////////////////////////////////////////
+////////////////////////////////////////// Action Functions /////////////////////////////////////////
 
 void AArenaRangedWeapon::OnBurstStarted()
 {
-	IsRecoiling = true;
 	const float GameTime = GetWorld()->GetTimeSeconds();
 
 	if (WeaponAttributes->LastFireTime > 0 && WeaponAttributes->GetAttackSpeed() > 0.0f && WeaponAttributes->LastFireTime + WeaponAttributes->GetAttackSpeed() > GameTime)
@@ -175,7 +119,7 @@ void AArenaRangedWeapon::OnBurstStarted()
 	{
 		if (WeaponAttributes->GetFireMode() == EFireMode::Burst)
 		{
-			GetWorldTimerManager().SetTimer(BurstFire, this, &AArenaRangedWeapon::HandleFiring, 0.05f, true);
+			GetWorldTimerManager().SetTimer(BurstFire, this, &AArenaRangedWeapon::HandleBurst, 0.05f, true);
 		}
 		else
 		{
@@ -187,19 +131,23 @@ void AArenaRangedWeapon::OnBurstStarted()
 
 void AArenaRangedWeapon::OnBurstFinished()
 {
+	if (WeaponState->GetWeaponState() == EWeaponState::Firing)
+	{
+		WeaponState->SetWeaponState(EWeaponState::Default);
+	}
 	if (WeaponAttributes->GetFireMode() == EFireMode::Burst)
 	{
-		if (WeaponAttributes->BurstCounter > 2)
+		if (BurstCounter > 2)
 		{
 			GetWorldTimerManager().ClearTimer(BurstFire);
-			WeaponAttributes->BurstCounter = 0;
+			BurstCounter = 0;
 		}
 		StopAttackFX();
 	}
 	else
 	{
 		GetWorldTimerManager().ClearTimer(this, &AArenaRangedWeapon::HandleFiring);
-		WeaponAttributes->BurstCounter = 0;
+		BurstCounter = 0;
 		StopAttackFX();
 	}
 	
@@ -211,9 +159,10 @@ void AArenaRangedWeapon::HandleFiring()
 {
 	if (ArenaWeaponCan::Fire(MyPawn, this))
 	{
+		IsRecoiling = true;
 		WeaponState->SetWeaponState(EWeaponState::Firing);
 
-		if (GetNetMode() != NM_DedicatedServer)// && WeaponAttributes->BurstCounter < 1)
+		if (GetNetMode() != NM_DedicatedServer)
 		{
 			PlayAttackFX();
 		}
@@ -221,7 +170,7 @@ void AArenaRangedWeapon::HandleFiring()
 		{
 			FireWeapon();
 			WeaponAttributes->CurrentClip--;
-			WeaponAttributes->BurstCounter++;
+			BurstCounter++;
 		}
 	}
 	else if (MyPawn && MyPawn->IsLocallyControlled())
@@ -230,10 +179,9 @@ void AArenaRangedWeapon::HandleFiring()
 		if (WeaponAttributes->TotalAmmo == 0 && !bRefiring)
 		{
 			PlayWeaponSound(WeaponEffects->GetOutOfAmmoSound());
-			AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(MyPawn->Controller);
 		}
 		// stop weapon fire FX, but stay in Firing state
-		if (WeaponAttributes->BurstCounter > 0)
+		if (BurstCounter > 0)
 		{
 			OnBurstFinished();
 		}
@@ -249,7 +197,7 @@ void AArenaRangedWeapon::HandleFiring()
 		// reload if possible
 		if (WeaponAttributes->CurrentClip <= 0 && ArenaWeaponCan::Reload(MyPawn, this))
 		{
-			OnBurstFinished();
+			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnBurstFinished, 0.1f, false);
 			StartReload();
 		}
 
@@ -259,7 +207,7 @@ void AArenaRangedWeapon::HandleFiring()
 		{
 			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::HandleFiring, WeaponAttributes->GetAttackSpeed(), false);
 		}
-		else if (WeaponAttributes->GetFireMode() == EFireMode::Burst && WeaponAttributes->BurstCounter > 2)
+		else if (WeaponAttributes->GetFireMode() == EFireMode::Burst && BurstCounter > 2)
 		{
 			OnBurstFinished();
 		}
@@ -286,25 +234,7 @@ void AArenaRangedWeapon::FireWeapon()
 
 		ShootDir = WeaponRandomStream.VRandCone((ShootDir - Origin).GetSafeNormal(), ConeHalfAngle, ConeHalfAngle);
 
-		SpawnProjectile(Origin, ShootDir, Hit);
-		//CurrentFiringSpread = FMath::Min(ProjectileConfig.FiringSpreadMax, CurrentFiringSpread + ProjectileConfig.FiringSpreadIncrement);
-	}
-}
-
-void AArenaRangedWeapon::SpawnProjectile(FVector Origin, FVector ShootDir, FHitResult Hit)
-{
-	FTransform SpawnTM(ShootDir.Rotation(), Origin);
-	AArenaProjectile* Projectile = Cast<AArenaProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileClass, SpawnTM));
-	if (Projectile)
-	{
-		Projectile->SetPawnOwner(MyPawn);
-		Projectile->Instigator = Instigator;
-		Projectile->SetOwner(this);
-		Projectile->SetInitialSpeed(WeaponAttributes->GetVelocity());
-		Projectile->InitVelocity(ShootDir);
-		Projectile->SetHitResults(Hit);
-
-		UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
+		ServerSpawnProjectile(Origin, ShootDir, Hit);
 	}
 }
 
@@ -316,11 +246,10 @@ void AArenaRangedWeapon::HandleBurst()
 void AArenaRangedWeapon::HandleRecoil(float DeltaSeconds)
 {
 	float Stability = 1 - (WeaponAttributes->GetStability() * 0.01);
-	if (RecoilCounter < Stability * 7)
+	if (RecoilCounter < Stability * 15)
 	{
-		RecoilCounter += Stability;
-
 		float Recoil = FMath::FInterpTo(0.0f, -Stability, DeltaSeconds, 100.0f);
+		RecoilCounter += (Recoil * -1.0f);
 
 		MyPawn->AddControllerPitchInput(Recoil);
 	}
@@ -330,7 +259,7 @@ void AArenaRangedWeapon::FinishRecoil(float DeltaSeconds)
 {
 	if (RecoilCounter > 0)
 	{
-		float Recoil = FMath::FInterpTo(0.0f, RecoilCounter, DeltaSeconds, 5.0f);
+		float Recoil = FMath::FInterpTo(0.0f, RecoilCounter, DeltaSeconds, 2.5f);
 		MyPawn->AddControllerPitchInput(Recoil);
 		RecoilCounter -= Recoil;
 	}
@@ -340,7 +269,28 @@ void AArenaRangedWeapon::FinishRecoil(float DeltaSeconds)
 	}
 }
 
-void AArenaRangedWeapon::Reload()
+void AArenaRangedWeapon::Reload_Implementation()
+{
+	WeaponState->SetWeaponState(EWeaponState::Reloading);
+	float AnimDuration = PlayWeaponAnimation(WeaponEffects->GetReloadAnim(), WeaponAttributes->GetMotility()) * (1.0f / WeaponAttributes->GetMotility());
+	if (AnimDuration <= 0.0f)
+	{
+		AnimDuration = 3.0f;
+	}
+
+	GetWorldTimerManager().SetTimer(StopReload_Timer, this, &AArenaRangedWeapon::StopReload, AnimDuration, false);
+	if (Role == ROLE_Authority)
+	{
+		GetWorldTimerManager().SetTimer(Reload_Timer, this, &AArenaRangedWeapon::FinishReload, FMath::Max(0.1f, AnimDuration - 0.1f), false);
+	}
+
+	if (MyPawn && MyPawn->IsLocallyControlled())
+	{
+		PlayWeaponSound(WeaponEffects->GetReloadSound());
+	}
+}
+
+void AArenaRangedWeapon::FinishReload_Implementation()
 {
 	int32 ClipDelta = FMath::Min(WeaponAttributes->GetCapacity() - WeaponAttributes->CurrentClip, WeaponAttributes->TotalAmmo - WeaponAttributes->CurrentClip);
 
@@ -351,63 +301,7 @@ void AArenaRangedWeapon::Reload()
 	}
 }
 
-void AArenaRangedWeapon::Melee()
-{
-	//Overlapping actors for each box spawned will be stored here
-	TArray<struct FOverlapResult> OutOverlaps;
-	TArray<AActor*> HitActors;
-	//The initial rotation of our box is the same as our character rotation
-	FQuat Rotation = Instigator->GetTransform().GetRotation();
-	FVector Start = Instigator->GetTransform().GetLocation() + Rotation.Rotator().Vector() * 100.0f;
-
-	FCollisionShape CollisionHitShape;
-	FCollisionQueryParams CollisionParams;
-	//We do not want to store the instigator character in the array, so ignore it's collision
-	CollisionParams.AddIgnoredActor(Instigator);
-
-	//Set the channels that will respond to the collision
-	FCollisionObjectQueryParams CollisionObjectTypes;
-	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
-	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
-	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-
-	//Create the box and get the overlapping actors
-	CollisionHitShape = FCollisionShape::MakeBox(FVector(60.0f, 60.0f, 0.5f));
-	//CollisionHitShape = FCollisionShape::Cone
-	GetWorld()->OverlapMulti(OutOverlaps, Start, Rotation, CollisionHitShape, CollisionParams, CollisionObjectTypes);
-
-	//Process all hit actors
-	for (int i = 0; i < OutOverlaps.Num(); ++i)
-	{
-		//We process each actor only once per Attack execution
-		if (OutOverlaps[i].GetActor() && !HitActors.Contains(OutOverlaps[i].GetActor()))
-		{
-			//Process the actor to deal damage
-			//CurrentWeapon->Melee(OutOverlaps[i].GetActor(), HitActors);
-			//ServerMeleeAttack(CurrentWeapon, OutOverlaps[i].GetActor(), HitActors);
-
-
-			if (!OutOverlaps[i].GetActor() || HitActors.Contains(OutOverlaps[i].GetActor()))
-			{
-				return;
-			}
-			//Add this actor to the array because we are spawning one box per tick and we don't want to hit the same actor twice during the same attack animation
-			HitActors.AddUnique(OutOverlaps[i].GetActor());
-			FHitResult AttackHitResult;
-			const FDamageEvent AttackDamageEvent;
-			AArenaCharacter* GameCharacter = Cast<AArenaCharacter>(OutOverlaps[i].GetActor());
-
-			if (GameCharacter)
-			{
-				//OutOverlaps[i].GetActor()->TakeDamage(WeaponConfig.MeleeDamage, AttackDamageEvent, Instigator->GetController(), MyPawn->Controller);
-				UGameplayStatics::ApplyDamage(OutOverlaps[i].GetActor(), 200.0f, Instigator->GetController(), MyPawn->Controller, UDamageType::StaticClass());
-			}
-		}
-		OutOverlaps.Empty();
-	}
-}
-
-///////////////////////////////////////// Aiming Helpers /////////////////////////////////////////
+/////////////////////////////////////////// Aiming Helpers ////////////////////////////////////////// 
 
 FVector AArenaRangedWeapon::GetCameraAim()
 {
@@ -426,7 +320,7 @@ FHitResult AArenaRangedWeapon::GetAdjustedAim()
 	{
 		UCameraComponent* Camera = GetPawnOwner()->FollowCamera;
 		FVector StartTrace = Camera->GetComponentLocation();
-		FVector EndTrace = StartTrace + (Camera->GetForwardVector() * 10000.0f);
+		FVector EndTrace = StartTrace + (Camera->GetForwardVector() * 100000.0f);
 
 		static FName CameraFireTag = FName(TEXT("CameraTrace"));
 
@@ -499,7 +393,7 @@ FHitResult AArenaRangedWeapon::WeaponTrace(const FVector& StartTrace, const FVec
 	return Hit;
 }
 
-///////////////////////////////////////// Particle Effects /////////////////////////////////////////
+////////////////////////////////////////// Particle Effects /////////////////////////////////////////
 
 void AArenaRangedWeapon::PlayAttackFX()
 {
@@ -511,7 +405,7 @@ void AArenaRangedWeapon::PlayAttackFX()
 	if (WeaponEffects->GetMuzzleFX())
 	{
 		USkeletalMeshComponent* UseWeaponMesh = GetWeaponMesh();
-		if (WeaponAttributes->BurstCounter < 1 || WeaponEffects->GetMuzzlePSC() == NULL)
+		if (WeaponAttributes->GetFireMode() != EFireMode::Automatic || WeaponEffects->GetMuzzlePSC() == NULL)
 		{
 			 //Split screen requires we create 2 effects. One that we see and one that the other player sees.
 			if (MyPawn && MyPawn->IsLocallyControlled())
@@ -566,12 +460,14 @@ void AArenaRangedWeapon::PlayAttackFX()
 
 void AArenaRangedWeapon::StopAttackFX()
 {
-	if (WeaponEffects->GetMuzzlePSC() != NULL)
+	if (WeaponAttributes->GetFireMode() == EFireMode::Automatic)
 	{
-		WeaponEffects->GetMuzzlePSC()->DeactivateSystem();
-		WeaponEffects->SetMuzzlePSC(NULL);
+		if (WeaponEffects->GetMuzzlePSC() != NULL)
+		{
+			WeaponEffects->GetMuzzlePSC()->DeactivateSystem();
+			WeaponEffects->SetMuzzlePSC(NULL);
+		}
 	}
-
 	if (WeaponAttributes->GetFireMode() == EFireMode::Automatic && WeaponEffects->IsPlayingFireAnim())
 	{
 		StopWeaponAnimation(WeaponEffects->GetFireAnim());
@@ -585,6 +481,7 @@ void AArenaRangedWeapon::StopAttackFX()
 
 		PlayWeaponSound(WeaponEffects->GetFireFinishSound());
 	}
+
 }
 
 ///////////////////////////////////////// Weapon Components /////////////////////////////////////////
@@ -599,7 +496,33 @@ UArenaRangedWeaponAttributes* AArenaRangedWeapon::GetWeaponAttributes()
 	return WeaponAttributes;
 }
 
-////////////////////////////////////////////// Server //////////////////////////////////////////////
+UArenaRangedWeaponEffects* AArenaRangedWeapon::GetWeaponEffects()
+{
+	return WeaponEffects;
+}
+
+//////////////////////////////////////////// Replication ////////////////////////////////////////////
+
+void AArenaRangedWeapon::OnRep_BurstCounter()
+{
+	if (BurstCounter > 0)
+	{
+		PlayAttackFX();
+	}
+	else
+	{
+		StopAttackFX();
+	}
+}
+
+void AArenaRangedWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AArenaRangedWeapon, BurstCounter, COND_SkipOwner);
+}
+
+/////////////////////////////////////////////// Server //////////////////////////////////////////////
 
 bool AArenaRangedWeapon::ServerStartAttack_Validate()
 {
@@ -632,7 +555,28 @@ void AArenaRangedWeapon::ServerHandleFiring_Implementation()
 	if (bShouldUpdateAmmo)
 	{
 		WeaponAttributes->CurrentClip--;
-		WeaponAttributes->BurstCounter++;
+		BurstCounter++;
+	}
+}
+
+bool AArenaRangedWeapon::ServerSpawnProjectile_Validate(FVector Origin, FVector ShootDir, FHitResult Hit)
+{
+	return true;
+}
+void AArenaRangedWeapon::ServerSpawnProjectile_Implementation(FVector Origin, FVector ShootDir, FHitResult Hit)
+{
+	FTransform SpawnTM(ShootDir.Rotation(), Origin);
+	AArenaProjectile* Projectile = Cast<AArenaProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileClass, SpawnTM));
+	if (Projectile)
+	{
+		Projectile->SetPawnOwner(MyPawn);
+		Projectile->Instigator = Instigator;
+		Projectile->SetOwner(this);
+		Projectile->SetInitialSpeed(WeaponAttributes->GetVelocity());
+		Projectile->InitVelocity(ShootDir);
+		Projectile->SetHitResults(Hit);
+
+		UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
 	}
 }
 
@@ -642,7 +586,7 @@ bool AArenaRangedWeapon::ServerStartReload_Validate()
 }
 void AArenaRangedWeapon::ServerStartReload_Implementation()
 {
-	StartReload();
+	Reload();
 }
 
 bool AArenaRangedWeapon::ServerStopReload_Validate()

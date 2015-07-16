@@ -27,7 +27,7 @@ AArenaProjectile::AArenaProjectile(const class FObjectInitializer& PCIP)
 	MovementComp->InitialSpeed = 2000.0f;
 	MovementComp->MaxSpeed = 100000.0f;
 	MovementComp->bRotationFollowsVelocity = true;
-	MovementComp->ProjectileGravityScale = 0.f;
+	MovementComp->ProjectileGravityScale = 0.0f;
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickGroup = TG_PrePhysics;
@@ -52,6 +52,8 @@ void AArenaProjectile::PostInitializeComponents()
 	SetLifeSpan(3.0f);
 	MyController = GetInstigatorController();
 }
+
+//////////////////////////////////////////// Projectile Functions ////////////////////////////////////////////
 
 void AArenaProjectile::InitVelocity(FVector& ShootDirection)
 {
@@ -79,28 +81,28 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 
 	// effects and damage origin shouldn't be placed inside mesh at impact point
 	const FVector NudgedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
-	if (MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetIsExplosive() == true)
+	if (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetIsExplosive() == true)
 	{
-		if (MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() > 0 
-			&& MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetExplosionRadius() > 0
+		if (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() > 0 
+			&& MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetExplosionRadius() > 0
 			&& UDamageType::StaticClass())
 		{
-			UGameplayStatics::ApplyRadialDamage(this, MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage(), NudgedImpactLocation, MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetExplosionRadius(), MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType(), TArray<AActor*>(), this, MyController.Get());
+			UGameplayStatics::ApplyRadialDamage(this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage(), NudgedImpactLocation, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetExplosionRadius(), MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType(), TArray<AActor*>(), this, MyController.Get());
 		}
 	}
 	else
 	{
-		if (MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() > 0 
+		if (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() > 0 
 			&& UDamageType::StaticClass())
 		{
 			FString critical = "head";
 			if (Impact.BoneName.ToString() == critical)
 			{
-				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), (MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() * 2), Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() * 2), Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
 			}
 			else
 			{
-				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage(), Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCharacterEquipment()->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage(), Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
 			}
 		}
 	}
@@ -162,10 +164,7 @@ void AArenaProjectile::DisableAndDestroy()
 	SetLifeSpan(2.0f);
 }
 
-void AArenaProjectile::OnRep_Exploded()
-{
-	Explode(ExplodeNotify.Hit);
-}
+///////////////////////////////////////////// Setting Essentials /////////////////////////////////////////////
 
 void AArenaProjectile::SetInitialSpeed(float Speed)
 {
@@ -197,5 +196,13 @@ void AArenaProjectile::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AArenaProjectile, MyPawn);
 	DOREPLIFETIME(AArenaProjectile, ExplodeNotify);
+}
+
+///////////////////////////////////////// Replication & Networking /////////////////////////////////////////
+
+void AArenaProjectile::OnRep_Exploded()
+{
+	Explode(ExplodeNotify.Hit);
 }

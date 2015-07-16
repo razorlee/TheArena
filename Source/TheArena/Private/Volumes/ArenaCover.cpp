@@ -13,19 +13,27 @@ AArenaCover::AArenaCover(const class FObjectInitializer& PCIP)
 	Cover->SetRelativeScale3D(FVector(2, 1, 3));
 	RootComponent = Cover;
 
-	//Cover->OnComponentBeginOverlap.AddDynamic(this, &AArenaCoverLow::TriggerEnter);
-	//Cover->OnComponentEndOverlap.AddDynamic(this, &AArenaCoverLow::TriggerExit);
+	Cover->OnComponentBeginOverlap.AddDynamic(this, &AArenaCover::BeginOverlap);
+	Cover->OnComponentEndOverlap.AddDynamic(this, &AArenaCover::EndOverlap);
 }
 
 
-void AArenaCover::TriggerEnter(class AActor* OtherActor)
+void AArenaCover::BeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(OtherActor);
+	if (MyPawn)
+	{
+		MyPawn->GetPlayerState()->SetIsNearCover(true);
+	}
 }
 
-void AArenaCover::TriggerExit(class AActor* OtherActor)
+void AArenaCover::EndOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(OtherActor);
+	if (MyPawn)
+	{
+		MyPawn->GetPlayerState()->SetIsNearCover(false);
+	}
 }
 
 

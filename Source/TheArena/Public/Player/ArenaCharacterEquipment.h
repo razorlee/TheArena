@@ -6,12 +6,12 @@
 #include "ArenaCharacterEquipment.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class THEARENA_API UArenaCharacterEquipment : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UArenaCharacterEquipment(const FObjectInitializer& ObjectInitializer);
 
@@ -76,7 +76,7 @@ private:
 	UPROPERTY()
 	AArenaCharacter* MyPawn;
 
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_CurrentWeapon)
+	UPROPERTY()
 	class AArenaWeapon* CurrentWeapon;
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_PrimaryWeapon)
@@ -127,15 +127,12 @@ private:
 	/** socket or bone name for attaching Utility mesh */
 	UPROPERTY(EditDefaultsOnly, Category = Sockets)
 	FName WristOneAttachPoint;
-	
+
 /////////////////////////////////////////////// Server ///////////////////////////////////////////////
 
 	UFUNCTION()
-	void OnRep_CurrentWeapon();
+	void OnRep_PrimaryWeapon(class AArenaWeapon* Weapon);
 
 	UFUNCTION()
-	void OnRep_PrimaryWeapon();
-
-	UFUNCTION()
-	void OnRep_SecondaryWeapon();
+	void OnRep_SecondaryWeapon(class AArenaWeapon* Weapon);
 };

@@ -46,10 +46,10 @@ struct FWeaponStats
 	FWeaponStats()
 	{
 		Damage = 100;
-		Stability = 5.0f;
-		Motility = 100.0f;
+		Stability = 60.0f;
+		Motility = 1.0f;
 		Velocity = 37600.0f;
-		Accuracy = 0.25f;
+		Accuracy = 10.0f;
 		AttackSpeed = 0.25f;
 		Mobility = 0.0f;
 		Capacity = 20.0f;
@@ -81,9 +81,6 @@ public:
 	float CurrentClip;
 
 	UPROPERTY(BlueprintReadOnly)
-	float BurstCounter;
-
-	UPROPERTY(BlueprintReadOnly)
 	float LastFireTime;
 
 	// void Sets default values for this component's properties
@@ -91,9 +88,6 @@ public:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
 	int32 GetDamage();
@@ -146,6 +140,21 @@ public:
 	void SetShotgunPellets(int32 Value);
 
 	UFUNCTION(BlueprintCallable, Category = Config)
+	bool GetHasScope();
+	UFUNCTION(BlueprintCallable, Category = Config)
+	void SetHasScope(bool Value);
+
+	UFUNCTION(BlueprintCallable, Category = Config)
+	float GetZoomDistance();
+	UFUNCTION(BlueprintCallable, Category = Config)
+	void SetZoomDistance(float Value);
+
+	UFUNCTION(BlueprintCallable, Category = Config)
+	float GetZoomFOV();
+	UFUNCTION(BlueprintCallable, Category = Config)
+	void SetZoomFOV(float Value);
+
+	UFUNCTION(BlueprintCallable, Category = Config)
 	bool GetIsExplosive();
 	UFUNCTION(BlueprintCallable, Category = Config)
 	void SetIsExplosive(bool Value);
@@ -160,6 +169,9 @@ public:
 
 private:
 
+	UPROPERTY()
+	class AArenaRangedWeapon* Weapon;
+
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FWeaponStats WeaponAttributes;
 
@@ -171,6 +183,15 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	int32 ShotgunPellets;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	bool HasScope;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config, meta = (EditCondition = "HasScope", ClampMin = "-1000", ClampMax = "50", UIMin = "-1000", UIMax = "50"))
+	float ZoomDistance;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config, meta = (EditCondition = "HasScope", ClampMin = "10", ClampMax = "90", UIMin = "10", UIMax = "90"))
+	float ZoomFOV;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	bool IsExplosive;

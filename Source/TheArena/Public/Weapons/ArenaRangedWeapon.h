@@ -20,10 +20,10 @@ class THEARENA_API AArenaRangedWeapon : public AArenaWeapon
 
 	void StartAttack();
 	void StopAttack();
+
 	void StartReload();
+	UFUNCTION(NetMulticast, Reliable)
 	void StopReload();
-	void StartMelee();
-	void StopMelee();
 
 ///////////////////////////////////////// Action Functions /////////////////////////////////////////
 
@@ -35,9 +35,10 @@ class THEARENA_API AArenaRangedWeapon : public AArenaWeapon
 
 	void HandleBurst();
 
+	UFUNCTION(NetMulticast, Reliable)
 	void Reload();
-
-	void Melee();
+	UFUNCTION(NetMulticast, Reliable)
+	void FinishReload();
 
 	virtual void OnBurstStarted();
 	virtual void OnBurstFinished();
@@ -52,17 +53,17 @@ class THEARENA_API AArenaRangedWeapon : public AArenaWeapon
 	FHitResult WeaponTrace(const FVector& TraceFrom, const FVector& TraceTo);
 	float GetCurrentSpread() const;
 
-	void PlayAttackFX();
-	void StopAttackFX();
-
-	UFUNCTION()
-	void SpawnProjectile(FVector Origin, FVector ShootDir, FHitResult Hit);
+	virtual void PlayAttackFX();
+	virtual void StopAttackFX();
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	virtual class UArenaRangedWeaponState* GetWeaponState() override;
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	virtual class UArenaRangedWeaponAttributes* GetWeaponAttributes() override;
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	virtual class UArenaRangedWeaponEffects* GetWeaponEffects() override;
 
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AArenaProjectile> ProjectileClass;
@@ -80,16 +81,24 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	FName MuzzleAttachPoint;
 	
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_BurstCounter)
+	float BurstCounter;
+
+	float Recoil;
 	float RecoilCounter;
 
 	bool IsRecoiling;
 
-	/** Handle for efficient management of StopReload timer */
 	FTimerHandle BurstFire;
 
 	uint32 bRefiring;
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////// Replication /////////////////////////////////////////////
+
+	UFUNCTION()
+	void OnRep_BurstCounter();
+
+/////////////////////////////////////////////// Server ///////////////////////////////////////////////
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStartAttack();
@@ -98,6 +107,9 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerHandleFiring();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSpawnProjectile(FVector Origin, FVector ShootDir, FHitResult Hit);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStartReload();

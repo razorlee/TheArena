@@ -40,11 +40,11 @@ void UArenaCharacterInventory::SwitchWeapon()
 {
 	if (PrimarySelected)
 	{
-		Owner->GetCharacterEquipment()->SetPrimaryWeapon(NewWeapon);
+		Owner->SetPrimaryWeapon(NewWeapon);
 	}
 	else if (SecondarySelected)
 	{
-		Owner->GetCharacterEquipment()->SetSecondaryWeapon(NewWeapon);
+		Owner->SetSecondaryWeapon(NewWeapon);
 	}
 }
 

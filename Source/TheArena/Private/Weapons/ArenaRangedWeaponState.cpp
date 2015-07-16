@@ -6,6 +6,9 @@
 UArenaRangedWeaponState::UArenaRangedWeaponState(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {	
+	SetIsReplicated(true);
+	bReplicates = true;
+
 	WeaponState = EWeaponState::Default;
 	TargetingState = ETargetingState::Default;
 	EquippedState = EEquippedState::UnEquipped;

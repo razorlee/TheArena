@@ -31,6 +31,15 @@ void UArenaCharacterState::SetMyPawn(AArenaCharacter* Pawn)
 	MyPawn = Pawn;
 }
 
+bool UArenaCharacterState::GetIsNearCover() const
+{
+	return IsNearCover;
+}
+void UArenaCharacterState::SetIsNearCover(bool Value)
+{
+	IsNearCover = Value;
+}
+
 EPlayerState::Type UArenaCharacterState::GetPlayerState() const
 {
 	return PlayerState;
@@ -53,30 +62,7 @@ ECombatState::Type UArenaCharacterState::GetCombatState() const
 {
 	return CombatState;
 }
-void UArenaCharacterState::SetCombatState(ECombatState::Type NewState, class AArenaCharacter* Pawn)
+void UArenaCharacterState::SetCombatState(ECombatState::Type NewState)
 {
 	CombatState = NewState;
-}
-
-///////////////////////////////////////////// Replication /////////////////////////////////////////////
-
-void UArenaCharacterState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(UArenaCharacterState, PlayerState);
-	DOREPLIFETIME(UArenaCharacterState, CombatState);
-}
-
-void UArenaCharacterState::OnRep_PlayerState()
-{
-
-}
-
-void UArenaCharacterState::OnRep_CombatState(ECombatState::Type NewState)
-{
-	if (CombatState == ECombatState::Aggressive)
-	{
-		//Pawn->EnterCombat();
-	}
 }

@@ -20,7 +20,7 @@ ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	GameStateClass = AArenaGameState::StaticClass();
 
 	MinRespawnDelay = 5.0f;
-
+	bUseSeamlessTravel = true;
 	bAllowBots = true;
 }
 
@@ -96,7 +96,6 @@ void ATheArenaGameMode::HandleMatchHasStarted()
 	MyGameState->RemainingTime = RoundTime;
 	if (bAllowBots)
 	{
-		SpawnBotsForGame();
 	}
 
 	// notify players
@@ -438,33 +437,3 @@ bool ATheArenaGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AControl
 	return true;
 }
 
-class AArenaAI* ATheArenaGameMode::SpawnBot(FVector SpawnLocation, FRotator SpawnRotation)
-{
-	return NULL;
-}
-
-void ATheArenaGameMode::SpawnBotsForGame()
-{
-	// getting max number of players
-	int32 MaxPlayers = -1;
-	if (GameSession)
-	{
-		MaxPlayers = GameSession->MaxPlayers;
-	}
-
-	// checking number of human players
-	int32 NumPlayers = 0;
-	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
-	{
-		AArenaPlayerController* PC = Cast<AArenaPlayerController>(*It);
-		if (PC)
-		{
-			++NumPlayers;
-		}
-	}
-}
-
-void ATheArenaGameMode::InitBot(AArenaAI* Bot, int BotNumber)
-{
-	
-}

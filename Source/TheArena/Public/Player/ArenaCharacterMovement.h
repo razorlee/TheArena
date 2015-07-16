@@ -17,8 +17,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	void ManageState(float DeltaSeconds);
 
-
-
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	float GetTurnRate();
 

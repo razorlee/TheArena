@@ -9,6 +9,5 @@ UArenaSaveGame::UArenaSaveGame(const FObjectInitializer& ObjectInitializer)
 {
 	SaveSlotName = TEXT("SavedGame");
 	UserIndex = 0;
-	Health = 0;
 }
 
