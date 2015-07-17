@@ -170,3 +170,11 @@ TSubclassOf<UDamageType> UArenaRangedWeaponAttributes::GetDamageType()
 {
 	return DamageType;
 }
+
+void UArenaRangedWeaponAttributes::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(UArenaRangedWeaponAttributes, TotalAmmo, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UArenaRangedWeaponAttributes, CurrentClip, COND_OwnerOnly);
+}

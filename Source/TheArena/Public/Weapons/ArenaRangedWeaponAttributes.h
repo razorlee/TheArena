@@ -74,13 +74,13 @@ class THEARENA_API UArenaRangedWeaponAttributes : public UActorComponent
 
 public:	
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Transient, Replicated)
 	float TotalAmmo;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(Transient, Replicated)
 	float CurrentClip;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY()
 	float LastFireTime;
 
 	// void Sets default values for this component's properties
@@ -168,9 +168,6 @@ public:
 	TSubclassOf<UDamageType> GetDamageType();
 
 private:
-
-	UPROPERTY()
-	class AArenaRangedWeapon* Weapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FWeaponStats WeaponAttributes;

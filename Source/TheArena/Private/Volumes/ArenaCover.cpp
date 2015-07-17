@@ -11,7 +11,12 @@ AArenaCover::AArenaCover(const class FObjectInitializer& PCIP)
 	Cover = PCIP.CreateDefaultSubobject<UBoxComponent>(this, TEXT("Cover"));
 	Cover->bGenerateOverlapEvents = true;
 	Cover->SetRelativeScale3D(FVector(2, 1, 3));
+
 	RootComponent = Cover;
+
+	Cover->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	Cover->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+	Cover->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 
 	Cover->OnComponentBeginOverlap.AddDynamic(this, &AArenaCover::BeginOverlap);
 	Cover->OnComponentEndOverlap.AddDynamic(this, &AArenaCover::EndOverlap);

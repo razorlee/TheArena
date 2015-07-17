@@ -58,6 +58,10 @@ public:
 
 /////////////////////////////////////// Input Implementation ///////////////////////////////////////
 
+	virtual void OnEnterInventory(AArenaCharacter* NewOwner);
+
+	virtual void OnLeaveInventory();
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Melee();
 
@@ -124,9 +128,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	virtual class UArenaRangedWeaponEffects* GetWeaponEffects();
 
+	UFUNCTION()
+	void OnRep_MyPawn();
+
 protected:
 
-	UPROPERTY()
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_MyPawn)
 	AArenaCharacter* MyPawn;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)

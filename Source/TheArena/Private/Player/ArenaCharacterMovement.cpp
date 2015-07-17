@@ -13,16 +13,16 @@ UArenaCharacterMovement::UArenaCharacterMovement(const FObjectInitializer& Objec
 	DodgeCost = 300.0f;
 
 	BaseMovementSpeed = 400.0f;
-	RunningMovementSpeed = 800.0f;
-	CrouchedMovementSpeed = 340.0f;
-	TargetingMovementSpeed = 280.0f;
+	RunningMovementSpeed = 650.0f;
+	CrouchedMovementSpeed = 300.0f;
+	TargetingMovementSpeed = 200.0f;
 }
 
 float UArenaCharacterMovement::GetMaxSpeed() const
 {
 	float MaxSpeed = BaseMovementSpeed;
 
-	const AArenaCharacter* ArenaCharacterOwner = Cast<AArenaCharacter>(PawnOwner);
+	AArenaCharacter* ArenaCharacterOwner = Cast<AArenaCharacter>(PawnOwner);
 	if (ArenaCharacterOwner)
 	{
 		if (ArenaCharacterOwner->GetPlayerState()->GetPlayerState() == EPlayerState::Running)
@@ -33,15 +33,14 @@ float UArenaCharacterMovement::GetMaxSpeed() const
 		{
 			MaxSpeed = CrouchedMovementSpeed;
 		}
-		/*if (ArenaCharacterOwner->GetCharacterEquipment()->GetCurrentWeapon())
+		if (ArenaCharacterOwner->GetCurrentWeapon())
 		{
-			if (ArenaCharacterOwner->GetCharacterEquipment->GetCurrentWeapon()->GetWeaponState()->GetTargetingState() == ETargetingState::Targeting)
+			if (ArenaCharacterOwner->GetCharacterEquipment()->GetDrawCrosshair())
 			{
 				MaxSpeed = TargetingMovementSpeed;
 			}
-		}*/
+		}
 	}
-
 	return MaxSpeed;
 }
 

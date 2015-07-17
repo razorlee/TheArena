@@ -48,7 +48,6 @@ void UArenaCharacterEquipment::SetMyPawn(AArenaCharacter* Pawn)
 	MyPawn = Pawn;
 }
 
-
 AArenaWeapon* UArenaCharacterEquipment::GetCurrentWeapon()
 {
 	return CurrentWeapon;

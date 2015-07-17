@@ -12,6 +12,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	CharacterAttributes = PCIP.CreateDefaultSubobject<UArenaCharacterAttributes>(this, TEXT("CharacterAttributes"));
 	CharacterEquipment = PCIP.CreateDefaultSubobject<UArenaCharacterEquipment>(this, TEXT("CharacterEquipment"));
 	CharacterInventory = PCIP.CreateDefaultSubobject<UArenaCharacterInventory>(this, TEXT("CharacterInventory"));
+	SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 	CharacterMovementComponent = Cast<UArenaCharacterMovement>(GetCharacterMovement());
 
 	//CharacterState->SetNetAddressable();
@@ -70,8 +71,6 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	FollowCamera->AttachTo(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	//FollowCamera->scale
-
-	//LoadGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 }
 
 void AArenaCharacter::PostInitializeComponents()
@@ -151,13 +150,14 @@ void AArenaCharacter::MoveForward(float Value)
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
 		AddMovementInput(Direction, Value);
 	}
 }
 void AArenaCharacter::MoveRight(float Value)
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (ArenaCharacterCan::MoveForward(this, MyPC, Value))
+	if (ArenaCharacterCan::MoveRight(this, MyPC, Value))
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -267,42 +267,31 @@ void AArenaCharacter::OnStartTargeting()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (ArenaCharacterCan::Target(this, MyPC))
 	{
-		CharacterEquipment->SetDrawCrosshair(true);
-		//CharacterEquipment->GetCurrentWeapon()->GetWeaponState()->SetTargetingState(ETargetingState::Targeting);
-		CurrentWeapon->GetWeaponState()->SetTargetingState(ETargetingState::Targeting);
-		StartTargeting();
+		if (Role == ROLE_Authority)
+		{
+			StartTargeting();
+		}
+		else
+		{
+			ServerStartTargeting();
+		}
 	}
 }
 void AArenaCharacter::OnStopTargeting()
 {
-   	if (CurrentWeapon)
+	if (Role == ROLE_Authority)
 	{
-		CharacterEquipment->SetDrawCrosshair(false);
-		GetWorldTimerManager().ClearTimer(this, &AArenaCharacter::LoopTargeting);
-		//CharacterEquipment->GetCurrentWeapon()->GetWeaponState()->SetTargetingState(ETargetingState::Default);
-		CurrentWeapon->GetWeaponState()->SetTargetingState(ETargetingState::Default);
+		StopTargeting();
 	}
-	/*if (IsLeftEdge() && IsHiCovering())
+	else
 	{
-	PlayAnimMontage(AimHiLeftAnimEnd);
+		ServerStopTargeting();
 	}
-	else if (IsRightEdge() && IsHiCovering())
-	{
-	PlayAnimMontage(AimHiRightAnimEnd);
-	}
-	else if (IsLeftEdge() && IsLoCovering())
-	{
-	PlayAnimMontage(AimLoLeftAnimEnd);
-	}
-	else if (IsRightEdge() && IsLoCovering())
-	{
-	PlayAnimMontage(AimLoRightAnimEnd);
-	}*/
 }
 void AArenaCharacter::OnToggleCombat()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (ArenaCharacterCan::Jump(this, MyPC))
+	if (ArenaCharacterCan::ToggleCombat(this, MyPC))
 	{
 		if (Role == ROLE_Authority)
 		{	
@@ -393,7 +382,7 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 void AArenaCharacter::Destroyed()
 {
 	Super::Destroyed();
-	//DestroyInventory();
+	DestroyInventory();
 }
 
 void AArenaCharacter::PawnClientRestart()
@@ -479,6 +468,9 @@ AArenaWeapon* AArenaCharacter::GetPrimaryWeapon()
 }
 void AArenaCharacter::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
+	SaveGameInstance->PrimaryWeapon = Weapon;
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);
+
 	if (Role == ROLE_Authority)
 	{
 		HandlePrimaryWeapon(Weapon);
@@ -492,6 +484,10 @@ void AArenaCharacter::HandlePrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon
 {
 	DefaultInventoryClasses[0] = Weapon;
 	CurrentWeapon = NULL;
+
+	PrimaryWeapon->OnLeaveInventory();
+	Inventory.RemoveSingle(PrimaryWeapon);
+
 	PrimaryWeapon->Destroy();
 
 	FActorSpawnParameters SpawnInfo;
@@ -500,7 +496,9 @@ void AArenaCharacter::HandlePrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon
 	PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(Weapon, SpawnInfo);
 	PrimaryWeapon->SetOwningPawn(this);
 	PrimaryWeapon->SetPrimary(true);
-	//Inventory[0] = PrimaryWeapon;
+
+	AddWeapon(PrimaryWeapon);
+
 	PrimaryWeapon->UnEquip();
 }
 
@@ -510,6 +508,9 @@ AArenaWeapon* AArenaCharacter::GetSecondaryWeapon()
 }
 void AArenaCharacter::SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
+	SaveGameInstance->SecondaryWeapon = Weapon;
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);
+
 	if (Role == ROLE_Authority)
 	{
 		HandleSecondaryWeapon(Weapon);
@@ -521,8 +522,13 @@ void AArenaCharacter::SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 }
 void AArenaCharacter::HandleSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
+
 	DefaultInventoryClasses[1] = Weapon;
 	CurrentWeapon = NULL;
+
+	SecondaryWeapon->OnLeaveInventory();
+	Inventory.RemoveSingle(SecondaryWeapon);
+
 	SecondaryWeapon->Destroy();
 
 	FActorSpawnParameters SpawnInfo;
@@ -531,7 +537,9 @@ void AArenaCharacter::HandleSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weap
 	SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(Weapon, SpawnInfo);
 	SecondaryWeapon->SetOwningPawn(this);
 	SecondaryWeapon->SetPrimary(false);
-	//Inventory[1] = SecondaryWeapon;
+
+	AddWeapon(SecondaryWeapon);
+	
 	SecondaryWeapon->UnEquip();
 }
 
@@ -576,26 +584,62 @@ void AArenaCharacter::SpawnDefaultEquipment()
 		return;
 	}
 
-	int32 NumWeaponClasses = DefaultInventoryClasses.Num();
-	for (int32 i = 0; i < NumWeaponClasses; i++)
-	{
-		if (DefaultInventoryClasses[i])
-		{
-			FActorSpawnParameters SpawnInfo;
-			SpawnInfo.bNoCollisionFail = true;
-			AArenaWeapon* NewWeapon = GetWorld()->SpawnActor<AArenaWeapon>(DefaultInventoryClasses[i], SpawnInfo);
-			Inventory.AddUnique(NewWeapon);
-		}
-	}
+	SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex));
 
-	// equip first weapon in inventory
-	if (Inventory.Num() > 0)
+	if (SaveGameInstance)
 	{
-		PrimaryWeapon = Inventory[0];
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.bNoCollisionFail = true;
+
+		PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(SaveGameInstance->PrimaryWeapon, SpawnInfo);
 		PrimaryWeapon->SetPrimary(true);
-		SecondaryWeapon = Inventory[1];
+		SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(SaveGameInstance->SecondaryWeapon, SpawnInfo);
 
 		InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
+	}
+	else
+	{
+		int32 NumWeaponClasses = DefaultInventoryClasses.Num();
+		for (int32 i = 0; i < NumWeaponClasses; i++)
+		{
+			if (DefaultInventoryClasses[i])
+			{
+				FActorSpawnParameters SpawnInfo;
+				SpawnInfo.bNoCollisionFail = true;
+				AArenaWeapon* NewWeapon = GetWorld()->SpawnActor<AArenaWeapon>(DefaultInventoryClasses[i], SpawnInfo);
+				AddWeapon(NewWeapon);
+			}
+		}
+
+		if (Inventory.Num() > 0)
+		{
+			PrimaryWeapon = Inventory[0];
+			PrimaryWeapon->SetPrimary(true);
+			SecondaryWeapon = Inventory[1];
+
+			InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
+		}
+
+		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		SaveGameInstance->PrimaryWeapon = DefaultInventoryClasses[0];
+		SaveGameInstance->SecondaryWeapon = DefaultInventoryClasses[1];
+		UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);
+	}
+}
+void AArenaCharacter::AddWeapon(AArenaWeapon* Weapon)
+{
+	if (Weapon && Role == ROLE_Authority && Inventory.Num() < 2)
+	{
+		Weapon->OnEnterInventory(this);
+		Inventory.AddUnique(Weapon);
+	}
+}
+void AArenaCharacter::RemoveWeapon(AArenaWeapon* Weapon)
+{
+	if (Weapon && Role == ROLE_Authority)
+	{
+		Weapon->OnLeaveInventory();
+		Inventory.RemoveSingle(Weapon);
 	}
 }
 
@@ -645,44 +689,72 @@ void AArenaCharacter::Running_Implementation(bool IsRunning)
 	if (IsRunning)
 	{
 		UnCrouch();
+		OnStopTargeting();
 		CharacterState->SetPlayerState(EPlayerState::Running);
+		UpdateRunSounds(true);
 	}
 	else
 	{
 		CharacterState->SetPlayerState(EPlayerState::Default);
+		UpdateRunSounds(false);
 	}
 }
 
-void AArenaCharacter::StartTargeting(bool bFromReplication)//recall3
+void AArenaCharacter::StartTargeting_Implementation()
 {
-	if (!bFromReplication && Role < ROLE_Authority)
+	CharacterEquipment->SetDrawCrosshair(true);
+	CurrentWeapon->GetWeaponState()->SetTargetingState(ETargetingState::Targeting);
+
+	if (TargetingSound)
 	{
-		ServerStartTargeting();
+		UGameplayStatics::PlaySoundAttached(TargetingSound, GetRootComponent());
 	}
 
-	if (bFromReplication || true)
+	float Duration = 0.0f;
+	/*if (IsLeftEdge() && IsHiCovering())
 	{
-		float Duration = 0.0f;
-
-		/*if (IsLeftEdge() && IsHiCovering())
-		{
-		Duration = PlayAnimMontage(AimHiLeftAnimStart);
-		}
-		else if (IsRightEdge() && IsHiCovering())
-		{
-		Duration = PlayAnimMontage(AimHiRightAnimStart);
-		}
-		else if (IsLeftEdge() && IsLoCovering())
-		{
-		Duration = PlayAnimMontage(AimLoLeftAnimStart);
-		}
-		else if (IsRightEdge() && IsLoCovering())
-		{
-		Duration = PlayAnimMontage(AimLoRightAnimStart);
-		}*/
-
-		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoopTargeting, 0.6f, false);
+	Duration = PlayAnimMontage(AimHiLeftAnimStart);
 	}
+	else if (IsRightEdge() && IsHiCovering())
+	{
+	Duration = PlayAnimMontage(AimHiRightAnimStart);
+	}
+	else if (IsLeftEdge() && IsLoCovering())
+	{
+	Duration = PlayAnimMontage(AimLoLeftAnimStart);
+	}
+	else if (IsRightEdge() && IsLoCovering())
+	{
+	Duration = PlayAnimMontage(AimLoRightAnimStart);
+	}*/
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoopTargeting, 0.6f, false);
+
+}
+void AArenaCharacter::StopTargeting_Implementation()
+{
+	if (CurrentWeapon)
+	{
+		CharacterEquipment->SetDrawCrosshair(false);
+		GetWorldTimerManager().ClearTimer(this, &AArenaCharacter::LoopTargeting);
+		//CharacterEquipment->GetCurrentWeapon()->GetWeaponState()->SetTargetingState(ETargetingState::Default);
+		CurrentWeapon->GetWeaponState()->SetTargetingState(ETargetingState::Default);
+	}
+	/*if (IsLeftEdge() && IsHiCovering())
+	{
+	PlayAnimMontage(AimHiLeftAnimEnd);
+	}
+	else if (IsRightEdge() && IsHiCovering())
+	{
+	PlayAnimMontage(AimHiRightAnimEnd);
+	}
+	else if (IsLeftEdge() && IsLoCovering())
+	{
+	PlayAnimMontage(AimLoLeftAnimEnd);
+	}
+	else if (IsRightEdge() && IsLoCovering())
+	{
+	PlayAnimMontage(AimLoRightAnimEnd);
+	}*/
 }
 void AArenaCharacter::SetTargeting(bool bNewTargeting)
 {
@@ -951,7 +1023,7 @@ void AArenaCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Da
 	}
 
 	// remove all weapons
-	//DestroyInventory();
+	DestroyInventory();
 
 	// switch back to 3rd person view
 	UpdatePawnMeshes();
@@ -1070,6 +1142,25 @@ void AArenaCharacter::UpdatePawnMeshes()
 void AArenaCharacter::TornOff()
 {
 	SetLifeSpan(25.f);
+}
+
+void AArenaCharacter::DestroyInventory()
+{
+	if (Role < ROLE_Authority)
+	{
+		return;
+	}
+
+	// remove all weapons from inventory and destroy them
+	for (int32 i = Inventory.Num() - 1; i >= 0; i--)
+	{
+		AArenaWeapon* Weapon = Inventory[i];
+		if (Weapon)
+		{
+			RemoveWeapon(Weapon);
+			Weapon->Destroy();
+		}
+	}
 }
 
 /*void AArenaCharacter::AttackTrace()
@@ -1232,6 +1323,7 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(AArenaCharacter, LastTakeHitInfo, COND_Custom);
+	DOREPLIFETIME_CONDITION(AArenaCharacter, Inventory, COND_OwnerOnly);
 
 	DOREPLIFETIME(AArenaCharacter, PrimaryWeapon);
 	DOREPLIFETIME(AArenaCharacter, SecondaryWeapon);
@@ -1308,7 +1400,7 @@ bool AArenaCharacter::ServerStopTargeting_Validate()
 }
 void AArenaCharacter::ServerStopTargeting_Implementation()
 {
-	OnStopTargeting();
+	StopTargeting();
 }
 
 bool AArenaCharacter::ServerToggleCrouch_Validate()

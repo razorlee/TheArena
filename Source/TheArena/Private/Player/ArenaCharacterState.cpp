@@ -66,3 +66,12 @@ void UArenaCharacterState::SetCombatState(ECombatState::Type NewState)
 {
 	CombatState = NewState;
 }
+
+void UArenaCharacterState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UArenaCharacterState, PlayerState);
+	DOREPLIFETIME(UArenaCharacterState, CoverState);
+	DOREPLIFETIME(UArenaCharacterState, CombatState);
+}

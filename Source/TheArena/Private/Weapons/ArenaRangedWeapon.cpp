@@ -22,6 +22,12 @@ AArenaRangedWeapon::AArenaRangedWeapon(const FObjectInitializer& ObjectInitializ
 	BurstCounter = 0;
 	RecoilCounter = 0;
 	IsRecoiling = false;
+
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = TG_PrePhysics;
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	bReplicates = true;
+	bNetUseOwnerRelevancy = true;
 }
 
 void AArenaRangedWeapon::Tick(float DeltaSeconds)

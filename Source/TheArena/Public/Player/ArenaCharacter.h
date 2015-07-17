@@ -129,6 +129,9 @@ public:
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
 	void SpawnDefaultEquipment();
+	void AddWeapon(class AArenaWeapon* Weapon);
+	void RemoveWeapon(class AArenaWeapon* Weapon);
+
 	UFUNCTION()
 	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon);
 
@@ -142,7 +145,10 @@ public:
 	void Running(bool IsRunning);
 
 	void SetTargeting(bool bNewTargeting);
-	void StartTargeting(bool bFromReplication = false);
+	UFUNCTION(NetMultiCast, Unreliable)
+	void StartTargeting();
+	UFUNCTION(NetMultiCast, Unreliable)
+	void StopTargeting();
 	void LoopTargeting();
 
 	UFUNCTION(NetMultiCast, Unreliable)
@@ -190,6 +196,8 @@ public:
 	/** Responsible for cleaning up bodies on clients. */
 	virtual void TornOff();
 
+	/** [server] remove all weapons from inventory and destroy them */
+	void DestroyInventory();
 ////////////////////////////////////////// Audio Controls //////////////////////////////////////////
 
 	/** handles sounds for running */
@@ -226,7 +234,7 @@ protected:
 
 	class UArenaCharacterMovement* CharacterMovementComponent;
 
-	class UArenaSaveGame* LoadGameInstance;
+	class UArenaSaveGame* SaveGameInstance;
 
 ////////////////////////////////////////// Weapons //////////////////////////////////////////
 

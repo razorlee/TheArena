@@ -69,12 +69,15 @@ public:
 private:
 
 	/** current weapon state */
-	EWeaponState::Type WeaponState;
+	UPROPERTY(Transient, Replicated)
+	TEnumAsByte<EWeaponState::Type> WeaponState;
 
 	/** current cover state */
-	ETargetingState::Type TargetingState;
+	UPROPERTY(Transient, Replicated)
+	TEnumAsByte<ETargetingState::Type> TargetingState;
 
 	/** current cover state */
-	EEquippedState::Type EquippedState;
+	UPROPERTY(Transient, Replicated)
+	TEnumAsByte<EEquippedState::Type> EquippedState;
 	
 };

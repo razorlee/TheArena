@@ -6,7 +6,8 @@
 bool ArenaCharacterCan::Turn(AArenaCharacter* character, AArenaPlayerController* controller)
 {
 	if (controller
-		&& controller->IsGameInputAllowed())
+		&& controller->IsGameInputAllowed()
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Vaulting)
 	{
 		return true;
 	}
@@ -33,10 +34,25 @@ bool ArenaCharacterCan::MoveForward(AArenaCharacter* character, AArenaPlayerCont
 {
 	if (controller
 		&& controller->IsGameInputAllowed()
-		//&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Covering
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Covering
 		&& Value != 0.0f)
 	{
-		return true;
+		if (Value < 0.0f)
+		{
+			if (character->GetPlayerState()->GetPlayerState() != EPlayerState::Running)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+
+		}
+		else
+		{
+			return true;
+		}
 	}
 	else
 	{
@@ -174,9 +190,40 @@ bool ArenaCharacterCan::Target(AArenaCharacter* character, AArenaPlayerControlle
 {
 	if (controller
 		&& controller->IsGameInputAllowed()
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Running)
 	{
 		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool ArenaCharacterCan::ToggleCombat(AArenaCharacter* character, AArenaPlayerController* controller)
+{
+	if (controller
+		&& controller->IsGameInputAllowed()
+		&& (character->GetPlayerState()->GetPlayerState() == EPlayerState::Default
+		|| character->GetPlayerState()->GetPlayerState() == EPlayerState::Jumping))
+	{
+		if (character->GetCurrentWeapon())
+		{
+			if (character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() == EWeaponState::Default
+				&& character->GetCurrentWeapon()->GetWeaponState()->GetTargetingState() == ETargetingState::Default)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return true;
+		}
 	}
 	else
 	{
@@ -188,9 +235,20 @@ bool ArenaCharacterCan::Fire(AArenaCharacter* character, AArenaPlayerController*
 {
 	if (controller
 		&& controller->IsGameInputAllowed()
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& character->GetCurrentWeapon()
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Running
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Vaulting)
 	{
-		return true;
+		if (character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() != EWeaponState::Reloading)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+		
 	}
 	else
 	{
@@ -202,7 +260,10 @@ bool ArenaCharacterCan::Reload(AArenaCharacter* character, AArenaPlayerControlle
 {
 	if (controller
 		&& controller->IsGameInputAllowed()
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& (character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() == EWeaponState::Idle
+		|| character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() == EWeaponState::Default
+		|| character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() == EWeaponState::Firing))
 	{
 		return true;
 	}

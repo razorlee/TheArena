@@ -34,8 +34,6 @@ void AArenaWeapon::PostInitializeComponents()
 void AArenaWeapon::Destroyed()
 {
 	Super::Destroyed();
-
-	StopAttack();
 }
 
 ////////////////////////////////////////// Input handlers //////////////////////////////////////////
@@ -88,6 +86,7 @@ void AArenaWeapon::Equip()
 	if (ArenaWeaponCan::Equip(MyPawn, this))
 	{
 		GetWeaponState()->SetWeaponState(EWeaponState::Equipping);
+		GetWeaponState()->SetEquippedState(EEquippedState::Equipped);
 		float Duration = PlayWeaponAnimation(EquipAnim, GetWeaponAttributes()->GetMotility()) / GetWeaponAttributes()->GetMotility();
 
 		GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishEquip, (Duration*0.25f), false);
@@ -116,6 +115,7 @@ float AArenaWeapon::UnEquip()
 		}
 
 		GetWeaponState()->SetWeaponState(EWeaponState::Holstering);
+		GetWeaponState()->SetEquippedState(EEquippedState::UnEquipped);
 		GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishUnEquip, (Duration*0.5f), false);
 		if (MyPawn && MyPawn->IsLocallyControlled())
 		{
@@ -127,6 +127,24 @@ float AArenaWeapon::UnEquip()
 }
 
 /////////////////////////////////////// Input Implementation ///////////////////////////////////////
+
+void AArenaWeapon::OnEnterInventory(AArenaCharacter* NewOwner)
+{
+	SetOwningPawn(NewOwner);
+}
+
+void AArenaWeapon::OnLeaveInventory()
+{
+	if (Role == ROLE_Authority)
+	{
+		SetOwningPawn(NULL);
+	}
+
+	if (GetWeaponState()->GetEquippedState() == EEquippedState::Equipped)
+	{
+		UnEquip();
+	}
+}
 
 void AArenaWeapon::Melee_Implementation()
 {
@@ -362,6 +380,25 @@ class UArenaRangedWeaponEffects* AArenaWeapon::GetWeaponEffects()
 }
 
 ///////////////////////////////////////////// Server /////////////////////////////////////////////
+
+void AArenaWeapon::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AArenaWeapon, MyPawn);
+}
+
+void AArenaWeapon::OnRep_MyPawn()
+{
+	if (MyPawn)
+	{
+		OnEnterInventory(MyPawn);
+	}
+	else
+	{
+		OnLeaveInventory();
+	}
+}
 
 bool AArenaWeapon::ServerMelee_Validate()
 {

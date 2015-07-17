@@ -99,12 +99,12 @@ protected:
 	UPROPERTY()
 	bool IsNearCover;
 
-	UPROPERTY()
+	UPROPERTY(Transient, Replicated)
 	TEnumAsByte<EPlayerState::Type> PlayerState;
 
-	UPROPERTY()
+	UPROPERTY(Transient, Replicated)
 	TEnumAsByte<ECoverState::Type> CoverState;
 
-	UPROPERTY()
+	UPROPERTY(Transient, Replicated)
 	TEnumAsByte<ECombatState::Type> CombatState;
 };

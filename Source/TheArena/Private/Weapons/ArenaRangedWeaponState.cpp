@@ -41,4 +41,11 @@ void UArenaRangedWeaponState::SetEquippedState(EEquippedState::Type NewState)
 	EquippedState = NewState;
 }
 
+void UArenaRangedWeaponState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(UArenaRangedWeaponState, WeaponState);
+	DOREPLIFETIME(UArenaRangedWeaponState, TargetingState);
+	DOREPLIFETIME(UArenaRangedWeaponState, EquippedState);
+}
