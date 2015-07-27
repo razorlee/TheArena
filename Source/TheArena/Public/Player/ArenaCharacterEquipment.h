@@ -32,14 +32,14 @@ public:
 	void SetCurrentWeapon();
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	AArenaWeapon* GetPrimaryWeapon();
+	TSubclassOf<class AArenaWeapon> GetPrimaryWeaponBP();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	void SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+	void SetPrimaryWeaponBP(TSubclassOf<class AArenaWeapon> Weapon);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	AArenaWeapon* GetSecondaryWeapon();
+	TSubclassOf<class AArenaWeapon> GetSecondaryWeaponBP();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	void SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+	void SetSecondaryWeaponBP(TSubclassOf<class AArenaWeapon> Weapon);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	bool GetDrawCrosshair();
@@ -81,12 +81,12 @@ private:
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_PrimaryWeapon)
 	class AArenaWeapon* PrimaryWeapon;
-	UPROPERTY(EditAnywhere, Category = Weapons)
+	UPROPERTY(EditAnywhere, Replicated, Category = Weapons)
 	TSubclassOf<class AArenaWeapon> PrimaryWeaponBP;
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_SecondaryWeapon)
 	class AArenaWeapon* SecondaryWeapon;
-	UPROPERTY(EditAnywhere, Category = Weapons)
+	UPROPERTY(EditAnywhere, Replicated, Category = Weapons)
 	TSubclassOf<class AArenaWeapon> SecondaryWeaponBP;
 
 /////////////////////////////////////////////// Booleans ///////////////////////////////////////////////

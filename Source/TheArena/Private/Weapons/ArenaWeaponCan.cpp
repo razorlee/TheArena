@@ -52,8 +52,15 @@ bool ArenaWeaponCan::Reload(AArenaCharacter* character, AArenaWeapon* weapon)
 
 bool ArenaWeaponCan::Melee(AArenaCharacter* character, AArenaWeapon* weapon)
 {
-	//bool bCanMelee = (!MyPawn);// || MyPawn->CanMelee());
-	//bool bStateOKToMelee = ((CurrentState == EWeaponState::Idle) || (CurrentState == EWeaponState::Firing));
-	//return ((bCanMelee == true) && (bStateOKToMelee == true));
-	return true;
+	if (character
+		&& (weapon->GetWeaponState()->GetWeaponState() == EWeaponState::Idle
+		|| weapon->GetWeaponState()->GetWeaponState() == EWeaponState::Default
+		|| weapon->GetWeaponState()->GetWeaponState() == EWeaponState::Firing))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

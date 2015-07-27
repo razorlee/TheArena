@@ -16,6 +16,7 @@ namespace EPlayerState
 		Crouching,
 		Covering,
 		Vaulting,
+		Climbing,
 		Default
 	};
 }
@@ -72,6 +73,20 @@ public:
 
 	/** get current weapon state */
 	UFUNCTION(BlueprintCallable, Category = Character)
+	bool GetIsNearLeftEdge() const;
+	/** update weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
+	void SetIsNearLeftEdge(bool Value);
+
+	/** get current weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
+	bool GetIsNearRightEdge() const;
+	/** update weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
+	void SetIsNearRightEdge(bool Value);
+
+	/** get current weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
 	EPlayerState::Type GetPlayerState() const;
 	/** update weapon state */
 	UFUNCTION(BlueprintCallable, Category = Character)
@@ -98,6 +113,12 @@ protected:
 
 	UPROPERTY()
 	bool IsNearCover;
+
+	UPROPERTY()
+	bool IsNearLeftEdge;
+
+	UPROPERTY()
+	bool IsNearRightEdge;
 
 	UPROPERTY(Transient, Replicated)
 	TEnumAsByte<EPlayerState::Type> PlayerState;

@@ -71,45 +71,21 @@ void UArenaCharacterEquipment::SetCurrentWeapon()
 	}
 }
 
-AArenaWeapon* UArenaCharacterEquipment::GetPrimaryWeapon()
+TSubclassOf<class AArenaWeapon> UArenaCharacterEquipment::GetPrimaryWeaponBP()
 {
-	return PrimaryWeapon;
+	return PrimaryWeaponBP;
 }
-void UArenaCharacterEquipment::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
+void UArenaCharacterEquipment::SetPrimaryWeaponBP(TSubclassOf<class AArenaWeapon> Weapon)
 {
-	CurrentWeapon = NULL;
-	PrimaryWeapon->Destroy();
-	//GetWorld()->DestroyActor(PrimaryWeapon);
-
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.bNoCollisionFail = true;
-
-	PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(Weapon, SpawnInfo);
-	PrimaryWeapon->SetOwningPawn(MyPawn);
-	PrimaryWeapon->SetPrimary(true);
-	PrimaryWeapon->UnEquip();
-
 	PrimaryWeaponBP = Weapon;
 }
 
-AArenaWeapon* UArenaCharacterEquipment::GetSecondaryWeapon()
+TSubclassOf<class AArenaWeapon> UArenaCharacterEquipment::GetSecondaryWeaponBP()
 {
-	return SecondaryWeapon;
+	return SecondaryWeaponBP;
 }
-void UArenaCharacterEquipment::SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
+void UArenaCharacterEquipment::SetSecondaryWeaponBP(TSubclassOf<class AArenaWeapon> Weapon)
 {
-	CurrentWeapon = NULL;
-	SecondaryWeapon->Destroy();
-	//GetWorld()->DestroyActor(SecondaryWeapon);
-
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.bNoCollisionFail = true;
-
-	SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(Weapon, SpawnInfo);
-	SecondaryWeapon->SetOwningPawn(MyPawn);
-	SecondaryWeapon->SetPrimary(false);
-	SecondaryWeapon->UnEquip();
-
 	SecondaryWeaponBP = Weapon;
 }
 
@@ -168,9 +144,11 @@ FName UArenaCharacterEquipment::GetWristOneAttachPoint()
 void UArenaCharacterEquipment::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
+	
 	DOREPLIFETIME(UArenaCharacterEquipment, PrimaryWeapon);
+	DOREPLIFETIME(UArenaCharacterEquipment, PrimaryWeaponBP);
 	DOREPLIFETIME(UArenaCharacterEquipment, SecondaryWeapon);
+	DOREPLIFETIME(UArenaCharacterEquipment, SecondaryWeaponBP);
 }
 
 void UArenaCharacterEquipment::OnRep_PrimaryWeapon(AArenaWeapon* Weapon)

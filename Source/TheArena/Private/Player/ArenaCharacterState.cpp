@@ -40,6 +40,24 @@ void UArenaCharacterState::SetIsNearCover(bool Value)
 	IsNearCover = Value;
 }
 
+bool UArenaCharacterState::GetIsNearLeftEdge() const
+{
+	return IsNearLeftEdge;
+}
+void UArenaCharacterState::SetIsNearLeftEdge(bool Value)
+{
+	IsNearLeftEdge = Value;
+}
+
+bool UArenaCharacterState::GetIsNearRightEdge() const
+{
+	return IsNearRightEdge;
+}
+void UArenaCharacterState::SetIsNearRightEdge(bool Value)
+{
+	IsNearRightEdge = Value;
+}
+
 EPlayerState::Type UArenaCharacterState::GetPlayerState() const
 {
 	return PlayerState;

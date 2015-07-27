@@ -5,6 +5,9 @@
 UArenaCharacterMovement::UArenaCharacterMovement(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	SetIsReplicated(true);
+	bReplicates = true;
+
 	BaseTurnRate = 25.f;
 	BaseLookUpRate = 25.f;
 
@@ -16,6 +19,8 @@ UArenaCharacterMovement::UArenaCharacterMovement(const FObjectInitializer& Objec
 	RunningMovementSpeed = 650.0f;
 	CrouchedMovementSpeed = 300.0f;
 	TargetingMovementSpeed = 200.0f;
+
+	FaceDirection = FName(TEXT("Right"));
 }
 
 float UArenaCharacterMovement::GetMaxSpeed() const
@@ -107,12 +112,133 @@ UAnimMontage* UArenaCharacterMovement::GetVaultAnimation()
 	return VaultAnimation;
 }
 
+UAnimMontage* UArenaCharacterMovement::GetClimbAnimation()
+{
+	return ClimbAnimation;
+}
+
+UAnimMontage* UArenaCharacterMovement::GetHighLeftAnimation(FString Sequence)
+{
+	if (Sequence == FString(TEXT("Start")))
+	{
+		return AimHiLeftAnimStart;
+	}
+	if (Sequence == FString(TEXT("Loop")))
+	{
+		return AimHiLeftAnimLoop;
+	}
+	if (Sequence == FString(TEXT("End")))
+	{
+		return AimHiLeftAnimEnd;
+	}
+	return NULL;
+}
+
+UAnimMontage* UArenaCharacterMovement::GetHighRightAnimation(FString Sequence)
+{
+	if (Sequence == FString(TEXT("Start")))
+	{
+		return AimHiRightAnimStart;
+	}
+	if (Sequence == FString(TEXT("Loop")))
+	{
+		return AimHiRightAnimLoop;
+	}
+	if (Sequence == FString(TEXT("End")))
+	{
+		return AimHiRightAnimEnd;
+	}
+	return NULL;
+}
+
+UAnimMontage* UArenaCharacterMovement::GetLowLeftAnimation(FString Sequence)
+{
+	if (Sequence == FString(TEXT("Start")))
+	{
+		return AimLoLeftAnimStart;
+	}
+	if (Sequence == FString(TEXT("Loop")))
+	{
+		return AimLoLeftAnimLoop;
+	}
+	if (Sequence == FString(TEXT("End")))
+	{
+		return AimLoLeftAnimEnd;
+	}
+	return NULL;
+}
+
+UAnimMontage* UArenaCharacterMovement::GetLowRightAnimation(FString Sequence)
+{
+	if (Sequence == FString(TEXT("Start")))
+	{
+		return AimLoRightAnimStart;
+	}
+	if (Sequence == FString(TEXT("Loop")))
+	{
+		return AimLoRightAnimLoop;
+	}
+	if (Sequence == FString(TEXT("End")))
+	{
+		return AimLoRightAnimEnd;
+	}
+	return NULL;
+}
+
 FName UArenaCharacterMovement::GetDirection()
 {
 	return FaceDirection;
 }
-
 void UArenaCharacterMovement::SetDirection(FName Direction)
 {
-	FaceDirection = Direction;
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		FaceDirection = Direction;
+	}
+	else
+	{
+		ServerFaceDirection(Direction);
+	}
+}
+
+FVector UArenaCharacterMovement::GetCoverDirection()
+{
+	return Direction;
+}
+void UArenaCharacterMovement::SetCoverDirection(FVector NewDirection)
+{
+	Direction = NewDirection;
+}
+
+FVector UArenaCharacterMovement::GetLocation()
+{
+	return Location;
+}
+void UArenaCharacterMovement::SetLocation(FVector NewLocation)
+{
+	Location = NewLocation;
+}
+
+FName UArenaCharacterMovement::GetLowCover()
+{
+	return LowCover;
+}
+
+/////////////////////////////////////////////// Server ///////////////////////////////////////////////
+
+void UArenaCharacterMovement::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UArenaCharacterMovement, FaceDirection);
+}
+
+bool UArenaCharacterMovement::ServerFaceDirection_Validate(FName NewFaceDirection)
+{
+	return true;
+}
+
+void UArenaCharacterMovement::ServerFaceDirection_Implementation(FName NewFaceDirection)
+{
+	FaceDirection = NewFaceDirection;
 }

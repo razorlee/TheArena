@@ -41,6 +41,15 @@ void UArenaRangedWeaponState::SetEquippedState(EEquippedState::Type NewState)
 	EquippedState = NewState;
 }
 
+bool UArenaRangedWeaponState::GetCoverTargeting()
+{
+	return CoverTargeting;
+}
+void UArenaRangedWeaponState::SetCoverTargeting(bool Value)
+{
+	CoverTargeting = Value;
+}
+
 void UArenaRangedWeaponState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -48,4 +57,5 @@ void UArenaRangedWeaponState::GetLifetimeReplicatedProps(TArray< FLifetimeProper
 	DOREPLIFETIME(UArenaRangedWeaponState, WeaponState);
 	DOREPLIFETIME(UArenaRangedWeaponState, TargetingState);
 	DOREPLIFETIME(UArenaRangedWeaponState, EquippedState);
+	DOREPLIFETIME(UArenaRangedWeaponState, CoverTargeting);
 }

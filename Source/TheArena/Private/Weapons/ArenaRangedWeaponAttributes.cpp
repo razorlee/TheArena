@@ -19,9 +19,10 @@ UArenaRangedWeaponAttributes::UArenaRangedWeaponAttributes()
 	ZoomFOV = 90.0f;
 	IsExplosive = false;
 	ExplosionRadius = 0.0f;
+
+
 }
 
-// Called when the game starts
 void UArenaRangedWeaponAttributes::BeginPlay()
 {
 	Super::BeginPlay();

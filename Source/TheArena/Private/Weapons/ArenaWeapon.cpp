@@ -77,6 +77,7 @@ void AArenaWeapon::StopMelee()
 {
 	if (GetWeaponState()->GetWeaponState() == EWeaponState::Meleeing)
 	{
+		GetWeaponState()->SetWeaponState(EWeaponState::Default);
 		StopWeaponAnimation(GetWeaponEffects()->GetMeleeAnim());
 	}
 }
@@ -148,6 +149,8 @@ void AArenaWeapon::OnLeaveInventory()
 
 void AArenaWeapon::Melee_Implementation()
 {
+	StopAttack();
+	GetWeaponState()->SetWeaponState(EWeaponState::Meleeing);
 	float AnimDuration = PlayWeaponAnimation(GetWeaponEffects()->GetMeleeAnim());
 	if (AnimDuration <= 0.0f)
 	{
@@ -214,6 +217,7 @@ void AArenaWeapon::FinishEquip()
 void AArenaWeapon::FinishUnEquip()
 {
 	FName AttachPoint;
+	DetachMeshFromPawn();
 	if (WeaponClass == EWeaponClass::HeavyWeapon)
 	{
 		AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainHeavyAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffHeavyAttachPoint();

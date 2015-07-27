@@ -59,13 +59,12 @@ void AArenaPlayerController::SetupInputComponent()
 void AArenaPlayerController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	//FArenaStyle::Initialize();
+
 }
 
 void AArenaPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 void AArenaPlayerController::UnFreeze()
@@ -263,15 +262,6 @@ void AArenaPlayerController::SetInteractiveMessage(FText Message)
 	InteractiveMessage = Message;
 }
 
-bool AArenaPlayerController::IsGameInputAllowed() const
-{
-	return bAllowGameActions && !bCinematicMode;
-}
-void AArenaPlayerController::SetAllowGameActions(bool bEnable)
-{
-	bAllowGameActions = bEnable;
-}
-
 bool AArenaPlayerController::HasInfiniteAmmo() const
 {
 	return bInfiniteAmmo;
@@ -370,7 +360,14 @@ void AArenaPlayerController::SetSettings(bool bEnable)
 	this->OpenSettings = bEnable;
 }
 
-
+bool AArenaPlayerController::IsGameInputAllowed() const
+{
+	return bAllowGameActions && !bCinematicMode;
+}
+void AArenaPlayerController::SetAllowGameActions(bool bEnable)
+{
+	bAllowGameActions = bEnable;
+}
 
 void AArenaPlayerController::ClientGameStarted_Implementation()
 {
@@ -609,7 +606,6 @@ bool AArenaPlayerController::ServerSuicide_Validate()
 {
 	return true;
 }
-
 void AArenaPlayerController::ServerSuicide_Implementation()
 {
 	if ((GetPawn() != NULL) && ((GetWorld()->TimeSeconds - GetPawn()->CreationTime > 1) || (GetNetMode() == NM_Standalone)))
@@ -626,6 +622,8 @@ bool AArenaPlayerController::GetAllowGameActions() const
 {
 	return bAllowGameActions;
 }
+
+
 
 
 

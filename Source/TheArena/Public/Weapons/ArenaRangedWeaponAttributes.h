@@ -72,6 +72,8 @@ class THEARENA_API UArenaRangedWeaponAttributes : public UActorComponent
 {
 	GENERATED_BODY()
 
+	virtual void BeginPlay() override;
+
 public:	
 
 	UPROPERTY(Transient, Replicated)
@@ -85,9 +87,6 @@ public:
 
 	// void Sets default values for this component's properties
 	UArenaRangedWeaponAttributes();
-
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
 	int32 GetDamage();

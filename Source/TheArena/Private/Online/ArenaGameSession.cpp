@@ -3,7 +3,6 @@
 #include "TheArena.h"
 #include "ArenaGameSession.h"
 
-
 namespace
 {
 	const FString CustomMatchKeyword("Custom");

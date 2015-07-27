@@ -16,6 +16,8 @@ public:
 	/** spawn inventory, setup initial variables */
 	virtual void PostInitializeComponents() override;
 
+	virtual void BeginPlay() override;
+
 ////////////////////////////////////////// Input handlers //////////////////////////////////////////
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
@@ -32,6 +34,10 @@ public:
 	void OnStartJump();
 	/** player released jump action */
 	void OnStopJump();
+	/** player pressed vault action */
+	void OnVault();
+	/** player pressed climb action */
+	void OnClimb();
 	/** player pressed crouch action */
 	void OnCrouch();
 	/** player pressed cover action */
@@ -96,6 +102,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	class UArenaCharacterInventory* GetCharacterInventory();
 
+	UFUNCTION(BlueprintCallable, Category = Character)
+	FString GetName() const;
+	UFUNCTION(NetMulticast, Reliable)
+	void SetName(const FString& NewName);
+
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	AArenaWeapon* GetCurrentWeapon();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
@@ -128,7 +139,7 @@ public:
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
-	void SpawnDefaultEquipment();
+	void LoadPersistence();
 	void AddWeapon(class AArenaWeapon* Weapon);
 	void RemoveWeapon(class AArenaWeapon* Weapon);
 
@@ -144,12 +155,10 @@ public:
 	UFUNCTION(NetMultiCast, Unreliable)
 	void Running(bool IsRunning);
 
-	void SetTargeting(bool bNewTargeting);
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void StartTargeting();
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void StopTargeting();
-	void LoopTargeting();
 
 	UFUNCTION(NetMultiCast, Unreliable)
 	void ToggleCombat();
@@ -163,8 +172,17 @@ public:
 	float UnEquipWeapon();
 	float FinishUnEquipWeapon(class AArenaWeapon* Weapon);
 
-	void OnStartVault(bool bFromReplication = false);
-	void OnStopVault();
+	UFUNCTION(NetMultiCast, Unreliable)
+	void StartVault();
+	UFUNCTION(NetMultiCast, Unreliable)
+	void StopVault();
+
+	UFUNCTION(NetMultiCast, Unreliable)
+	void StartClimb();
+	UFUNCTION(NetMultiCast, Unreliable)
+	void StopClimb();
+
+	void SetLocation();
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
 
@@ -218,6 +236,9 @@ public:
 
 protected:
 
+	UPROPERTY(Replicated)
+	FString Name;
+
 ////////////////////////////////////////// Private Properties //////////////////////////////////////////
 
 	UPROPERTY(EditAnywhere, Category = State)
@@ -237,13 +258,6 @@ protected:
 	class UArenaSaveGame* SaveGameInstance;
 
 ////////////////////////////////////////// Weapons //////////////////////////////////////////
-
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-	TArray<TSubclassOf<class AArenaWeapon> > DefaultInventoryClasses;
-
-	/** weapons in inventory */
-	UPROPERTY(Transient, Replicated)
-	TArray<class AArenaWeapon*> Inventory;
 
 	UPROPERTY(Transient)
 	class AArenaWeapon* CurrentWeapon;
@@ -291,10 +305,8 @@ protected:
 
 //////////////////////////////////////////// Replication ////////////////////////////////////////////
 
-	/** Called on the actor right before replication occurs */
 	virtual void PreReplication(IRepChangedPropertyTracker & ChangedPropertyTracker) override;
 
-	/** sets up the replication for taking a hit */
 	void ReplicateHit(float Damage, struct FDamageEvent const& DamageEvent, class APawn* InstigatingPawn, class AActor* DamageCauser, bool bKilled);
 
 	UFUNCTION()
@@ -312,26 +324,20 @@ protected:
 
 ////////////////////////////////////////////// Server //////////////////////////////////////////////
 
-	/** equip weapon */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon();
 
-	/** equip weapon */
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerUnEquipWeapon();
-
-	/** update targeting state */
-	UFUNCTION(reliable, server, WithValidation)
-	void ServerSetTargeting(bool bNewTargeting);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerJump(class AArenaCharacter* client);
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerStartVault();
+	void ServerVault();
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerStopVault();
+	void ServerClimb();
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStartTargeting();
@@ -340,6 +346,12 @@ protected:
 	void ServerStopTargeting();
 
 /////////////////////////////////////////////////////////////////////////
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetName(const FString& NewName);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSpawnEquipment(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerToggleCrouch();
@@ -364,5 +376,4 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
-
 };

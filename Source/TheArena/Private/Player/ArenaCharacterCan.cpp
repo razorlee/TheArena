@@ -67,7 +67,30 @@ bool ArenaCharacterCan::MoveRight(AArenaCharacter* character, AArenaPlayerContro
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Running
 		&& Value != 0.0f)
 	{
-		return true;
+		if (Value < 0.0f)
+		{
+			if (character->GetPlayerState()->GetPlayerState() != EPlayerState::Covering 
+				|| (character->GetPlayerState()->GetPlayerState() == EPlayerState::Covering && !character->GetPlayerState()->GetIsNearLeftEdge()))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if (character->GetPlayerState()->GetPlayerState() != EPlayerState::Covering 
+				|| (character->GetPlayerState()->GetPlayerState() == EPlayerState::Covering && !character->GetPlayerState()->GetIsNearRightEdge()))
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	}
 	else
 	{
@@ -115,7 +138,8 @@ bool ArenaCharacterCan::Jump(AArenaCharacter* character, AArenaPlayerController*
 	if (controller
 		&& controller->IsGameInputAllowed()
 		&& character->GetCharacterAttributes()->GetCurrentStamina() >= character->GetPlayerMovement()->GetJumpCost()
-		&& !character->GetCharacterMovement()->IsFalling())
+		&& !character->GetCharacterMovement()->IsFalling()
+		&& !character->GetPlayerState()->GetIsNearCover())
 	{
 		return true;
 	}
@@ -147,6 +171,22 @@ bool ArenaCharacterCan::Vault(AArenaCharacter* character, AArenaPlayerController
 		&& controller->IsGameInputAllowed()
 		&& !character->GetCharacterMovement()->IsFalling()
 		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+	{
+		return false;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool ArenaCharacterCan::Climb(AArenaCharacter* character, AArenaPlayerController* controller)
+{
+	if (controller
+		&& controller->IsGameInputAllowed()
+		&& !character->GetCharacterMovement()->IsFalling()
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& character->GetPlayerState()->GetIsNearCover())
 	{
 		return true;
 	}
@@ -205,6 +245,8 @@ bool ArenaCharacterCan::ToggleCombat(AArenaCharacter* character, AArenaPlayerCon
 {
 	if (controller
 		&& controller->IsGameInputAllowed()
+		&& character->GetPrimaryWeapon()
+		&& character->GetSecondaryWeapon()
 		&& (character->GetPlayerState()->GetPlayerState() == EPlayerState::Default
 		|| character->GetPlayerState()->GetPlayerState() == EPlayerState::Jumping))
 	{

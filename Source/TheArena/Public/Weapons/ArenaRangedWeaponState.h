@@ -65,6 +65,11 @@ public:
 	EEquippedState::Type GetEquippedState();
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void SetEquippedState(EEquippedState::Type NewState);
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	bool GetCoverTargeting();
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void SetCoverTargeting(bool Value);
 	
 private:
 
@@ -79,5 +84,8 @@ private:
 	/** current cover state */
 	UPROPERTY(Transient, Replicated)
 	TEnumAsByte<EEquippedState::Type> EquippedState;
+
+	UPROPERTY(Transient, Replicated)
+	bool CoverTargeting;
 	
 };

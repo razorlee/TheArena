@@ -12,6 +12,7 @@ class THEARENA_API UArenaCharacterMovement : public UCharacterMovementComponent
 	UArenaCharacterMovement(const FObjectInitializer& ObjectInitializer);
 
 public:
+
 	virtual float GetMaxSpeed() const override;
 
 	UFUNCTION(BlueprintCallable, Category = Movement)
@@ -23,135 +24,161 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	float GetLookUpRate();
 
-	/** set current direction state  */
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	float GetJumpCost();
-	/** set current direction state  */
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	void SetJumpCost(float cost);
 
-	/** set current direction state  */
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	USoundBase* GetRunLoopSound();
 
-	/** set current direction state  */
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	USoundBase* GetRunStopSound();
 
-	/** set current direction state  */
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	UAudioComponent* GetRunLoopAC();
-	/** set current direction state  */
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	void SetRunLoopAC(UAudioComponent* AudioComp);
 
-	/** set current direction state  */
 	UFUNCTION(BlueprintCallable, Category = Cover)
 	UAnimMontage* GetVaultAnimation();
 
-	/** set current direction state  */
+	UFUNCTION(BlueprintCallable, Category = Cover)
+	UAnimMontage* GetClimbAnimation();
+
+	UFUNCTION(BlueprintCallable, Category = Cover)
+	UAnimMontage* GetHighLeftAnimation(FString Sequence);
+
+	UFUNCTION(BlueprintCallable, Category = Cover)
+	UAnimMontage* GetHighRightAnimation(FString Sequence);
+
+	UFUNCTION(BlueprintCallable, Category = Cover)
+	UAnimMontage* GetLowLeftAnimation(FString Sequence);
+
+	UFUNCTION(BlueprintCallable, Category = Cover)
+	UAnimMontage* GetLowRightAnimation(FString Sequence);
+
 	UFUNCTION(BlueprintCallable, Category = Cover)
 	FName GetDirection();
-	/** set current direction state  */
 	UFUNCTION(BlueprintCallable, Category = Cover)
 	void SetDirection(FName Direction);
+
+	UFUNCTION(BlueprintCallable, Category = Movement)
+	FVector GetCoverDirection();
+	UFUNCTION(BlueprintCallable, Category = Movement)
+	void SetCoverDirection(FVector NewDirection);
+
+	UFUNCTION(BlueprintCallable, Category = Cover)
+	FVector GetLocation();
+	UFUNCTION(BlueprintCallable, Category = Cover)
+	void SetLocation(FVector NewLocation);
+
+	UFUNCTION(BlueprintCallable, Category = Sockets)
+	FName GetLowCover();
 
 private:
 
 /////////////////////////////////////////// Movement Defaults ///////////////////////////////////////////
 
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY()
 	float BaseTurnRate;
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY()
 	float BaseLookUpRate;
 
 /////////////////////////////////////////////// Movement Speed ///////////////////////////////////////////////
 
-	/** set the default movement speed */
 	UPROPERTY(EditDefaultsOnly, Category = Movement)
 	float BaseMovementSpeed;
-	/** replaces max movement speed */
+
 	UPROPERTY(EditDefaultsOnly, Category = Movement)
 	float RunningMovementSpeed;
-	/** replaces max movement speed */
+
 	UPROPERTY(EditDefaultsOnly, Category = Movement)
 	float CrouchedMovementSpeed;
-	/** replaces max movement speed */
+
 	UPROPERTY(EditDefaultsOnly, Category = Movement)
 	float TargetingMovementSpeed;
 
 /////////////////////////////////////////////// Movement Cost ///////////////////////////////////////////////
 
-	/** replaces max movement speed */
 	UPROPERTY(EditDefaultsOnly, Category = Pawn)
 	float SprintCost;
-	/** replaces max movement speed */
+
 	UPROPERTY(EditDefaultsOnly, Category = Pawn)
 	float JumpCost;
-	/** replaces max movement speed */
+
 	UPROPERTY(EditDefaultsOnly, Category = Pawn)
 	float DodgeCost;
 
 ////////////////////////////////////////////// Movement Sound //////////////////////////////////////////////
 
-	/** create property for running loop sound cue */
 	UPROPERTY(EditDefaultsOnly, Category = Aesthetics)
 	USoundBase* RunLoopSound;
-	/** create property for running end sound cue !currently broken! */
+
 	UPROPERTY(EditDefaultsOnly, Category = Aesthetics)
 	USoundCue* RunStopSound;
-	/** manipulates run loop sound */
+
 	UPROPERTY()
 	UAudioComponent* RunLoopAC;
 
 /////////////////////////////////////////// Movement Animation ///////////////////////////////////////////
 
-	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* VaultAnimation;
-	/** animation played on pawn (3rd person view) */
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* ClimbAnimation;
+
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimHiLeftAnimStart;
-	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimHiLeftAnimLoop;
-	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimHiLeftAnimEnd;
-	/** animation played on pawn (3rd person view) */
+
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimHiRightAnimStart;
-	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimHiRightAnimLoop;
-	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimHiRightAnimEnd;
-	/** animation played on pawn (3rd person view) */
+
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimLoLeftAnimStart;
-	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimLoLeftAnimLoop;
-	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimLoLeftAnimEnd;
-	/** animation played on pawn (3rd person view) */
+
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimLoRightAnimStart;
-	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimLoRightAnimLoop;
-	/** animation played on pawn (3rd person view) */
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* AimLoRightAnimEnd;
 
 /////////////////////////////////////////// Movement States ///////////////////////////////////////////
 
-	/** current facing right */
-	UPROPERTY()
+	UPROPERTY(Transient, Replicated)
 	FName FaceDirection;
+
+	UPROPERTY()
+	FVector Direction;
+
+	UPROPERTY()
+	FVector Location;
+
+////////////////////////////////////////////// MSockets //////////////////////////////////////////////
+
+	UPROPERTY(EditDefaultsOnly, Category = Sockets)
+	FName LowCover;
+
+/////////////////////////////////////////////// Server ///////////////////////////////////////////////
+
+	//UFUNCTION(reliable, server, WithValidation)
+	//void ServerSwapWeapon();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerFaceDirection(FName NewFaceDirection);
 
 };

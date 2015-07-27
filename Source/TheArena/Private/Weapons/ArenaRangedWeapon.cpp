@@ -203,7 +203,8 @@ void AArenaRangedWeapon::HandleFiring()
 		// reload if possible
 		if (WeaponAttributes->CurrentClip <= 0 && ArenaWeaponCan::Reload(MyPawn, this))
 		{
-			GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnBurstFinished, 0.1f, false);
+			StopAttack();
+			//GetWorldTimerManager().SetTimer(this, &AArenaRangedWeapon::OnBurstFinished, 0.1f, false);
 			StartReload();
 		}
 
@@ -277,6 +278,7 @@ void AArenaRangedWeapon::FinishRecoil(float DeltaSeconds)
 
 void AArenaRangedWeapon::Reload_Implementation()
 {
+	StopAttack();
 	WeaponState->SetWeaponState(EWeaponState::Reloading);
 	float AnimDuration = PlayWeaponAnimation(WeaponEffects->GetReloadAnim(), WeaponAttributes->GetMotility()) * (1.0f / WeaponAttributes->GetMotility());
 	if (AnimDuration <= 0.0f)
@@ -369,13 +371,27 @@ float AArenaRangedWeapon::GetCurrentSpread() const
 	float FinalSpread = WeaponAttributes->GetAccuracy();
 	if (MyPawn)
 	{
-		if (WeaponState->GetTargetingState() == ETargetingState::Targeting || ETargetingState::Scoping)
+		if (MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Crouching || MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Covering)
 		{
-			FinalSpread = WeaponAttributes->GetAccuracy() * 0.5;
+			if (WeaponState->GetTargetingState() == ETargetingState::Targeting || ETargetingState::Scoping)
+			{
+				FinalSpread = WeaponAttributes->GetAccuracy() * 0.25;
+			}
+			else
+			{
+				FinalSpread = WeaponAttributes->GetAccuracy() * 0.75;
+			}
 		}
 		else
 		{
-			FinalSpread = WeaponAttributes->GetAccuracy();
+			if (WeaponState->GetTargetingState() == ETargetingState::Targeting)
+			{
+				FinalSpread = WeaponAttributes->GetAccuracy() * 0.5;
+			}
+			else
+			{
+				FinalSpread = WeaponAttributes->GetAccuracy();
+			}
 		}
 	}
 

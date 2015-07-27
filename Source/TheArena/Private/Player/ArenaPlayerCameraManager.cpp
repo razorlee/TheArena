@@ -74,17 +74,17 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 		Speed = 100 * MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetMotility();
 		MyPawn->bUseControllerRotationYaw = true;
 
-		if (TargetingState == ETargetingState::Targeting)
+		if (PlayerState == EPlayerState::Covering)
+		{
+			HandleCoverCamera();
+		}
+		else if (TargetingState == ETargetingState::Targeting)
 		{
 			HandleTargetingCamera();
 		}
 		else if (PlayerState == EPlayerState::Running)
 		{
 			HandleRunningCamera();
-		}
-		else if (PlayerState == EPlayerState::Covering)
-		{
-			HandleCoverCamera();
 		}
 		else
 		{
@@ -113,11 +113,11 @@ void AArenaPlayerCameraManager::HandleCoverCamera()
 {
 	ECoverState::Type CoverState = MyPawn->GetPlayerState()->GetCoverState();
 
-	if (CoverState == ECoverState::HighLeft || ECoverState::HighRight || ECoverState::HighMiddle)
+	if ((CoverState == ECoverState::HighLeft) || (CoverState == ECoverState::HighRight) || (CoverState == ECoverState::HighMiddle))
 	{
 		HandleHighCoverCamera(CoverState);
 	}
-	else if (CoverState == ECoverState::LowLeft || ECoverState::LowRight || ECoverState::LowMiddle)
+	else if ((CoverState == ECoverState::LowLeft) || (CoverState == ECoverState::LowRight) || (CoverState == ECoverState::LowMiddle))
 	{
 		HandleLowCoverCamera(CoverState);
 	}
@@ -159,6 +159,7 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 	{
 		if (TargetingState == ETargetingState::Targeting)
 		{
+			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::HighLeft)
 			{
 				TargetArm = 50.0f;
@@ -167,6 +168,7 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 		}
 		else
 		{
+			MyPawn->bUseControllerRotationYaw = false;
 			TargetArm = 150.0f;
 			TargetOffset = FVector(0.0f, -50.0f, 50.0f);
 		}
@@ -175,6 +177,7 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 	{
 		if (TargetingState == ETargetingState::Targeting)
 		{
+			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::LowLeft)
 			{
 				TargetArm = 50.0f;
@@ -188,6 +191,7 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 		}
 		else
 		{
+			MyPawn->bUseControllerRotationYaw = false;
 			TargetArm = 150.0f;
 			TargetOffset = FVector(0.0f, -50.0f, -20.0f);
 		}
@@ -200,6 +204,7 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 	{
 		if (TargetingState == ETargetingState::Targeting)
 		{
+			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::HighRight)
 			{
 				TargetArm = 50.0f;
@@ -208,6 +213,7 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 		}
 		else
 		{
+			MyPawn->bUseControllerRotationYaw = false;
 			TargetArm = 150.0f;
 			TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 		}
@@ -216,6 +222,7 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 	{
 		if (TargetingState == ETargetingState::Targeting)
 		{
+			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::LowRight)
 			{
 				TargetArm = 50.0f;
@@ -229,6 +236,7 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 		}
 		else
 		{
+			MyPawn->bUseControllerRotationYaw = false;
 			TargetArm = 150.0f;
 			TargetOffset = FVector(0.0f, 50.0f, -20.0f);
 		}
