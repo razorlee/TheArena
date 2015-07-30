@@ -85,6 +85,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Character)
 	void SetIsNearRightEdge(bool Value);
 
+
+
+	/** get current weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
+	bool GetCanClimb() const;
+	/** update weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
+	void SetCanClimb(bool Value);
+
+	/** get current weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
+	bool GetCanVault() const;
+	/** update weapon state */
+	UFUNCTION(BlueprintCallable, Category = Character)
+	void SetCanVault(bool Value);
+
+
+
 	/** get current weapon state */
 	UFUNCTION(BlueprintCallable, Category = Character)
 	EPlayerState::Type GetPlayerState() const;
@@ -116,9 +134,13 @@ protected:
 
 	UPROPERTY()
 	bool IsNearLeftEdge;
-
 	UPROPERTY()
 	bool IsNearRightEdge;
+
+	UPROPERTY()
+	bool CanClimb;
+	UPROPERTY()
+	bool CanVault;
 
 	UPROPERTY(Transient, Replicated)
 	TEnumAsByte<EPlayerState::Type> PlayerState;

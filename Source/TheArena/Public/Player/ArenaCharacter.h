@@ -41,7 +41,9 @@ public:
 	/** player pressed crouch action */
 	void OnCrouch();
 	/** player pressed cover action */
-	void OnCover();
+	void OnToggleCover();
+	/** player pressed exit cover action */
+	void OnExitCover();
 	/** player pressed run action */
 	void OnStartRunning();
 	/** player released run action */
@@ -50,6 +52,10 @@ public:
 	void OnStartTargeting();
 	/** player released targeting action */
 	void OnStopTargeting();
+	/** player pressed peak action */
+	void OnStartPeaking();
+	/** player released peak action */
+	void OnStopPeaking();
 	/** player enters combat */
 	void OnToggleCombat();
 	/** player pressed prev weapon action */
@@ -81,6 +87,14 @@ public:
 	/** get aim offsets */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	FRotator GetAimOffsets() const;
+
+	UFUNCTION()
+	bool GetBusy();
+	UFUNCTION(NetMultiCast, Unreliable)
+	void ToggleBusy();
+
+	UFUNCTION(NetMultiCast, Unreliable)
+	void SetLocation();
 
 ////////////////////////////////////////// Character Components //////////////////////////////////////////
 
@@ -152,6 +166,9 @@ public:
 	UFUNCTION(NetMultiCast, Unreliable)
 	void ToggleCover();
 
+	UFUNCTION(NetMultiCast, Reliable)
+	void ExitCover();
+
 	UFUNCTION(NetMultiCast, Unreliable)
 	void Running(bool IsRunning);
 
@@ -159,6 +176,11 @@ public:
 	void StartTargeting();
 	UFUNCTION(NetMultiCast, Reliable)
 	void StopTargeting();
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void StartPeaking();
+	UFUNCTION(NetMultiCast, Reliable)
+	void StopPeaking();
 
 	UFUNCTION(NetMultiCast, Unreliable)
 	void ToggleCombat();
@@ -181,8 +203,6 @@ public:
 	void StartClimb();
 	UFUNCTION(NetMultiCast, Unreliable)
 	void StopClimb();
-
-	void SetLocation();
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
 
@@ -234,6 +254,9 @@ public:
 	UPROPERTY()
 	class UCameraComponent* FollowCamera;
 
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
+	uint32 Peaking : 1;
+
 protected:
 
 	UPROPERTY(Replicated)
@@ -274,8 +297,12 @@ protected:
 	FTimerHandle TimerHandle_SwapWeapon;
 
 	/** Identifies if pawn is in its dying state */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Resources)
-	uint32 bIsDying : 1;
+	UPROPERTY(Transient, Replicated)
+	uint32 Busy : 1;
+
+	/** Identifies if pawn is in its dying state */
+	UPROPERTY(Transient, Replicated)
+	float ActionQueue;
 
 	/** Replicate where this pawn was last hit and damaged */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_LastTakeHitInfo)
@@ -345,6 +372,12 @@ protected:
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopTargeting();
 
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartPeaking();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopPeaking();
+
 /////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(reliable, server, WithValidation)
@@ -358,6 +391,9 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerToggleCover();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerExitCover();
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerRunning(bool IsRunning);

@@ -50,26 +50,50 @@ void AArenaCover::Tick(float DeltaSeconds)
 	for (int i = 0; i < CoverActors.Num(); i++)
 	{
 		AArenaCharacter* MyPawn = CoverActors[i];
-		MyPawn->GetPlayerState()->SetIsNearCover(true);
-		HandleCoverState(MyPawn);
+		if (!MyPawn->GetCurrentWeapon()->GetWeaponState()->GetCoverTargeting())
+		{
+			MyPawn->GetPlayerState()->SetIsNearCover(true);
+			MyPawn->GetPlayerState()->SetCanClimb(CanClimbUp);
+			MyPawn->GetPlayerState()->SetCanVault(CanVaultOver);
+			HandleCoverState(MyPawn);
 
-		FRotator NewRotation = MyPawn->GetActorRotation();
-		NewRotation.Yaw = Arrow->GetComponentRotation().Yaw;
-		MyPawn->SetActorRotation(NewRotation);
+			if (MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Covering)
+			{
+				FRotator NewRotation = MyPawn->GetActorRotation();
+				NewRotation.Yaw = Arrow->GetComponentRotation().Yaw;
 
-		const FRotator Rotation = Arrow->GetComponentRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		MyPawn->GetPlayerMovement()->SetCoverDirection(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y));
+				MyPawn->SetActorRotation(NewRotation);
+
+				const FRotator Rotation = Arrow->GetComponentRotation();
+				const FRotator YawRotation(0, Rotation.Yaw, 0);
+				MyPawn->GetPlayerMovement()->SetCoverDirection(FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y));
+			}
+
+			if (MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Climbing || MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Vaulting)
+			{
+				float PlayerTest = MyPawn->GetActorRotation().Yaw;
+				float ArrowTest = Arrow->GetComponentRotation().Yaw;
+				FRotator NewRotation = MyPawn->GetActorRotation();
+				NewRotation.Yaw = FMath::FInterpTo(MyPawn->GetActorRotation().Yaw, Arrow->GetComponentRotation().Yaw, DeltaSeconds, 10.0f);
+
+
+				MyPawn->SetActorRotation(NewRotation);
+			}
+
+
+		}
 	}
 }
 
 void AArenaCover::BeginOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(OtherActor);
-	if (MyPawn)
+	if (MyPawn && MyPawn->GetPlayerState()->GetPlayerState() != EPlayerState::Climbing && MyPawn->GetPlayerState()->GetPlayerState() != EPlayerState::Vaulting)
 	{
 		CoverActors.AddUnique(MyPawn);
 		MyPawn->GetPlayerState()->SetIsNearCover(true);
+		MyPawn->GetPlayerState()->SetCanClimb(CanClimbUp);
+		MyPawn->GetPlayerState()->SetCanVault(CanVaultOver);
 	}	
 }
 void AArenaCover::EndOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -79,16 +103,25 @@ void AArenaCover::EndOverlap(class AActor* OtherActor, class UPrimitiveComponent
 	{
 		CoverActors.RemoveSingle(MyPawn);
 		MyPawn->GetPlayerState()->SetIsNearCover(false);
+		MyPawn->GetPlayerState()->SetCanClimb(false);
+		MyPawn->GetPlayerState()->SetCanVault(false);
 	}
 }
 
 void AArenaCover::BeginLeftOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(OtherActor);
-	if (MyPawn && CoverType != ECoverType::Right && !MyPawn->GetPlayerState()->GetIsNearRightEdge())
+	if (MyPawn 
+		&& CoverType != ECoverType::Right 
+		&& MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Covering 
+		&& !MyPawn->GetPlayerState()->GetIsNearRightEdge())
 	{
-		MyPawn->GetPlayerState()->SetIsNearCover(true);
 		MyPawn->GetPlayerState()->SetIsNearLeftEdge(true);
+		HandleCoverState(MyPawn);
+		if (MyPawn->Peaking)
+		{
+			MyPawn->OnStartPeaking();
+		}
 	}
 }
 void AArenaCover::EndLeftOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -103,10 +136,17 @@ void AArenaCover::EndLeftOverlap(class AActor* OtherActor, class UPrimitiveCompo
 void AArenaCover::BeginRightOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(OtherActor);
-	if (MyPawn && CoverType != ECoverType::Left && !MyPawn->GetPlayerState()->GetIsNearLeftEdge())
+	if (MyPawn 
+		&& CoverType != ECoverType::Left 
+		&& MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Covering 
+		&& !MyPawn->GetPlayerState()->GetIsNearLeftEdge())
 	{
-		MyPawn->GetPlayerState()->SetIsNearCover(true);
 		MyPawn->GetPlayerState()->SetIsNearRightEdge(true);
+		HandleCoverState(MyPawn);
+		if (MyPawn->Peaking)
+		{
+			MyPawn->OnStartPeaking();
+		}
 	}
 }
 void AArenaCover::EndRightOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

@@ -50,6 +50,9 @@ public:
 	static bool Target(AArenaCharacter* character, AArenaPlayerController* controller);
 
 	/*Checks if the player can aim a weapon*/
+	static bool Peak(AArenaCharacter* character, AArenaPlayerController* controller);
+
+	/*Checks if the player can aim a weapon*/
 	static bool ToggleCombat(AArenaCharacter* character, AArenaPlayerController* controller);
 
 	/*Checks if the player can fire a weapon*/

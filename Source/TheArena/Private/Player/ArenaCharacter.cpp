@@ -71,6 +71,9 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	FollowCamera->AttachTo(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	//FollowCamera->scale
+
+	Busy = false;
+	ActionQueue = 0.0f;
 }
 
 void AArenaCharacter::PostInitializeComponents()
@@ -82,7 +85,7 @@ void AArenaCharacter::PostInitializeComponents()
 
 	if (IsRunningGame() || IsRunningDedicatedServer())
 	{
-		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.25f, false);
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.2f, false);
 	}
 	else
 	{
@@ -117,7 +120,7 @@ void AArenaCharacter::BeginPlay()
 
 void AArenaCharacter::LoadPersistence()
 {
-	AArenaPlayerState* MyPlayerState = MyPlayerState = Cast<AArenaPlayerState>(PlayerState);
+	AArenaPlayerState* MyPlayerState = Cast<AArenaPlayerState>(PlayerState);
 	Name = MyPlayerState->PlayerName;
 
 	if (Role == ROLE_Authority)
@@ -168,13 +171,18 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 
 	InputComponent->BindAction("Crouch", IE_Pressed, this, &AArenaCharacter::OnCrouch);
 
-	InputComponent->BindAction("Cover", IE_Pressed, this, &AArenaCharacter::OnCover);
+	InputComponent->BindAction("Cover", IE_Pressed, this, &AArenaCharacter::OnToggleCover);
+
+	InputComponent->BindAction("ExitCover", IE_Pressed, this, &AArenaCharacter::OnExitCover);
 
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &AArenaCharacter::OnStartRunning);
 	InputComponent->BindAction("Sprint", IE_Released, this, &AArenaCharacter::OnStopRunning);
 
 	InputComponent->BindAction("Targeting", IE_Pressed, this, &AArenaCharacter::OnStartTargeting);
 	InputComponent->BindAction("Targeting", IE_Released, this, &AArenaCharacter::OnStopTargeting);
+
+	InputComponent->BindAction("Peaking", IE_Pressed, this, &AArenaCharacter::OnStartPeaking);
+	InputComponent->BindAction("Peaking", IE_Released, this, &AArenaCharacter::OnStopPeaking);
 
 	InputComponent->BindAction("ReadyWeapon", IE_Pressed, this, &AArenaCharacter::OnToggleCombat);
 
@@ -220,15 +228,14 @@ void AArenaCharacter::MoveRight(float Value)
 		{
 			AddMovementInput(Direction, Value);
 		}
-
-		if (Value >= 0)
-		{
-			CharacterMovementComponent->SetDirection(FName(TEXT("Right")));
-		}
-		if (Value < 0)
-		{
-			CharacterMovementComponent->SetDirection(FName(TEXT("Left")));
-		}
+	}
+	if (Value > 0)
+	{
+		CharacterMovementComponent->SetDirection(FName(TEXT("Right")));
+	}
+	if (Value < 0)
+	{
+		CharacterMovementComponent->SetDirection(FName(TEXT("Left")));
 	}
 }
 void AArenaCharacter::TurnAtRate(float Rate)
@@ -260,7 +267,10 @@ void AArenaCharacter::OnStartJump()
 }
 void AArenaCharacter::OnStopJump()
 {
-	CharacterState->SetPlayerState(EPlayerState::Default);
+	if (CharacterState->GetPlayerState() == EPlayerState::Jumping)
+	{
+		CharacterState->SetPlayerState(EPlayerState::Default);
+	}
 }
 void AArenaCharacter::OnVault()
 {
@@ -307,7 +317,7 @@ void AArenaCharacter::OnCrouch()
 		}
 	}
 }
-void AArenaCharacter::OnCover()
+void AArenaCharacter::OnToggleCover()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (ArenaCharacterCan::Cover(this, MyPC))
@@ -319,6 +329,21 @@ void AArenaCharacter::OnCover()
 		else
 		{
 			ServerToggleCover();
+		}
+	}
+}
+void AArenaCharacter::OnExitCover()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (ArenaCharacterCan::Cover(this, MyPC))
+	{
+		if (Role == ROLE_Authority)
+		{
+			ExitCover();
+		}
+		else
+		{
+			ServerExitCover();
 		}
 	}
 }
@@ -372,6 +397,42 @@ void AArenaCharacter::OnStopTargeting()
 	else
 	{
 		ServerStopTargeting();
+	}
+}
+void AArenaCharacter::OnStartPeaking()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (ArenaCharacterCan::Peak(this, MyPC))
+	{
+		if (Role == ROLE_Authority)
+		{
+			StartPeaking();
+		}
+		else
+		{
+			ServerStartPeaking();
+		}
+	}
+}
+void AArenaCharacter::OnStopPeaking()
+{
+	if (Peaking)
+	{
+		if (Role == ROLE_Authority)
+		{
+			if (Busy)
+			{
+				GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopPeaking, ActionQueue * 0.3f, false);
+			}
+			else
+			{
+				StopPeaking();
+			}
+		}
+		else
+		{
+			ServerStopPeaking();
+		}
 	}
 }
 void AArenaCharacter::OnToggleCombat()
@@ -494,6 +555,36 @@ FRotator AArenaCharacter::GetAimOffsets() const
 	const FRotator AimRotLS = AimDirLS.Rotation();
 
 	return AimRotLS;
+}
+
+bool AArenaCharacter::GetBusy()
+{
+	return Busy;
+}
+void AArenaCharacter::ToggleBusy_Implementation()
+{
+	if (Busy)
+	{
+		Busy = false;
+		ActionQueue = 0.0f;
+	}
+	else
+	{
+		Busy = true;
+	}
+}
+
+void AArenaCharacter::SetLocation_Implementation()
+{
+	if (CharacterState->GetPlayerState() == EPlayerState::Covering
+		&& (CharacterState->GetCoverState() == ECoverState::HighLeft
+		|| CharacterState->GetCoverState() == ECoverState::HighRight
+		|| CharacterState->GetCoverState() == ECoverState::LowLeft
+		|| CharacterState->GetCoverState() == ECoverState::LowRight))
+	{
+		SetActorLocation(CharacterMovementComponent->GetLocation());
+		CurrentWeapon->GetWeaponState()->SetCoverTargeting(false);
+	}
 }
 
 ////////////////////////////////////////// Character Components //////////////////////////////////////////
@@ -707,16 +798,40 @@ void AArenaCharacter::ToggleCover_Implementation()
 {
 	if (CharacterState->GetPlayerState() == EPlayerState::Covering)
 	{
-		CharacterState->SetPlayerState(EPlayerState::Default);
-		CharacterState->SetCoverState(ECoverState::Default);
-		CharacterState->SetIsNearLeftEdge(false);
-		CharacterState->SetIsNearRightEdge(false);
-		CurrentWeapon->GetWeaponState()->SetCoverTargeting(false);
+		ExitCover();
 	}
 	else
 	{
 		UnCrouch();
 		CharacterState->SetPlayerState(EPlayerState::Covering);
+	}
+}
+
+void AArenaCharacter::ExitCover_Implementation()
+{
+	Peaking = false;
+	CharacterState->SetPlayerState(EPlayerState::Default);
+	CharacterState->SetCoverState(ECoverState::Default);
+	CharacterState->SetIsNearLeftEdge(false);
+	CharacterState->SetIsNearRightEdge(false);
+	CurrentWeapon->GetWeaponState()->SetCoverTargeting(false);
+
+	//somewhere else
+	if (CharacterState->GetCoverState() == ECoverState::HighLeft)
+	{
+
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::HighRight)
+	{
+
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::LowLeft)
+	{
+
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::LowRight)
+	{
+
 	}
 }
 
@@ -748,30 +863,8 @@ void AArenaCharacter::StartTargeting_Implementation()
 
 	if (CharacterState->GetPlayerState() == EPlayerState::Covering)
 	{
-		CurrentWeapon->GetWeaponState()->SetCoverTargeting(true);
-		CharacterMovementComponent->SetLocation(GetActorLocation());
-		if (CharacterState->GetCoverState() == ECoverState::HighLeft)
-		{
-			PlayAnimMontage(CharacterMovementComponent->GetHighLeftAnimation(FString(TEXT("Start"))));
-		}
-		else if (CharacterState->GetCoverState() == ECoverState::HighRight)
-		{
-			PlayAnimMontage(CharacterMovementComponent->GetHighRightAnimation(FString(TEXT("Start"))));
-		}
-		else if (CharacterState->GetCoverState() == ECoverState::LowLeft)
-		{
-			PlayAnimMontage(CharacterMovementComponent->GetLowLeftAnimation(FString(TEXT("Start"))));
-		}
-		else if (CharacterState->GetCoverState() == ECoverState::LowRight)
-		{
-			PlayAnimMontage(CharacterMovementComponent->GetLowRightAnimation(FString(TEXT("Start"))));
-		}
-		else
-		{
-			return;
-		}
+		
 	}
-
 }
 void AArenaCharacter::StopTargeting_Implementation()
 {
@@ -783,30 +876,77 @@ void AArenaCharacter::StopTargeting_Implementation()
 
 	if (CharacterState->GetPlayerState() == EPlayerState::Covering)
 	{
-		float Duration = 0.0f;
-		CameraBoom->TargetArmLength = 150.0f;
-		if (CharacterState->GetCoverState() == ECoverState::HighLeft)
-		{
-			Duration = PlayAnimMontage(CharacterMovementComponent->GetHighLeftAnimation(FString(TEXT("End"))));
-		}
-		else if (CharacterState->GetCoverState() == ECoverState::HighRight)
-		{
-			Duration = PlayAnimMontage(CharacterMovementComponent->GetHighRightAnimation(FString(TEXT("End"))));
-		}
-		else if (CharacterState->GetCoverState() == ECoverState::LowLeft)
-		{
-			Duration = PlayAnimMontage(CharacterMovementComponent->GetLowLeftAnimation(FString(TEXT("End"))));
-		}
-		else if (CharacterState->GetCoverState() == ECoverState::LowRight)
-		{
-			Duration = PlayAnimMontage(CharacterMovementComponent->GetLowRightAnimation(FString(TEXT("End"))));
-		}
-		else
-		{
-			return;
-		}
-		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::SetLocation, Duration * 0.40f, false);
+		
 	}
+}
+
+void AArenaCharacter::StartPeaking_Implementation()
+{
+	Peaking = true;
+	if (CharacterState->GetCoverState() == ECoverState::HighLeft)
+	{
+		Busy = true;
+		CurrentWeapon->GetWeaponState()->SetCoverTargeting(true);
+		CharacterMovementComponent->SetLocation(GetActorLocation());
+		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetHighLeftAnimation(FString(TEXT("Start"))));
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::HighRight)
+	{
+		Busy = true;
+		CurrentWeapon->GetWeaponState()->SetCoverTargeting(true);
+		CharacterMovementComponent->SetLocation(GetActorLocation());
+		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetHighRightAnimation(FString(TEXT("Start"))));
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::LowLeft)
+	{
+		Busy = true;
+		CurrentWeapon->GetWeaponState()->SetCoverTargeting(true);
+		CharacterMovementComponent->SetLocation(GetActorLocation());
+		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetLowLeftAnimation(FString(TEXT("Start"))));
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::LowRight)
+	{
+		Busy = true;
+		CurrentWeapon->GetWeaponState()->SetCoverTargeting(true);
+		CharacterMovementComponent->SetLocation(GetActorLocation());
+		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetLowRightAnimation(FString(TEXT("Start"))));
+	}
+	else
+	{
+		return;
+	}
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.40f, false);
+}
+void AArenaCharacter::StopPeaking_Implementation()
+{
+	Peaking = false;
+	CurrentWeapon->StopAttack();
+	if (CharacterState->GetCoverState() == ECoverState::HighLeft)
+	{
+		Busy = true;
+		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetHighLeftAnimation(FString(TEXT("End"))));
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::HighRight)
+	{
+		Busy = true;
+		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetHighRightAnimation(FString(TEXT("End"))));
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::LowLeft)
+	{
+		Busy = true;
+		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetLowLeftAnimation(FString(TEXT("End"))));
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::LowRight)
+	{
+		Busy = true;
+		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetLowRightAnimation(FString(TEXT("End"))));
+	}
+	else
+	{
+		return;
+	}
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::SetLocation, ActionQueue * 0.4f, false);
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.4f, false);
 }
 
 void AArenaCharacter::ToggleCombat_Implementation()
@@ -880,8 +1020,8 @@ float AArenaCharacter::FinishUnEquipWeapon(class AArenaWeapon* Weapon)
 
 void AArenaCharacter::StartVault_Implementation()
 {
+	OnStopFire();
 	CharacterState->SetPlayerState(EPlayerState::Vaulting);
-	GetCapsuleComponent()->SetCapsuleSize(0, 0);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 
 	float AnimDuration = PlayAnimMontage(CharacterMovementComponent->GetVaultAnimation());
@@ -890,20 +1030,19 @@ void AArenaCharacter::StartVault_Implementation()
 		AnimDuration = 0.3f;
 	}
 
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopVault, AnimDuration, false);
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopVault, AnimDuration * 0.9f, false);
 }
 void AArenaCharacter::StopVault_Implementation()
 {
 	CharacterState->SetPlayerState(EPlayerState::Default);
-	GetCapsuleComponent()->SetCapsuleSize(42.f, 96.0f);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	StopAnimMontage(CharacterMovementComponent->GetVaultAnimation());
 }
 
 void AArenaCharacter::StartClimb_Implementation()
 {
+	OnStopFire();
 	CharacterState->SetPlayerState(EPlayerState::Climbing);
-	//GetCapsuleComponent()->SetCapsuleSize(0, 0);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 
 	float AnimDuration = PlayAnimMontage(CharacterMovementComponent->GetClimbAnimation());
@@ -912,23 +1051,13 @@ void AArenaCharacter::StartClimb_Implementation()
 		AnimDuration = 0.3f;
 	}
 
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopClimb, AnimDuration, false);
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopClimb, AnimDuration * 0.9f, false);
 }
 void AArenaCharacter::StopClimb_Implementation()
 {
 	CharacterState->SetPlayerState(EPlayerState::Default);
-	//GetCapsuleComponent()->SetCapsuleSize(42.f, 96.0f);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	StopAnimMontage(CharacterMovementComponent->GetClimbAnimation());
-}
-
-void AArenaCharacter::SetLocation()
-{
-	if (CharacterState->GetPlayerState() == EPlayerState::Covering)
-	{
-		SetActorLocation(CharacterMovementComponent->GetLocation());
-		CurrentWeapon->GetWeaponState()->SetCoverTargeting(false);
-	}
 }
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
@@ -1367,6 +1496,9 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	DOREPLIFETIME_CONDITION(AArenaCharacter, LastTakeHitInfo, COND_Custom);
 
 	DOREPLIFETIME(AArenaCharacter, Name);
+	DOREPLIFETIME(AArenaCharacter, Busy);
+	DOREPLIFETIME(AArenaCharacter, Peaking);
+	DOREPLIFETIME(AArenaCharacter, ActionQueue);
 	DOREPLIFETIME(AArenaCharacter, PrimaryWeapon);
 	DOREPLIFETIME(AArenaCharacter, SecondaryWeapon);
 }
@@ -1436,6 +1568,31 @@ void AArenaCharacter::ServerStopTargeting_Implementation()
 	StopTargeting();
 }
 
+bool AArenaCharacter::ServerStartPeaking_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerStartPeaking_Implementation()
+{
+	StartPeaking();
+}
+
+bool AArenaCharacter::ServerStopPeaking_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerStopPeaking_Implementation()
+{
+	if (Busy)
+	{
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopPeaking, ActionQueue * 0.4f, false);
+	}
+	else
+	{
+		StopPeaking();
+	}
+}
+
 bool AArenaCharacter::ServerSetName_Validate(const FString& NewName)
 {
 	return true;
@@ -1451,10 +1608,10 @@ bool AArenaCharacter::ServerSpawnEquipment_Validate(TSubclassOf<class AArenaWeap
 }
 void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon)
 {
-	//if (Role < ROLE_Authority)
-	//{
-	//	return;
-	//}
+	if (Role < ROLE_Authority)
+	{
+		return;
+	}
 
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
@@ -1482,6 +1639,15 @@ bool AArenaCharacter::ServerToggleCover_Validate()
 void AArenaCharacter::ServerToggleCover_Implementation()
 {
 	ToggleCover();
+}
+
+bool AArenaCharacter::ServerExitCover_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerExitCover_Implementation()
+{
+	ExitCover();
 }
 
 bool AArenaCharacter::ServerRunning_Validate(bool IsRunning)

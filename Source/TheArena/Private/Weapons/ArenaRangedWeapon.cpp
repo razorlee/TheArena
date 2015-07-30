@@ -279,6 +279,7 @@ void AArenaRangedWeapon::FinishRecoil(float DeltaSeconds)
 void AArenaRangedWeapon::Reload_Implementation()
 {
 	StopAttack();
+	MyPawn->OnStopPeaking();
 	WeaponState->SetWeaponState(EWeaponState::Reloading);
 	float AnimDuration = PlayWeaponAnimation(WeaponEffects->GetReloadAnim(), WeaponAttributes->GetMotility()) * (1.0f / WeaponAttributes->GetMotility());
 	if (AnimDuration <= 0.0f)

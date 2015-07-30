@@ -78,6 +78,13 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 		{
 			HandleCoverCamera();
 		}
+		else if (PlayerState == EPlayerState::Climbing || PlayerState == EPlayerState::Vaulting)
+		{
+			MyPawn->bUseControllerRotationYaw = false;
+			TargetFOV = NormalFOV;
+			TargetArm = 150.0f;
+			TargetOffset = FVector(0.0f, 50.0f, 50.0f);
+		}
 		else if (TargetingState == ETargetingState::Targeting)
 		{
 			HandleTargetingCamera();

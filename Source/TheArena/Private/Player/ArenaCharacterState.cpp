@@ -58,6 +58,24 @@ void UArenaCharacterState::SetIsNearRightEdge(bool Value)
 	IsNearRightEdge = Value;
 }
 
+bool UArenaCharacterState::GetCanClimb() const
+{
+	return CanClimb;
+}
+void UArenaCharacterState::SetCanClimb(bool Value)
+{
+	CanClimb = Value;
+}
+
+bool UArenaCharacterState::GetCanVault() const
+{
+	return CanVault;
+}
+void UArenaCharacterState::SetCanVault(bool Value)
+{
+	CanVault = Value;
+}
+
 EPlayerState::Type UArenaCharacterState::GetPlayerState() const
 {
 	return PlayerState;

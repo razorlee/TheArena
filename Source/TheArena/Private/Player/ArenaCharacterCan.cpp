@@ -170,9 +170,13 @@ bool ArenaCharacterCan::Vault(AArenaCharacter* character, AArenaPlayerController
 	if (controller
 		&& controller->IsGameInputAllowed()
 		&& !character->GetCharacterMovement()->IsFalling()
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& character->GetPlayerState()->GetIsNearCover()
+		//&& !character->GetPlayerState()->GetIsNearLeftEdge()
+		//&& !character->GetPlayerState()->GetIsNearRightEdge()
+		&& character->GetPlayerState()->GetCanVault())
 	{
-		return false;
+		return true;
 	}
 	else
 	{
@@ -186,7 +190,10 @@ bool ArenaCharacterCan::Climb(AArenaCharacter* character, AArenaPlayerController
 		&& controller->IsGameInputAllowed()
 		&& !character->GetCharacterMovement()->IsFalling()
 		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
-		&& character->GetPlayerState()->GetIsNearCover())
+		&& character->GetPlayerState()->GetIsNearCover()
+		//&& !character->GetPlayerState()->GetIsNearLeftEdge()
+		//&& !character->GetPlayerState()->GetIsNearRightEdge()
+		&& character->GetPlayerState()->GetCanClimb())
 	{
 		return true;
 	}
@@ -241,6 +248,29 @@ bool ArenaCharacterCan::Target(AArenaCharacter* character, AArenaPlayerControlle
 	}
 }
 
+bool ArenaCharacterCan::Peak(AArenaCharacter* character, AArenaPlayerController* controller)
+{
+	if (controller
+		&& controller->IsGameInputAllowed()
+		&& character->GetCurrentWeapon()
+		&& character->GetPlayerState()->GetCombatState() == ECombatState::Aggressive
+		&& character->GetPlayerState()->GetPlayerState() == EPlayerState::Covering)
+	{
+		if (!character->GetCurrentWeapon()->GetWeaponState()->GetCoverTargeting())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
 bool ArenaCharacterCan::ToggleCombat(AArenaCharacter* character, AArenaPlayerController* controller)
 {
 	if (controller
@@ -282,15 +312,28 @@ bool ArenaCharacterCan::Fire(AArenaCharacter* character, AArenaPlayerController*
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Running
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Vaulting)
 	{
-		if (character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() != EWeaponState::Reloading)
+		if (character->GetPlayerState()->GetPlayerState() == EPlayerState::Covering)
 		{
-			return true;
+			if (character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() != EWeaponState::Reloading && character->Peaking)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
-			return false;
+			if (character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() != EWeaponState::Reloading)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
-		
 	}
 	else
 	{
