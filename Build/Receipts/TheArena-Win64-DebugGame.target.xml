@@ -3,12 +3,12 @@
   <Properties>
     <Property Name="TargetName" Value="TheArena" />
     <Property Name="Platform" Value="Win64" />
-    <Property Name="Configuration" Value="Development" />
+    <Property Name="Configuration" Value="DebugGame" />
     <Property Name="Precompile" Value="False" />
   </Properties>
   <BuildProducts>
-    <BuildProduct Path="$(ProjectDir)\Binaries\Win64\TheArena.exe" Type="Executable" />
-    <BuildProduct Path="$(ProjectDir)\Binaries\Win64\TheArena.pdb" Type="SymbolFile" />
+    <BuildProduct Path="$(ProjectDir)\Binaries\Win64\TheArena-Win64-DebugGame.exe" Type="Executable" />
+    <BuildProduct Path="$(ProjectDir)\Binaries\Win64\TheArena-Win64-DebugGame.pdb" Type="SymbolFile" />
   </BuildProducts>
   <RuntimeDependencies>
     <RuntimeDependency Path="$(EngineDir)/Binaries/ThirdParty/PhysX/PhysX-3.3/Win64/VS2013/PhysX3PROFILE_x64.dll" />

@@ -83,14 +83,16 @@ void AArenaCharacter::PostInitializeComponents()
 	CharacterState->SetMyPawn(this);
 	CharacterEquipment->SetMyPawn(this);
 
-	if (IsRunningGame() || IsRunningDedicatedServer())
-	{
-		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.2f, false);
-	}
-	else
-	{
-		ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP());
-	}
+	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.2f, false);
+
+	//if (IsRunningGame() || IsRunningDedicatedServer())
+	//{
+		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.2f, false);
+	//}
+	//else
+	//{
+	//	ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP());
+	//}
 
 	CharacterState->Reset();
 
@@ -115,7 +117,6 @@ void AArenaCharacter::BeginPlay()
 
 	//AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	//MyPC->SetAllowGameActions(false);
-
 }
 
 void AArenaCharacter::LoadPersistence()
@@ -1608,11 +1609,6 @@ bool AArenaCharacter::ServerSpawnEquipment_Validate(TSubclassOf<class AArenaWeap
 }
 void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon)
 {
-	if (Role < ROLE_Authority)
-	{
-		return;
-	}
-
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
 
