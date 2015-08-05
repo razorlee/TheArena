@@ -73,6 +73,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	//FollowCamera->scale
 
 	Busy = false;
+	//Spawned = false;
 	ActionQueue = 0.0f;
 }
 
@@ -83,16 +84,17 @@ void AArenaCharacter::PostInitializeComponents()
 	CharacterState->SetMyPawn(this);
 	CharacterEquipment->SetMyPawn(this);
 
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.2f, false);
+	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.25f, false);
 
-	//if (IsRunningGame() || IsRunningDedicatedServer())
-	//{
-		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.2f, false);
-	//}
-	//else
-	//{
-	//	ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP());
-	//}
+	//LoadPersistence();
+	if (IsRunningGame() || IsRunningDedicatedServer())
+	{
+		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.2f, false);
+	}
+	else
+	{
+		ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP());
+	}
 
 	CharacterState->Reset();
 
@@ -115,23 +117,28 @@ void AArenaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	//MyPC->SetAllowGameActions(false);
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->Equip();
+	}
 }
 
 void AArenaCharacter::LoadPersistence()
 {
 	AArenaPlayerState* MyPlayerState = Cast<AArenaPlayerState>(PlayerState);
-	Name = MyPlayerState->PlayerName;
+	if (PlayerState)
+	{
+		Name = MyPlayerState->PlayerName;
+	}
 
-	if (Role == ROLE_Authority)
-	{
-		SetName(Name);
-	}
-	else
-	{
-		ServerSetName(Name);
-	}
+	//if (Role == ROLE_Authority)
+	//{
+	//	SetName(Name);
+	//}
+	//else
+	//{
+	//	ServerSetName(Name);
+	//}
 
 	if (IsLocallyControlled())
 	{
@@ -261,6 +268,7 @@ void AArenaCharacter::OnStartJump()
 	if (ArenaCharacterCan::Jump(this, MyPC))
 	{
 		UnCrouch();
+		OnStopRunning();
 		CharacterState->SetPlayerState(EPlayerState::Jumping);
 		CharacterAttributes->SetCurrentStamina(CharacterAttributes->GetCurrentStamina() - CharacterMovementComponent->GetJumpCost());
 		Jump();
@@ -528,6 +536,11 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 		CharacterAttributes->Regenerate(DeltaSeconds);
 		CharacterMovementComponent->ManageState(DeltaSeconds);
 	}
+
+	/*if (!Spawned)
+	{
+		LoadPersistence();
+	}*/
 }
 
 void AArenaCharacter::Destroyed()
@@ -637,7 +650,7 @@ void AArenaCharacter::SetCurrentWeapon()
 {
 	if (CurrentWeapon == NULL)
 	{
-		CurrentWeapon = SecondaryWeapon;
+		CurrentWeapon = PrimaryWeapon;
 		return;
 	}
 	if (CurrentWeapon == PrimaryWeapon)
@@ -771,9 +784,9 @@ void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* 
 	if (Role == ROLE_Authority)
 	{
 		PrimaryWeapon->SetOwningPawn(this);
-		PrimaryWeapon->UnEquip();
+		PrimaryWeapon->FinishUnEquip();
 		SecondaryWeapon->SetOwningPawn(this);;
-		SecondaryWeapon->UnEquip();
+		SecondaryWeapon->FinishUnEquip();
 	}
 	else
 	{
@@ -854,17 +867,15 @@ void AArenaCharacter::Running_Implementation(bool IsRunning)
 
 void AArenaCharacter::StartTargeting_Implementation()
 {
-	CharacterEquipment->SetDrawCrosshair(true);
-	CurrentWeapon->GetWeaponState()->SetTargetingState(ETargetingState::Targeting);
+	if (CurrentWeapon && CharacterEquipment)
+	{
+		CharacterEquipment->SetDrawCrosshair(true);
+		CurrentWeapon->GetWeaponState()->SetTargetingState(ETargetingState::Targeting);
+	}
 
 	if (TargetingSound)
 	{
 		UGameplayStatics::PlaySoundAttached(TargetingSound, GetRootComponent());
-	}
-
-	if (CharacterState->GetPlayerState() == EPlayerState::Covering)
-	{
-		
 	}
 }
 void AArenaCharacter::StopTargeting_Implementation()
@@ -969,6 +980,7 @@ void AArenaCharacter::ToggleCombat_Implementation()
 void AArenaCharacter::SwapWeapon_Implementation()
 {
 	float Duration = UnEquipWeapon();
+	SetCurrentWeapon();
 	GetWorldTimerManager().SetTimer(TimerHandle_SwapWeapon, this, &AArenaCharacter::EquipWeapon, Duration * 0.75f, false);
 }
 
@@ -976,8 +988,8 @@ void AArenaCharacter::EquipWeapon()
 {
 	//if (Role == ROLE_Authority)
 	//{
-		SetCurrentWeapon();
-		FinishEquipWeapon(CurrentWeapon);
+	//SetCurrentWeapon();	
+	FinishEquipWeapon(CurrentWeapon);
 	//}
 	//else
 	//{
@@ -1000,12 +1012,11 @@ void AArenaCharacter::FinishEquipWeapon(class AArenaWeapon* Weapon)
 
 float AArenaCharacter::UnEquipWeapon()
 {
-	float Duration = FinishUnEquipWeapon(CurrentWeapon);
-	return Duration;
+	return FinishUnEquipWeapon(CurrentWeapon);
 }
 float AArenaCharacter::FinishUnEquipWeapon(class AArenaWeapon* Weapon)
 {
-	float Duration;
+	float Duration = 0.0f;
 	if (Weapon->IsPrimary() == true)
 	{
 		Weapon->SetOwningPawn(this);
@@ -1167,6 +1178,7 @@ void AArenaCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Da
 
 	bReplicateMovement = false;
 	bTearOff = true;
+	//Spawned = false;
 	CharacterAttributes->bIsDying = true;
 
 	if (Role == ROLE_Authority)
@@ -1453,41 +1465,23 @@ void AArenaCharacter::OnRep_LastTakeHitInfo()
 	}
 }
 
-void AArenaCharacter::OnRep_PrimaryWeapon(AArenaWeapon* NewWeapon)
+void AArenaCharacter::OnRep_PrimaryWeapon()
 {
-	PrimaryWeapon->SetPrimary(true);
-	PrimaryWeapon->SetOwningPawn(this);
-	PrimaryWeapon->UnEquip();
-}
-
-void AArenaCharacter::OnRep_SecondaryWeapon(AArenaWeapon* NewWeapon)
-{
-	SecondaryWeapon->SetOwningPawn(this);
-	SecondaryWeapon->UnEquip();
-}
-
-void AArenaCharacter::OnRep_Vault()
-{
-	/*if (bWantsToVault)
+	if (PrimaryWeapon)
 	{
-	OnStartVault(true);
+		PrimaryWeapon->SetPrimary(true);
+		PrimaryWeapon->SetOwningPawn(this);
+		PrimaryWeapon->FinishUnEquip();
 	}
-	else
-	{
-	OnStopVault();
-	}*/
 }
 
-void AArenaCharacter::OnRep_Aim()
+void AArenaCharacter::OnRep_SecondaryWeapon()
 {
-	//if (bWantsToAim)
-	//{
-	//	StartTargeting();
-	//}
-	//else
-	//{
-	//	OnStopTargeting();
-	//}
+	if (SecondaryWeapon)
+	{
+		SecondaryWeapon->SetOwningPawn(this);
+		SecondaryWeapon->FinishUnEquip();
+	}
 }
 
 void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -1500,6 +1494,7 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	DOREPLIFETIME(AArenaCharacter, Busy);
 	DOREPLIFETIME(AArenaCharacter, Peaking);
 	DOREPLIFETIME(AArenaCharacter, ActionQueue);
+	DOREPLIFETIME(AArenaCharacter, CurrentWeapon);
 	DOREPLIFETIME(AArenaCharacter, PrimaryWeapon);
 	DOREPLIFETIME(AArenaCharacter, SecondaryWeapon);
 }

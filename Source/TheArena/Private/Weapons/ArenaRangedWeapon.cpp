@@ -241,6 +241,7 @@ void AArenaRangedWeapon::FireWeapon()
 
 		ShootDir = WeaponRandomStream.VRandCone((ShootDir - Origin).GetSafeNormal(), ConeHalfAngle, ConeHalfAngle);
 
+		SpawnTrailEffect(Hit.ImpactPoint);
 		ServerSpawnProjectile(Origin, ShootDir, Hit);
 	}
 }
@@ -279,6 +280,7 @@ void AArenaRangedWeapon::FinishRecoil(float DeltaSeconds)
 void AArenaRangedWeapon::Reload_Implementation()
 {
 	StopAttack();
+	MyPawn->OnStopTargeting();
 	MyPawn->OnStopPeaking();
 	WeaponState->SetWeaponState(EWeaponState::Reloading);
 	float AnimDuration = PlayWeaponAnimation(WeaponEffects->GetReloadAnim(), WeaponAttributes->GetMotility()) * (1.0f / WeaponAttributes->GetMotility());
@@ -311,6 +313,20 @@ void AArenaRangedWeapon::FinishReload_Implementation()
 }
 
 /////////////////////////////////////////// Aiming Helpers ////////////////////////////////////////// 
+
+void AArenaRangedWeapon::SpawnTrailEffect(const FVector& EndPoint)
+{
+	if (WeaponEffects->GetTrailFX())
+	{
+		const FVector Origin = GetMuzzleLocation();
+
+		UParticleSystemComponent* TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(this, WeaponEffects->GetTrailFX(), Origin);
+		if (TrailPSC)
+		{
+			TrailPSC->SetVectorParameter(WeaponEffects->GetTrailFXParams(), EndPoint);
+		}
+	}
+}
 
 FVector AArenaRangedWeapon::GetCameraAim()
 {

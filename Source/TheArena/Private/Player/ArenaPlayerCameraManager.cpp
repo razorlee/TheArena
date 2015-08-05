@@ -169,7 +169,8 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::HighLeft)
 			{
-				TargetArm = 50.0f;
+				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, -50.0f, 50.0f);
 			}
 		}
@@ -177,6 +178,7 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 		{
 			MyPawn->bUseControllerRotationYaw = false;
 			TargetArm = 150.0f;
+			TargetFOV = NormalFOV;
 			TargetOffset = FVector(0.0f, -50.0f, 50.0f);
 		}
 	}
@@ -187,12 +189,14 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::LowLeft)
 			{
-				TargetArm = 50.0f;
+				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, -50.0f, -20.0f);
 			}
 			else
 			{
-				TargetArm = 50.0f;
+				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 			}
 		}
@@ -200,6 +204,7 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 		{
 			MyPawn->bUseControllerRotationYaw = false;
 			TargetArm = 150.0f;
+			TargetFOV = NormalFOV;
 			TargetOffset = FVector(0.0f, -50.0f, -20.0f);
 		}
 	}
@@ -214,7 +219,8 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::HighRight)
 			{
-				TargetArm = 50.0f;
+				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 			}
 		}
@@ -222,6 +228,7 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 		{
 			MyPawn->bUseControllerRotationYaw = false;
 			TargetArm = 150.0f;
+			TargetFOV = NormalFOV;
 			TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 		}
 	}
@@ -232,12 +239,14 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::LowRight)
 			{
-				TargetArm = 50.0f;
+				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, 50.0f, -20.0f);
 			}
 			else
 			{
-				TargetArm = 50.0f;
+				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 			}
 		}
@@ -245,6 +254,7 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 		{
 			MyPawn->bUseControllerRotationYaw = false;
 			TargetArm = 150.0f;
+			TargetFOV = NormalFOV;
 			TargetOffset = FVector(0.0f, 50.0f, -20.0f);
 		}
 	}

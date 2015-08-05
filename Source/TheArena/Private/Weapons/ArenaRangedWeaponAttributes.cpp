@@ -9,7 +9,7 @@ UArenaRangedWeaponAttributes::UArenaRangedWeaponAttributes()
 	SetIsReplicated(true);
 	bReplicates = true;
 
-	bWantsBeginPlay = true;
+	bWantsInitializeComponent = true;
 
 	DamageType = UDamageType::StaticClass();
 
@@ -19,13 +19,11 @@ UArenaRangedWeaponAttributes::UArenaRangedWeaponAttributes()
 	ZoomFOV = 90.0f;
 	IsExplosive = false;
 	ExplosionRadius = 0.0f;
-
-
 }
 
-void UArenaRangedWeaponAttributes::BeginPlay()
+void UArenaRangedWeaponAttributes::InitializeComponent()
 {
-	Super::BeginPlay();
+	Super::InitializeComponent();
 
 	TotalAmmo = GetCapacity() * 13;
 	CurrentClip = GetCapacity();

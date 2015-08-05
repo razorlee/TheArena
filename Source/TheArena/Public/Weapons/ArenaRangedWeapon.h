@@ -45,6 +45,7 @@ class THEARENA_API AArenaRangedWeapon : public AArenaWeapon
 
 ///////////////////////////////////////// Aiming Helpers /////////////////////////////////////////
 
+	void SpawnTrailEffect(const FVector& EndPoint);
 	FHitResult GetAdjustedAim();
 	FVector GetCameraAim();
 	FVector GetCameraDamageStartLocation(const FVector& AimDir);

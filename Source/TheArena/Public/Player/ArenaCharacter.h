@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ArenaTypes.h"
+#include "ArenaCharacterState.h"
 #include "ArenaDamageType.h"
 #include "GameFramework/Character.h"
 #include "ArenaCharacter.generated.h"
@@ -16,6 +17,7 @@ public:
 	/** spawn inventory, setup initial variables */
 	virtual void PostInitializeComponents() override;
 
+	/** spawn inventory, setup initial variables */
 	virtual void BeginPlay() override;
 
 ////////////////////////////////////////// Input handlers //////////////////////////////////////////
@@ -122,19 +124,19 @@ public:
 	void SetName(const FString& NewName);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	AArenaWeapon* GetCurrentWeapon();
+	class AArenaWeapon* GetCurrentWeapon();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void SetCurrentWeapon();
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	AArenaWeapon* GetPrimaryWeapon();
+	class AArenaWeapon* GetPrimaryWeapon();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void HandlePrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	AArenaWeapon* GetSecondaryWeapon();
+	class AArenaWeapon* GetSecondaryWeapon();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 	UFUNCTION(BlueprintCallable, Category = Weapons)
@@ -157,13 +159,12 @@ public:
 	void AddWeapon(class AArenaWeapon* Weapon);
 	void RemoveWeapon(class AArenaWeapon* Weapon);
 
-	UFUNCTION()
 	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon);
 
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void ToggleCrouch();
 
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void ToggleCover();
 
 	UFUNCTION(NetMultiCast, Reliable)
@@ -182,10 +183,10 @@ public:
 	UFUNCTION(NetMultiCast, Reliable)
 	void StopPeaking();
 
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void ToggleCombat();
 
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void SwapWeapon();
 
 	void EquipWeapon();
@@ -194,14 +195,14 @@ public:
 	float UnEquipWeapon();
 	float FinishUnEquipWeapon(class AArenaWeapon* Weapon);
 
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void StartVault();
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void StopVault();
 
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void StartClimb();
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void StopClimb();
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
@@ -259,6 +260,9 @@ public:
 
 protected:
 
+	UPROPERTY()
+	bool Spawned;
+
 	UPROPERTY(Replicated)
 	FString Name;
 
@@ -282,7 +286,7 @@ protected:
 
 ////////////////////////////////////////// Weapons //////////////////////////////////////////
 
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, Replicated/*ReplicatedUsing = OnRep_CurrentWeapon*/)
 	class AArenaWeapon* CurrentWeapon;
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_PrimaryWeapon)
@@ -340,14 +344,9 @@ protected:
 	void OnRep_LastTakeHitInfo();
 
 	UFUNCTION()
-	void OnRep_PrimaryWeapon(class AArenaWeapon* NewWeapon);
+	void OnRep_PrimaryWeapon();
 	UFUNCTION()
-	void OnRep_SecondaryWeapon(class AArenaWeapon* NewWeapon);
-
-	UFUNCTION()
-	void OnRep_Vault();
-	UFUNCTION()
-	void OnRep_Aim();
+	void OnRep_SecondaryWeapon();
 
 ////////////////////////////////////////////// Server //////////////////////////////////////////////
 
@@ -405,7 +404,7 @@ protected:
 	void ServerSwapWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerInitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon);
+	void ServerInitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);

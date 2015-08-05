@@ -122,8 +122,7 @@ bool ArenaCharacterCan::Crouch(AArenaCharacter* character, AArenaPlayerControlle
 		&& controller->IsGameInputAllowed()
 		&& !character->GetCharacterMovement()->IsFalling()
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Jumping
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
-		&& !character->GetPlayerState()->GetIsNearCover())
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
 	{
 		return true;
 	}
@@ -206,8 +205,7 @@ bool ArenaCharacterCan::Climb(AArenaCharacter* character, AArenaPlayerController
 bool ArenaCharacterCan::Equip(AArenaCharacter* character, AArenaPlayerController* controller)
 {
 	if (controller
-		&& controller->IsGameInputAllowed()
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& controller->IsGameInputAllowed())
 	{
 		return true;
 	}

@@ -22,14 +22,19 @@ public:
 //////////////////////////////////////// Effects ////////////////////////////////////////
 
 	UFUNCTION()
-	bool IsLoopedMuzzleFX();
-	UFUNCTION()
-	void SetLoopedMuzzleFX(bool Value);
-
-	UFUNCTION()
 	UParticleSystem* GetMuzzleFX();
 	UFUNCTION()
 	void SetMuzzleFX(UParticleSystem* Value);
+
+	UFUNCTION()
+	FName GetTrailFXParams();
+	UFUNCTION()
+	void SetTrailFXParams(FName Value);
+
+	UFUNCTION()
+	UParticleSystem* GetTrailFX();
+	UFUNCTION()
+	void SetTrailFX(UParticleSystem* Value);
 
 	UFUNCTION()
 	UParticleSystemComponent* GetMuzzlePSC();
@@ -42,11 +47,6 @@ public:
 	UAudioComponent* GetFireAC();
 	UFUNCTION()
 	void SetFireAC(UAudioComponent* Value);
-
-	UFUNCTION()
-	bool IsLoopedFireSound();
-	UFUNCTION()
-	void SetLoopedFireSound(bool Value);
 
 	UFUNCTION()
 	USoundCue* GetFireStartSound();
@@ -81,11 +81,6 @@ public:
 //////////////////////////////////////// Animations ////////////////////////////////////////
 
 	UFUNCTION()
-	bool IsLoopedFireAnim();
-	UFUNCTION()
-	void SetLoopedFireAnim(bool Value);
-
-	UFUNCTION()
 	bool IsPlayingFireAnim();
 	UFUNCTION()
 	void SetPlayingFireAnim(bool Value);
@@ -110,10 +105,13 @@ protected:
 //////////////////////////////////////// Effects ////////////////////////////////////////
 
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	bool LoopedMuzzleFX;
+	UParticleSystem* MuzzleFX;
 
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	UParticleSystem* MuzzleFX;
+	FName TrailTargetParam;
+
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UParticleSystem* TrailFX;
 
 	UPROPERTY(Transient)
 	UParticleSystemComponent* MuzzlePSC;
@@ -122,9 +120,6 @@ protected:
 
 	UPROPERTY(Transient)
 	UAudioComponent* FireAC;
-
-	UPROPERTY(EditDefaultsOnly, Category = Sound)
-	bool LoopedFireSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
 	USoundCue* FireStartSound;
@@ -145,9 +140,6 @@ protected:
 	USoundCue* MeleeSound;
 
 //////////////////////////////////////// Animations ////////////////////////////////////////
-
-	UPROPERTY(EditDefaultsOnly, Category = Animation)
-	bool LoopedFireAnim;
 
 	UPROPERTY()
 	bool PlayingFireAnim;

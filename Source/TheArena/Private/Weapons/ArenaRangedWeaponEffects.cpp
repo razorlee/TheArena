@@ -27,15 +27,6 @@ void UArenaRangedWeaponEffects::TickComponent( float DeltaTime, ELevelTick TickT
 
 //////////////////////////////////////// Effects ////////////////////////////////////////
 
-bool UArenaRangedWeaponEffects::IsLoopedMuzzleFX()
-{
-	return LoopedMuzzleFX;
-}
-void UArenaRangedWeaponEffects::SetLoopedMuzzleFX(bool Value)
-{
-	LoopedMuzzleFX = Value;
-}
-
 UParticleSystem* UArenaRangedWeaponEffects::GetMuzzleFX()
 {
 	return MuzzleFX;
@@ -43,6 +34,24 @@ UParticleSystem* UArenaRangedWeaponEffects::GetMuzzleFX()
 void UArenaRangedWeaponEffects::SetMuzzleFX(UParticleSystem* Value)
 {
 	MuzzleFX = Value;
+}
+
+FName UArenaRangedWeaponEffects::GetTrailFXParams()
+{
+	return TrailTargetParam;
+}
+void UArenaRangedWeaponEffects::SetTrailFXParams(FName Value)
+{
+	TrailTargetParam = Value;
+}
+
+UParticleSystem* UArenaRangedWeaponEffects::GetTrailFX()
+{
+	return TrailFX;
+}
+void UArenaRangedWeaponEffects::SetTrailFX(UParticleSystem* Value)
+{
+	TrailFX = Value;
 }
 
 UParticleSystemComponent* UArenaRangedWeaponEffects::GetMuzzlePSC()
@@ -63,15 +72,6 @@ UAudioComponent* UArenaRangedWeaponEffects::GetFireAC()
 void UArenaRangedWeaponEffects::SetFireAC(UAudioComponent* Value)
 {
 	FireAC = Value;
-}
-
-bool UArenaRangedWeaponEffects::IsLoopedFireSound()
-{
-	return LoopedFireSound;
-}
-void UArenaRangedWeaponEffects::SetLoopedFireSound(bool Value)
-{
-	LoopedFireSound = Value;
 }
 
 USoundCue* UArenaRangedWeaponEffects::GetFireStartSound()
@@ -129,15 +129,6 @@ void UArenaRangedWeaponEffects::SetMeleeSound(USoundCue* Value)
 }
 
 //////////////////////////////////////// Animations ////////////////////////////////////////
-
-bool UArenaRangedWeaponEffects::IsLoopedFireAnim()
-{
-	return LoopedFireAnim;
-}
-void UArenaRangedWeaponEffects::SetLoopedFireAnim(bool Value)
-{
-	LoopedFireAnim = Value;
-}
 
 bool UArenaRangedWeaponEffects::IsPlayingFireAnim()
 {

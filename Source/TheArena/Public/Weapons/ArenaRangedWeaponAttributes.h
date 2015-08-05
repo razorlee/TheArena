@@ -72,7 +72,7 @@ class THEARENA_API UArenaRangedWeaponAttributes : public UActorComponent
 {
 	GENERATED_BODY()
 
-	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
 
 public:	
 

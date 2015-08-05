@@ -27,9 +27,9 @@ public:
 	void SetMyPawn(AArenaCharacter* Pawn);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	AArenaWeapon* GetCurrentWeapon();
+	FString GetCurrentWeapon();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
-	void SetCurrentWeapon();
+	void SetCurrentWeapon(FString Value);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	TSubclassOf<class AArenaWeapon> GetPrimaryWeaponBP();
@@ -76,8 +76,8 @@ private:
 	UPROPERTY()
 	AArenaCharacter* MyPawn;
 
-	UPROPERTY()
-	class AArenaWeapon* CurrentWeapon;
+	UPROPERTY(EditAnywhere, Replicated, Category = Weapons)
+	FString CurrentWeapon;
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_PrimaryWeapon)
 	class AArenaWeapon* PrimaryWeapon;

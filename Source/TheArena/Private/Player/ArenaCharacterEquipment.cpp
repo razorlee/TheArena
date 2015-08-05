@@ -48,27 +48,13 @@ void UArenaCharacterEquipment::SetMyPawn(AArenaCharacter* Pawn)
 	MyPawn = Pawn;
 }
 
-AArenaWeapon* UArenaCharacterEquipment::GetCurrentWeapon()
+FString UArenaCharacterEquipment::GetCurrentWeapon()
 {
 	return CurrentWeapon;
 }
-void UArenaCharacterEquipment::SetCurrentWeapon()
+void UArenaCharacterEquipment::SetCurrentWeapon(FString Value)
 {
-	if (CurrentWeapon == NULL)
-	{
-		CurrentWeapon = SecondaryWeapon;
-		return;
-	}
-	if (CurrentWeapon == PrimaryWeapon)
-	{
-		CurrentWeapon = SecondaryWeapon;
-		return;
-	}
-	if (CurrentWeapon == SecondaryWeapon)
-	{
-		CurrentWeapon = PrimaryWeapon;
-		return;
-	}
+	CurrentWeapon = Value;
 }
 
 TSubclassOf<class AArenaWeapon> UArenaCharacterEquipment::GetPrimaryWeaponBP()
@@ -145,6 +131,7 @@ void UArenaCharacterEquipment::GetLifetimeReplicatedProps(TArray< FLifetimePrope
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
+	DOREPLIFETIME(UArenaCharacterEquipment, CurrentWeapon);
 	DOREPLIFETIME(UArenaCharacterEquipment, PrimaryWeapon);
 	DOREPLIFETIME(UArenaCharacterEquipment, PrimaryWeaponBP);
 	DOREPLIFETIME(UArenaCharacterEquipment, SecondaryWeapon);
