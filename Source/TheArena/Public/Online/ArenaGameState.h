@@ -17,19 +17,19 @@ class AArenaGameState : public AGameState
 public:
 
 	/** number of teams in current game */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
 	int32 NumTeams;
 
 	/** accumulated score per team */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
 	TArray<int32> TeamScores;
 
 	/** time left for warmup / match */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
 	int32 RemainingTime;
 
 	/** is timer paused? */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
 	bool bTimerPaused;
 
 	/** gets ranked PlayerState map for specific team */

@@ -144,11 +144,6 @@ public:
 	void SetHasScope(bool Value);
 
 	UFUNCTION(BlueprintCallable, Category = Config)
-	float GetZoomDistance();
-	UFUNCTION(BlueprintCallable, Category = Config)
-	void SetZoomDistance(float Value);
-
-	UFUNCTION(BlueprintCallable, Category = Config)
 	float GetZoomFOV();
 	UFUNCTION(BlueprintCallable, Category = Config)
 	void SetZoomFOV(float Value);
@@ -182,9 +177,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	bool HasScope;
-
-	UPROPERTY(EditDefaultsOnly, Category = Config, meta = (EditCondition = "HasScope", ClampMin = "-1000", ClampMax = "50", UIMin = "-1000", UIMax = "50"))
-	float ZoomDistance;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config, meta = (EditCondition = "HasScope", ClampMin = "10", ClampMax = "90", UIMin = "10", UIMax = "90"))
 	float ZoomFOV;

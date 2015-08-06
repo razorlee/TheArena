@@ -52,7 +52,6 @@ void AArenaGameState::GetRankedMap(int32 TeamIndex, RankedPlayerMap& OutRankedMa
 
 }
 
-
 void AArenaGameState::RequestFinishAndExitToMainMenu()
 {
 	if (AuthorityGameMode)

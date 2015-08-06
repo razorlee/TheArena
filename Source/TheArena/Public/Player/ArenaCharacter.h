@@ -86,6 +86,12 @@ public:
 	/** [server] perform PlayerState related setup */
 	virtual void PossessedBy(class AController* C) override;
 
+	/** handle mesh colors on specified material instance */
+	void UpdateTeamColors(UMaterialInstanceDynamic* UseMID);
+
+	/** Update the team color of all player meshes. */
+	void UpdateTeamColorsAllMIDs();
+
 	/** get aim offsets */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	FRotator GetAimOffsets() const;
@@ -339,6 +345,9 @@ protected:
 	virtual void PreReplication(IRepChangedPropertyTracker & ChangedPropertyTracker) override;
 
 	void ReplicateHit(float Damage, struct FDamageEvent const& DamageEvent, class APawn* InstigatingPawn, class AActor* DamageCauser, bool bKilled);
+
+	/** [client] perform PlayerState related setup */
+	virtual void OnRep_PlayerState() override;
 
 	UFUNCTION()
 	void OnRep_LastTakeHitInfo();

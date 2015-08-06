@@ -97,8 +97,14 @@ void AArenaCharacter::PostInitializeComponents()
 	}
 
 	CharacterState->Reset();
-
 	UpdatePawnMeshes();
+
+	// create material instance for setting team colors (3rd person view)
+	for (int32 iMat = 0; iMat < GetMesh()->GetNumMaterials(); iMat++)
+	{
+		MeshMIDs.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(iMat));
+	}
+
 	if (GetNetMode() != NM_DedicatedServer)
 	{
 		if (RespawnFX)
@@ -554,12 +560,39 @@ void AArenaCharacter::PawnClientRestart()
 	Super::PawnClientRestart();
 
 	UpdatePawnMeshes();
+
+	// set team colors for 1st person view
+	UMaterialInstanceDynamic* Mesh1PMID = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
+	UpdateTeamColors(Mesh1PMID);
 }
 
 void AArenaCharacter::PossessedBy(class AController* InController)
 {
 	Super::PossessedBy(InController);
 
+	// [server] as soon as PlayerState is assigned, set team colors of this pawn for local player
+	UpdateTeamColorsAllMIDs();
+}
+
+void AArenaCharacter::UpdateTeamColorsAllMIDs()
+{
+	for (int32 i = 0; i < MeshMIDs.Num(); ++i)
+	{
+		UpdateTeamColors(MeshMIDs[i]);
+	}
+}
+
+void AArenaCharacter::UpdateTeamColors(UMaterialInstanceDynamic* UseMID)
+{
+	if (UseMID)
+	{
+		AArenaPlayerState* MyPlayerState = Cast<AArenaPlayerState>(PlayerState);
+		if (MyPlayerState != NULL)
+		{
+			float MaterialParam = (float)MyPlayerState->GetTeamNum();
+			UseMID->SetScalarParameterValue(TEXT("Team Color Index"), MaterialParam);
+		}
+	}
 }
 
 FRotator AArenaCharacter::GetAimOffsets() const
@@ -966,6 +999,7 @@ void AArenaCharacter::ToggleCombat_Implementation()
 	if (CharacterState->GetCombatState() == ECombatState::Passive)
 	{
 		CharacterState->SetCombatState(ECombatState::Aggressive);
+		GetCharacterMovement()->bOrientRotationToMovement = false;
 		SetCurrentWeapon();
 		EquipWeapon();
 		//CharacterEquipment->GetCurrentWeapon()->SetRole(Role);
@@ -973,6 +1007,7 @@ void AArenaCharacter::ToggleCombat_Implementation()
 	else
 	{
 		CharacterState->SetCombatState(ECombatState::Passive);
+		GetCharacterMovement()->bOrientRotationToMovement = true;
 		UnEquipWeapon();
 	}
 }
@@ -1160,7 +1195,7 @@ bool AArenaCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, 
 	Killer = GetDamageInstigator(Killer, *DamageType);
 
 	AController* const KilledPlayer = (Controller != NULL) ? Controller : Cast<AController>(GetOwner());
-	//GetWorld()->GetAuthGameMode<AArenaGameMode>()->Killed(Killer, KilledPlayer, this, DamageType);
+	GetWorld()->GetAuthGameMode<ATheArenaGameMode>()->Killed(Killer, KilledPlayer, this, DamageType);
 
 	NetUpdateFrequency = GetDefault<AArenaCharacter>()->NetUpdateFrequency;
 	GetCharacterMovement()->ForceReplicationUpdate();
@@ -1451,6 +1486,17 @@ void AArenaCharacter::ReplicateHit(float Damage, struct FDamageEvent const& Dama
 	LastTakeHitInfo.EnsureReplication();
 
 	LastTakeHitTimeTimeout = TimeoutTime;
+}
+
+void AArenaCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	// [client] as soon as PlayerState is assigned, set team colors of this pawn for local player
+	if (PlayerState != NULL)
+	{
+		UpdateTeamColorsAllMIDs();
+	}
 }
 
 void AArenaCharacter::OnRep_LastTakeHitInfo()

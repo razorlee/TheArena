@@ -68,26 +68,26 @@ void AArenaPlayerState::SetQuitter(bool bInQuitter)
 	bQuitter = bInQuitter;
 }
 
-//void AArenaPlayerState::CopyProperties(APlayerState* PlayerState)
-//{
-//	Super::CopyProperties(PlayerState);
-//
-//	AArenaPlayerState* ShooterPlayer = Cast<AArenaPlayerState>(PlayerState);
-//	if (ShooterPlayer)
-//	{
-//		ShooterPlayer->TeamNumber = TeamNumber;
-//	}
-//}
+void AArenaPlayerState::CopyProperties(APlayerState* PlayerState)
+{
+	Super::CopyProperties(PlayerState);
+
+	AArenaPlayerState* ArenaPlayer = Cast<AArenaPlayerState>(PlayerState);
+	if (ArenaPlayer)
+	{
+		ArenaPlayer->TeamNumber = TeamNumber;
+	}
+}
 
 void AArenaPlayerState::UpdateTeamColors()
 {
 	AController* OwnerController = Cast<AController>(GetOwner());
 	if (OwnerController != NULL)
 	{
-		AArenaCharacter* ShooterCharacter = Cast<AArenaCharacter>(OwnerController->GetCharacter());
-		if (ShooterCharacter != NULL)
+		AArenaCharacter* ArenaCharacter = Cast<AArenaCharacter>(OwnerController->GetCharacter());
+		if (ArenaCharacter != NULL)
 		{
-			//ShooterCharacter->UpdateTeamColorsAllMIDs();
+			ArenaCharacter->UpdateTeamColorsAllMIDs();
 		}
 	}
 }

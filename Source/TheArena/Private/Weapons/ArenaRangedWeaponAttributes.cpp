@@ -15,7 +15,6 @@ UArenaRangedWeaponAttributes::UArenaRangedWeaponAttributes()
 
 	ShotgunPellets = 1;
 	HasScope = false;
-	ZoomDistance = 50.0f;
 	ZoomFOV = 90.0f;
 	IsExplosive = false;
 	ExplosionRadius = 0.0f;
@@ -127,15 +126,6 @@ bool UArenaRangedWeaponAttributes::GetHasScope()
 void UArenaRangedWeaponAttributes::SetHasScope(bool Value)
 {
 	HasScope = Value;
-}
-
-float UArenaRangedWeaponAttributes::GetZoomDistance()
-{
-	return ZoomDistance;
-}
-void UArenaRangedWeaponAttributes::SetZoomDistance(float Value)
-{
-	ZoomDistance = Value;
 }
 
 float UArenaRangedWeaponAttributes::GetZoomFOV()

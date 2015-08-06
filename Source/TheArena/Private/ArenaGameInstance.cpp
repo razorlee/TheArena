@@ -36,7 +36,7 @@ bool UArenaGameInstance::HostGame(ULocalPlayer* LocalPlayer, const FString& Game
 		bool const bIsLanMatch = InTravelURL.Contains(TEXT("?bIsLanMatch"));
 
 		//determine the map name from the travelURL
-		const FString& MapNameSubStr = "/Game/Mapss/";
+		const FString& MapNameSubStr = "/Game/Maps/";
 		const FString& ChoppedMapName = TravelURL.RightChop(MapNameSubStr.Len());
 		const FString& MapName = ChoppedMapName.LeftChop(ChoppedMapName.Len() - ChoppedMapName.Find("?game"));
 

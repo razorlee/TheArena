@@ -20,8 +20,9 @@ ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	GameStateClass = AArenaGameState::StaticClass();
 
 	MinRespawnDelay = 5.0f;
+
+	bAllowBots = false;
 	bUseSeamlessTravel = true;
-	bAllowBots = true;
 }
 
 FString ATheArenaGameMode::GetBotsCountOptionName()
@@ -33,8 +34,13 @@ void ATheArenaGameMode::InitGame(const FString& MapName, const FString& Options,
 {
 	const int32 BotsCountOptionValue = GetIntOption(Options, GetBotsCountOptionName(), 0);
 	SetAllowBots(BotsCountOptionValue > 0 ? true : false, BotsCountOptionValue);
-
 	Super::InitGame(MapName, Options, ErrorMessage);
+
+	const UGameInstance* GameInstance = GetGameInstance();
+	if (GameInstance && Cast<UArenaGameInstance>(GameInstance)->GetIsOnline())
+	{
+		bPauseable = false;
+	}
 }
 
 void ATheArenaGameMode::SetAllowBots(bool bInAllowBots, int32 InMaxBots)
@@ -49,10 +55,15 @@ TSubclassOf<AGameSession> ATheArenaGameMode::GetGameSessionClass() const
 	return AArenaGameSession::StaticClass();
 }
 
+void ATheArenaGameMode::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+
+	GetWorldTimerManager().SetTimer(TimerHandle_DefaultTimer, this, &ATheArenaGameMode::DefaultTimer, GetWorldSettings()->GetEffectiveTimeDilation(), true);
+}
+
 void ATheArenaGameMode::DefaultTimer()
 {
-	//SSuper::DefaultTimer();
-
 	// don't update timers for Play In Editor mode, it's not real match
 	if (GetWorld()->IsPlayInEditor())
 	{
@@ -67,9 +78,27 @@ void ATheArenaGameMode::DefaultTimer()
 	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
 	if (MyGameState && MyGameState->RemainingTime > 0 && !MyGameState->bTimerPaused)
 	{
-		MyGameState->RemainingTime;//--;
+		MyGameState->RemainingTime--;
 
-		if (MyGameState->RemainingTime <= 0)
+		int32 BestScore = MAX_uint32;
+		int32 BestTeam = -1;
+		int32 NumBestTeams = 1;
+		for (int32 i = 0; i < MyGameState->TeamScores.Num(); i++)
+		{
+			const int32 TeamScore = MyGameState->TeamScores[i];
+			if (BestScore < TeamScore)
+			{
+				BestScore = TeamScore;
+				BestTeam = i;
+				NumBestTeams = 1;
+			}
+			else if (BestScore == TeamScore)
+			{
+				NumBestTeams++;
+			}
+		}
+
+		if (MyGameState->RemainingTime <= 0 || BestScore >= RoundKillLimit)
 		{
 			if (GetMatchState() == MatchState::WaitingPostMatch)
 			{
@@ -78,6 +107,20 @@ void ATheArenaGameMode::DefaultTimer()
 			else if (GetMatchState() == MatchState::InProgress)
 			{
 				FinishMatch();
+
+				// Send end round events
+				for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+				{
+					AArenaPlayerController* PlayerController = Cast<AArenaPlayerController>(*It);
+
+					if (PlayerController && MyGameState)
+					{
+						AArenaPlayerState* PlayerState = Cast<AArenaPlayerState>((*It)->PlayerState);
+						const bool bIsWinner = IsWinner(PlayerState);
+
+						//PlayerController->ClientSendRoundEndEvent(bIsWinner, MyGameState->ElapsedTime);
+					}
+				}
 			}
 			else if (GetMatchState() == MatchState::WaitingToStart)
 			{
@@ -92,11 +135,7 @@ void ATheArenaGameMode::HandleMatchHasStarted()
 	Super::HandleMatchHasStarted();
 
 	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
-
 	MyGameState->RemainingTime = RoundTime;
-	if (bAllowBots)
-	{
-	}
 
 	// notify players
 	for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
@@ -107,9 +146,27 @@ void ATheArenaGameMode::HandleMatchHasStarted()
 			PC->ClientGameStarted();
 		}
 	}
+}
 
-	// probably needs to be done somewhere else when Arenagame goes multiplayer
-	TriggerRoundStartForLocalPlayers();
+void ATheArenaGameMode::HandleMatchIsWaitingToStart()
+{
+	if (bDelayedStart)
+	{
+		// start warmup if needed
+		AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
+		if (MyGameState && MyGameState->RemainingTime == 0)
+		{
+			const bool bWantsMatchWarmup = !GetWorld()->IsPlayInEditor();
+			if (bWantsMatchWarmup && WarmupTime > 0)
+			{
+				MyGameState->RemainingTime = WarmupTime;
+			}
+			else
+			{
+				MyGameState->RemainingTime = 0.0f;
+			}
+		}
+	}
 }
 
 void ATheArenaGameMode::FinishMatch()
@@ -129,13 +186,12 @@ void ATheArenaGameMode::FinishMatch()
 			(*It)->GameHasEnded(NULL, bIsWinner);
 		}
 
-		// probably needs to be done somewhere else when Arenagame goes multiplayer
-		TriggerRoundEndForLocalPlayers();
-
 		// lock all pawns
+		// pawns are not marked as keep for seamless travel, so we will create new pawns on the next match rather than
+		// turning these back on.
 		for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; ++It)
 		{
-			(*It)->TurnOff();
+			//(*It)->TurnOff();
 		}
 
 		// set up to restart the match
@@ -143,90 +199,29 @@ void ATheArenaGameMode::FinishMatch()
 	}
 }
 
-void ATheArenaGameMode::TriggerRoundStartForLocalPlayers()
-{
-	// Send start match event, this will set the CurrentMap stat.
-	const auto Events = Online::GetEventsInterface();
-	const auto Identity = Online::GetIdentityInterface();
-
-	if (Events.IsValid() && Identity.IsValid())
-	{
-		// notify players
-		for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
-		{
-			AArenaPlayerController* PC = Cast<AArenaPlayerController>(*It);
-			ULocalPlayer* LocalPlayer = PC ? Cast<ULocalPlayer>(PC->Player) : nullptr;
-			if (LocalPlayer)
-			{
-				int32 UserIndex = LocalPlayer->GetControllerId();
-				if (UserIndex != -1)
-				{
-					FOnlineEventParms Params;
-					Params.Add(TEXT("GameplayModeId"), FVariantData((int32)1));
-					Params.Add(TEXT("DifficultyLevelId"), FVariantData((int32)0));
-
-					if (PC->PlayerState->UniqueId.IsValid())
-					{
-						Events->TriggerEvent(*PC->PlayerState->UniqueId, TEXT("PlayerSessionStart"), Params);
-					}
-				}
-			}
-		}
-	}
-}
-
-void ATheArenaGameMode::TriggerRoundEndForLocalPlayers()
-{
-	// Send start match event, this will set the CurrentMap stat.
-	const auto Events = Online::GetEventsInterface();
-	const auto Identity = Online::GetIdentityInterface();
-
-	FOnlineEventParms Params;
-	FString MapName = *FPackageName::GetShortName(GetWorld()->PersistentLevel->GetOutermost()->GetName());
-
-	if (Events.IsValid() && Identity.IsValid())
-	{
-		// notify players
-		for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
-		{
-			AArenaPlayerController* PC = Cast<AArenaPlayerController>(*It);
-			ULocalPlayer* LocalPlayer = PC ? Cast<ULocalPlayer>(PC->Player) : nullptr;
-			if (LocalPlayer)
-			{
-				int32 UserIndex = LocalPlayer->GetControllerId();
-				if (UserIndex != -1)
-				{
-					// round end
-					{
-						FOnlineEventParms Params;
-						Params.Add(TEXT("GameplayModeId"), FVariantData((int32)1));
-						Params.Add(TEXT("DifficultyLevelId"), FVariantData((int32)0));
-						Params.Add(TEXT("ExitStatusId"), FVariantData((int32)0));
-
-						if (PC->PlayerState->UniqueId.IsValid())
-						{
-							Events->TriggerEvent(*PC->PlayerState->UniqueId, TEXT("PlayerSessionEnd"), Params);
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
 void ATheArenaGameMode::RequestFinishAndExitToMainMenu()
 {
-	FString RemoteReturnReason = NSLOCTEXT("NetworkErrors", "HostHasLeft", "Host has left the game.").ToString();
-	FString LocalReturnReason(TEXT(""));
-
 	FinishMatch();
 
-	APlayerController* LocalPrimaryController = nullptr;
+	UArenaGameInstance* const GameInstance = Cast<UArenaGameInstance>(GetGameInstance());
+	if (GameInstance)
+	{
+		//GameInstance->RemoveSplitScreenPlayers();
+	}
+
+	AArenaPlayerController* LocalPrimaryController = nullptr;
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-		APlayerController* Controller = *Iterator;
-		if (Controller && !Controller->IsLocalController())
+		AArenaPlayerController* Controller = Cast<AArenaPlayerController>(*Iterator);
+
+		if (Controller == NULL)
 		{
+			continue;
+		}
+
+		if (!Controller->IsLocalController())
+		{
+			const FString RemoteReturnReason = NSLOCTEXT("NetworkErrors", "HostHasLeft", "Host has left the game.").ToString();
 			Controller->ClientReturnToMainMenu(RemoteReturnReason);
 		}
 		else
@@ -235,9 +230,10 @@ void ATheArenaGameMode::RequestFinishAndExitToMainMenu()
 		}
 	}
 
+	// GameInstance should be calling this from an EndState.  So call the PC function that performs cleanup, not the one that sets GI state.
 	if (LocalPrimaryController != NULL)
 	{
-		LocalPrimaryController->ClientReturnToMainMenu(LocalReturnReason);
+		//LocalPrimaryController->HandleReturnToMainMenu();
 	}
 }
 
@@ -253,15 +249,18 @@ bool ATheArenaGameMode::IsWinner(class AArenaPlayerState* PlayerState) const
 
 void ATheArenaGameMode::PreLogin(const FString& Options, const FString& Address, const TSharedPtr<FUniqueNetId>& UniqueId, FString& ErrorMessage)
 {
-	Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
-
 	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
 	const bool bMatchIsOver = MyGameState && MyGameState->HasMatchEnded();
-	const FString EndGameError = TEXT("Match is over!");
-
-	ErrorMessage = bMatchIsOver ? *EndGameError : GameSession->ApproveLogin(Options);
+	if (bMatchIsOver)
+	{
+		ErrorMessage = TEXT("Match is over!");
+	}
+	else
+	{
+		// GameSession can be NULL if the match is over
+		Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
+	}
 }
-
 
 void ATheArenaGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -269,20 +268,9 @@ void ATheArenaGameMode::PostLogin(APlayerController* NewPlayer)
 
 	// update spectator location for client
 	AArenaPlayerController* NewPC = Cast<AArenaPlayerController>(NewPlayer);
-
-	// start warmup if needed
-	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
-	if (MyGameState && MyGameState->RemainingTime == 0)
+	if (NewPC && NewPC->GetPawn() == NULL)
 	{
-		const bool bWantsMatchWarmup = !GetWorld()->IsPlayInEditor();
-		if (bWantsMatchWarmup && WarmupTime > 0)
-		{
-			MyGameState->RemainingTime = WarmupTime;
-		}
-		else
-		{
-			MyGameState->RemainingTime = 0.0f;
-		}
+		//NewPC->ClientSetSpectatorCamera(NewPC->GetSpawnLocation(), NewPC->GetControlRotation());
 	}
 
 	// notify new player if match is already in progress
@@ -300,13 +288,14 @@ void ATheArenaGameMode::Killed(AController* Killer, AController* KilledPlayer, A
 
 	if (KillerPlayerState && KillerPlayerState != VictimPlayerState)
 	{
-		//KillerPlayerState->ScoreKill(VictimPlayerState, KillScore);
-		//KillerPlayerState->InformAboutKill(KillerPlayerState, DamageType, VictimPlayerState);
+		KillerPlayerState->ScoreKill(VictimPlayerState, KillScore);
+		KillerPlayerState->InformAboutKill(KillerPlayerState, DamageType, VictimPlayerState);
 	}
 
 	if (VictimPlayerState)
 	{
-		//VictimPlayerState->ScoreDeath(KillerPlayerState, DeathScore);
+		VictimPlayerState->ScoreDeath(KillerPlayerState, DeathScore);
+		VictimPlayerState->BroadcastDeath(KillerPlayerState, DamageType, VictimPlayerState);
 	}
 }
 
@@ -351,68 +340,76 @@ bool ATheArenaGameMode::ShouldSpawnAtStartSpot(AController* Player)
 	return false;
 }
 
-UClass* ATheArenaGameMode::GetDefaultPawnClassForController(AController* InController)
+UClass* ATheArenaGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
 {
-	return Super::GetDefaultPawnClassForController(InController);
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
 }
 
-AActor* ATheArenaGameMode::ChoosePlayerStart(AController* Player)
+AActor* ATheArenaGameMode::ChoosePlayerStart_Implementation(AController* Player)
 {
 	TArray<APlayerStart*> PreferredSpawns;
 	TArray<APlayerStart*> FallbackSpawns;
 
-	//for (int32 i = 0; i < PlayerStarts.Num(); i++)
-	//{
-	//	APlayerStart* TestSpawn = PlayerStarts[i];
-	//	if (IsSpawnpointAllowed(TestSpawn, Player))
-	//	{
-	//		if (IsSpawnpointPreferred(TestSpawn, Player))
-	//		{
-	//			PreferredSpawns.Add(TestSpawn);
-	//		}
-	//		else
-	//		{
-	//			FallbackSpawns.Add(TestSpawn);
-	//		}
-	//	}
-	//}
-
 	APlayerStart* BestStart = NULL;
-	if (PreferredSpawns.Num() > 0)
+	for (TActorIterator<APlayerStart> It(GetWorld()); It; ++It)
 	{
-		BestStart = PreferredSpawns[FMath::RandHelper(PreferredSpawns.Num())];
-	}
-	else if (FallbackSpawns.Num() > 0)
-	{
-		BestStart = FallbackSpawns[FMath::RandHelper(FallbackSpawns.Num())];
+		APlayerStart* TestSpawn = *It;
+		if (TestSpawn->IsA<APlayerStartPIE>())
+		{
+			// Always prefer the first "Play from Here" PlayerStart, if we find one while in PIE mode
+			BestStart = TestSpawn;
+			break;
+		}
+		else
+		{
+			if (IsSpawnpointAllowed(TestSpawn, Player))
+			{
+				if (IsSpawnpointPreferred(TestSpawn, Player))
+				{
+					PreferredSpawns.Add(TestSpawn);
+				}
+				else
+				{
+					FallbackSpawns.Add(TestSpawn);
+				}
+			}
+		}
 	}
 
-	return BestStart ? BestStart : Super::ChoosePlayerStart(Player);
+
+	if (BestStart == NULL)
+	{
+		if (PreferredSpawns.Num() > 0)
+		{
+			BestStart = PreferredSpawns[FMath::RandHelper(PreferredSpawns.Num())];
+		}
+		else if (FallbackSpawns.Num() > 0)
+		{
+			BestStart = FallbackSpawns[FMath::RandHelper(FallbackSpawns.Num())];
+		}
+	}
+
+	return BestStart ? BestStart : Super::ChoosePlayerStart_Implementation(Player);
 }
 
 bool ATheArenaGameMode::IsSpawnpointAllowed(APlayerStart* SpawnPoint, AController* Player) const
 {
-	/*AArenaTeamStart* ArenaSpawnPoint = Cast<AArenaTeamStart>(SpawnPoint);
+	AArenaTeamStart* ArenaSpawnPoint = Cast<AArenaTeamStart>(SpawnPoint);
 	if (ArenaSpawnPoint)
 	{
-		AArenaAIController* AIController = Cast<AArenaAIController>(Player);
-		if (ArenaSpawnPoint->bNotForBots && AIController)
+		if (ArenaSpawnPoint->bNotForPlayers)
 		{
 			return false;
 		}
-
-		if (ArenaSpawnPoint->bNotForPlayers && AIController == NULL)
-		{
-			return false;
-		}
-	}*/
+		return true;
+	}
 
 	return false;
 }
 
 bool ATheArenaGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AController* Player) const
 {
-	ACharacter* MyPawn = Player ? Cast<ACharacter>(Player->GetPawn()) : NULL;
+	ACharacter* MyPawn = Cast<ACharacter>((*DefaultPawnClass)->GetDefaultObject<ACharacter>());
 	if (MyPawn)
 	{
 		const FVector SpawnLocation = SpawnPoint->GetActorLocation();
@@ -433,7 +430,15 @@ bool ATheArenaGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AControl
 			}
 		}
 	}
+	else
+	{
+		return false;
+	}
 
 	return true;
 }
 
+void ATheArenaGameMode::RestartGame()
+{
+	Super::RestartGame();
+}

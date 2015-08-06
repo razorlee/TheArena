@@ -104,7 +104,7 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 
 void AArenaPlayerCameraManager::HandleTargetingCamera()
 {
-	TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+	TargetArm = 50.0f;
 	TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 	TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 }
@@ -169,7 +169,7 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::HighLeft)
 			{
-				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetArm = 50.0f;
 				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, -50.0f, 50.0f);
 			}
@@ -189,13 +189,13 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::LowLeft)
 			{
-				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetArm = 50.0f;
 				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, -50.0f, -20.0f);
 			}
 			else
 			{
-				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetArm = 50.0f;
 				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 			}
@@ -219,7 +219,7 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::HighRight)
 			{
-				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetArm = 50.0f;
 				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 			}
@@ -239,13 +239,13 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::LowRight)
 			{
-				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetArm = 50.0f;
 				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, 50.0f, -20.0f);
 			}
 			else
 			{
-				TargetArm = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomDistance();
+				TargetArm = 50.0f;
 				TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 				TargetOffset = FVector(0.0f, 50.0f, 50.0f);
 			}

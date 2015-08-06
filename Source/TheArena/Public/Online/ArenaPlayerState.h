@@ -82,8 +82,7 @@ class THEARENA_API AArenaPlayerState : public APlayerState
 	/** Set whether the player is a quitter */
 	void SetQuitter(bool bInQuitter);
 
-	//virtual void CopyProperties(class APlayerState* PlayerState) override;
-
+	virtual void CopyProperties(class APlayerState* PlayerState) override;
 protected:
 
 	/** Set the mesh colors based on the current teamnum variable */

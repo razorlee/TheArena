@@ -18,6 +18,8 @@ class ATheArenaGameMode : public AGameMode
 	UFUNCTION(exec)
 	void SetAllowBots(bool bInAllowBots, int32 InMaxBots = 8);
 
+	virtual void PreInitializeComponents() override;
+
 	/** Initialize the game. This is called before actors' PreInitializeComponents. */
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
@@ -31,13 +33,13 @@ class ATheArenaGameMode : public AGameMode
 	//TSubclassOf<class AHUD> ArenaHUD;
 
 	/** select best spawn point for player */
-	virtual AActor* ChoosePlayerStart(AController* Player);
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 	/** always pick new random spawn */
 	virtual bool ShouldSpawnAtStartSpot(AController* Player) override;
 
 	/** returns default pawn class for given controller */
-	virtual UClass* GetDefaultPawnClassForController(AController* InController);
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 
 	/** prevents friendly fire */
 	virtual float ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const;
@@ -54,8 +56,13 @@ class ATheArenaGameMode : public AGameMode
 	/** update remaining time */
 	virtual void DefaultTimer();
 
+	virtual void HandleMatchIsWaitingToStart() override;
+
 	/** starts new match */
 	virtual void HandleMatchHasStarted() override;
+
+	/** hides the onscreen hud and restarts the map */
+	virtual void RestartGame() override;
 
 	/** spawns default bot */
 	class AArenaAI* SpawnBot(FVector SpawnLocation, FRotator SpawnRotation);
@@ -69,6 +76,10 @@ protected:
 	/** match duration */
 	UPROPERTY(config)
 	int32 RoundTime;
+
+	/** match kills to win */
+	UPROPERTY(config)
+	int32 RoundKillLimit;
 
 	UPROPERTY(config)
 	int32 TimeBetweenMatches;
@@ -91,13 +102,10 @@ protected:
 	//UPROPERTY()
 	//TArray<AArenaAIController*> BotControllers;
 
+	/** Handle for efficient management of DefaultTimer timer */
+	FTimerHandle TimerHandle_DefaultTimer;
+
 	bool bAllowBots;
-
-	/** Triggers round start event for local players. Needs revising when shootergame goes multiplayer */
-	void TriggerRoundStartForLocalPlayers();
-
-	/** Triggers round end event for local players. Needs revising when shootergame goes multiplayer */
-	void TriggerRoundEndForLocalPlayers();
 
 	/** check who won */
 	virtual void DetermineMatchWinner();

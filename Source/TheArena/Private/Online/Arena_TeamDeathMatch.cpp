@@ -1,4 +1,4 @@
-	// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TheArena.h"
 
@@ -14,7 +14,7 @@ void AArena_TeamDeathMatch::PostLogin(APlayerController* NewPlayer)
 	// Place player on a team before Super (VoIP team based init, findplayerstart, etc)
 	AArenaPlayerState* NewPlayerState = CastChecked<AArenaPlayerState>(NewPlayer->PlayerState);
 	const int32 TeamNum = ChooseTeam(NewPlayerState);
-	//NewPlayerState->SetTeamNum(TeamNum);
+	NewPlayerState->SetTeamNum(TeamNum);
 
 	Super::PostLogin(NewPlayer);
 }
@@ -32,7 +32,7 @@ void AArena_TeamDeathMatch::InitGameState()
 
 bool AArena_TeamDeathMatch::CanDealDamage(class AArenaPlayerState* DamageInstigator, class AArenaPlayerState* DamagedPlayer) const
 {
-	return DamageInstigator && DamagedPlayer && (DamagedPlayer == DamageInstigator); //|| DamagedPlayer->GetTeamNum() != DamageInstigator->GetTeamNum());
+	return true;//DamageInstigator && DamagedPlayer && (DamagedPlayer == DamageInstigator || DamagedPlayer->GetTeamNum() != DamageInstigator->GetTeamNum());
 }
 
 int32 AArena_TeamDeathMatch::ChooseTeam(AArenaPlayerState* ForPlayerState) const
@@ -44,9 +44,9 @@ int32 AArena_TeamDeathMatch::ChooseTeam(AArenaPlayerState* ForPlayerState) const
 	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
 	{
 		AArenaPlayerState const* const TestPlayerState = Cast<AArenaPlayerState>(GameState->PlayerArray[i]);
-		if (TestPlayerState && TestPlayerState != ForPlayerState) //&& TeamBalance.IsValidIndex(TestPlayerState->GetTeamNum()))
+		if (TestPlayerState && TestPlayerState != ForPlayerState && TeamBalance.IsValidIndex(TestPlayerState->GetTeamNum()))
 		{
-			//TeamBalance[TestPlayerState->GetTeamNum()]++;
+			TeamBalance[TestPlayerState->GetTeamNum()]++;
 		}
 	}
 
@@ -102,7 +102,7 @@ void AArena_TeamDeathMatch::DetermineMatchWinner()
 
 bool AArena_TeamDeathMatch::IsWinner(class AArenaPlayerState* PlayerState) const
 {
-	return true; //PlayerState; //&& PlayerState->GetTeamNum() == WinnerTeam;
+	return PlayerState && PlayerState->GetTeamNum() == WinnerTeam;
 }
 
 bool AArena_TeamDeathMatch::IsSpawnpointAllowed(APlayerStart* SpawnPoint, AController* Player) const
@@ -112,12 +112,11 @@ bool AArena_TeamDeathMatch::IsSpawnpointAllowed(APlayerStart* SpawnPoint, AContr
 		AArenaTeamStart* TeamStart = Cast<AArenaTeamStart>(SpawnPoint);
 		AArenaPlayerState* PlayerState = Cast<AArenaPlayerState>(Player->PlayerState);
 
-		if (PlayerState && TeamStart) //&& TeamStart->SpawnTeam != PlayerState->GetTeamNum())
+		if (PlayerState && TeamStart && TeamStart->SpawnTeam != PlayerState->GetTeamNum())
 		{
 			return false;
 		}
 	}
-
 	return Super::IsSpawnpointAllowed(SpawnPoint, Player);
 }
 
