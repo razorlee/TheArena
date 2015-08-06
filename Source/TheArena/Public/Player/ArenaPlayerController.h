@@ -11,6 +11,11 @@ class THEARENA_API AArenaPlayerController : public APlayerController
 	GENERATED_UCLASS_BODY()
 
 public:
+
+	/** sets spectator location and rotation */
+	UFUNCTION(reliable, client)
+	void ClientSetSpectatorCamera(FVector CameraLocation, FRotator CameraRotation);
+
 	/** Delegate for starting a session */
 	FOnEndSessionCompleteDelegate OnStartSessionCompleteEndItDelegate;
 
@@ -31,6 +36,14 @@ public:
 	/** Ends the online game using the session name in the PlayerState */
 	UFUNCTION(reliable, client)
 	void ClientEndOnlineGame();
+
+	/** Notifies clients to send the end-of-round event */
+	UFUNCTION(reliable, client)
+	void ClientSendRoundEndEvent(bool bIsWinner, int32 ExpendedTimeInSeconds);
+
+	/** used for input simulation from blueprint (for automatic perf tests) */
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void SimulateInputKey(FKey Key, bool bPressed = true);
 
 	virtual void ClientGameEnded_Implementation(class AActor* EndGameFocus, bool bIsWinner);
 
@@ -105,9 +118,18 @@ public:
 
 	virtual void SetCinematicMode(bool bInCinematicMode, bool bHidePlayer, bool bAffectsHUD, bool bAffectsMovement, bool bAffectsTurning) override;
 
+	/** Returns true if movement input is ignored. Overridden to always allow spectators to move. */
+	virtual bool IsMoveInputIgnored() const override;
+
+	/** Returns true if look input is ignored. Overridden to always allow spectators to look around. */
+	virtual bool IsLookInputIgnored() const override;
+
 	virtual void InitInputSystem() override;
 
 	void OnKill();
+
+	/** Cleans up any resources necessary to return to main menu.  Does not modify GameInstance state. */
+	virtual void HandleReturnToMainMenu();
 
 protected:
 
@@ -156,11 +178,14 @@ protected:
 	/** if set, gameplay related actions (movement, weapn usage, etc) are allowed */
 	uint8 bAllowGameActions : 1;
 
+	/** true for the first frame after the game has ended */
+	uint8 bGameEndedFrame : 1;
+
 	/** stores pawn location at last player death, used where player scores a kill after they died **/
 	FVector LastDeathLocation;
 
 	/** try to find spot for death cam */
-	//bool FindDeathCameraSpot(FVector& CameraLocation, FRotator& CameraRotation);
+	bool FindDeathCameraSpot(FVector& CameraLocation, FRotator& CameraRotation);
 
 	//Begin AActor interface
 
@@ -211,5 +236,12 @@ protected:
 	// End APlayerController interface
 
 	FName ServerSayString;
+
+	// Timer used for updating friends in the player tick.
+	float ArenaFriendUpdateTimer;
+
+	// For tracking whether or not to send the end event
+	bool bHasSentStartEvents;
+
 };
 

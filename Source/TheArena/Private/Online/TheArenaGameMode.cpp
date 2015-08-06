@@ -118,7 +118,7 @@ void ATheArenaGameMode::DefaultTimer()
 						AArenaPlayerState* PlayerState = Cast<AArenaPlayerState>((*It)->PlayerState);
 						const bool bIsWinner = IsWinner(PlayerState);
 
-						//PlayerController->ClientSendRoundEndEvent(bIsWinner, MyGameState->ElapsedTime);
+						PlayerController->ClientSendRoundEndEvent(bIsWinner, MyGameState->ElapsedTime);
 					}
 				}
 			}
@@ -191,7 +191,7 @@ void ATheArenaGameMode::FinishMatch()
 		// turning these back on.
 		for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; ++It)
 		{
-			//(*It)->TurnOff();
+			(*It)->TurnOff();
 		}
 
 		// set up to restart the match
@@ -233,7 +233,7 @@ void ATheArenaGameMode::RequestFinishAndExitToMainMenu()
 	// GameInstance should be calling this from an EndState.  So call the PC function that performs cleanup, not the one that sets GI state.
 	if (LocalPrimaryController != NULL)
 	{
-		//LocalPrimaryController->HandleReturnToMainMenu();
+		LocalPrimaryController->HandleReturnToMainMenu();
 	}
 }
 
@@ -270,7 +270,7 @@ void ATheArenaGameMode::PostLogin(APlayerController* NewPlayer)
 	AArenaPlayerController* NewPC = Cast<AArenaPlayerController>(NewPlayer);
 	if (NewPC && NewPC->GetPawn() == NULL)
 	{
-		//NewPC->ClientSetSpectatorCamera(NewPC->GetSpawnLocation(), NewPC->GetControlRotation());
+		NewPC->ClientSetSpectatorCamera(NewPC->GetSpawnLocation(), NewPC->GetControlRotation());
 	}
 
 	// notify new player if match is already in progress

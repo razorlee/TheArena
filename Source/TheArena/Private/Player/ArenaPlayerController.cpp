@@ -32,16 +32,13 @@ AArenaPlayerController::AArenaPlayerController(const class FObjectInitializer& P
 	PlayerCameraManagerClass = AArenaPlayerCameraManager::StaticClass();
 	//CheatClass = UArenaCheatManager::StaticClass();
 	bAllowGameActions = true;
+	bGameEndedFrame = false;
 	LastDeathLocation = FVector::ZeroVector;
 	OpenMenu = false;
 
-	if (!HasAnyFlags(RF_ClassDefaultObject))
-	{
-		OnStartSessionCompleteEndItDelegate = FOnEndSessionCompleteDelegate::CreateUObject(this, &AArenaPlayerController::OnStartSessionCompleteEndIt);
-		OnEndSessionCompleteDelegate = FOnEndSessionCompleteDelegate::CreateUObject(this, &AArenaPlayerController::OnEndSessionComplete);
-		OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &AArenaPlayerController::OnDestroySessionComplete);
-	}
 	ServerSayString = TEXT("Say");
+	ArenaFriendUpdateTimer = 0.0f;
+	bHasSentStartEvents = false;
 }
 
 void AArenaPlayerController::SetupInputComponent()
@@ -60,6 +57,7 @@ void AArenaPlayerController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	ArenaFriendUpdateTimer = 0;
 }
 
 void AArenaPlayerController::BeginPlay()
@@ -86,58 +84,115 @@ void AArenaPlayerController::PawnPendingDestroy(APawn* P)
 	LastDeathLocation = P->GetActorLocation();
 	FVector CameraLocation = LastDeathLocation + FVector(0, 0, 300.0f);
 	FRotator CameraRotation(-90.0f, 0.0f, 0.0f);
-	//FindDeathCameraSpot(CameraLocation, CameraRotation);
+	FindDeathCameraSpot(CameraLocation, CameraRotation);
 
 	Super::PawnPendingDestroy(P);
+
+	ClientSetSpectatorCamera(CameraLocation, CameraRotation);
 }
 
 void AArenaPlayerController::GameHasEnded(class AActor* EndGameFocus, bool bIsWinner)
 {
-	// write stats
-	ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
-	if (LocalPlayer)
+	//UpdateSaveFileOnGameEnd(bIsWinner);
+	//UpdateAchievementsOnGameEnd();
+	//UpdateLeaderboardsOnGameEnd();
+
+	Super::GameHasEnded(EndGameFocus, bIsWinner);
+}
+
+void AArenaPlayerController::ClientSetSpectatorCamera_Implementation(FVector CameraLocation, FRotator CameraRotation)
+{
+	SetInitialLocationAndRotation(CameraLocation, CameraRotation);
+	SetViewTarget(this);
+}
+
+bool AArenaPlayerController::FindDeathCameraSpot(FVector& CameraLocation, FRotator& CameraRotation)
+{
+	const FVector PawnLocation = GetPawn()->GetActorLocation();
+	FRotator ViewDir = GetControlRotation();
+	ViewDir.Pitch = -45.0f;
+
+	const float YawOffsets[] = { 0.0f, -180.0f, 90.0f, -90.0f, 45.0f, -45.0f, 135.0f, -135.0f };
+	const float CameraOffset = 600.0f;
+	FCollisionQueryParams TraceParams(TEXT("DeathCamera"), true, GetPawn());
+
+	FHitResult HitResult;
+	for (int32 i = 0; i < ARRAY_COUNT(YawOffsets); i++)
 	{
-		AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PlayerState);
-		if (CharacterState)
+		FRotator CameraDir = ViewDir;
+		CameraDir.Yaw += YawOffsets[i];
+		CameraDir.Normalize();
+
+		const FVector TestLocation = PawnLocation - CameraDir.Vector() * CameraOffset;
+
+		const bool bBlocked = GetWorld()->LineTraceSingleByChannel(HitResult, PawnLocation, TestLocation, ECC_Camera, TraceParams);
+
+		if (!bBlocked)
 		{
-			// update local saved profile
-			/*UArenaPersistentUser* const PersistentUser = GetPersistentUser();
-			if (PersistentUser)
-			{
-				PersistentUser->AddMatchResult(CharacterState->GetKills(), CharacterState->GetDeaths(), CharacterState->GetNumBulletsFired(), CharacterState->GetNumRocketsFired(), bIsWinner);
-				PersistentUser->SaveIfDirty();
-			}*/
-
-			// update leaderboards
-			IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
-			if (OnlineSub)
-			{
-				IOnlineIdentityPtr Identity = OnlineSub->GetIdentityInterface();
-				if (Identity.IsValid())
-				{
-					TSharedPtr<FUniqueNetId> UserId = Identity->GetUniquePlayerId(LocalPlayer->GetControllerId());
-					if (UserId.IsValid())
-					{
-						IOnlineLeaderboardsPtr Leaderboards = OnlineSub->GetLeaderboardsInterface();
-						if (Leaderboards.IsValid())
-						{
-							/*FArenaAllTimeMatchResultsWrite WriteObject;
-
-							WriteObject.SetIntStat(LEADERBOARD_STAT_SCORE, CharacterState->GetKills());
-							WriteObject.SetIntStat(LEADERBOARD_STAT_KILLS, CharacterState->GetKills());
-							WriteObject.SetIntStat(LEADERBOARD_STAT_DEATHS, CharacterState->GetDeaths());
-							WriteObject.SetIntStat(LEADERBOARD_STAT_MATCHESPLAYED, 1);
-
-							// the call will copy the user id and write object to its own memory
-							Leaderboards->WriteLeaderboards(CharacterState->SessionName, *UserId, WriteObject);*/
-						}
-					}
-				}
-			}
+			CameraLocation = TestLocation;
+			CameraRotation = CameraDir;
+			return true;
 		}
 	}
 
-	Super::GameHasEnded(EndGameFocus, bIsWinner);
+	return false;
+}
+
+void AArenaPlayerController::ClientSendRoundEndEvent_Implementation(bool bIsWinner, int32 ExpendedTimeInSeconds)
+{
+	const auto Events = Online::GetEventsInterface();
+	ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
+
+	if (bHasSentStartEvents && LocalPlayer != nullptr && Events.IsValid())
+	{
+		auto UniqueId = LocalPlayer->GetPreferredUniqueNetId();
+
+		if (UniqueId.IsValid())
+		{
+			FString MapName = *FPackageName::GetShortName(GetWorld()->PersistentLevel->GetOutermost()->GetName());
+			AArenaPlayerState* ArenaPlayerState = Cast<AArenaPlayerState>(PlayerState);
+			int32 PlayerScore = ArenaPlayerState ? ArenaPlayerState->GetScore() : 0;
+
+			// Fire session end event for all cases
+			FOnlineEventParms Params;
+			Params.Add(TEXT("GameplayModeId"), FVariantData((int32)1)); // @todo determine game mode (ffa v tdm)
+			Params.Add(TEXT("DifficultyLevelId"), FVariantData((int32)0)); // unused
+			Params.Add(TEXT("ExitStatusId"), FVariantData((int32)0)); // unused
+			Params.Add(TEXT("PlayerScore"), FVariantData((int32)PlayerScore));
+			Params.Add(TEXT("PlayerWon"), FVariantData((bool)bIsWinner));
+			Params.Add(TEXT("MapName"), FVariantData(MapName));
+			Params.Add(TEXT("MapNameString"), FVariantData(MapName)); // @todo workaround for a bug in backend service, remove when fixed
+
+			Events->TriggerEvent(*UniqueId, TEXT("PlayerSessionEnd"), Params);
+
+			// Online matches require the MultiplayerRoundEnd event as well
+			UArenaGameInstance* AGI = GetWorld() != NULL ? Cast<UArenaGameInstance>(GetWorld()->GetGameInstance()) : NULL;
+			if (AGI->GetIsOnline())
+			{
+				FOnlineEventParms MultiplayerParams;
+
+				AArenaGameState* const MyGameState = GetWorld() != NULL ? GetWorld()->GetGameState<AArenaGameState>() : NULL;
+				if (ensure(MyGameState != nullptr))
+				{
+					MultiplayerParams.Add(TEXT("SectionId"), FVariantData((int32)0)); // unused
+					MultiplayerParams.Add(TEXT("GameplayModeId"), FVariantData((int32)1)); // @todo determine game mode (ffa v tdm)
+					MultiplayerParams.Add(TEXT("MatchTypeId"), FVariantData((int32)1)); // @todo abstract the specific meaning of this value across platforms
+					MultiplayerParams.Add(TEXT("DifficultyLevelId"), FVariantData((int32)0)); // unused
+					MultiplayerParams.Add(TEXT("TimeInSeconds"), FVariantData((float)ExpendedTimeInSeconds));
+					MultiplayerParams.Add(TEXT("ExitStatusId"), FVariantData((int32)0)); // unused
+
+					Events->TriggerEvent(*UniqueId, TEXT("MultiplayerRoundEnd"), MultiplayerParams);
+				}
+			}
+		}
+
+		bHasSentStartEvents = false;
+	}
+}
+
+void AArenaPlayerController::SimulateInputKey(FKey Key, bool bPressed)
+{
+	InputKey(Key, bPressed ? IE_Pressed : IE_Released, 1, false);
 }
 
 void AArenaPlayerController::OnKill()
@@ -154,13 +209,9 @@ void AArenaPlayerController::OnKill()
 			TSharedPtr<FUniqueNetId> UniqueID = Identity->GetUniquePlayerId(UserIndex);
 			if (UniqueID.IsValid())
 			{
-				ACharacter* Pawn = GetCharacter();
+				ACharacter* Pawn = Cast<AArenaCharacter>(GetCharacter());
 				// If player is dead, use location stored during pawn cleanup.
-				FVector Location = LastDeathLocation;
-				if (Pawn)
-				{
-					Pawn->GetActorLocation();
-				}
+				FVector Location = Pawn ? Pawn->GetActorLocation() : LastDeathLocation;
 
 				FOnlineEventParms Params;
 
@@ -183,7 +234,7 @@ void AArenaPlayerController::OnKill()
 	}
 }
 
-
+///////////////////////////////////////////////// INPUT /////////////////////////////////////////////////
 
 void AArenaPlayerController::OnToggleInGameMenu()
 {
@@ -251,7 +302,7 @@ void AArenaPlayerController::OnToggleInventory()
 	return;
 }
 
-
+////////////////////////////////////////// Getters and Setters //////////////////////////////////////////
 
 FText AArenaPlayerController::GetInteractiveMessage()
 {
@@ -369,6 +420,24 @@ void AArenaPlayerController::SetAllowGameActions(bool bEnable)
 	bAllowGameActions = bEnable;
 }
 
+/////////////////////////////////////////////////////////////// Server ///////////////////////////////////////////////////////////////
+
+void AArenaPlayerController::HandleReturnToMainMenu()
+{
+	//OnHideScoreboard();
+	CleanupSessionOnReturnToMenu();
+}
+
+void AArenaPlayerController::CleanupSessionOnReturnToMenu()
+{
+	UArenaGameInstance * AGI = GetWorld() != NULL ? Cast<UArenaGameInstance>(GetWorld()->GetGameInstance()) : NULL;
+
+	if (ensure(AGI != NULL))
+	{
+		//AGI->CleanupSessionOnReturnToMenu();
+	}
+}
+
 void AArenaPlayerController::ClientGameStarted_Implementation()
 {
 	/*AArenaHUD* ArenaHUD = GetArenaHUD();
@@ -430,60 +499,6 @@ void AArenaPlayerController::ClientEndOnlineGame_Implementation()
 void AArenaPlayerController::ClientReturnToMainMenu_Implementation(const FString& ReturnReason)
 {
 	CleanupSessionOnReturnToMenu();
-}
-
-void AArenaPlayerController::CleanupSessionOnReturnToMenu()
-{
-	bool bPendingOnlineOp = false;
-
-	// end online game and then destroy it
-	AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PlayerState);
-	if (CharacterState)
-	{
-		IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
-		if (OnlineSub)
-		{
-			IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-			if (Sessions.IsValid())
-			{
-				EOnlineSessionState::Type SessionState = Sessions->GetSessionState(CharacterState->SessionName);
-				UE_LOG(LogOnline, Log, TEXT("Session %s is '%s'"), *CharacterState->SessionName.ToString(), EOnlineSessionState::ToString(SessionState));
-
-				if (EOnlineSessionState::InProgress == SessionState)
-				{
-					UE_LOG(LogOnline, Log, TEXT("Ending session %s on return to main menu"), *CharacterState->SessionName.ToString());
-					Sessions->AddOnEndSessionCompleteDelegate(OnEndSessionCompleteDelegate);
-					Sessions->EndSession(CharacterState->SessionName);
-					bPendingOnlineOp = true;
-				}
-				else if (EOnlineSessionState::Ending == SessionState)
-				{
-					UE_LOG(LogOnline, Log, TEXT("Waiting for session %s to end on return to main menu"), *CharacterState->SessionName.ToString());
-					Sessions->AddOnEndSessionCompleteDelegate(OnEndSessionCompleteDelegate);
-					bPendingOnlineOp = true;
-				}
-				else if (EOnlineSessionState::Ended == SessionState ||
-					EOnlineSessionState::Pending == SessionState)
-				{
-					UE_LOG(LogOnline, Log, TEXT("Destroying session %s on return to main menu"), *CharacterState->SessionName.ToString());
-					Sessions->AddOnDestroySessionCompleteDelegate(OnDestroySessionCompleteDelegate);
-					Sessions->DestroySession(CharacterState->SessionName);
-					bPendingOnlineOp = true;
-				}
-				else if (EOnlineSessionState::Starting == SessionState)
-				{
-					UE_LOG(LogOnline, Log, TEXT("Waiting for session %s to start, and then we will end it to return to main menu"), *CharacterState->SessionName.ToString());
-					Sessions->AddOnStartSessionCompleteDelegate(OnStartSessionCompleteEndItDelegate);
-					bPendingOnlineOp = true;
-				}
-			}
-		}
-	}
-
-	if (!bPendingOnlineOp)
-	{
-		GEngine->HandleDisconnect(GetWorld(), GetWorld()->GetNetDriver());
-	}
 }
 
 void AArenaPlayerController::OnStartSessionCompleteEndIt(FName SessionName, bool bWasSuccessful)
@@ -555,6 +570,8 @@ void AArenaPlayerController::ClientGameEnded_Implementation(class AActor* EndGam
 	SetViewTarget(GetPawn());
 }
 
+///////////////////////////////////////////////////////////////// Input /////////////////////////////////////////////////////////////////
+
 void AArenaPlayerController::SetCinematicMode(bool bInCinematicMode, bool bHidePlayer, bool bAffectsHUD, bool bAffectsMovement, bool bAffectsTurning)
 {
 	Super::SetCinematicMode(bInCinematicMode, bHidePlayer, bAffectsHUD, bAffectsMovement, bAffectsTurning);
@@ -572,6 +589,30 @@ void AArenaPlayerController::SetCinematicMode(bool bInCinematicMode, bool bHideP
 		{
 			MyWeapon->SetActorHiddenInGame(false);
 		}
+	}
+}
+
+bool AArenaPlayerController::IsMoveInputIgnored() const
+{
+	if (IsInState(NAME_Spectating))
+	{
+		return false;
+	}
+	else
+	{
+		return Super::IsMoveInputIgnored();
+	}
+}
+
+bool AArenaPlayerController::IsLookInputIgnored() const
+{
+	if (IsInState(NAME_Spectating))
+	{
+		return false;
+	}
+	else
+	{
+		return Super::IsLookInputIgnored();
 	}
 }
 
