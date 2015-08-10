@@ -83,13 +83,17 @@ class THEARENA_API AArenaPlayerState : public APlayerState
 	void SetQuitter(bool bInQuitter);
 
 	virtual void CopyProperties(class APlayerState* PlayerState) override;
+
+	UPROPERTY(BlueprintReadOnly, Category = Defaults)
+	AArenaCharacter* MyPawn;
+
 protected:
 
 	/** Set the mesh colors based on the current teamnum variable */
 	void UpdateTeamColors();
 
 	/** team number */
-	UPROPERTY(Transient, ReplicatedUsing = OnRep_TeamColor)
+	UPROPERTY(BlueprintReadOnly, Transient, ReplicatedUsing = OnRep_TeamColor)
 	int32 TeamNumber;
 
 	/** number of kills */

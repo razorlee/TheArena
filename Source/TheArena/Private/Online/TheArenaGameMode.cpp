@@ -102,6 +102,15 @@ void ATheArenaGameMode::DefaultTimer()
 		{
 			if (GetMatchState() == MatchState::WaitingPostMatch)
 			{
+				for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
+				{
+					AArenaPlayerController* PlayerController = Cast<AArenaPlayerController>(*It);
+
+					if (PlayerController && MyGameState)
+					{
+						PlayerController->SetMatchOver(false);
+					}
+				}
 				RestartGame();
 			}
 			else if (GetMatchState() == MatchState::InProgress)
@@ -222,7 +231,7 @@ void ATheArenaGameMode::RequestFinishAndExitToMainMenu()
 		if (!Controller->IsLocalController())
 		{
 			const FString RemoteReturnReason = NSLOCTEXT("NetworkErrors", "HostHasLeft", "Host has left the game.").ToString();
-			Controller->ClientReturnToMainMenu(RemoteReturnReason);
+			//Controller->ClientReturnToMainMenu(RemoteReturnReason);
 		}
 		else
 		{
@@ -233,7 +242,7 @@ void ATheArenaGameMode::RequestFinishAndExitToMainMenu()
 	// GameInstance should be calling this from an EndState.  So call the PC function that performs cleanup, not the one that sets GI state.
 	if (LocalPrimaryController != NULL)
 	{
-		LocalPrimaryController->HandleReturnToMainMenu();
+		//LocalPrimaryController->HandleReturnToMainMenu();
 	}
 }
 

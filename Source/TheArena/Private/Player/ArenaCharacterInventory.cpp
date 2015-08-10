@@ -8,6 +8,7 @@
 UArenaCharacterInventory::UArenaCharacterInventory()
 {
 	bWantsInitializeComponent = true;
+	//UtilitySelected = EUtilitySelected::Head;
 }
 
 void UArenaCharacterInventory::InitializeComponent()
@@ -53,6 +54,11 @@ TArray<TSubclassOf<class AArenaWeapon>> UArenaCharacterInventory::GetInventoryBP
 	return DefaultInventoryClasses;
 }
 
+TArray<TSubclassOf<class AArenaUtility>> UArenaCharacterInventory::GetUtilitiesBP()
+{
+	return DefaultUtilityClasses;
+}
+
 TArray<class AArenaWeapon*> UArenaCharacterInventory::GetInventory()
 {
 	return Inventory;
@@ -65,6 +71,15 @@ TSubclassOf<class AArenaWeapon> UArenaCharacterInventory::GetNewWeapon()
 void UArenaCharacterInventory::SetNewWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
 	NewWeapon = Weapon;
+}
+
+TSubclassOf<class AArenaUtility> UArenaCharacterInventory::GetNewUtility()
+{
+	return NewUtility;
+}
+void UArenaCharacterInventory::SetNewUtility(TSubclassOf<class AArenaUtility> Utility)
+{
+	NewUtility = Utility;
 }
 
 bool UArenaCharacterInventory::GetPrimarySelected()
@@ -83,4 +98,13 @@ bool UArenaCharacterInventory::GetSecondarySelected()
 void UArenaCharacterInventory::SetSecondarySelected(bool Selected)
 {
 	SecondarySelected = Selected;
+}
+
+EUtilitySelected::Type UArenaCharacterInventory::GetUtilitySelected()
+{
+	return UtilitySelected;
+}
+void UArenaCharacterInventory::SetUtilitySelected(EUtilitySelected::Type Selected)
+{
+	UtilitySelected = Selected;
 }

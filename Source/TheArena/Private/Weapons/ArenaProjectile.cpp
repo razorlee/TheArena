@@ -98,11 +98,13 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 			FString critical = "head";
 			if (Impact.BoneName.ToString() == critical)
 			{
-				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() * 2), Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
+				float Damage = (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() * 2) * (MovementComp->MaxSpeed / MovementComp->InitialSpeed);
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
 			}
 			else
 			{
-				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage(), Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
+				float Damage = (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage()) * (MovementComp->MaxSpeed / MovementComp->InitialSpeed);
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
 			}
 		}
 	}

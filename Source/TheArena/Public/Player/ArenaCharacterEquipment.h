@@ -42,9 +42,46 @@ public:
 	void SetSecondaryWeaponBP(TSubclassOf<class AArenaWeapon> Weapon);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
+	TSubclassOf<class AArenaUtility> GetHeadUtilityBP();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetHeadUtilityBP(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	TSubclassOf<class AArenaUtility> GetUpperBackUtilityBP();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetUpperBackUtilityBP(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	TSubclassOf<class AArenaUtility> GetLowerBackUtilityBP();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetLowerBackUtilityBP(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	TSubclassOf<class AArenaUtility> GetLeftWristUtilityBP();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetLeftWristUtilityBP(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	TSubclassOf<class AArenaUtility> GetRightWristUtilityBP();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetRightWristUtilityBP(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	TSubclassOf<class AArenaUtility> GetLeftWaistUtilityBP();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetLeftWaistUtilityBP(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	TSubclassOf<class AArenaUtility> GetRightWaistUtilityBP();
+	UFUNCTION(BlueprintCallable, Category = Weapons)
+	void SetRightWaistUtilityBP(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Weapons)
 	bool GetDrawCrosshair();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void SetDrawCrosshair(bool Allow);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Sockets)
 	FName GetWeaponAttachPoint();
@@ -88,6 +125,27 @@ private:
 	class AArenaWeapon* SecondaryWeapon;
 	UPROPERTY(EditAnywhere, Replicated, Category = Weapons)
 	TSubclassOf<class AArenaWeapon> SecondaryWeaponBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
+	TSubclassOf<class AArenaUtility> HeadUtilityBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
+	TSubclassOf<class AArenaUtility> UpperBackUtilityBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
+	TSubclassOf<class AArenaUtility> LowerBackUtilityBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
+	TSubclassOf<class AArenaUtility> LeftWristUtilityBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
+	TSubclassOf<class AArenaUtility> RightWristUtilityBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
+	TSubclassOf<class AArenaUtility> LeftWaistUtilityBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
+	TSubclassOf<class AArenaUtility> RightWaistUtilityBP;
 
 /////////////////////////////////////////////// Booleans ///////////////////////////////////////////////
 

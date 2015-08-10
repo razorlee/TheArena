@@ -3,7 +3,7 @@
 AArenaPlayerCameraManager::AArenaPlayerCameraManager(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	MyPawn = NULL;
-	Speed = 20.0f;
+	Speed = 5.0f;
 	NormalFOV = 90.0f;
 
 	CurrentFOV = 90.0;
@@ -57,7 +57,7 @@ void AArenaPlayerCameraManager::UpdateCurrents(float DeltaTime)
 void AArenaPlayerCameraManager::HandlePassiveCamera()
 {
 	MyPawn->bUseControllerRotationYaw = false;
-	Speed = 20.0f;
+	Speed = 5.0f;
 	TargetFOV = NormalFOV;
 	TargetArm = 250.0f;
 	TargetOffset = FVector(0.0f, 0.0f, 0.0f);
@@ -71,7 +71,7 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 	{
 		ETargetingState::Type TargetingState = MyPawn->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
 
-		Speed = 100 * MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetMotility();
+		Speed = 5.0f * MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetMotility();
 		MyPawn->bUseControllerRotationYaw = true;
 
 		if (PlayerState == EPlayerState::Covering)

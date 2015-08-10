@@ -101,6 +101,11 @@ public:
 	void SetSettings(bool bEnable);
 
 	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsMatchOver() const;
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetMatchOver(bool bEnable);
+
+	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool IsGameInputAllowed() const;
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetAllowGameActions(bool bEnable);
@@ -131,6 +136,12 @@ public:
 	/** Cleans up any resources necessary to return to main menu.  Does not modify GameInstance state. */
 	virtual void HandleReturnToMainMenu();
 
+	UFUNCTION(BlueprintCallable, Category = HUD)
+	TArray< class APlayerState* > GetPlayerArray();
+
+	UPROPERTY(BlueprintReadWrite, Category = Multiplayer)
+	bool IsWinner;
+
 protected:
 
 	UPROPERTY()
@@ -158,6 +169,10 @@ protected:
 	/** informs the HUD if the menu is open */
 	UPROPERTY(Transient, Replicated)
 	uint8 OpenSettings : 1;
+
+	/** informs the HUD if the menu is open */
+	UPROPERTY(Transient, Replicated)
+	uint8 MatchOver : 1;
 
 	/** infinite ammo cheat */
 	UPROPERTY(Transient, Replicated)

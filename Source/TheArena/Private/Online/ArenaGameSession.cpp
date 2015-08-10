@@ -15,8 +15,10 @@ AArenaGameSession::AArenaGameSession(const FObjectInitializer& ObjectInitializer
 	{
 		OnCreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnCreateSessionComplete);
 		OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnDestroySessionComplete);
+
 		OnFindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnFindSessionsComplete);
 		OnJoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnJoinSessionComplete);
+
 		OnStartSessionCompleteDelegate = FOnStartSessionCompleteDelegate::CreateUObject(this, &AArenaGameSession::OnStartOnlineGameComplete);
 	}
 }
@@ -63,7 +65,7 @@ void AArenaGameSession::HandleMatchHasStarted()
 		if (Sessions.IsValid())
 		{
 			UE_LOG(LogOnlineGame, Log, TEXT("Starting session %s on server"), *GameSessionName.ToString());
-			Sessions->AddOnStartSessionCompleteDelegate(OnStartSessionCompleteDelegate);
+			OnStartSessionCompleteDelegateHandle = Sessions->AddOnStartSessionCompleteDelegate_Handle(OnStartSessionCompleteDelegate);
 			Sessions->StartSession(GameSessionName);
 		}
 	}
@@ -167,7 +169,7 @@ void AArenaGameSession::OnCreateSessionComplete(FName SessionName, bool bWasSucc
 	if (OnlineSub)
 	{
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-		Sessions->ClearOnCreateSessionCompleteDelegate(OnCreateSessionCompleteDelegate);
+		Sessions->ClearOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegateHandle);
 	}
 
 	OnCreatePresenceSessionComplete().Broadcast(SessionName, bWasSuccessful);
@@ -187,7 +189,7 @@ void AArenaGameSession::OnDestroySessionComplete(FName SessionName, bool bWasSuc
 	if (OnlineSub)
 	{
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-		Sessions->ClearOnDestroySessionCompleteDelegate(OnDestroySessionCompleteDelegate);
+		Sessions->ClearOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegateHandle);
 		HostSettings = NULL;
 	}
 }
@@ -204,7 +206,7 @@ bool AArenaGameSession::HostSession(TSharedPtr<FUniqueNetId> UserId, FName Sessi
 		MaxPlayers = MaxNumPlayers;
 
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
-		if (Sessions.IsValid() && CurrentSessionParams.UserId.IsValid())
+		//if (Sessions.IsValid() && CurrentSessionParams.UserId.IsValid())
 		{
 			HostSettings = MakeShareable(new FArenaOnlineSessionSettings(bIsLAN, bIsPresence, MaxNumPlayers));
 			HostSettings->Set(SETTING_GAMEMODE, GameType, EOnlineDataAdvertisementType::ViaOnlineService);
@@ -214,7 +216,7 @@ bool AArenaGameSession::HostSession(TSharedPtr<FUniqueNetId> UserId, FName Sessi
 			HostSettings->Set(SETTING_SESSION_TEMPLATE_NAME, FString("GameSession"), EOnlineDataAdvertisementType::DontAdvertise);
 			HostSettings->Set(SEARCH_KEYWORDS, CustomMatchKeyword, EOnlineDataAdvertisementType::ViaOnlineService);
 
-			Sessions->AddOnCreateSessionCompleteDelegate(OnCreateSessionCompleteDelegate);
+			OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
 			return Sessions->CreateSession(*CurrentSessionParams.UserId, CurrentSessionParams.SessionName, *HostSettings);
 		}
 	}
@@ -240,7 +242,7 @@ void AArenaGameSession::OnFindSessionsComplete(bool bWasSuccessful)
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
-			Sessions->ClearOnFindSessionsCompleteDelegate(OnFindSessionsCompleteDelegate);
+			Sessions->ClearOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegateHandle);
 
 			UE_LOG(LogOnlineGame, Verbose, TEXT("Num Search Results: %d"), SearchSettings->SearchResults.Num());
 			for (int32 SearchIdx = 0; SearchIdx < SearchSettings->SearchResults.Num(); SearchIdx++)
@@ -289,7 +291,7 @@ void AArenaGameSession::ContinueMatchmaking()
 			IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 			if (Sessions.IsValid() && CurrentSessionParams.UserId.IsValid())
 			{
-				Sessions->AddOnJoinSessionCompleteDelegate(OnJoinSessionCompleteDelegate);
+				OnJoinSessionCompleteDelegateHandle = Sessions->AddOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegate);
 				Sessions->JoinSession(*CurrentSessionParams.UserId, CurrentSessionParams.SessionName, SearchSettings->SearchResults[CurrentSessionParams.BestSessionIdx]);
 			}
 		}
@@ -324,7 +326,7 @@ void AArenaGameSession::FindSessions(TSharedPtr<FUniqueNetId> UserId, FName Sess
 
 			TSharedRef<FOnlineSessionSearch> SearchSettingsRef = SearchSettings.ToSharedRef();
 
-			Sessions->AddOnFindSessionsCompleteDelegate(OnFindSessionsCompleteDelegate);
+			OnFindSessionsCompleteDelegateHandle = Sessions->AddOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegate);
 			Sessions->FindSessions(*CurrentSessionParams.UserId, SearchSettingsRef);
 		}
 	}
@@ -356,7 +358,7 @@ bool AArenaGameSession::JoinSession(TSharedPtr<FUniqueNetId> UserId, FName Sessi
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid() && UserId.IsValid())
 		{
-			Sessions->AddOnJoinSessionCompleteDelegate(OnJoinSessionCompleteDelegate);
+			OnJoinSessionCompleteDelegateHandle = Sessions->AddOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegate);
 			bResult = Sessions->JoinSession(*UserId, SessionName, SearchResult);
 		}
 	}
@@ -381,7 +383,7 @@ void AArenaGameSession::OnJoinSessionComplete(FName SessionName, EOnJoinSessionC
 	if (OnlineSub)
 	{
 		Sessions = OnlineSub->GetSessionInterface();
-		Sessions->ClearOnJoinSessionCompleteDelegate(OnJoinSessionCompleteDelegate);
+		Sessions->ClearOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegateHandle);
 	}
 
 	OnJoinSessionComplete().Broadcast(Result);

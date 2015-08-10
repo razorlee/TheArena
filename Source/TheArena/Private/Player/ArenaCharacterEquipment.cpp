@@ -75,6 +75,69 @@ void UArenaCharacterEquipment::SetSecondaryWeaponBP(TSubclassOf<class AArenaWeap
 	SecondaryWeaponBP = Weapon;
 }
 
+TSubclassOf<class AArenaUtility> UArenaCharacterEquipment::GetHeadUtilityBP()
+{
+	return HeadUtilityBP;
+}
+void UArenaCharacterEquipment::SetHeadUtilityBP(TSubclassOf<class AArenaUtility> Utility)
+{
+	HeadUtilityBP = Utility;
+}
+
+TSubclassOf<class AArenaUtility> UArenaCharacterEquipment::GetUpperBackUtilityBP()
+{
+	return UpperBackUtilityBP;
+}
+void UArenaCharacterEquipment::SetUpperBackUtilityBP(TSubclassOf<class AArenaUtility> Utility)
+{
+	UpperBackUtilityBP = Utility;
+}
+
+TSubclassOf<class AArenaUtility> UArenaCharacterEquipment::GetLowerBackUtilityBP()
+{
+	return LowerBackUtilityBP;
+}
+void UArenaCharacterEquipment::SetLowerBackUtilityBP(TSubclassOf<class AArenaUtility> Utility)
+{
+	LowerBackUtilityBP = Utility;
+}
+
+TSubclassOf<class AArenaUtility> UArenaCharacterEquipment::GetLeftWristUtilityBP()
+{
+	return LeftWristUtilityBP;
+}
+void UArenaCharacterEquipment::SetLeftWristUtilityBP(TSubclassOf<class AArenaUtility> Utility)
+{
+	LeftWristUtilityBP = Utility;
+}
+
+TSubclassOf<class AArenaUtility> UArenaCharacterEquipment::GetRightWristUtilityBP()
+{
+	return RightWristUtilityBP;
+}
+void UArenaCharacterEquipment::SetRightWristUtilityBP(TSubclassOf<class AArenaUtility> Utility)
+{
+	RightWristUtilityBP = Utility;
+}
+
+TSubclassOf<class AArenaUtility> UArenaCharacterEquipment::GetLeftWaistUtilityBP()
+{
+	return LeftWaistUtilityBP;
+}
+void UArenaCharacterEquipment::SetLeftWaistUtilityBP(TSubclassOf<class AArenaUtility> Utility)
+{
+	LeftWaistUtilityBP = Utility;
+}
+
+TSubclassOf<class AArenaUtility> UArenaCharacterEquipment::GetRightWaistUtilityBP()
+{
+	return RightWaistUtilityBP;
+}
+void UArenaCharacterEquipment::SetRightWaistUtilityBP(TSubclassOf<class AArenaUtility> Utility)
+{
+	RightWaistUtilityBP = Utility;
+}
+
 bool UArenaCharacterEquipment::GetDrawCrosshair()
 {
 	return DrawCrosshair;

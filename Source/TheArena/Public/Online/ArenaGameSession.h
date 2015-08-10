@@ -31,11 +31,11 @@ struct FArenaGameSessionParams
 
 
 UCLASS(config=game)
-class AArenaGameSession : public AGameSession
+class THEARENA_API AArenaGameSession : public AGameSession
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
-	AArenaGameSession(const FObjectInitializer& ObjectInitializer);
+	//AArenaGameSession(const FObjectInitializer& ObjectInitializer);
 
 protected:
 
@@ -49,8 +49,10 @@ protected:
 	FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
 	/** Delegate after joining a session */
 	FOnJoinSessionCompleteDelegate OnJoinSessionCompleteDelegate;
+
 	/** Transient properties of a session during game creation/matchmaking */
 	FArenaGameSessionParams CurrentSessionParams;
+
 	/** Current host settings */
 	TSharedPtr<class FArenaOnlineSessionSettings> HostSettings;
 	/** Current search settings */
@@ -239,5 +241,12 @@ public:
 	* @return true if successful, false otherwise
 	*/
 	bool TravelToSession(int32 ControllerId, FName SessionName);
+
+	/** Handles to various registered delegates */
+	FDelegateHandle OnStartSessionCompleteDelegateHandle;
+	FDelegateHandle OnCreateSessionCompleteDelegateHandle;
+	FDelegateHandle OnDestroySessionCompleteDelegateHandle;
+	FDelegateHandle OnFindSessionsCompleteDelegateHandle;
+	FDelegateHandle OnJoinSessionCompleteDelegateHandle;
 };
 

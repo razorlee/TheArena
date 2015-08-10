@@ -140,6 +140,9 @@ bool AArenaPlayerController::FindDeathCameraSpot(FVector& CameraLocation, FRotat
 
 void AArenaPlayerController::ClientSendRoundEndEvent_Implementation(bool bIsWinner, int32 ExpendedTimeInSeconds)
 {
+	SetMatchOver(true);
+	IsWinner = bIsWinner;
+
 	const auto Events = Online::GetEventsInterface();
 	ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
 
@@ -238,6 +241,14 @@ void AArenaPlayerController::OnKill()
 
 void AArenaPlayerController::OnToggleInGameMenu()
 {
+	if (OpenSettings == true)
+	{
+		SetSettings(false);
+	}
+	if (OpenFriendsList == true)
+	{
+		SetFriendsList(false);
+	}
 	if (OpenMenu == true)
 	{
 		SetMenu(false);
@@ -246,6 +257,9 @@ void AArenaPlayerController::OnToggleInGameMenu()
 		bShowMouseCursor = false;
 		bEnableClickEvents = false;
 		bEnableMouseOverEvents = false;
+
+		FInputModeGameOnly Input;
+		SetInputMode(Input);
 	}
 	else
 	{
@@ -255,14 +269,6 @@ void AArenaPlayerController::OnToggleInGameMenu()
 		bShowMouseCursor = true;
 		bEnableClickEvents = true;
 		bEnableMouseOverEvents = true;
-	}
-	if (OpenFriendsList == true)
-	{
-		SetFriendsList(false);
-
-		bShowMouseCursor = false;
-		bEnableClickEvents = false;
-		bEnableMouseOverEvents = false;
 	}
 }
 
@@ -356,6 +362,17 @@ bool AArenaPlayerController::IsMenuOpen() const
 void AArenaPlayerController::SetMenu(bool bEnable)
 {
 	this->OpenMenu = bEnable;
+	if (!OpenMenu && !OpenSettings && !OpenFriendsList)
+	{
+		bAllowGameActions = true;
+
+		bShowMouseCursor = false;
+		bEnableClickEvents = false;
+		bEnableMouseOverEvents = false;
+
+		FInputModeGameOnly Input;
+		SetInputMode(Input);
+	}
 }
 
 bool AArenaPlayerController::IsFriendsListOpen() const
@@ -409,6 +426,26 @@ bool AArenaPlayerController::IsSettingsOpen() const
 void AArenaPlayerController::SetSettings(bool bEnable)
 {
 	this->OpenSettings = bEnable;
+	if (!OpenSettings)
+	{
+		bAllowGameActions = true;
+
+		bShowMouseCursor = false;
+		bEnableClickEvents = false;
+		bEnableMouseOverEvents = false;
+
+		FInputModeGameOnly Input;
+		SetInputMode(Input);
+	}
+}
+
+bool AArenaPlayerController::IsMatchOver() const
+{
+	return this->MatchOver;
+}
+void AArenaPlayerController::SetMatchOver(bool bEnable)
+{
+	this->MatchOver = bEnable;
 }
 
 bool AArenaPlayerController::IsGameInputAllowed() const
@@ -434,7 +471,7 @@ void AArenaPlayerController::CleanupSessionOnReturnToMenu()
 
 	if (ensure(AGI != NULL))
 	{
-		//AGI->CleanupSessionOnReturnToMenu();
+		AGI->CleanupSessionOnReturnToMenu();
 	}
 }
 
@@ -563,8 +600,8 @@ void AArenaPlayerController::ClientGameEnded_Implementation(class AActor* EndGam
 	Super::ClientGameEnded_Implementation(EndGameFocus, bIsWinner);
 
 	// Allow only looking around
-	SetIgnoreMoveInput(true);
-	bAllowGameActions = false;
+	//SetIgnoreMoveInput(true);
+	//bAllowGameActions = false;
 
 	// Make sure that we still have valid view target
 	SetViewTarget(GetPawn());
@@ -662,6 +699,17 @@ void AArenaPlayerController::ServerSuicide_Implementation()
 bool AArenaPlayerController::GetAllowGameActions() const
 {
 	return bAllowGameActions;
+}
+
+TArray< class APlayerState* > AArenaPlayerController::GetPlayerArray()
+{
+	AArenaGameState* const MyGameState = GetWorld() != NULL ? GetWorld()->GetGameState<AArenaGameState>() : NULL;
+	if (MyGameState)
+	{
+		return MyGameState->PlayerArray;
+	}
+	TArray< class APlayerState* > Empty;
+	return Empty;
 }
 
 

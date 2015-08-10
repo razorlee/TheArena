@@ -339,6 +339,43 @@ bool ArenaCharacterCan::Fire(AArenaCharacter* character, AArenaPlayerController*
 	}
 }
 
+bool ArenaCharacterCan::Head(AArenaCharacter* character, AArenaPlayerController* controller)
+{
+	return true;
+}
+
+bool ArenaCharacterCan::Back(AArenaCharacter* character, AArenaPlayerController* controller)
+{
+	if (controller
+		&& controller->IsGameInputAllowed()
+		&& character->GetUpperBackUtility()
+		&& character->GetPlayerState()->GetCombatState() == ECombatState::Aggressive)
+	{
+		if (character->GetCharacterAttributes()->GetCurrentEnergy() >= character->GetUpperBackUtility()->GetActivationCost())
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool ArenaCharacterCan::Wrist(AArenaCharacter* character, AArenaPlayerController* controller)
+{
+	return true;
+}
+
+bool ArenaCharacterCan::Waist(AArenaCharacter* character, AArenaPlayerController* controller)
+{
+	return true;
+}
+
 bool ArenaCharacterCan::Reload(AArenaCharacter* character, AArenaPlayerController* controller)
 {
 	if (controller

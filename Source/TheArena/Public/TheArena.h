@@ -43,6 +43,7 @@
 #include "Public/Online/ArenaTeamStart.h"
 #include "Public/UI/ArenaFriendsList.h"
 #include "Public/UI/ArenaStartMenu.h"
+#include "Public/Utilities/ArenaUtility.h"
 #include "Public/Weapons/ArenaWeapon.h"
 #include "Public/Weapons/ArenaWeaponCan.h"
 #include "Public/Weapons/ArenaRangedWeapon.h"
@@ -51,6 +52,8 @@
 #include "Public/Weapons/ArenaRangedWeaponEffects.h"
 #include "Public/Weapons/ArenaProjectile.h"
 #include "Public/Weapons/ArenaFragGrenade.h"
+
+//class UBehaviorTreeComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogShooter, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogShooterWeapon, Log, All);
@@ -61,4 +64,11 @@ DECLARE_LOG_CATEGORY_EXTERN(LogShooterWeapon, Log, All);
 
 #define MAX_PLAYER_NAME_LENGTH 16
 
+///** Set to 1 to pretend we're building for console even on a PC, for testing purposes */
+//#define ARENA_SIMULATE_CONSOLE_UI	0
+//
+//#if PLATFORM_PS4 || PLATFORM_XBOXONE || ARENA_SIMULATE_CONSOLE_UI
+//	#define ARENA_CONSOLE_UI 1
+//#else
+//	#define ARENA_CONSOLE_UI 0
 #endif

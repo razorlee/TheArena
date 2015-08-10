@@ -66,12 +66,16 @@ public:
 	void OnReload();
 	/** player pressed melee action */
 	void OnMelee();
-	/** player pressed melee action */
+	/** player pressed dodge action */
 	void OnDodge();
 	/** player pressed start fire action */
 	void OnStartFire();
-	/** player released start fire action */
+	/** player released stop fire action */
 	void OnStopFire();
+	/** player pressed start back action */
+	void OnActivateBack();
+	/** player released stop back action */
+	void OnDeactivateBack();
 
 ////////////////////////////////////////// Character Defaults //////////////////////////////////////////
 
@@ -126,7 +130,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Character)
 	FString GetName() const;
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(NetMulticast, Unreliable)
 	void SetName(const FString& NewName);
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
@@ -147,6 +151,41 @@ public:
 	void SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void HandleSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetHeadUtility();
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void SetHeadUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetUpperBackUtility();
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void SetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetLowerBackUtility();
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void SetLowerBackUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetLeftWristUtility();
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void SetLeftWristUtility(TSubclassOf<class AArenaUtility> Utility);
+	
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetRightWristUtility();
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void SetRightWristUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetLeftWaistUtility();
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void SetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetRightWaistUtility();
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void SetRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 
 ////////////////////////////////////////// Animation Controls //////////////////////////////////////////
 
@@ -176,7 +215,7 @@ public:
 	UFUNCTION(NetMultiCast, Reliable)
 	void ExitCover();
 
-	UFUNCTION(NetMultiCast, Unreliable)
+	UFUNCTION(NetMultiCast, Reliable)
 	void Running(bool IsRunning);
 
 	UFUNCTION(NetMultiCast, Reliable)
@@ -269,6 +308,9 @@ protected:
 	UPROPERTY()
 	bool Spawned;
 
+	UPROPERTY()
+	bool ReadySpawned;
+
 	UPROPERTY(Replicated)
 	FString Name;
 
@@ -300,6 +342,27 @@ protected:
 
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_SecondaryWeapon)
 	class AArenaWeapon* SecondaryWeapon;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* HeadUtility;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* UpperBackUtility;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* LowerBackUtility;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* LeftWristUtility;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* RightWristUtility;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* LeftWaistUtility;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* RightWaistUtility;
 
 ////////////////////////////////////////// Private Properties //////////////////////////////////////////
 

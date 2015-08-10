@@ -58,6 +58,18 @@ public:
 	/*Checks if the player can fire a weapon*/
 	static bool Fire(AArenaCharacter* character, AArenaPlayerController* controller);
 
+	/*Checks if the player can activate head utility*/
+	static bool Head(AArenaCharacter* character, AArenaPlayerController* controller);
+
+	/*Checks if the player can activate back utility*/
+	static bool Back(AArenaCharacter* character, AArenaPlayerController* controller);
+
+	/*Checks if the player can activate wrist utility*/
+	static bool Wrist(AArenaCharacter* character, AArenaPlayerController* controller);
+
+	/*Checks if the player can activate waist utility*/
+	static bool Waist(AArenaCharacter* character, AArenaPlayerController* controller);
+
 	/*Checks if the player can fire a weapon*/
 	static bool Reload(AArenaCharacter* character, AArenaPlayerController* controller);
 
