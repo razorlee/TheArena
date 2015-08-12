@@ -36,7 +36,7 @@ class THEARENA_API AArenaUtility : public AActor
 	
 public:	
 
-	AArenaUtility();
+	AArenaUtility(const class FObjectInitializer& PCIP);
 
 	virtual void BeginPlay() override;
 	
@@ -73,11 +73,11 @@ public:
 	void DeactivateBP();
 
 	UFUNCTION(BlueprintCallable, Category = Defaults)
-	void ConsumeEnergy( float DeltaSeconds = 1 );
+	void ConsumeEnergy(float Cost, float DeltaSeconds = 1);
 		
 protected:
 
-	UPROPERTY(BlueprintReadOnly, Category = Defaults)
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_MyPawn, BlueprintReadOnly, Category = Defaults)
 	AArenaCharacter* MyPawn;
 
 	UPROPERTY(EditDefaultsOnly, Category = Defaults)
@@ -92,10 +92,26 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	TEnumAsByte<EActivationType::Type> ActivationType;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = Utility)
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = Utility)
 	bool Active;
 
+	/*The cost to initially activate the ability*/
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Config)
 	float ActivationCost;
+
+	/*The cost to sustain channeled or toggled ability per second*/
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Config)
+	float ContinuationCost;
 	
+/////////////////////////////////////// Server ///////////////////////////////////////
+
+	UFUNCTION()
+	void OnRep_MyPawn();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerDeactivate();
+
+	UFUNCTION(Reliable, Server, WithValidation)
+	void ServerActivate();
+
 };

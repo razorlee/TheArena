@@ -572,7 +572,6 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Input Allowed: %s"), MyPC->IsGameInputAllowed() ? TEXT("True") : TEXT("False")));
 	if (MyPC)
 	{
 		CharacterAttributes->Regenerate(DeltaSeconds);
@@ -1027,6 +1026,7 @@ void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* 
 		if (UpperBackUtility)
 		{
 			UpperBackUtility->SetMyPawn(this);
+			UpperBackUtility->Equip();
 		}
 		if (LowerBackUtility)
 		{
@@ -1771,6 +1771,14 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	DOREPLIFETIME(AArenaCharacter, CurrentWeapon);
 	DOREPLIFETIME(AArenaCharacter, PrimaryWeapon);
 	DOREPLIFETIME(AArenaCharacter, SecondaryWeapon);
+
+	DOREPLIFETIME(AArenaCharacter, HeadUtility);
+	DOREPLIFETIME(AArenaCharacter, UpperBackUtility);
+	DOREPLIFETIME(AArenaCharacter, LowerBackUtility);
+	DOREPLIFETIME(AArenaCharacter, LeftWristUtility);
+	DOREPLIFETIME(AArenaCharacter, RightWristUtility);
+	DOREPLIFETIME(AArenaCharacter, LeftWaistUtility);
+	DOREPLIFETIME(AArenaCharacter, RightWaistUtility);
 }
 
 ////////////////////////////////////////////// Server //////////////////////////////////////////////
@@ -1888,13 +1896,13 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AAre
 	HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
 
 	UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetUpperBackUtilityBP(), SpawnInfo);
-	LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
+	LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLowerBackUtilityBP(), SpawnInfo);
 
-	LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
-	RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
+	LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
+	RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
 
-	LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
-	RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
+	LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
+	RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
 
 	InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
 }

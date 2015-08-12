@@ -346,6 +346,7 @@ bool ArenaCharacterCan::Head(AArenaCharacter* character, AArenaPlayerController*
 
 bool ArenaCharacterCan::Back(AArenaCharacter* character, AArenaPlayerController* controller)
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Controller: %s"), controller ? TEXT("True") : TEXT("False")));
 	if (controller
 		&& controller->IsGameInputAllowed()
 		&& character->GetUpperBackUtility()

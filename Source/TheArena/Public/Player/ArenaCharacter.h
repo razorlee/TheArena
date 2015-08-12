@@ -45,6 +45,7 @@ public:
 	/** player pressed cover action */
 	void OnToggleCover();
 	/** player pressed exit cover action */
+	UFUNCTION(BlueprintCallable, Category = Input)
 	void OnExitCover();
 	/** player pressed run action */
 	void OnStartRunning();
@@ -385,7 +386,7 @@ protected:
 	float LastTakeHitTimeTimeout;
 
 	/** material instances for setting team color in mesh (3rd person view) */
-	UPROPERTY(Transient)
+	UPROPERTY(BlueprintReadWrite, Transient, Category = Mesh)
 	TArray<UMaterialInstanceDynamic*> MeshMIDs;
 
 	/** effect played on respawn */
