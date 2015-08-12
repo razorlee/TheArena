@@ -352,13 +352,20 @@ bool ArenaCharacterCan::Back(AArenaCharacter* character, AArenaPlayerController*
 		&& character->GetUpperBackUtility()
 		&& character->GetPlayerState()->GetCombatState() == ECombatState::Aggressive)
 	{
-		if (character->GetCharacterAttributes()->GetCurrentEnergy() >= character->GetUpperBackUtility()->GetActivationCost())
+		if (!character->GetUpperBackUtility()->Active)
 		{
-			return true;
+			if (character->GetCharacterAttributes()->GetCurrentEnergy() >= character->GetUpperBackUtility()->GetActivationCost())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		else
 		{
-			return false;
+			return true;
 		}
 	}
 	else

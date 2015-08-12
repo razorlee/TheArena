@@ -74,6 +74,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Defaults)
 	void ConsumeEnergy(float Cost, float DeltaSeconds = 1);
+
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = Utility)
+	bool Active;
 		
 protected:
 
@@ -91,9 +94,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	TEnumAsByte<EActivationType::Type> ActivationType;
-
-	UPROPERTY(Replicated, BlueprintReadWrite, Category = Utility)
-	bool Active;
 
 	/*The cost to initially activate the ability*/
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Config)

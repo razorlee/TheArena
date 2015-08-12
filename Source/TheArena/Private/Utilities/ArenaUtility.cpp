@@ -129,7 +129,10 @@ void AArenaUtility::Activate()
 {
 	if (Role == ROLE_Authority)
 	{
-		ConsumeEnergy(ActivationCost);
+		if (!Active)
+		{
+			ConsumeEnergy(ActivationCost);
+		}
 		ActivateBP();
 		// Do nothing here
 	}
@@ -184,7 +187,10 @@ bool AArenaUtility::ServerActivate_Validate()
 }
 void AArenaUtility::ServerActivate_Implementation()
 {
-	ConsumeEnergy(ActivationCost);
+	if (!Active)
+	{
+		ConsumeEnergy(ActivationCost);
+	}
 	ActivateBP();
 }
 
