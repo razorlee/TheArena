@@ -357,7 +357,7 @@ FHitResult AArenaRangedWeapon::GetAdjustedAim()
 		TraceParams.bReturnPhysicalMaterial = true;
 
 
-		GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, COLLISION_PROJECTILE, TraceParams);
+		GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, Channel, TraceParams);
 
 		return Hit;// .ImpactPoint;//Camera->GetForwardVector();
 	}
@@ -428,7 +428,7 @@ FHitResult AArenaRangedWeapon::WeaponTrace(const FVector& StartTrace, const FVec
 	TraceParams.bReturnPhysicalMaterial = true;
 
 	FHitResult Hit(ForceInit);
-	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, COLLISION_PROJECTILE, TraceParams);
+	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, Channel, TraceParams);
 
 	return Hit;
 }

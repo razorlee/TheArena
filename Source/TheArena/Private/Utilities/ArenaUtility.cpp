@@ -27,6 +27,11 @@ AArenaUtility::AArenaUtility(const class FObjectInitializer& PCIP)
 	Active = false;
 }
 
+void AArenaUtility::Destroyed()
+{
+	Super::Destroyed();
+}
+
 // Called when the game starts or when spawned
 void AArenaUtility::BeginPlay()
 {
@@ -113,6 +118,16 @@ void AArenaUtility::Equip()
 }
 void AArenaUtility::UnEquip()
 {
+	if (Role == ROLE_Authority)
+	{
+		SetMyPawn(NULL);
+	}
+
+	Deactivate();
+	Active = false;
+	
+	Mesh3P->DetachFromParent();
+	Mesh3P->SetHiddenInGame(true);
 }
 
 EUtilityType::Type AArenaUtility::GetUtilityType()

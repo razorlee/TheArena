@@ -49,6 +49,39 @@ void UArenaCharacterInventory::SwitchWeapon()
 	}
 }
 
+void UArenaCharacterInventory::SwitchUtility()
+{
+
+	if (UtilitySelected == EUtilitySelected::Head)
+	{
+		
+	}
+	else if (UtilitySelected == EUtilitySelected::UpperBack)
+	{
+		Owner->SetUpperBackUtility(NewUtility);
+	}
+	else if (UtilitySelected == EUtilitySelected::LowerBack)
+	{
+
+	}
+	else if (UtilitySelected == EUtilitySelected::LeftWrist)
+	{
+
+	}
+	else if (UtilitySelected == EUtilitySelected::RightWrist)
+	{
+
+	}
+	else if (UtilitySelected == EUtilitySelected::LeftWaist)
+	{
+
+	}
+	else if (UtilitySelected == EUtilitySelected::RightWaist)
+	{
+
+	}
+}
+
 TArray<TSubclassOf<class AArenaWeapon>> UArenaCharacterInventory::GetInventoryBP()
 {
 	return DefaultInventoryClasses;

@@ -162,6 +162,8 @@ public:
 	class AArenaUtility* GetUpperBackUtility();
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void SetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void HandleUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	class AArenaUtility* GetLowerBackUtility();
@@ -484,4 +486,7 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
 };

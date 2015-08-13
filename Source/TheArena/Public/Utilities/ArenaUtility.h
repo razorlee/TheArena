@@ -38,6 +38,8 @@ public:
 
 	AArenaUtility(const class FObjectInitializer& PCIP);
 
+	void Destroyed() override;
+
 	virtual void BeginPlay() override;
 	
 	virtual void Tick( float DeltaSeconds ) override;
