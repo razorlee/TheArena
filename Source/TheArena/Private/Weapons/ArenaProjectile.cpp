@@ -63,6 +63,14 @@ void AArenaProjectile::InitVelocity(FVector& ShootDirection)
 	}
 }
 
+void AArenaProjectile::SetCollisionChannel(ECollisionChannel Value)
+{
+	if (CollisionComp)
+	{
+		CollisionComp->SetCollisionObjectType(Value);
+	}
+}
+
 void AArenaProjectile::OnImpact(const FHitResult& HitResult)
 {
 	if (Role == ROLE_Authority && !bExploded)

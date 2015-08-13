@@ -19,6 +19,7 @@ AArenaRangedWeapon::AArenaRangedWeapon(const FObjectInitializer& ObjectInitializ
 	WeaponState->SetNetAddressable();
 	WeaponState->SetIsReplicated(true);
 
+	Channel = COLLISION_PROJECTILE;
 	BurstCounter = 0;
 	RecoilCounter = 0;
 	IsRecoiling = false;
@@ -612,6 +613,7 @@ void AArenaRangedWeapon::ServerSpawnProjectile_Implementation(FVector Origin, FV
 		Projectile->Instigator = Instigator;
 		Projectile->SetOwner(this);
 		Projectile->SetInitialSpeed(WeaponAttributes->GetVelocity());
+		Projectile->SetCollisionChannel(Channel);
 		Projectile->InitVelocity(ShootDir);
 		Projectile->SetHitResults(Hit);
 

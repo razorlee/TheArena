@@ -79,6 +79,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = Attributes)
 	class UArenaRangedWeaponEffects* WeaponEffects;
 
+	UPROPERTY(BlueprintReadWrite, Category = Config)
+	TEnumAsByte< ECollisionChannel > Channel;
+
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)
 	FName MuzzleAttachPoint;
 	

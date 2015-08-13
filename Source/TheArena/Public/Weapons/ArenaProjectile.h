@@ -29,6 +29,9 @@ class THEARENA_API AArenaProjectile : public AActor
 	/** setup velocity */
 	void InitVelocity(FVector& ShootDirection);
 
+	/** setup collision */
+	void SetCollisionChannel(ECollisionChannel Value);
+
 	/** handle hit */
 	UFUNCTION()
 	void OnImpact(const FHitResult& HitResult);
