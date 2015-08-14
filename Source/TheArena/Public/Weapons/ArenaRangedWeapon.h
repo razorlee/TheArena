@@ -72,7 +72,10 @@ public :
 	TSubclassOf<class AArenaProjectile> ProjectileClass;
 
 	UPROPERTY(BlueprintReadWrite, Category = Mesh)
-	UMaterialInstanceDynamic* MaterialInstance;
+	UMaterialInstanceDynamic* MaterialInstanceA;
+
+	UPROPERTY(BlueprintReadWrite, Category = Mesh)
+	UMaterialInstanceDynamic* MaterialInstanceB;
 
 protected:
 
