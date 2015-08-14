@@ -63,6 +63,15 @@ void UArenaRangedWeaponEffects::SetMuzzlePSC(UParticleSystemComponent* Value)
 	MuzzlePSC = Value;
 }
 
+TSubclassOf<UCameraShake> UArenaRangedWeaponEffects::GetCameraShake()
+{
+	return FireCameraShake;
+}
+void UArenaRangedWeaponEffects::SetCameraShake(TSubclassOf<UCameraShake> Value)
+{
+	FireCameraShake = Value;
+}
+
 //////////////////////////////////////// Audio ////////////////////////////////////////
 
 UAudioComponent* UArenaRangedWeaponEffects::GetFireAC()

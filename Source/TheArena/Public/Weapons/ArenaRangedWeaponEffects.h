@@ -41,6 +41,11 @@ public:
 	UFUNCTION()
 	void SetMuzzlePSC(UParticleSystemComponent* Value);
 
+	UFUNCTION()
+	TSubclassOf<UCameraShake> GetCameraShake();
+	UFUNCTION()
+	void SetCameraShake(TSubclassOf<UCameraShake> Value);
+
 //////////////////////////////////////// Audio ////////////////////////////////////////
 
 	UFUNCTION()
@@ -115,6 +120,10 @@ protected:
 
 	UPROPERTY(Transient)
 	UParticleSystemComponent* MuzzlePSC;
+
+	/** camera shake on firing */
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	TSubclassOf<UCameraShake> FireCameraShake;
 
 //////////////////////////////////////// Audio ////////////////////////////////////////
 

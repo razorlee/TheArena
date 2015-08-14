@@ -35,7 +35,7 @@ void AArenaRangedWeapon::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (IsRecoiling)
+	if (WeaponAttributes->GetFireMode() != EFireMode::Automatic && IsRecoiling)
 	{
 		HandleRecoil(DeltaSeconds);
 	}
@@ -487,11 +487,11 @@ void AArenaRangedWeapon::PlayAttackFX()
 	AArenaPlayerController* PC = (MyPawn != NULL) ? Cast<AArenaPlayerController>(MyPawn->Controller) : NULL;
 	if (PC != NULL && PC->IsLocalController())
 	{
-		/*if (FireCameraShake != NULL)
+		if (WeaponEffects->GetCameraShake() && WeaponAttributes->GetFireMode() == EFireMode::Automatic)
 		{
-			PC->ClientPlayCameraShake(FireCameraShake, 1);
+			PC->ClientPlayCameraShake(WeaponEffects->GetCameraShake(), 1 - (WeaponAttributes->GetStability() * 0.01f));
 		}
-		if (FireForceFeedback != NULL)
+		/*if (FireForceFeedback != NULL)
 		{
 			PC->ClientPlayForceFeedback(FireForceFeedback, false, "Weapon");
 		}*/

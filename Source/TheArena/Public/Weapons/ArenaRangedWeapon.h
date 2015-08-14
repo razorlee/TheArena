@@ -10,6 +10,8 @@ class THEARENA_API AArenaRangedWeapon : public AArenaWeapon
 {
 	GENERATED_BODY()
 
+public :
+
 	AArenaRangedWeapon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Tick(float DeltaSeconds) override;
@@ -68,6 +70,9 @@ class THEARENA_API AArenaRangedWeapon : public AArenaWeapon
 
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AArenaProjectile> ProjectileClass;
+
+	UPROPERTY(BlueprintReadWrite, Category = Mesh)
+	UMaterialInstanceDynamic* MaterialInstance;
 
 protected:
 
