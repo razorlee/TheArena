@@ -43,14 +43,39 @@ void UArenaCharacterAttributes::Regenerate(float DeltaSeconds)
 			CurrentEnergy = this->GetMaxEnergy();
 		}
 	}
+	if (CurrentEnergy > ResourcesConfig.Energy)
+	{
+		CurrentEnergy = ResourcesConfig.Energy;
+	}
+	if (CurrentEnergy < 0.0)
+	{
+		CurrentEnergy = 0;
+	}
 
-	if (CurrentStamina < ResourcesConfig.Stamina && Owner->GetPlayerState()->GetPlayerState() != EPlayerState::Running)
+	if (CurrentHealth > ResourcesConfig.Health)
+	{
+		CurrentHealth = ResourcesConfig.Health;
+	}
+	if (CurrentHealth < 0.0)
+	{
+		CurrentHealth = 0;
+	}
+
+	if (CurrentStamina < ResourcesConfig.Stamina)
 	{
 		CurrentStamina += StatsConfig.StaminaRegen * DeltaSeconds;
 		if (CurrentStamina > ResourcesConfig.Stamina)
 		{
 			CurrentStamina = GetMaxStamina();
 		}
+	}
+	if (CurrentStamina > ResourcesConfig.Stamina)
+	{
+		CurrentStamina = ResourcesConfig.Stamina;
+	}
+	if (CurrentStamina < 0.0)
+	{
+		CurrentStamina = 0;
 	}
 }
 

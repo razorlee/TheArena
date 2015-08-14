@@ -11,10 +11,7 @@ UArenaCharacterMovement::UArenaCharacterMovement(const FObjectInitializer& Objec
 	BaseTurnRate = 25.f;
 	BaseLookUpRate = 25.f;
 
-	JumpCost = 200.0f;
-	SprintCost = 50.0f;
-	DodgeCost = 300.0f;
-
+	MovementSpeedModifier = 1.0f;
 	BaseMovementSpeed = 400.0f;
 	RunningMovementSpeed = 650.0f;
 	CrouchedMovementSpeed = 300.0f;
@@ -25,24 +22,24 @@ UArenaCharacterMovement::UArenaCharacterMovement(const FObjectInitializer& Objec
 
 float UArenaCharacterMovement::GetMaxSpeed() const
 {
-	float MaxSpeed = BaseMovementSpeed;
+	float MaxSpeed = BaseMovementSpeed  * MovementSpeedModifier;
 
 	AArenaCharacter* ArenaCharacterOwner = Cast<AArenaCharacter>(PawnOwner);
 	if (ArenaCharacterOwner)
 	{
 		if (ArenaCharacterOwner->GetPlayerState()->GetPlayerState() == EPlayerState::Running)
 		{
-			MaxSpeed = RunningMovementSpeed;
+			MaxSpeed = RunningMovementSpeed * MovementSpeedModifier;
 		}
 		if (ArenaCharacterOwner->GetPlayerState()->GetPlayerState() == EPlayerState::Crouching)
 		{
-			MaxSpeed = CrouchedMovementSpeed;
+			MaxSpeed = CrouchedMovementSpeed * MovementSpeedModifier;
 		}
 		if (ArenaCharacterOwner->GetCurrentWeapon())
 		{
 			if (ArenaCharacterOwner->GetCharacterEquipment()->GetDrawCrosshair())
 			{
-				MaxSpeed = TargetingMovementSpeed;
+				MaxSpeed = TargetingMovementSpeed * MovementSpeedModifier;
 			}
 		}
 	}
@@ -61,7 +58,7 @@ void UArenaCharacterMovement::ManageState(float DeltaSeconds)
 
 		if (ArenaCharacterOwner->GetPlayerState()->GetPlayerState() == EPlayerState::Running)
 		{
-			ArenaCharacterOwner->GetCharacterAttributes()->SetCurrentStamina(ArenaCharacterOwner->GetCharacterAttributes()->GetCurrentStamina() - (SprintCost * DeltaSeconds));
+			ArenaCharacterOwner->GetCharacterAttributes()->SetCurrentStamina(ArenaCharacterOwner->GetCharacterAttributes()->GetCurrentStamina() - (CostConfig.SprintCost * DeltaSeconds));
 		}
 		ArenaCharacterOwner->GetCharacterAttributes()->SetCurrentHealth(ArenaCharacterOwner->GetCharacterAttributes()->GetCurrentHealth());
 	}
@@ -77,14 +74,13 @@ float UArenaCharacterMovement::GetLookUpRate()
 	return BaseLookUpRate;
 }
 
-float UArenaCharacterMovement::GetJumpCost()
+float UArenaCharacterMovement::GetMovementSpeedModifier()
 {
-	return JumpCost;
+	return MovementSpeedModifier;
 }
-
-void UArenaCharacterMovement::SetJumpCost(float cost)
+void UArenaCharacterMovement::SetMovementSpeedModifier(float Value)
 {
-	JumpCost = cost;
+	MovementSpeedModifier = Value;
 }
 
 USoundBase* UArenaCharacterMovement::GetRunLoopSound()

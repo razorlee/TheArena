@@ -45,6 +45,7 @@ public:
 	/** player pressed cover action */
 	void OnToggleCover();
 	/** player pressed exit cover action */
+	UFUNCTION(BlueprintCallable, Category = Input)
 	void OnExitCover();
 	/** player pressed run action */
 	void OnStartRunning();
@@ -161,6 +162,8 @@ public:
 	class AArenaUtility* GetUpperBackUtility();
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void SetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void HandleUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	class AArenaUtility* GetLowerBackUtility();
@@ -385,7 +388,7 @@ protected:
 	float LastTakeHitTimeTimeout;
 
 	/** material instances for setting team color in mesh (3rd person view) */
-	UPROPERTY(Transient)
+	UPROPERTY(BlueprintReadWrite, Transient, Category = Mesh)
 	TArray<UMaterialInstanceDynamic*> MeshMIDs;
 
 	/** effect played on respawn */
@@ -483,4 +486,7 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
 };

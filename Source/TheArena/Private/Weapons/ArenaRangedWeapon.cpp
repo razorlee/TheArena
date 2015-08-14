@@ -19,6 +19,7 @@ AArenaRangedWeapon::AArenaRangedWeapon(const FObjectInitializer& ObjectInitializ
 	WeaponState->SetNetAddressable();
 	WeaponState->SetIsReplicated(true);
 
+	Channel = COLLISION_PROJECTILE;
 	BurstCounter = 0;
 	RecoilCounter = 0;
 	IsRecoiling = false;
@@ -356,7 +357,7 @@ FHitResult AArenaRangedWeapon::GetAdjustedAim()
 		TraceParams.bReturnPhysicalMaterial = true;
 
 
-		GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, COLLISION_PROJECTILE, TraceParams);
+		GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, Channel, TraceParams);
 
 		return Hit;// .ImpactPoint;//Camera->GetForwardVector();
 	}
@@ -427,7 +428,7 @@ FHitResult AArenaRangedWeapon::WeaponTrace(const FVector& StartTrace, const FVec
 	TraceParams.bReturnPhysicalMaterial = true;
 
 	FHitResult Hit(ForceInit);
-	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, COLLISION_PROJECTILE, TraceParams);
+	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, Channel, TraceParams);
 
 	return Hit;
 }
@@ -612,6 +613,7 @@ void AArenaRangedWeapon::ServerSpawnProjectile_Implementation(FVector Origin, FV
 		Projectile->Instigator = Instigator;
 		Projectile->SetOwner(this);
 		Projectile->SetInitialSpeed(WeaponAttributes->GetVelocity());
+		Projectile->SetCollisionChannel(Channel);
 		Projectile->InitVelocity(ShootDir);
 		Projectile->SetHitResults(Hit);
 

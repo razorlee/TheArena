@@ -33,8 +33,14 @@ public:
 
 	void SpawnDefaultInventory();
 
+	//UFUNCTION(BlueprintCallable, Category = Weapon)
+	//void SwitchArmor();
+
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void SwitchWeapon();
+
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void SwitchUtility();
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	TArray<TSubclassOf<class AArenaWeapon>> GetInventoryBP();

@@ -4,6 +4,37 @@
 
 #include "ArenaCharacterMovement.generated.h"
 
+USTRUCT(BlueprintType)
+struct FActionCosts
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	float SprintCost;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	float JumpCost;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	float VaultCost;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	float ClimbCost;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	float DodgeCost;
+
+	///** defaults */
+	FActionCosts()
+	{
+		SprintCost = 300.0f;
+		JumpCost = 300.0f;
+		VaultCost = 300.0f;
+		ClimbCost = 300.0f;
+		DodgeCost = 500.0f;
+	}
+};
+
 UCLASS()
 class THEARENA_API UArenaCharacterMovement : public UCharacterMovementComponent
 {
@@ -25,9 +56,9 @@ public:
 	float GetLookUpRate();
 
 	UFUNCTION(BlueprintCallable, Category = Movement)
-	float GetJumpCost();
+	float GetMovementSpeedModifier();
 	UFUNCTION(BlueprintCallable, Category = Movement)
-	void SetJumpCost(float cost);
+	void SetMovementSpeedModifier(float Value);
 
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	USoundBase* GetRunLoopSound();
@@ -76,6 +107,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Sockets)
 	FName GetLowCover();
 
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FActionCosts CostConfig;
+
 private:
 
 /////////////////////////////////////////// Movement Defaults ///////////////////////////////////////////
@@ -88,6 +122,9 @@ private:
 /////////////////////////////////////////////// Movement Speed ///////////////////////////////////////////////
 
 	UPROPERTY(EditDefaultsOnly, Category = Movement)
+	float MovementSpeedModifier;
+
+	UPROPERTY(EditDefaultsOnly, Category = Movement)
 	float BaseMovementSpeed;
 
 	UPROPERTY(EditDefaultsOnly, Category = Movement)
@@ -98,17 +135,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = Movement)
 	float TargetingMovementSpeed;
-
-/////////////////////////////////////////////// Movement Cost ///////////////////////////////////////////////
-
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
-	float SprintCost;
-
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
-	float JumpCost;
-
-	UPROPERTY(EditDefaultsOnly, Category = Pawn)
-	float DodgeCost;
 
 ////////////////////////////////////////////// Movement Sound //////////////////////////////////////////////
 

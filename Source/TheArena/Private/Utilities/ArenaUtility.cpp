@@ -4,11 +4,32 @@
 #include "ArenaUtility.h"
 
 // Sets default values
-AArenaUtility::AArenaUtility()
+AArenaUtility::AArenaUtility(const class FObjectInitializer& PCIP)
 {
+	Mesh3P = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("UtilityMesh3P"));
+	Mesh3P->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
+	Mesh3P->bChartDistanceFactor = true;
+	Mesh3P->bReceivesDecals = false;
+	Mesh3P->CastShadow = true;
+	Mesh3P->SetCollisionObjectType(ECC_WorldDynamic);
+	Mesh3P->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh3P->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
+	Mesh3P->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	Mesh3P->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickGroup = TG_PrePhysics;
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	bReplicates = true;
+	bNetUseOwnerRelevancy = true;
+
 	Active = false;
+}
+
+void AArenaUtility::Destroyed()
+{
+	Super::Destroyed();
 }
 
 // Called when the game starts or when spawned
@@ -25,10 +46,11 @@ void AArenaUtility::Tick(float DeltaTime)
 
 	if (Active && (ActivationType == EActivationType::Toggle || ActivationType == EActivationType::Channel))
 	{
-		ConsumeEnergy(DeltaTime);
+		ConsumeEnergy(ContinuationCost, DeltaTime);
 		if (MyPawn->GetCharacterAttributes()->GetCurrentEnergy() <= 0.0f)
 		{
 			Deactivate();
+			Active = false;
 		}
 	}
 }
@@ -40,6 +62,7 @@ class AArenaCharacter* AArenaUtility::GetMyPawn() const
 void AArenaUtility::SetMyPawn(AArenaCharacter* Pawn)
 {
 	MyPawn = Pawn;
+	SetOwner(Pawn);
 }
 
 FName AArenaUtility::GetUtilityName() const
@@ -65,7 +88,7 @@ void AArenaUtility::Equip()
 	}
 	else if (UtilityType == EUtilityType::UpperBack)
 	{
-		//AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainPistolAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffPistolAttachPoint();
+		AttachPoint = FName(TEXT("UpperBackUtility"));
 	}
 	else if (UtilityType == EUtilityType::LowerBack)
 	{
@@ -95,6 +118,16 @@ void AArenaUtility::Equip()
 }
 void AArenaUtility::UnEquip()
 {
+	if (Role == ROLE_Authority)
+	{
+		SetMyPawn(NULL);
+	}
+
+	Deactivate();
+	Active = false;
+	
+	Mesh3P->DetachFromParent();
+	Mesh3P->SetHiddenInGame(true);
 }
 
 EUtilityType::Type AArenaUtility::GetUtilityType()
@@ -109,17 +142,78 @@ EActivationType::Type AArenaUtility::GetActivationType()
 
 void AArenaUtility::Activate()
 {
-	ConsumeEnergy();
-	ActivateBP();
-	// Do nothing here
+	if (Role == ROLE_Authority)
+	{
+		if (!Active)
+		{
+			ConsumeEnergy(ActivationCost);
+		}
+		ActivateBP();
+		// Do nothing here
+	}
+	else
+	{
+		ServerActivate();
+	}
 }
 void AArenaUtility::Deactivate()
 {
-	DeactivateBP();
-	// Do nothing here
+	if (Role == ROLE_Authority)
+	{
+		DeactivateBP();
+		// Do nothing here
+	}
+	else
+	{
+		ServerDeactivate();
+	}
 }
 
-void AArenaUtility::ConsumeEnergy(float DeltaSeconds)
+void AArenaUtility::ConsumeEnergy(float DeltaSeconds, float Cost)
 {
-	MyPawn->GetCharacterAttributes()->SetCurrentEnergy(MyPawn->GetCharacterAttributes()->GetCurrentEnergy() - (ActivationCost * DeltaSeconds));
+	MyPawn->GetCharacterAttributes()->SetCurrentEnergy(MyPawn->GetCharacterAttributes()->GetCurrentEnergy() - (Cost * DeltaSeconds));
+}
+
+/////////////////////////////////////// Server ///////////////////////////////////////
+
+void AArenaUtility::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AArenaUtility, MyPawn);
+	DOREPLIFETIME(AArenaUtility, Active);
+}
+
+void AArenaUtility::OnRep_MyPawn()
+{
+	if (MyPawn)
+	{
+		SetMyPawn(MyPawn);
+	}
+	else
+	{
+		UnEquip();
+	}
+}
+
+bool AArenaUtility::ServerActivate_Validate()
+{
+	return true;
+}
+void AArenaUtility::ServerActivate_Implementation()
+{
+	if (!Active)
+	{
+		ConsumeEnergy(ActivationCost);
+	}
+	ActivateBP();
+}
+
+bool AArenaUtility::ServerDeactivate_Validate()
+{
+	return true;
+}
+void AArenaUtility::ServerDeactivate_Implementation()
+{
+	DeactivateBP();
 }

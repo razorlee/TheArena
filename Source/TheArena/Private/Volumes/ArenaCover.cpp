@@ -127,7 +127,7 @@ void AArenaCover::BeginLeftOverlap(class AActor* OtherActor, class UPrimitiveCom
 void AArenaCover::EndLeftOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(OtherActor);
-	if (MyPawn->GetCurrentWeapon() && MyPawn && !MyPawn->GetCurrentWeapon()->GetWeaponState()->GetCoverTargeting())
+	if (MyPawn && MyPawn->GetCurrentWeapon() && !MyPawn->GetCurrentWeapon()->GetWeaponState()->GetCoverTargeting())
 	{
 		MyPawn->GetPlayerState()->SetIsNearLeftEdge(false);
 	}
@@ -152,7 +152,7 @@ void AArenaCover::BeginRightOverlap(class AActor* OtherActor, class UPrimitiveCo
 void AArenaCover::EndRightOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(OtherActor);
-	if (MyPawn->GetCurrentWeapon() && MyPawn && !MyPawn->GetCurrentWeapon()->GetWeaponState()->GetCoverTargeting())
+	if (MyPawn && MyPawn->GetCurrentWeapon() && !MyPawn->GetCurrentWeapon()->GetWeaponState()->GetCoverTargeting())
 	{
 		MyPawn->GetPlayerState()->SetIsNearRightEdge(false);
 	}
