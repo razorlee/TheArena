@@ -129,6 +129,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	class UArenaCharacterInventory* GetCharacterInventory();
 
+	UFUNCTION(BlueprintCallable, Category = Mesh)
+	TArray<UMaterialInstanceDynamic*> GetMeshMIDs();
+
 	UFUNCTION(BlueprintCallable, Category = Character)
 	FString GetName() const;
 	UFUNCTION(NetMulticast, Unreliable)

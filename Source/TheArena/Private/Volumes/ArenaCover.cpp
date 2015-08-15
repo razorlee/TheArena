@@ -23,14 +23,17 @@ AArenaCover::AArenaCover(const class FObjectInitializer& PCIP)
 
 	Cover->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	Cover->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+	Cover->SetCollisionResponseToChannel(COLLISION_PROJECTILEPEN, ECR_Ignore);
 	Cover->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 
 	LeftEdge->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	LeftEdge->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+	LeftEdge->SetCollisionResponseToChannel(COLLISION_PROJECTILEPEN, ECR_Ignore);
 	LeftEdge->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 
 	RightEdge->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	RightEdge->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+	RightEdge->SetCollisionResponseToChannel(COLLISION_PROJECTILEPEN, ECR_Ignore);
 	RightEdge->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 
 	Cover->OnComponentBeginOverlap.AddDynamic(this, &AArenaCover::BeginOverlap);

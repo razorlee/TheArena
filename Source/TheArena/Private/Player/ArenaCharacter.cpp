@@ -1038,6 +1038,11 @@ UArenaCharacterInventory* AArenaCharacter::GetCharacterInventory()
 	return CharacterInventory;
 }
 
+TArray<UMaterialInstanceDynamic*> AArenaCharacter::GetMeshMIDs()
+{
+	return MeshMIDs;
+}
+
 FString AArenaCharacter::GetName() const
 {
 	return Name;

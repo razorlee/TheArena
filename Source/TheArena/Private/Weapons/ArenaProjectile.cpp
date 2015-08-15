@@ -14,6 +14,7 @@ AArenaProjectile::AArenaProjectile(const class FObjectInitializer& PCIP)
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILEPEN, ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	RootComponent = CollisionComp;
 
@@ -68,6 +69,7 @@ void AArenaProjectile::SetCollisionChannel(ECollisionChannel Value)
 	if (CollisionComp)
 	{
 		CollisionComp->SetCollisionObjectType(Value);
+		CollisionComp->SetCollisionResponseToChannel(Value, ECR_Ignore);
 	}
 }
 

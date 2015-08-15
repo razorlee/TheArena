@@ -46,6 +46,8 @@ public:
 
 	virtual float GetMaxSpeed() const override;
 
+	void UpdateMIDs(float Speed) const;
+
 	UFUNCTION(BlueprintCallable, Category = Movement)
 	void ManageState(float DeltaSeconds);
 

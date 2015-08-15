@@ -43,7 +43,35 @@ float UArenaCharacterMovement::GetMaxSpeed() const
 			}
 		}
 	}
+	UpdateMIDs(MaxSpeed);
 	return MaxSpeed;
+}
+
+void UArenaCharacterMovement::UpdateMIDs(float Speed) const
+{
+	AArenaCharacter* ArenaCharacterOwner = Cast<AArenaCharacter>(PawnOwner);
+	if (ArenaCharacterOwner)
+	{
+		for (int32 i = 0; i < ArenaCharacterOwner->GetMeshMIDs().Num(); ++i)
+		{
+			UMaterialInstanceDynamic* UseMID = ArenaCharacterOwner->GetMeshMIDs()[i];
+			if (UseMID)
+			{
+				if (Velocity.IsZero())
+				{
+					float MaterialParam = 0.0f;
+					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Speed: %f"), MaterialParam));
+					UseMID->SetScalarParameterValue(TEXT("Speed"), MaterialParam);
+				}
+				else
+				{
+					float MaterialParam = Velocity.X > Velocity.Y ? FMath::Abs(Velocity.X / 3000.0f) : FMath::Abs(Velocity.Y / 3000.0f);
+					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Speed: %f"), MaterialParam));
+					UseMID->SetScalarParameterValue(TEXT("Speed"), MaterialParam);
+				}
+			}
+		}
+	}
 }
 
 void UArenaCharacterMovement::ManageState(float DeltaSeconds)
