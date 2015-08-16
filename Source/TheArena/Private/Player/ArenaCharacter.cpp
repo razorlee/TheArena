@@ -91,12 +91,13 @@ void AArenaCharacter::PostInitializeComponents()
 	if (IsRunningGame() || IsRunningDedicatedServer())
 	{
 		ReadySpawned = true;
-		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.2f, false);
+		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.5f, false);
 	}
 	else
 	{
 		ReadySpawned = true;
-		//ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP());
+		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.5f, false);
+		//ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP(), CharacterEquipment->GetUpperBackUtilityBP());
 	}
 
 	CharacterState->Reset();
@@ -165,7 +166,7 @@ void AArenaCharacter::LoadPersistence()
 			CharacterEquipment->SetRightWaistUtilityBP(SaveGameInstance->RightWaistUtility);
 		}
 
-		ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP());
+		ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP(), CharacterEquipment->GetUpperBackUtilityBP());
 
 		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->PrimaryWeapon = CharacterEquipment->GetPrimaryWeaponBP();
@@ -679,15 +680,20 @@ void AArenaCharacter::OnDeactivateBack()
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
-void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon)
+void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
 {
 	if (Role == ROLE_Authority)
 	{
-		PrimaryWeapon->SetOwningPawn(this);
-		PrimaryWeapon->FinishUnEquip();
-
-		SecondaryWeapon->SetOwningPawn(this);;
-		SecondaryWeapon->FinishUnEquip();
+		if (PrimaryWeapon)
+		{
+			PrimaryWeapon->SetOwningPawn(this);
+			PrimaryWeapon->FinishUnEquip();
+		}
+		if (SecondaryWeapon)
+		{
+			SecondaryWeapon->SetOwningPawn(this);;
+			SecondaryWeapon->FinishUnEquip();
+		}
 
 		if (HeadUtility)
 		{
@@ -721,7 +727,7 @@ void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* 
 	}
 	else
 	{
-		ServerInitializeWeapons(mainWeapon, offWeapon);
+		ServerInitializeWeapons(mainWeapon, offWeapon, UpperBack);
 	}
 }
 
@@ -1083,9 +1089,9 @@ void AArenaCharacter::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
 	if (IsLocallyControlled() && Weapon)
 	{
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->PrimaryWeapon = Weapon;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1124,9 +1130,9 @@ void AArenaCharacter::SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
 	if (IsLocallyControlled() && Weapon)
 	{
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->SecondaryWeapon = Weapon;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1165,9 +1171,9 @@ void AArenaCharacter::SetHeadUtility(TSubclassOf<class AArenaUtility> Utility)
 {
 	if (IsLocallyControlled() && Utility)
 	{
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->HeadUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1187,9 +1193,10 @@ void AArenaCharacter::SetUpperBackUtility(TSubclassOf<class AArenaUtility> Utili
 {
 	if (IsLocallyControlled() && Utility)
 	{
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+
 		SaveGameInstance->UpperBackUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1225,9 +1232,9 @@ void AArenaCharacter::SetLowerBackUtility(TSubclassOf<class AArenaUtility> Utili
 {
 	if (IsLocallyControlled() && Utility)
 	{
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->LowerBackUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1247,9 +1254,9 @@ void AArenaCharacter::SetLeftWristUtility(TSubclassOf<class AArenaUtility> Utili
 {
 	if (IsLocallyControlled() && Utility)
 	{
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->LeftWristUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1269,9 +1276,9 @@ void AArenaCharacter::SetRightWristUtility(TSubclassOf<class AArenaUtility> Util
 {
 	if (IsLocallyControlled() && Utility)
 	{
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->RightWristUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1291,9 +1298,9 @@ void AArenaCharacter::SetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utili
 {
 	if (IsLocallyControlled() && Utility)
 	{
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->LeftWaistUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1313,9 +1320,9 @@ void AArenaCharacter::SetRightWaistUtility(TSubclassOf<class AArenaUtility> Util
 {
 	if (IsLocallyControlled() && Utility)
 	{
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->RightWaistUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1912,31 +1919,41 @@ void AArenaCharacter::ServerSetName_Implementation(const FString& NewName)
 	SetName(NewName);
 }
 
-bool AArenaCharacter::ServerSpawnEquipment_Validate(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon)
+bool AArenaCharacter::ServerSpawnEquipment_Validate(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack)
 {
 	return true;
 }
-void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon)
+void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility>  UpperBack)
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
 
-	PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(MainWeapon, SpawnInfo);
-	PrimaryWeapon->SetPrimary(true);
-	SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(OffWeapon, SpawnInfo);
+	if (MainWeapon)
+	{
+		PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(MainWeapon, SpawnInfo);
+		PrimaryWeapon->SetPrimary(true);
+	}
+	if (OffWeapon)
+	{
+		SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(OffWeapon, SpawnInfo);
+	}
+	if (UpperBack)
+	{
+		UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(UpperBack, SpawnInfo);
+	}
 
-	HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
+	//HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
 
-	UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetUpperBackUtilityBP(), SpawnInfo);
-	LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLowerBackUtilityBP(), SpawnInfo);
+	//UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetUpperBackUtilityBP(), SpawnInfo);
+	//LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLowerBackUtilityBP(), SpawnInfo);
 
-	LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
-	RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
+	//LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
+	//RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
 
-	LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
-	RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
+	//LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
+	//RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
 
-	InitializeWeapons(PrimaryWeapon, SecondaryWeapon);
+	InitializeWeapons(PrimaryWeapon, SecondaryWeapon, UpperBackUtility);
 }
 
 bool AArenaCharacter::ServerToggleCrouch_Validate()
@@ -1993,13 +2010,13 @@ void AArenaCharacter::ServerSwapWeapon_Implementation()
 	SwapWeapon();
 }
 
-bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon)
+bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
 {
 	return true;
 }
-void AArenaCharacter::ServerInitializeWeapons_Implementation(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon)
+void AArenaCharacter::ServerInitializeWeapons_Implementation(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
 {
-	InitializeWeapons(mainWeapon, offWeapon);
+	InitializeWeapons(mainWeapon, offWeapon, UpperBack);
 }
 
 bool AArenaCharacter::ServerSetPrimaryWeapon_Validate(TSubclassOf<class AArenaWeapon> Weapon)

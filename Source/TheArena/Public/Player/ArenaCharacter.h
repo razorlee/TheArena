@@ -210,7 +210,7 @@ public:
 	void AddWeapon(class AArenaWeapon* Weapon);
 	void RemoveWeapon(class AArenaWeapon* Weapon);
 
-	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon);
+	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack);
 
 	UFUNCTION(NetMultiCast, Reliable)
 	void ToggleCrouch();
@@ -461,7 +461,7 @@ protected:
 	void ServerSetName(const FString& NewName);
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerSpawnEquipment(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon);
+	void ServerSpawnEquipment(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerToggleCrouch();
@@ -482,7 +482,7 @@ protected:
 	void ServerSwapWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerInitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon);
+	void ServerInitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
