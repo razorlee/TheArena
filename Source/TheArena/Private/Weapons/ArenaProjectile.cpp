@@ -13,6 +13,7 @@ AArenaProjectile::AArenaProjectile(const class FObjectInitializer& PCIP)
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILEPEN, ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
@@ -108,12 +109,14 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 			FString critical = "head";
 			if (Impact.BoneName.ToString() == critical)
 			{
-				float Damage = (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() * 2) * (MovementComp->MaxSpeed / MovementComp->InitialSpeed);
+				float Damage = (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() * 2) * ( StartTime / StopTimer() );
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
 				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
 			}
 			else
 			{
-				float Damage = (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage()) * (MovementComp->MaxSpeed / MovementComp->InitialSpeed);
+				float Damage = (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage()) * (StartTime / StopTimer() );
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
 				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
 			}
 		}
@@ -194,6 +197,17 @@ void AArenaProjectile::SetPawnOwner(class AArenaCharacter* NewOwner)
 void AArenaProjectile::SetHitResults(const FHitResult& Impact)
 {
 	HitResults = Impact;
+}
+
+void AArenaProjectile::StartTimer()
+{
+	 StartTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+}
+
+float AArenaProjectile::StopTimer()
+{
+	StopTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+	return StopTime;
 }
 
 void AArenaProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)

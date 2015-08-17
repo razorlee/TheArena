@@ -618,6 +618,7 @@ void AArenaRangedWeapon::ServerSpawnProjectile_Implementation(FVector Origin, FV
 		Projectile->SetHitResults(Hit);
 
 		UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
+		Projectile->StartTimer();
 	}
 }
 

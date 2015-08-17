@@ -45,6 +45,11 @@ class THEARENA_API AArenaProjectile : public AActor
 
 	void SetHitResults(const FHitResult& Impact);
 
+	UFUNCTION()
+	void StartTimer();
+	UFUNCTION()
+	float StopTimer();
+
 private:
 
 	/** movement component */
@@ -83,6 +88,12 @@ protected:
 	/** explode hit notify for replication */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Exploded)
 	FProjectileHitInfo ExplodeNotify;
+
+	UPROPERTY()
+	float StartTime;
+
+	UPROPERTY()
+	float StopTime;
 
 	/** [client] explosion happened */
 	UFUNCTION()
