@@ -28,6 +28,7 @@ void AArenaExplosionEffect::BeginPlay()
 
 	if (ExplosionFX)
 	{
+		//ExplosionFX
 		UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionFX, GetActorLocation(), GetActorRotation());
 	}
 

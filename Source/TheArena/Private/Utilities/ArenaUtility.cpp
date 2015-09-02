@@ -147,6 +147,7 @@ void AArenaUtility::Activate()
 		if (!Active)
 		{
 			ConsumeEnergy(ActivationCost);
+			PlayUtilityAnimation();
 		}
 		ActivateBP();
 		// Do nothing here
@@ -172,6 +173,14 @@ void AArenaUtility::Deactivate()
 void AArenaUtility::ConsumeEnergy(float DeltaSeconds, float Cost)
 {
 	MyPawn->GetCharacterAttributes()->SetCurrentEnergy(MyPawn->GetCharacterAttributes()->GetCurrentEnergy() - (Cost * DeltaSeconds));
+}
+
+void AArenaUtility::PlayUtilityAnimation_Implementation()
+{
+	if (UtilityAnim)
+	{
+		MyPawn->PlayAnimMontage(UtilityAnim);
+	}
 }
 
 /////////////////////////////////////// Server ///////////////////////////////////////
@@ -205,6 +214,7 @@ void AArenaUtility::ServerActivate_Implementation()
 	if (!Active)
 	{
 		ConsumeEnergy(ActivationCost);
+		PlayUtilityAnimation();
 	}
 	ActivateBP();
 }

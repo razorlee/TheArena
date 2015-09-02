@@ -605,20 +605,48 @@ bool AArenaRangedWeapon::ServerSpawnProjectile_Validate(FVector Origin, FVector 
 }
 void AArenaRangedWeapon::ServerSpawnProjectile_Implementation(FVector Origin, FVector ShootDir, FHitResult Hit)
 {
-	FTransform SpawnTM(ShootDir.Rotation(), Origin);
-	AArenaProjectile* Projectile = Cast<AArenaProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileClass, SpawnTM));
-	if (Projectile)
+	if (Hit.bBlockingHit)
 	{
-		Projectile->SetPawnOwner(MyPawn);
-		Projectile->Instigator = Instigator;
-		Projectile->SetOwner(this);
-		Projectile->SetInitialSpeed(WeaponAttributes->GetVelocity());
-		Projectile->SetCollisionChannel(Channel);
-		Projectile->InitVelocity(ShootDir);
-		Projectile->SetHitResults(Hit);
+		FTransform SpawnTM(ShootDir.Rotation(), Origin);
+		AArenaProjectile* Projectile = Cast<AArenaProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileClass, SpawnTM));
+		if (Projectile)
+		{
+			Projectile->SetPawnOwner(MyPawn);
+			Projectile->Instigator = Instigator;
+			Projectile->SetOwner(this);
+			Projectile->SetInitialSpeed(WeaponAttributes->GetVelocity());
+			Projectile->SetCollisionChannel(Channel);
+			Projectile->InitVelocity(ShootDir);
+			Projectile->SetDamage(WeaponAttributes->GetDamage());
+			Projectile->SetIsExplosive(WeaponAttributes->GetIsExplosive());
+			Projectile->SetExplosionRadius(WeaponAttributes->GetExplosionRadius());
+			Projectile->SetIsAffectByVelocity(true);
+			Projectile->SetHitResults(Hit);
 
-		UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
-		Projectile->StartTimer();
+			UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
+			Projectile->StartTimer();
+		}
+	}
+	else
+	{
+		//FTransform SpawnTM(ShootDir.Rotation(), Origin); //new function
+		//AArenaProjectile* Projectile = Cast<AArenaProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileClass, SpawnTM));
+		//if (Projectile)
+		//{
+		//	Projectile->SetPawnOwner(MyPawn);
+		//	Projectile->Instigator = Instigator;
+		//	Projectile->SetOwner(this);
+		//	Projectile->SetInitialSpeed(WeaponAttributes->GetVelocity());
+		//	Projectile->SetCollisionChannel(Channel);
+		//	Projectile->InitVelocity(ShootDir);
+		//	Projectile->SetDamage(WeaponAttributes->GetDamage());
+		//	Projectile->SetIsExplosive(WeaponAttributes->GetIsExplosive());
+		//	Projectile->SetExplosionRadius(WeaponAttributes->GetExplosionRadius());
+		//	Projectile->SetIsAffectByVelocity(true);
+
+		//	UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
+		//	Projectile->StartTimer();
+		//}
 	}
 }
 

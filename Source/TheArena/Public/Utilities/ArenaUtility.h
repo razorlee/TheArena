@@ -79,6 +79,9 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadWrite, Category = Utility)
 	bool Active;
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void PlayUtilityAnimation();
 		
 protected:
 
@@ -96,6 +99,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	TEnumAsByte<EActivationType::Type> ActivationType;
+
+	UPROPERTY(EditDefaultsOnly, Category = Animation)
+	UAnimMontage* UtilityAnim;
 
 	/*The cost to initially activate the ability*/
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Config)
