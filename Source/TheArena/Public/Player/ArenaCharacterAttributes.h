@@ -175,6 +175,8 @@ private:
 	AArenaCharacter* Owner;
 
 	UPROPERTY(Transient, Replicated)
+	float CurrentShield;
+	UPROPERTY(Transient, Replicated)
 	float CurrentHealth;
 	UPROPERTY(Transient, Replicated)
 	float CurrentEnergy;

@@ -23,6 +23,7 @@ void UArenaCharacterAttributes::InitializeComponent()
 	CurrentHealth = ResourcesConfig.Health;
 	CurrentEnergy = ResourcesConfig.Stamina;
 	CurrentStamina = ResourcesConfig.Energy;
+	CurrentShield = ResourcesConfig.Shield;
 	
 }
 
@@ -126,17 +127,17 @@ void UArenaCharacterAttributes::SetCurrentEnergy(float Value)
 
 int32 UArenaCharacterAttributes::GetMaxShields() const
 {
-	return ResourcesConfig.Shield;
+	return ResourcesConfig.Health;
 }
 
 float UArenaCharacterAttributes::GetCurrentShields() const
 {
-	return ResourcesConfig.Shield;
+	return CurrentShield;
 }
 
 void UArenaCharacterAttributes::SetCurrentShields(float Value)
 {
-	ResourcesConfig.Shield = Value;
+	CurrentShield = Value;
 }
 
 // Called every frame
