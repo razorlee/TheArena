@@ -93,7 +93,7 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 	const FVector NudgedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
 	if (IsExplosive)
 	{
-		if (Damage > 0 && ExplosionRadius > 0 && UDamageType::StaticClass())
+		if (Damage != 0 && ExplosionRadius > 0 && UDamageType::StaticClass())
 		{
 			UGameplayStatics::ApplyRadialDamage(this, Damage, NudgedImpactLocation, ExplosionRadius, UDamageType::StaticClass(), TArray<AActor*>(), this, MyController.Get());
 		}

@@ -1419,8 +1419,8 @@ float AArenaCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damag
 	//AArenaGameMode* const Game = GetWorld()->GetAuthGameMode<AArenaGameMode>();
 	//Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
 
-	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-	if (ActualDamage > 0.f)
+	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser); // negatives dont work here
+	if (ActualDamage != 0.f)
 	{
 		CharacterAttributes->SetCurrentHealth(CharacterAttributes->GetCurrentHealth() - ActualDamage);
 		if (CharacterAttributes->GetCurrentHealth() <= 0)
