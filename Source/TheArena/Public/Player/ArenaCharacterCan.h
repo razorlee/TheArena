@@ -68,7 +68,7 @@ public:
 	static bool Wrist(AArenaCharacter* character, AArenaPlayerController* controller);
 
 	/*Checks if the player can activate waist utility*/
-	static bool Waist(AArenaCharacter* character, AArenaPlayerController* controller);
+	static bool Waist(AArenaUtility* utility, AArenaCharacter* character, AArenaPlayerController* controller);
 
 	/*Checks if the player can fire a weapon*/
 	static bool Reload(AArenaCharacter* character, AArenaPlayerController* controller);
