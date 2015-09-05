@@ -686,7 +686,7 @@ void AArenaCharacter::OnDeactivateBack()
 void AArenaCharacter::OnActivateLeftWaist()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (ArenaCharacterCan::Waist(this, MyPC))
+	if (ArenaCharacterCan::Waist(LeftWaistUtility, this, MyPC))
 	{
 		LeftWaistUtility->Activate();
 	}
@@ -702,7 +702,7 @@ void AArenaCharacter::OnDeactivateLeftWaist()
 void AArenaCharacter::OnActivateRightWaist()
 {
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (ArenaCharacterCan::Waist(this, MyPC))
+	if (ArenaCharacterCan::Waist(RightWaistUtility, this, MyPC))
 	{
 		RightWaistUtility->Activate();
 	}
@@ -1419,20 +1419,31 @@ float AArenaCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damag
 	//AArenaGameMode* const Game = GetWorld()->GetAuthGameMode<AArenaGameMode>();
 	//Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
 
-	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser); // negatives dont work here
+	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	if (ActualDamage != 0.f)
 	{
-		CharacterAttributes->SetCurrentHealth(CharacterAttributes->GetCurrentHealth() - ActualDamage);
-		if (CharacterAttributes->GetCurrentHealth() <= 0)
+		if (CharacterAttributes->GetCurrentShields() > 0 && ActualDamage > 0)
 		{
-			Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
+			float temp = ActualDamage - CharacterAttributes->GetCurrentShields();
+			CharacterAttributes->SetCurrentShields(CharacterAttributes->GetCurrentShields() - ActualDamage);
+			if (temp > 0)
+			{
+				ActualDamage = temp;
+			}
 		}
-		else
+		if (CharacterAttributes->GetCurrentShields() <= 0 || ActualDamage < 0)
 		{
-			PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
+			CharacterAttributes->SetCurrentHealth(CharacterAttributes->GetCurrentHealth() - ActualDamage);
+			if (CharacterAttributes->GetCurrentHealth() <= 0)
+			{
+				Die(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
+			}
+			else
+			{
+				PlayHit(ActualDamage, DamageEvent, EventInstigator ? EventInstigator->GetPawn() : NULL, DamageCauser);
+			}
+			MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
 		}
-
-		MakeNoise(1.0f, EventInstigator ? EventInstigator->GetPawn() : this);
 	}
 
 	return ActualDamage;

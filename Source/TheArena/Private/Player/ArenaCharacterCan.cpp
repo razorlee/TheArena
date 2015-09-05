@@ -385,9 +385,33 @@ bool ArenaCharacterCan::Wrist(AArenaCharacter* character, AArenaPlayerController
 	return true;
 }
 
-bool ArenaCharacterCan::Waist(AArenaCharacter* character, AArenaPlayerController* controller)
+bool ArenaCharacterCan::Waist(AArenaUtility* utility, AArenaCharacter* character, AArenaPlayerController* controller)
 {
-	return true;
+	if (controller
+		&& controller->IsGameInputAllowed()
+		&& character->GetUpperBackUtility()
+		&& character->GetPlayerState()->GetCombatState() == ECombatState::Aggressive)
+	{
+		if (!utility->Active)
+		{
+			if (character->GetCharacterAttributes()->GetCurrentEnergy() >= utility->GetActivationCost())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return true;
+		}
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool ArenaCharacterCan::Reload(AArenaCharacter* character, AArenaPlayerController* controller)
