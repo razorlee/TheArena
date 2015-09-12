@@ -52,6 +52,7 @@
 #include "Public/Weapons/ArenaRangedWeaponEffects.h"
 #include "Public/Weapons/ArenaProjectile.h"
 #include "Public/Weapons/ArenaFragGrenade.h"
+#include "Public/Armor/ArenaArmor.h"
 
 //class UBehaviorTreeComponent;
 

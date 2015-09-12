@@ -138,6 +138,19 @@ void UArenaCharacterEquipment::SetRightWaistUtilityBP(TSubclassOf<class AArenaUt
 	RightWaistUtilityBP = Utility;
 }
 
+
+TSubclassOf<class AArenaArmor> UArenaCharacterEquipment::GetHeadArmorBP()
+{
+	return HeadArmorBP;
+}
+void UArenaCharacterEquipment::SetHeadArmorBP(TSubclassOf<class AArenaArmor> Armor)
+{
+	HeadArmorBP = Armor;
+}
+
+
+
+
 bool UArenaCharacterEquipment::GetDrawCrosshair()
 {
 	return DrawCrosshair;

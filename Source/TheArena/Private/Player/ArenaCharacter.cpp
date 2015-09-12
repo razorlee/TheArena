@@ -166,7 +166,7 @@ void AArenaCharacter::LoadPersistence()
 			CharacterEquipment->SetRightWaistUtilityBP(SaveGameInstance->RightWaistUtility);
 		}
 
-		ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP(), CharacterEquipment->GetUpperBackUtilityBP());
+		ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP(), CharacterEquipment->GetUpperBackUtilityBP(), CharacterEquipment->GetHeadArmorBP());
 
 		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 		SaveGameInstance->PrimaryWeapon = CharacterEquipment->GetPrimaryWeaponBP();
@@ -718,7 +718,7 @@ void AArenaCharacter::OnDeactivateRightWaist()
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
-void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
+void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack, AArenaArmor* HeadArmor)
 {
 	if (Role == ROLE_Authority)
 	{
@@ -731,6 +731,12 @@ void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* 
 		{
 			SecondaryWeapon->SetOwningPawn(this);;
 			SecondaryWeapon->FinishUnEquip();
+		}
+
+		if (HeadArmor)
+		{
+			HeadArmor->SetMyPawn(this);
+			HeadArmor->Equip();
 		}
 
 		if (HeadUtility)
@@ -765,7 +771,7 @@ void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* 
 	}
 	else
 	{
-		ServerInitializeWeapons(mainWeapon, offWeapon, UpperBack);
+		ServerInitializeWeapons(mainWeapon, offWeapon, UpperBack, HeadArmor);
 	}
 }
 
@@ -1420,6 +1426,7 @@ float AArenaCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damag
 	//Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
 
 	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	// Actual damage as a precentage reduction from armor
 	if (ActualDamage != 0.f)
 	{
 		if (CharacterAttributes->GetCurrentShields() > 0 && ActualDamage > 0)
@@ -2001,11 +2008,11 @@ void AArenaCharacter::ServerSetName_Implementation(const FString& NewName)
 	SetName(NewName);
 }
 
-bool AArenaCharacter::ServerSpawnEquipment_Validate(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack)
+bool AArenaCharacter::ServerSpawnEquipment_Validate(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack, TSubclassOf<class AArenaArmor>  HeadArmor)
 {
 	return true;
 }
-void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility>  UpperBack)
+void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility>  UpperBack, TSubclassOf<class AArenaArmor>  HeadArmorBP)
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
@@ -2024,6 +2031,11 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AAre
 		UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(UpperBack, SpawnInfo);
 	}
 
+	if (HeadArmorBP)
+	{
+		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(HeadArmorBP, SpawnInfo);
+	}
+
 	//HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
 
 	//UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetUpperBackUtilityBP(), SpawnInfo);
@@ -2035,7 +2047,7 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AAre
 	LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
 	RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
 
-	InitializeWeapons(PrimaryWeapon, SecondaryWeapon, UpperBackUtility);
+	InitializeWeapons(PrimaryWeapon, SecondaryWeapon, UpperBackUtility, HeadArmor);
 }
 
 bool AArenaCharacter::ServerToggleCrouch_Validate()
@@ -2092,13 +2104,13 @@ void AArenaCharacter::ServerSwapWeapon_Implementation()
 	SwapWeapon();
 }
 
-bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
+bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack, AArenaArmor* HeadArmor)
 {
 	return true;
 }
-void AArenaCharacter::ServerInitializeWeapons_Implementation(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
+void AArenaCharacter::ServerInitializeWeapons_Implementation(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack, AArenaArmor* HeadArmor)
 {
-	InitializeWeapons(mainWeapon, offWeapon, UpperBack);
+	InitializeWeapons(mainWeapon, offWeapon, UpperBack, HeadArmor);
 }
 
 bool AArenaCharacter::ServerSetPrimaryWeapon_Validate(TSubclassOf<class AArenaWeapon> Weapon)

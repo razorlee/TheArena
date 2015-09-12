@@ -222,7 +222,7 @@ public:
 	void AddWeapon(class AArenaWeapon* Weapon);
 	void RemoveWeapon(class AArenaWeapon* Weapon);
 
-	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack);
+	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack, class AArenaArmor* cHeadArmor);
 
 	UFUNCTION(NetMultiCast, Reliable)
 	void ToggleCrouch();
@@ -382,6 +382,11 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	class AArenaUtility* RightWaistUtility;
 
+////////////////////////////////////////// Armor //////////////////////////////////////////
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaArmor* HeadArmor;
+
 ////////////////////////////////////////// Private Properties //////////////////////////////////////////
 
 	/** Handle for efficient management of StopReload timer */
@@ -473,7 +478,7 @@ protected:
 	void ServerSetName(const FString& NewName);
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerSpawnEquipment(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack);
+	void ServerSpawnEquipment(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack, TSubclassOf<class AArenaArmor> HeadArmorBP);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerToggleCrouch();
@@ -483,7 +488,7 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerExitCover();
-
+	 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerRunning(bool IsRunning);
 
@@ -494,7 +499,7 @@ protected:
 	void ServerSwapWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerInitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack);
+	void ServerInitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack, class AArenaArmor* cHeadArmor);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);

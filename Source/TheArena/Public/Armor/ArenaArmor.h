@@ -5,6 +5,42 @@
 #include "GameFramework/Actor.h"
 #include "ArenaArmor.generated.h"
 
+UENUM()
+namespace EArmorType
+{
+	enum Type
+	{
+		Head		UMETA(DisplayName = "Head"),
+		Shoulders	UMETA(DisplayName = "Shoulders"),
+		Chest		UMETA(DisplayName = "Chest"),
+		Legs		UMETA(DisplayName = "Legs"),
+		Feet		UMETA(DisplayName = "Feet"),
+		Hands		UMETA(DisplayName = "Hands")
+	};
+}
+
+USTRUCT(BlueprintType)
+struct FArmorStats 
+{
+	GENERATED_USTRUCT_BODY()
+
+	/** Increases the amount of damage mitigated */
+	UPROPERTY(EditAnywhere, Category = Stats)
+	float Protection;
+
+	/** How lightweight the armor is */
+	UPROPERTY(EditAnywhere, Category = Stats)
+	float Motility;
+
+	///** defaults */
+	FArmorStats()
+	{
+		Protection = 0.0f;
+		Motility = 0.0f;
+	}
+};
+
+
 UCLASS()
 class THEARENA_API AArenaArmor : public AActor
 {
@@ -12,7 +48,7 @@ class THEARENA_API AArenaArmor : public AActor
 	
 public:	
 	// Sets default values for this actor's properties
-	AArenaArmor();
+	AArenaArmor(const class FObjectInitializer& PCIP);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -20,6 +56,37 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	void Equip();
+	void UnEquip();
+
+	UFUNCTION(BlueprintCallable, Category = Defaults)
+	class AArenaCharacter* GetMyPawn() const;
+	UFUNCTION(BlueprintCallable, Category = Defaults)
+	void SetMyPawn(AArenaCharacter* Pawn);
+
+	UFUNCTION(BlueprintCallable, Category = Config)
+	FName GetArmorName() const;
+
+protected:
+
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_MyPawn, BlueprintReadOnly, Category = Defaults)
+	AArenaCharacter* MyPawn;
+
+	UPROPERTY(EditDefaultsOnly, Category = Mesh)
+	UStaticMeshComponent* Mesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FName ArmorName;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	TEnumAsByte<EArmorType::Type> ArmorType;
 	
+/////////////////////////////////////// Server ///////////////////////////////////////
+
+	UFUNCTION()
+	void OnRep_MyPawn();
+
+
+
 	
 };

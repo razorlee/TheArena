@@ -81,6 +81,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void SetDrawCrosshair(bool Allow);
 
+////////////////////////////////////////// Armor Getter and Setter /////////////////////////////////////////////////////
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	TSubclassOf<class AArenaArmor> GetHeadArmorBP();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetHeadArmorBP(TSubclassOf<class AArenaArmor> Armor);
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Sockets)
@@ -146,6 +153,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
 	TSubclassOf<class AArenaUtility> RightWaistUtilityBP;
+
+///////////////////////////////////////////////// Armor ////////////////////////////////////////////////
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Armor)
+	TSubclassOf<class AArenaArmor> HeadArmorBP;
 
 /////////////////////////////////////////////// Booleans ///////////////////////////////////////////////
 
