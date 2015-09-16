@@ -32,7 +32,7 @@ FString ATheArenaGameMode::GetBotsCountOptionName()
 
 void ATheArenaGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
-	const int32 BotsCountOptionValue = GetIntOption(Options, GetBotsCountOptionName(), 0);
+	const int32 BotsCountOptionValue = UGameplayStatics::GetIntOption(Options, GetBotsCountOptionName(), 0);
 	SetAllowBots(BotsCountOptionValue > 0 ? true : false, BotsCountOptionValue);
 	Super::InitGame(MapName, Options, ErrorMessage);
 

@@ -6,6 +6,7 @@
 #include "OnlineIdentityInterface.h"
 #include "OnlineSessionInterface.h"
 #include "Engine/GameInstance.h"
+#include "Runtime/Core/Public/Templates/SharedPointer.h"
 #include "ArenaGameInstance.generated.h"
 
 class FVariantData;
@@ -200,7 +201,7 @@ private:
 		const int32							ControllerId,
 		TSharedPtr< FUniqueNetId >			UserId,
 		const FOnlineSessionSearchResult &	InviteResult
-		) override;
+		);
 
 	void HandleNetworkConnectionStatusChanged(EOnlineServerConnectionStatus::Type LastConnectionStatus, EOnlineServerConnectionStatus::Type ConnectionStatus);
 

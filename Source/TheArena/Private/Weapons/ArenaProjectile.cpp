@@ -50,7 +50,7 @@ void AArenaProjectile::PostInitializeComponents()
 	MovementComp->OnProjectileStop.AddDynamic(this, &AArenaProjectile::OnImpact);
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
 
-	SetLifeSpan(6.0f);
+	//SetLifeSpan(6.0f);
 	MyController = GetInstigatorController();
 }
 

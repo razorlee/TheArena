@@ -508,7 +508,7 @@ void AArenaPlayerController::ClientStartOnlineGame_Implementation()
 	else
 	{
 		// Keep retrying until player state is replicated
-		GetWorld()->GetTimerManager().SetTimer(FTimerDelegate::CreateUObject(this, &AArenaPlayerController::ClientStartOnlineGame_Implementation), 0.2f, false);
+		GetWorld()->GetTimerManager().SetTimer(StartGame_Timer, FTimerDelegate::CreateUObject(this, &AArenaPlayerController::ClientStartOnlineGame_Implementation), 0.2f, false);
 	}
 }
 
@@ -548,7 +548,7 @@ void AArenaPlayerController::OnStartSessionCompleteEndIt(FName SessionName, bool
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
-			Sessions->ClearOnStartSessionCompleteDelegate(OnStartSessionCompleteEndItDelegate);
+			//Sessions->ClearOnStartSessionCompleteDelegate(OnStartSessionCompleteEndItDelegate);
 		}
 	}
 
@@ -566,7 +566,7 @@ void AArenaPlayerController::OnEndSessionComplete(FName SessionName, bool bWasSu
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
-			Sessions->ClearOnEndSessionCompleteDelegate(OnEndSessionCompleteDelegate);
+			//Sessions->ClearOnEndSessionCompleteDelegate(OnEndSessionCompleteDelegate);
 		}
 	}
 
@@ -584,7 +584,7 @@ void AArenaPlayerController::OnDestroySessionComplete(FName SessionName, bool bW
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
-			Sessions->ClearOnDestroySessionCompleteDelegate(OnDestroySessionCompleteDelegate);
+			//Sessions->ClearOnDestroySessionCompleteDelegate(OnDestroySessionCompleteDelegate);
 		}
 	}
 

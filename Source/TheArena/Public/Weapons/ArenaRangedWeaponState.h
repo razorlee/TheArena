@@ -5,7 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "ArenaRangedWeaponState.generated.h"
 
-UENUM(BlueprintCallable, BlueprintType, Category = Weapon)
+UENUM(BlueprintType, Category = Weapon)
 namespace EWeaponState
 {
 	enum Type
@@ -20,7 +20,7 @@ namespace EWeaponState
 	};
 }
 
-UENUM(BlueprintCallable, BlueprintType, Category = Weapon)
+UENUM(BlueprintType, Category = Weapon)
 namespace ETargetingState
 {
 	enum Type
@@ -31,7 +31,7 @@ namespace ETargetingState
 	};
 }
 
-UENUM(BlueprintCallable, BlueprintType, Category = Weapon)
+UENUM(BlueprintType, Category = Weapon)
 namespace EEquippedState
 {
 	enum Type

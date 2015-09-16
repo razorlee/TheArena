@@ -578,7 +578,7 @@ void UArenaGameInstance::SetPresenceForLocalPlayers(const FVariantData& Presence
 	{
 		for (int i = 0; i < LocalPlayers.Num(); ++i)
 		{
-			const TSharedPtr<FUniqueNetId> UserId = LocalPlayers[i]->GetPreferredUniqueNetId();
+			const TSharedPtr<const FUniqueNetId> UserId = LocalPlayers[i]->GetPreferredUniqueNetId();
 
 			if (UserId.IsValid())
 			{

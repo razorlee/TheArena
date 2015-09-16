@@ -37,7 +37,7 @@ void AArenaGameSession::OnStartOnlineGameComplete(FName SessionName, bool bWasSu
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
-			Sessions->ClearOnStartSessionCompleteDelegate(OnStartSessionCompleteDelegate);
+			//Sessions->ClearOnStartSessionCompleteDelegate(OnStartSessionCompleteDelegate);
 		}
 	}
 	if (bWasSuccessful)
