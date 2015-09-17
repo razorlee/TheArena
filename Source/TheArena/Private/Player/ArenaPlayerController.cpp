@@ -209,7 +209,7 @@ void AArenaPlayerController::OnKill()
 		if (LocalPlayer)
 		{
 			int32 UserIndex = LocalPlayer->GetControllerId();
-			TSharedPtr<FUniqueNetId> UniqueID = Identity->GetUniquePlayerId(UserIndex);
+			TSharedPtr<const FUniqueNetId> UniqueID = Identity->GetUniquePlayerId(UserIndex);
 			if (UniqueID.IsValid())
 			{
 				ACharacter* Pawn = Cast<AArenaCharacter>(GetCharacter());

@@ -1466,13 +1466,13 @@ FReply UArenaGameInstance::OnControllerReconnectConfirm()
 	return FReply::Handled();
 }
 
-TSharedPtr< FUniqueNetId > UArenaGameInstance::GetUniqueNetIdFromControllerId(const int ControllerId)
+TSharedPtr<const FUniqueNetId > UArenaGameInstance::GetUniqueNetIdFromControllerId(const int ControllerId)
 {
 	IOnlineIdentityPtr OnlineIdentityInt = Online::GetIdentityInterface();
 
 	if (OnlineIdentityInt.IsValid())
 	{
-		TSharedPtr<FUniqueNetId> UniqueId = OnlineIdentityInt->GetUniquePlayerId(ControllerId);
+		TSharedPtr<const FUniqueNetId> UniqueId = OnlineIdentityInt->GetUniquePlayerId(ControllerId);
 
 		if (UniqueId.IsValid())
 		{
@@ -1494,7 +1494,7 @@ void UArenaGameInstance::SetIsOnline(bool bInIsOnline)
 		{
 			ULocalPlayer* LocalPlayer = LocalPlayers[i];
 
-			TSharedPtr<FUniqueNetId> PlayerId = LocalPlayer->GetPreferredUniqueNetId();
+			TSharedPtr<const FUniqueNetId> PlayerId = LocalPlayer->GetPreferredUniqueNetId();
 			if (PlayerId.IsValid())
 			{
 				OnlineSub->SetUsingMultiplayerFeatures(*PlayerId, bIsOnline);
@@ -1650,7 +1650,7 @@ void UArenaGameInstance::DisplayOnlinePrivilegeFailureDialogs(const FUniqueNetId
 	{
 		for (auto It = GEngine->GetLocalPlayerIterator(GetWorld()); It; ++It)
 		{
-			TSharedPtr<FUniqueNetId> OtherId = (*It)->GetPreferredUniqueNetId();
+			TSharedPtr<const FUniqueNetId> OtherId = (*It)->GetPreferredUniqueNetId();
 			if (OtherId.IsValid())
 			{
 				if (UserId == (*OtherId))

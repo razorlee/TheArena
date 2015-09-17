@@ -102,7 +102,7 @@ public:
 
 	void RemoveSplitScreenPlayers();
 
-	TSharedPtr< FUniqueNetId > GetUniqueNetIdFromControllerId(const int ControllerId);
+	TSharedPtr< const FUniqueNetId > GetUniqueNetIdFromControllerId(const int ControllerId);
 
 	/** Returns true if the game is in online mode */
 	bool GetIsOnline() const { return bIsOnline; }

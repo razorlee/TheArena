@@ -203,13 +203,13 @@ void UArenaFriendsList::StartOnlinePrivilegeTask(const IOnlineIdentity::FOnGetUs
 	if (GameInstance.IsValid())
 	{
 		// Lock controls for the duration of the async task
-		//MenuWidget->LockControls(true);//recall
-		TSharedPtr<FUniqueNetId> UserId;
+		//MenuWidget->LockControls(true);
+		TSharedPtr<const FUniqueNetId> UserId;
 		if (PlayerOwner.IsValid())
 		{
 			UserId = PlayerOwner->GetPreferredUniqueNetId();
 		}
-		GameInstance->StartOnlinePrivilegeTask(Delegate, EUserPrivileges::CanPlayOnline, UserId);
+		//GameInstance->StartOnlinePrivilegeTask(Delegate, EUserPrivileges::CanPlayOnline, UserId);
 	}
 }
 

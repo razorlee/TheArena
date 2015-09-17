@@ -100,18 +100,18 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 	}
 	else
 	{
-		if (Damage > 0 && UDamageType::StaticClass())
+		if (Damage != 0 && UDamageType::StaticClass())
 		{
 			FString critical = "head";
 			if (Impact.BoneName.ToString() == critical)
 			{
-				Damage = (Damage * 2) * IsAffectByVelocity ? (StartTime / StopTimer()) : 1.0f;
+				Damage = (Damage * 2) * (IsAffectByVelocity ? (StartTime / StopTimer()) : 1.0f);
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
 				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, UDamageType::StaticClass());
 			}
 			else
 			{
-				Damage = (Damage)* IsAffectByVelocity ? (StartTime / StopTimer()) : 1.0f;
+				Damage = (Damage) * (IsAffectByVelocity ? (StartTime / StopTimer()) : 1.0f);
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
 				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, UDamageType::StaticClass());
 			}
