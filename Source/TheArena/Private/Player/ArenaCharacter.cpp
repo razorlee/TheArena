@@ -1444,6 +1444,7 @@ float AArenaCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damag
 	//Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
 
 	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	ActualDamage = ActualDamage * (1 - (CharacterAttributes->GetProtection() / 2000.0f)); //2000 is 100% protection
 	if (ActualDamage != 0.f)
 	{
 		if (CharacterAttributes->GetCurrentShields() > 0 && ActualDamage > 0)
