@@ -26,13 +26,13 @@ public:
 	AArenaCover(const class FObjectInitializer& PCIP);
 
 	UPROPERTY(EditAnywhere)
-	TSubobjectPtr<UBoxComponent>Cover;
+	UBoxComponent* Cover;
 
 	UPROPERTY(EditAnywhere)
-	TSubobjectPtr<UBoxComponent>LeftEdge;
+	UBoxComponent* LeftEdge;
 
 	UPROPERTY(EditAnywhere)
-	TSubobjectPtr<UBoxComponent>RightEdge;
+	UBoxComponent* RightEdge;
 
 	UPROPERTY(EditAnywhere)
 	class UArrowComponent* Arrow;
