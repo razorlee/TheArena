@@ -20,6 +20,8 @@ public:
 	/** spawn inventory, setup initial variables */
 	virtual void BeginPlay() override;
 
+	void SaveCharacter();
+
 ////////////////////////////////////////// Input handlers //////////////////////////////////////////
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;

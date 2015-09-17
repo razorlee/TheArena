@@ -133,6 +133,21 @@ void AArenaCharacter::BeginPlay()
 	}
 }
 
+void AArenaCharacter::SaveCharacter()
+{
+	SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+	SaveGameInstance->PrimaryWeapon = CharacterEquipment->GetPrimaryWeaponBP();
+	SaveGameInstance->SecondaryWeapon = CharacterEquipment->GetSecondaryWeaponBP();
+	SaveGameInstance->HeadUtility = CharacterEquipment->GetHeadUtilityBP();
+	SaveGameInstance->UpperBackUtility = CharacterEquipment->GetUpperBackUtilityBP();
+	SaveGameInstance->LowerBackUtility = CharacterEquipment->GetLowerBackUtilityBP();
+	SaveGameInstance->LeftWristUtility = CharacterEquipment->GetLeftWristUtilityBP();
+	SaveGameInstance->RightWristUtility = CharacterEquipment->GetRightWristUtilityBP();
+	SaveGameInstance->LeftWaistUtility = CharacterEquipment->GetLeftWaistUtilityBP();
+	SaveGameInstance->RightWaistUtility = CharacterEquipment->GetRightWaistUtilityBP();
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+}
+
 void AArenaCharacter::LoadPersistence()
 {
 	AArenaPlayerState* MyPlayerState = Cast<AArenaPlayerState>(PlayerState);
@@ -1128,8 +1143,9 @@ void AArenaCharacter::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 	if (IsLocallyControlled() && Weapon)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->PrimaryWeapon = Weapon;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->PrimaryWeapon = Weapon;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1170,8 +1186,9 @@ void AArenaCharacter::SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 	if (IsLocallyControlled() && Weapon)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->SecondaryWeapon = Weapon;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->SecondaryWeapon = Weapon;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1211,8 +1228,9 @@ void AArenaCharacter::SetHeadUtility(TSubclassOf<class AArenaUtility> Utility)
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->HeadUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->HeadUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1233,9 +1251,9 @@ void AArenaCharacter::SetUpperBackUtility(TSubclassOf<class AArenaUtility> Utili
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-
-		SaveGameInstance->UpperBackUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
+		//SaveGameInstance->UpperBackUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1272,8 +1290,9 @@ void AArenaCharacter::SetLowerBackUtility(TSubclassOf<class AArenaUtility> Utili
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->LowerBackUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->LowerBackUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1294,8 +1313,9 @@ void AArenaCharacter::SetLeftWristUtility(TSubclassOf<class AArenaUtility> Utili
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->LeftWristUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->LeftWristUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1316,8 +1336,9 @@ void AArenaCharacter::SetRightWristUtility(TSubclassOf<class AArenaUtility> Util
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->RightWristUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->RightWristUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1338,8 +1359,9 @@ void AArenaCharacter::SetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utili
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->LeftWaistUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->LeftWaistUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1376,8 +1398,9 @@ void AArenaCharacter::SetRightWaistUtility(TSubclassOf<class AArenaUtility> Util
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->RightWaistUtility = Utility;
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->RightWaistUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
