@@ -741,7 +741,7 @@ void AArenaCharacter::OnDeactivateRightWaist()
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
-void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
+void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack, AArenaArmor* HeadArmor)
 {
 	if (Role == ROLE_Authority)
 	{
@@ -754,6 +754,12 @@ void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* 
 		{
 			SecondaryWeapon->SetOwningPawn(this);;
 			SecondaryWeapon->FinishUnEquip();
+		}
+
+		if (HeadArmor)
+		{
+			HeadArmor->SetMyPawn(this);
+			HeadArmor->Equip();
 		}
 
 		if (HeadUtility)
@@ -793,7 +799,7 @@ void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* 
 	}
 	else
 	{
-		ServerInitializeWeapons(mainWeapon, offWeapon, UpperBack);
+		ServerInitializeWeapons(mainWeapon, offWeapon, UpperBack, HeadArmor);
 	}
 }
 
@@ -2039,11 +2045,11 @@ void AArenaCharacter::ServerSetName_Implementation(const FString& NewName)
 	SetName(NewName);
 }
 
-bool AArenaCharacter::ServerSpawnEquipment_Validate(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack)
+bool AArenaCharacter::ServerSpawnEquipment_Validate(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack, TSubclassOf<class AArenaArmor>  HeadArmor)
 {
 	return true;
 }
-void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility>  UpperBack)
+void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility>  UpperBack, TSubclassOf<class AArenaArmor>  HeadArmorBP)
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
@@ -2060,6 +2066,11 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AAre
 	if (UpperBack)
 	{
 		UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(UpperBack, SpawnInfo);
+	}
+
+	if (HeadArmorBP)
+	{
+		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(HeadArmorBP, SpawnInfo);
 	}
 
 	//HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
@@ -2104,7 +2115,7 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AAre
 		ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetShoulderArmorBP(), SpawnInfo);
 	}
 
-	InitializeWeapons(PrimaryWeapon, SecondaryWeapon, UpperBackUtility);
+	InitializeWeapons(PrimaryWeapon, SecondaryWeapon, UpperBackUtility, HeadArmor);
 }
 
 bool AArenaCharacter::ServerToggleCrouch_Validate()
@@ -2161,13 +2172,13 @@ void AArenaCharacter::ServerSwapWeapon_Implementation()
 	SwapWeapon();
 }
 
-bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
+bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack, AArenaArmor* HeadArmor)
 {
 	return true;
 }
-void AArenaCharacter::ServerInitializeWeapons_Implementation(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
+void AArenaCharacter::ServerInitializeWeapons_Implementation(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack, AArenaArmor* HeadArmor)
 {
-	InitializeWeapons(mainWeapon, offWeapon, UpperBack);
+	InitializeWeapons(mainWeapon, offWeapon, UpperBack, HeadArmor);
 }
 
 bool AArenaCharacter::ServerSetPrimaryWeapon_Validate(TSubclassOf<class AArenaWeapon> Weapon)
