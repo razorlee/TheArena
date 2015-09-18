@@ -20,6 +20,8 @@ public:
 	/** spawn inventory, setup initial variables */
 	virtual void BeginPlay() override;
 
+	void SaveCharacter();
+
 ////////////////////////////////////////// Input handlers //////////////////////////////////////////
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
@@ -387,6 +389,10 @@ protected:
 	/** Handle for efficient management of StopReload timer */
 	FTimerHandle TimerHandle_SwapWeapon;
 
+	FTimerHandle TimerHandle_StopPeaking;
+
+	FTimerHandle TimerHandle_Vault;
+
 	/** Identifies if pawn is in its dying state */
 	UPROPERTY(Transient, Replicated)
 	uint32 Busy : 1;
@@ -504,4 +510,10 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 };

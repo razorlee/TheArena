@@ -16,7 +16,7 @@ struct FArenaGameSessionParams
 	/** Presence enabled session */
 	bool bIsPresence;
 	/** Id of player initiating lobby */
-	TSharedPtr<FUniqueNetId> UserId;
+	TSharedPtr<const FUniqueNetId> UserId;
 	/** Current search result choice to join */
 	int32 BestSessionIdx;
 
@@ -164,7 +164,7 @@ public:
 	*
 	* @return bool true if successful, false otherwise
 	*/
-	bool HostSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, const FString& GameType, const FString& MapName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
+	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FString& GameType, const FString& MapName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
 
 	/**
 	* Find an online session
@@ -174,7 +174,7 @@ public:
 	* @param bIsLAN are we searching LAN matches
 	* @param bIsPresence are we searching presence sessions
 	*/
-	void FindSessions(TSharedPtr<FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence);
+	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence);
 
 	/**
 	* Joins one of the session in search results
@@ -185,7 +185,7 @@ public:
 	*
 	* @return bool true if successful, false otherwise
 	*/
-	bool JoinSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, int32 SessionIndexInSearchResults);
+	bool JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, int32 SessionIndexInSearchResults);
 
 	/**
 	* Joins a session via a search result
@@ -195,7 +195,7 @@ public:
 	*
 	* @return bool true if successful, false otherwise
 	*/
-	bool JoinSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult);
+	bool JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult);
 
 	/** @return true if any online async work is in progress, false otherwise */
 	bool IsBusy() const;

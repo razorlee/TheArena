@@ -74,11 +74,11 @@ void UArenaCharacterInventory::SwitchUtility()
 	}
 	else if (UtilitySelected == EUtilitySelected::LeftWaist)
 	{
-
+		Owner->SetLeftWaistUtility(NewUtility);
 	}
 	else if (UtilitySelected == EUtilitySelected::RightWaist)
 	{
-
+		Owner->SetRightWaistUtility(NewUtility);
 	}
 }
 

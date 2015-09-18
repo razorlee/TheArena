@@ -32,7 +32,7 @@ FString ATheArenaGameMode::GetBotsCountOptionName()
 
 void ATheArenaGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
-	const int32 BotsCountOptionValue = GetIntOption(Options, GetBotsCountOptionName(), 0);
+	const int32 BotsCountOptionValue = UGameplayStatics::GetIntOption(Options, GetBotsCountOptionName(), 0);
 	SetAllowBots(BotsCountOptionValue > 0 ? true : false, BotsCountOptionValue);
 	Super::InitGame(MapName, Options, ErrorMessage);
 
@@ -256,7 +256,7 @@ bool ATheArenaGameMode::IsWinner(class AArenaPlayerState* PlayerState) const
 	return false;
 }
 
-void ATheArenaGameMode::PreLogin(const FString& Options, const FString& Address, const TSharedPtr<FUniqueNetId>& UniqueId, FString& ErrorMessage)
+void ATheArenaGameMode::PreLogin(const FString& Options, const FString& Address, const TSharedPtr<const FUniqueNetId>& UniqueId, FString& ErrorMessage)
 {
 	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
 	const bool bMatchIsOver = MyGameState && MyGameState->HasMatchEnded();
@@ -270,6 +270,7 @@ void ATheArenaGameMode::PreLogin(const FString& Options, const FString& Address,
 		Super::PreLogin(Options, Address, UniqueId, ErrorMessage);
 	}
 }
+
 
 void ATheArenaGameMode::PostLogin(APlayerController* NewPlayer)
 {

@@ -51,7 +51,7 @@ struct FPlayerStats
 		ShieldRegen = 0.0f;
 		Protection = 0.0f;
 		Mobility = 0.0f;
-		Speed = 0.0f;
+		Speed = 1.0f;
 		Recovery = 0.0f;
 	}
 };
@@ -169,6 +169,20 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Resources)
 	uint32 bIsDying : 1;
+
+	/** get current shields */
+	UFUNCTION(BlueprintCallable, Category = Resources)
+	float GetSpeed() const;
+	/** get current health */
+	UFUNCTION(BlueprintCallable, Category = Resources)
+	void SetSpeed(float Value);
+
+	/** get current shields */
+	UFUNCTION(BlueprintCallable, Category = Resources)
+	float GetProtection() const;
+	/** get current health */
+	UFUNCTION(BlueprintCallable, Category = Resources)
+	void SetProtection(float Value);
 
 private:
 

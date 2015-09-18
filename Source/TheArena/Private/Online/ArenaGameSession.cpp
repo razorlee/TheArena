@@ -37,7 +37,7 @@ void AArenaGameSession::OnStartOnlineGameComplete(FName SessionName, bool bWasSu
 		IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
-			Sessions->ClearOnStartSessionCompleteDelegate(OnStartSessionCompleteDelegate);
+			//Sessions->ClearOnStartSessionCompleteDelegate(OnStartSessionCompleteDelegate);
 		}
 	}
 	if (bWasSuccessful)
@@ -194,7 +194,7 @@ void AArenaGameSession::OnDestroySessionComplete(FName SessionName, bool bWasSuc
 	}
 }
 
-bool AArenaGameSession::HostSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, const FString& GameType, const FString& MapName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
+bool AArenaGameSession::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FString& GameType, const FString& MapName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
 {
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
@@ -308,7 +308,7 @@ void AArenaGameSession::OnNoMatchesAvailable()
 	SearchSettings = NULL;
 }
 
-void AArenaGameSession::FindSessions(TSharedPtr<FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence)
+void AArenaGameSession::FindSessions(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence)
 {
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
@@ -336,7 +336,7 @@ void AArenaGameSession::FindSessions(TSharedPtr<FUniqueNetId> UserId, FName Sess
 	}
 }
 
-bool AArenaGameSession::JoinSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, int32 SessionIndexInSearchResults)
+bool AArenaGameSession::JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, int32 SessionIndexInSearchResults)
 {
 	bool bResult = false;
 
@@ -348,7 +348,7 @@ bool AArenaGameSession::JoinSession(TSharedPtr<FUniqueNetId> UserId, FName Sessi
 	return bResult;
 }
 
-bool AArenaGameSession::JoinSession(TSharedPtr<FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult)
+bool AArenaGameSession::JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult)
 {
 	bool bResult = false;
 
