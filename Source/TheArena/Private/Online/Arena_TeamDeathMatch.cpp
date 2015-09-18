@@ -50,29 +50,14 @@ int32 AArena_TeamDeathMatch::ChooseTeam(AArenaPlayerState* ForPlayerState) const
 		}
 	}
 
-	// find least populated one
-	int32 BestTeamScore = TeamBalance[0];
-	for (int32 i = 1; i < TeamBalance.Num(); i++)
+	if (TeamBalance[0] < 4)
 	{
-		if (BestTeamScore > TeamBalance[i])
-		{
-			BestTeamScore = TeamBalance[i];
-		}
+		return 0;
 	}
-
-	// there could be more than one...
-	TArray<int32> BestTeams;
-	for (int32 i = 0; i < TeamBalance.Num(); i++)
+	else
 	{
-		if (TeamBalance[i] == BestTeamScore)
-		{
-			BestTeams.Add(i);
-		}
+		return 1;
 	}
-
-	// get random from best list
-	const int32 RandomBestTeam = BestTeams[FMath::RandHelper(BestTeams.Num())];
-	return RandomBestTeam;
 }
 
 void AArena_TeamDeathMatch::DetermineMatchWinner()

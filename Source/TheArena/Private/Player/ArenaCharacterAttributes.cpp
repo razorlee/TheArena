@@ -140,6 +140,28 @@ void UArenaCharacterAttributes::SetCurrentShields(float Value)
 	CurrentShield = Value;
 }
 
+
+float UArenaCharacterAttributes::GetSpeed() const
+{
+	return StatsConfig.Speed;
+}
+
+void UArenaCharacterAttributes::SetSpeed(float Value)
+{
+	StatsConfig.Speed = Value;
+}
+
+
+float UArenaCharacterAttributes::GetProtection() const
+{
+	return StatsConfig.Protection;
+}
+
+void UArenaCharacterAttributes::SetProtection(float Value)
+{
+	StatsConfig.Protection = Value;
+}
+
 // Called every frame
 void UArenaCharacterAttributes::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
