@@ -363,6 +363,8 @@ protected:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_SecondaryWeapon)
 	class AArenaWeapon* SecondaryWeapon;
 
+////////////////////////////////////////// Utilities //////////////////////////////////////////
+
 	UPROPERTY(Transient, Replicated)
 	class AArenaUtility* HeadUtility;
 
@@ -383,6 +385,26 @@ protected:
 
 	UPROPERTY(Transient, Replicated)
 	class AArenaUtility* RightWaistUtility;
+
+////////////////////////////////////////// Armor //////////////////////////////////////////
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaArmor* ChestArmor;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaArmor* HandArmor;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaArmor* HeadArmor;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaArmor* FeetArmor;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaArmor* LegArmor;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaArmor* ShoulderArmor;
 
 ////////////////////////////////////////// Private Properties //////////////////////////////////////////
 

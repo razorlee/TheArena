@@ -26,6 +26,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Character)
 	void SetMyPawn(AArenaCharacter* Pawn);
 
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	FString GetCurrentWeapon();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
@@ -40,6 +42,8 @@ public:
 	TSubclassOf<class AArenaWeapon> GetSecondaryWeaponBP();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void SetSecondaryWeaponBP(TSubclassOf<class AArenaWeapon> Weapon);
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	TSubclassOf<class AArenaUtility> GetHeadUtilityBP();
@@ -82,6 +86,38 @@ public:
 	void SetDrawCrosshair(bool Allow);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	TSubclassOf<class AArenaArmor> GetChestArmorBP();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetChestArmorBP(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	TSubclassOf<class AArenaArmor> GetFeetArmorBP();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetFeetArmorBP(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	TSubclassOf<class AArenaArmor> GetHandsArmorBP();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetHandsArmorBP(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	TSubclassOf<class AArenaArmor> GetHeadArmorBP();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetHeadArmorBP(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	TSubclassOf<class AArenaArmor> GetLegsArmorBP();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetLegsArmorBP(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	TSubclassOf<class AArenaArmor> GetShoulderArmorBP();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetShoulderArmorBP(TSubclassOf<class AArenaArmor> Armor);
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Sockets)
 	FName GetWeaponAttachPoint();
@@ -126,6 +162,8 @@ private:
 	UPROPERTY(EditAnywhere, Replicated, Category = Weapons)
 	TSubclassOf<class AArenaWeapon> SecondaryWeaponBP;
 
+/////////////////////////////////////////////// Utilities ///////////////////////////////////////////////
+
 	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
 	TSubclassOf<class AArenaUtility> HeadUtilityBP;
 
@@ -146,6 +184,26 @@ private:
 
 	UPROPERTY(EditAnywhere, Replicated, Category = Utilities)
 	TSubclassOf<class AArenaUtility> RightWaistUtilityBP;
+
+/////////////////////////////////////////////// Armor ///////////////////////////////////////////////
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Armor)
+	TSubclassOf<class AArenaArmor> ChestArmorBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Armor)
+	TSubclassOf<class AArenaArmor> FeetArmorBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Armor)
+	TSubclassOf<class AArenaArmor> HandArmorBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Armor)
+	TSubclassOf<class AArenaArmor> HeadArmorBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Armor)
+	TSubclassOf<class AArenaArmor> LegArmorBP;
+
+	UPROPERTY(EditAnywhere, Replicated, Category = Armor)
+	TSubclassOf<class AArenaArmor> ShoulderArmorBP;
 
 /////////////////////////////////////////////// Booleans ///////////////////////////////////////////////
 
@@ -185,6 +243,8 @@ private:
 	/** socket or bone name for attaching Utility mesh */
 	UPROPERTY(EditDefaultsOnly, Category = Sockets)
 	FName WristOneAttachPoint;
+
+
 
 /////////////////////////////////////////////// Server ///////////////////////////////////////////////
 

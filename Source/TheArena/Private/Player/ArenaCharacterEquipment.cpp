@@ -147,6 +147,61 @@ void UArenaCharacterEquipment::SetDrawCrosshair(bool Allow)
 	DrawCrosshair = Allow;
 }
 
+
+TSubclassOf<class AArenaArmor> UArenaCharacterEquipment::GetChestArmorBP()
+{
+	return ChestArmorBP;
+}
+void UArenaCharacterEquipment::SetChestArmorBP(TSubclassOf<class AArenaArmor> Armor)
+{
+	ChestArmorBP = Armor;
+}
+
+TSubclassOf<class AArenaArmor> UArenaCharacterEquipment::GetFeetArmorBP()
+{
+	return FeetArmorBP;
+}
+void UArenaCharacterEquipment::SetFeetArmorBP(TSubclassOf<class AArenaArmor> Armor)
+{
+	FeetArmorBP = Armor;
+}
+
+TSubclassOf<class AArenaArmor> UArenaCharacterEquipment::GetHandsArmorBP()
+{
+	return HandArmorBP;
+}
+void UArenaCharacterEquipment::SetHandsArmorBP(TSubclassOf<class AArenaArmor> Armor)
+{
+	HandArmorBP = Armor;
+}
+
+TSubclassOf<class AArenaArmor> UArenaCharacterEquipment::GetHeadArmorBP()
+{
+	return HeadArmorBP;
+}
+void UArenaCharacterEquipment::SetHeadArmorBP(TSubclassOf<class AArenaArmor> Armor)
+{
+	HeadArmorBP = Armor;
+}
+
+TSubclassOf<class AArenaArmor> UArenaCharacterEquipment::GetLegsArmorBP()
+{
+	return LegArmorBP;
+}
+void UArenaCharacterEquipment::SetLegsArmorBP(TSubclassOf<class AArenaArmor> Armor)
+{
+	LegArmorBP = Armor;
+}
+
+TSubclassOf<class AArenaArmor> UArenaCharacterEquipment::GetShoulderArmorBP()
+{
+	return ShoulderArmorBP;
+}
+void UArenaCharacterEquipment::SetShoulderArmorBP(TSubclassOf<class AArenaArmor> Armor)
+{
+	ShoulderArmorBP = Armor;
+}
+
 FName UArenaCharacterEquipment::GetWeaponAttachPoint()
 {
 	return WeaponAttachPoint;

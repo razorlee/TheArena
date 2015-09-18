@@ -136,8 +136,10 @@ void AArenaCharacter::BeginPlay()
 void AArenaCharacter::SaveCharacter()
 {
 	SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+
 	SaveGameInstance->PrimaryWeapon = CharacterEquipment->GetPrimaryWeaponBP();
 	SaveGameInstance->SecondaryWeapon = CharacterEquipment->GetSecondaryWeaponBP();
+
 	SaveGameInstance->HeadUtility = CharacterEquipment->GetHeadUtilityBP();
 	SaveGameInstance->UpperBackUtility = CharacterEquipment->GetUpperBackUtilityBP();
 	SaveGameInstance->LowerBackUtility = CharacterEquipment->GetLowerBackUtilityBP();
@@ -145,6 +147,14 @@ void AArenaCharacter::SaveCharacter()
 	SaveGameInstance->RightWristUtility = CharacterEquipment->GetRightWristUtilityBP();
 	SaveGameInstance->LeftWaistUtility = CharacterEquipment->GetLeftWaistUtilityBP();
 	SaveGameInstance->RightWaistUtility = CharacterEquipment->GetRightWaistUtilityBP();
+
+	SaveGameInstance->ChestArmor = CharacterEquipment->GetChestArmorBP();
+	SaveGameInstance->HandArmor = CharacterEquipment->GetHandsArmorBP();
+	SaveGameInstance->HeadArmor = CharacterEquipment->GetHeadArmorBP();
+	SaveGameInstance->FeetArmor = CharacterEquipment->GetFeetArmorBP();
+	SaveGameInstance->LegArmor = CharacterEquipment->GetLegsArmorBP();
+	SaveGameInstance->ShoulderArmor = CharacterEquipment->GetShoulderArmorBP();
+
 	UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 }
 
@@ -172,6 +182,7 @@ void AArenaCharacter::LoadPersistence()
 		{
 			CharacterEquipment->SetPrimaryWeaponBP(SaveGameInstance->PrimaryWeapon);
 			CharacterEquipment->SetSecondaryWeaponBP(SaveGameInstance->SecondaryWeapon);
+
 			CharacterEquipment->SetHeadUtilityBP(SaveGameInstance->HeadUtility);
 			CharacterEquipment->SetUpperBackUtilityBP(SaveGameInstance->UpperBackUtility);
 			CharacterEquipment->SetLowerBackUtilityBP(SaveGameInstance->LowerBackUtility);
@@ -179,21 +190,18 @@ void AArenaCharacter::LoadPersistence()
 			CharacterEquipment->SetRightWristUtilityBP(SaveGameInstance->RightWristUtility);
 			CharacterEquipment->SetLeftWaistUtilityBP(SaveGameInstance->LeftWaistUtility);
 			CharacterEquipment->SetRightWaistUtilityBP(SaveGameInstance->RightWaistUtility);
+
+			CharacterEquipment->SetChestArmorBP(SaveGameInstance->ChestArmor);
+			CharacterEquipment->SetHandsArmorBP(SaveGameInstance->HandArmor);
+			CharacterEquipment->SetHeadArmorBP(SaveGameInstance->HeadArmor);
+			CharacterEquipment->SetFeetArmorBP(SaveGameInstance->FeetArmor);
+			CharacterEquipment->SetLegsArmorBP(SaveGameInstance->LegArmor);
+			CharacterEquipment->SetShoulderArmorBP(SaveGameInstance->ShoulderArmor);
 		}
 
 		ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP(), CharacterEquipment->GetUpperBackUtilityBP());
+		SaveCharacter();
 
-		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->PrimaryWeapon = CharacterEquipment->GetPrimaryWeaponBP();
-		SaveGameInstance->SecondaryWeapon = CharacterEquipment->GetSecondaryWeaponBP();
-		SaveGameInstance->HeadUtility = CharacterEquipment->GetHeadUtilityBP();
-		SaveGameInstance->UpperBackUtility = CharacterEquipment->GetUpperBackUtilityBP();
-		SaveGameInstance->LowerBackUtility = CharacterEquipment->GetLowerBackUtilityBP();
-		SaveGameInstance->LeftWristUtility = CharacterEquipment->GetLeftWristUtilityBP();
-		SaveGameInstance->RightWristUtility = CharacterEquipment->GetRightWristUtilityBP();
-		SaveGameInstance->LeftWaistUtility = CharacterEquipment->GetLeftWaistUtilityBP();
-		SaveGameInstance->RightWaistUtility = CharacterEquipment->GetRightWaistUtilityBP();
-		UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	Spawned = true;
 }
@@ -777,6 +785,11 @@ void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* 
 		{
 			RightWaistUtility->SetMyPawn(this);
 		}
+
+		/*if (ChestArmor)
+		{
+			ChestArmor->SetMyPawn(this);
+		}*/
 	}
 	else
 	{
@@ -2057,8 +2070,39 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AAre
 	//LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
 	//RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
 
-	LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
-	RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
+	if (CharacterEquipment->GetLeftWaistUtilityBP())
+	{
+		LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
+	}
+	if (CharacterEquipment->GetRightWaistUtilityBP())
+	{
+		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
+	}
+
+	if (CharacterEquipment->GetChestArmorBP())
+	{
+		ChestArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetChestArmorBP(), SpawnInfo);
+	}
+	if (CharacterEquipment->GetHandsArmorBP())
+	{
+		HandArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHandsArmorBP(), SpawnInfo);
+	}
+	if (CharacterEquipment->GetHeadArmorBP())
+	{
+		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHeadArmorBP(), SpawnInfo);
+	}
+	if (CharacterEquipment->GetFeetArmorBP())
+	{
+		FeetArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetFeetArmorBP(), SpawnInfo);
+	}
+	if (CharacterEquipment->GetLegsArmorBP())
+	{
+		LegArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetLegsArmorBP(), SpawnInfo);
+	}
+	if (CharacterEquipment->GetShoulderArmorBP())
+	{
+		ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetShoulderArmorBP(), SpawnInfo);
+	}
 
 	InitializeWeapons(PrimaryWeapon, SecondaryWeapon, UpperBackUtility);
 }

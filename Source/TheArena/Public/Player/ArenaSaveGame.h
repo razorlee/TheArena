@@ -48,6 +48,24 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Utility)
 	TSubclassOf<class AArenaUtility> RightWaistUtility;
 
+	UPROPERTY(VisibleAnywhere, Category = Armor)
+	TSubclassOf<class AArenaArmor> ChestArmor;
+
+	UPROPERTY(VisibleAnywhere, Category = Armor)
+	TSubclassOf<class AArenaArmor> HandArmor;
+
+	UPROPERTY(VisibleAnywhere, Category = Armor)
+	TSubclassOf<class AArenaArmor> HeadArmor;
+
+	UPROPERTY(VisibleAnywhere, Category = Armor)
+	TSubclassOf<class AArenaArmor> FeetArmor;
+
+	UPROPERTY(VisibleAnywhere, Category = Armor)
+	TSubclassOf<class AArenaArmor> LegArmor;
+
+	UPROPERTY(VisibleAnywhere, Category = Armor)
+	TSubclassOf<class AArenaArmor> ShoulderArmor;
+
 	UArenaSaveGame(const FObjectInitializer& ObjectInitializer);
 	
 };
