@@ -14,6 +14,8 @@
 #include "Runtime/UMG/Public/IUMGModule.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+//#include "Runtime/Online/OnlineSubsystemSteam/Private/OnlineSubsystemSteamTypes.h"
+#include "Runtime/Online/OnlineSubsystemUtils/Private/OnlineSubsystemUtilsPrivatePCH.h"
 
 ///////////////////////////////////////// The Arena Classes /////////////////////////////////////////
 

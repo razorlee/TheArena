@@ -5,7 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "ArenaWeapon.generated.h"
 
-UENUM(BlueprintCallable, BlueprintType, Category = Weapon)
+UENUM(BlueprintType, Category = Weapon)
 namespace EWeaponClass
 {
 	enum Type
@@ -153,6 +153,10 @@ protected:
 	FTimerHandle Reload_Timer;
 
 	FTimerHandle StopReload_Timer;
+
+	FTimerHandle Equip_Timer;
+
+	FTimerHandle Melee_Timer;
 
 	/** equip sound */
 	UPROPERTY(EditDefaultsOnly, Category = Sound)

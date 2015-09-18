@@ -5,7 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "ArenaCharacterState.generated.h"
 
-UENUM(BlueprintCallable, BlueprintType, Category = Character)
+UENUM(BlueprintType, Category = Character)
 namespace EPlayerState
 {
 	enum Type
@@ -21,7 +21,7 @@ namespace EPlayerState
 	};
 }
 
-UENUM(BlueprintCallable, BlueprintType, Category = Character)
+UENUM(BlueprintType, Category = Character)
 namespace ECoverState
 {
 	enum Type
@@ -36,7 +36,7 @@ namespace ECoverState
 	};
 }
 
-UENUM(BlueprintCallable, BlueprintType, Category = Character)
+UENUM(BlueprintType, Category = Character)
 namespace ECombatState
 {
 	enum Type

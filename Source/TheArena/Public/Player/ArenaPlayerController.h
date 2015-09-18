@@ -144,6 +144,8 @@ public:
 
 protected:
 
+	FTimerHandle StartGame_Timer;
+
 	UPROPERTY()
 	FText InteractiveMessage;
 

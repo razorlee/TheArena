@@ -133,6 +133,21 @@ void AArenaCharacter::BeginPlay()
 	}
 }
 
+void AArenaCharacter::SaveCharacter()
+{
+	SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
+	SaveGameInstance->PrimaryWeapon = CharacterEquipment->GetPrimaryWeaponBP();
+	SaveGameInstance->SecondaryWeapon = CharacterEquipment->GetSecondaryWeaponBP();
+	SaveGameInstance->HeadUtility = CharacterEquipment->GetHeadUtilityBP();
+	SaveGameInstance->UpperBackUtility = CharacterEquipment->GetUpperBackUtilityBP();
+	SaveGameInstance->LowerBackUtility = CharacterEquipment->GetLowerBackUtilityBP();
+	SaveGameInstance->LeftWristUtility = CharacterEquipment->GetLeftWristUtilityBP();
+	SaveGameInstance->RightWristUtility = CharacterEquipment->GetRightWristUtilityBP();
+	SaveGameInstance->LeftWaistUtility = CharacterEquipment->GetLeftWaistUtilityBP();
+	SaveGameInstance->RightWaistUtility = CharacterEquipment->GetRightWaistUtilityBP();
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+}
+
 void AArenaCharacter::LoadPersistence()
 {
 	AArenaPlayerState* MyPlayerState = Cast<AArenaPlayerState>(PlayerState);
@@ -577,7 +592,7 @@ void AArenaCharacter::OnStopPeaking()
 		{
 			if (Busy)
 			{
-				GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopPeaking, ActionQueue * 0.3f, false);
+				GetWorldTimerManager().SetTimer(TimerHandle_StopPeaking, this, &AArenaCharacter::StopPeaking, ActionQueue * 0.3f, false);
 			}
 			else
 			{
@@ -856,7 +871,7 @@ void AArenaCharacter::StartTargeting_Implementation()
 
 	if (TargetingSound)
 	{
-		UGameplayStatics::PlaySoundAttached(TargetingSound, GetRootComponent());
+		UGameplayStatics::SpawnSoundAttached(TargetingSound, GetRootComponent());
 	}
 }
 void AArenaCharacter::StopTargeting_Implementation()
@@ -908,7 +923,7 @@ void AArenaCharacter::StartPeaking_Implementation()
 	{
 		return;
 	}
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.40f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_StopPeaking, this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.40f, false);
 }
 void AArenaCharacter::StopPeaking_Implementation()
 {
@@ -938,8 +953,8 @@ void AArenaCharacter::StopPeaking_Implementation()
 	{
 		return;
 	}
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::SetLocation, ActionQueue * 0.4f, false);
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.4f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_StopPeaking, this, &AArenaCharacter::SetLocation, ActionQueue * 0.4f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_StopPeaking, this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.4f, false);
 }
 
 void AArenaCharacter::ToggleCombat_Implementation()
@@ -1026,7 +1041,7 @@ void AArenaCharacter::StartVault_Implementation()
 		AnimDuration = 0.3f;
 	}
 
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopVault, AnimDuration * 0.9f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_Vault, this, &AArenaCharacter::StopVault, AnimDuration * 0.9f, false);
 }
 void AArenaCharacter::StopVault_Implementation()
 {
@@ -1047,7 +1062,7 @@ void AArenaCharacter::StartClimb_Implementation()
 		AnimDuration = 0.3f;
 	}
 
-	GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopClimb, AnimDuration * 0.9f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_Vault, this, &AArenaCharacter::StopClimb, AnimDuration * 0.9f, false);
 }
 void AArenaCharacter::StopClimb_Implementation()
 {
@@ -1134,8 +1149,9 @@ void AArenaCharacter::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 	if (IsLocallyControlled() && Weapon)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->PrimaryWeapon = Weapon;
-  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->PrimaryWeapon = Weapon;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1157,6 +1173,7 @@ void AArenaCharacter::HandlePrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon
 	}
 
 	FActorSpawnParameters SpawnInfo;
+	//SpawnInfo.SpawnCollisionHandlingOverride;
 	SpawnInfo.bNoCollisionFail = true;
 
 	PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(Weapon, SpawnInfo);
@@ -1175,8 +1192,9 @@ void AArenaCharacter::SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 	if (IsLocallyControlled() && Weapon)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->SecondaryWeapon = Weapon;
-  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->SecondaryWeapon = Weapon;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1216,8 +1234,9 @@ void AArenaCharacter::SetHeadUtility(TSubclassOf<class AArenaUtility> Utility)
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->HeadUtility = Utility;
-  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->HeadUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1238,9 +1257,9 @@ void AArenaCharacter::SetUpperBackUtility(TSubclassOf<class AArenaUtility> Utili
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-
-		SaveGameInstance->UpperBackUtility = Utility;
-  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
+		//SaveGameInstance->UpperBackUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1277,8 +1296,9 @@ void AArenaCharacter::SetLowerBackUtility(TSubclassOf<class AArenaUtility> Utili
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->LowerBackUtility = Utility;
-  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->LowerBackUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1299,8 +1319,9 @@ void AArenaCharacter::SetLeftWristUtility(TSubclassOf<class AArenaUtility> Utili
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->LeftWristUtility = Utility;
-  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->LeftWristUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1321,8 +1342,9 @@ void AArenaCharacter::SetRightWristUtility(TSubclassOf<class AArenaUtility> Util
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->RightWristUtility = Utility;
-  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->RightWristUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
@@ -1343,16 +1365,17 @@ void AArenaCharacter::SetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utili
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->LeftWaistUtility = Utility;
-  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->LeftWaistUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
-		//HandleSecondaryWeapon(Weapon);
+		HandleLeftWaistUtility(Utility);
 	}
 	else
 	{
-		//ServerSetSecondaryWeapon(Weapon);
+		ServerSetLeftWaistUtility(Utility);
 	}
 }
 void AArenaCharacter::HandleLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility)
@@ -1381,16 +1404,17 @@ void AArenaCharacter::SetRightWaistUtility(TSubclassOf<class AArenaUtility> Util
 	if (IsLocallyControlled() && Utility)
 	{
 		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveGameInstance->RightWaistUtility = Utility;
-  UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		//SaveGameInstance->RightWaistUtility = Utility;
+		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
+		SaveCharacter();
 	}
 	if (Role == ROLE_Authority)
 	{
-		//HandleSecondaryWeapon(Weapon);
+		HandleRightWaistUtility(Utility);
 	}
 	else
 	{
-		//ServerSetSecondaryWeapon(Weapon);
+		ServerSetRightWaistUtility(Utility);
 	}
 }
 void AArenaCharacter::HandleRightWaistUtility(TSubclassOf<class AArenaUtility> Utility)
@@ -1426,7 +1450,7 @@ float AArenaCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damag
 	//Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
 
 	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-	// Actual damage as a precentage reduction from armor
+	ActualDamage = ActualDamage * (1 - (CharacterAttributes->GetProtection() / 2000.0f)); //2000 is 100% protection
 	if (ActualDamage != 0.f)
 	{
 		if (CharacterAttributes->GetCurrentShields() > 0 && ActualDamage > 0)
@@ -1991,7 +2015,7 @@ void AArenaCharacter::ServerStopPeaking_Implementation()
 {
 	if (Busy)
 	{
-		GetWorldTimerManager().SetTimer(this, &AArenaCharacter::StopPeaking, ActionQueue * 0.4f, false);
+		GetWorldTimerManager().SetTimer(TimerHandle_Vault, this, &AArenaCharacter::StopPeaking, ActionQueue * 0.4f, false);
 	}
 	else
 	{
@@ -2138,4 +2162,22 @@ bool AArenaCharacter::ServerSetUpperBackUtility_Validate(TSubclassOf<class AAren
 void AArenaCharacter::ServerSetUpperBackUtility_Implementation(TSubclassOf<class AArenaUtility> Utility)
 {
 	HandleUpperBackUtility(Utility);
+}
+
+bool AArenaCharacter::ServerSetLeftWaistUtility_Validate(TSubclassOf<class AArenaUtility> Utility)
+{
+	return true;
+}
+void AArenaCharacter::ServerSetLeftWaistUtility_Implementation(TSubclassOf<class AArenaUtility> Utility)
+{
+	HandleLeftWaistUtility(Utility);
+}
+
+bool AArenaCharacter::ServerSetRightWaistUtility_Validate(TSubclassOf<class AArenaUtility> Utility)
+{
+	return true;
+}
+void AArenaCharacter::ServerSetRightWaistUtility_Implementation(TSubclassOf<class AArenaUtility> Utility)
+{
+	HandleRightWaistUtility(Utility);
 }

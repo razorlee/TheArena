@@ -90,7 +90,7 @@ void AArenaWeapon::Equip()
 		GetWeaponState()->SetEquippedState(EEquippedState::Equipped);
 		float Duration = PlayWeaponAnimation(EquipAnim, GetWeaponAttributes()->GetMotility()) / GetWeaponAttributes()->GetMotility();
 
-		GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishEquip, (Duration*0.25f), false);
+		GetWorldTimerManager().SetTimer(Equip_Timer, this, &AArenaWeapon::FinishEquip, (Duration*0.25f), false);
 
 		if (MyPawn && MyPawn->IsLocallyControlled())
 		{
@@ -117,7 +117,7 @@ float AArenaWeapon::UnEquip()
 
 		GetWeaponState()->SetWeaponState(EWeaponState::Holstering);
 		GetWeaponState()->SetEquippedState(EEquippedState::UnEquipped);
-		GetWorldTimerManager().SetTimer(this, &AArenaWeapon::FinishUnEquip, (Duration*0.5f), false);
+		GetWorldTimerManager().SetTimer(Equip_Timer, this, &AArenaWeapon::FinishUnEquip, (Duration*0.5f), false);
 		if (MyPawn && MyPawn->IsLocallyControlled())
 		{
 			PlayWeaponSound(UnEquipSound);
@@ -157,7 +157,7 @@ void AArenaWeapon::Melee_Implementation()
 		AnimDuration = 0.3f;
 	}
 
-	GetWorldTimerManager().SetTimer(this, &AArenaWeapon::StopMelee, AnimDuration, false);
+	GetWorldTimerManager().SetTimer(Melee_Timer, this, &AArenaWeapon::StopMelee, AnimDuration, false);
 	if (Role == ROLE_Authority)
 	{
 		TArray<struct FOverlapResult> OutOverlaps;

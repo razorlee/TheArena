@@ -18,6 +18,9 @@
 /Intermediate
 /Saved
 
+# Ignore maps too big for git
+/Content/Maps/TheArenaPrototype3.umap
+
 # Ignore project files in the root
 /*.sln
 /*.xcodeproj

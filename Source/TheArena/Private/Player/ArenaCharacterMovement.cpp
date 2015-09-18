@@ -29,17 +29,17 @@ float UArenaCharacterMovement::GetMaxSpeed() const
 	{
 		if (ArenaCharacterOwner->GetPlayerState()->GetPlayerState() == EPlayerState::Running)
 		{
-			MaxSpeed = RunningMovementSpeed * MovementSpeedModifier;
+			MaxSpeed = RunningMovementSpeed * MovementSpeedModifier * ArenaCharacterOwner->GetCharacterAttributes()->GetSpeed();
 		}
 		if (ArenaCharacterOwner->GetPlayerState()->GetPlayerState() == EPlayerState::Crouching)
 		{
-			MaxSpeed = CrouchedMovementSpeed * MovementSpeedModifier;
+			MaxSpeed = CrouchedMovementSpeed * MovementSpeedModifier * ArenaCharacterOwner->GetCharacterAttributes()->GetSpeed();
 		}
 		if (ArenaCharacterOwner->GetCurrentWeapon())
 		{
 			if (ArenaCharacterOwner->GetCharacterEquipment()->GetDrawCrosshair())
 			{
-				MaxSpeed = TargetingMovementSpeed * MovementSpeedModifier;
+				MaxSpeed = TargetingMovementSpeed * MovementSpeedModifier * ArenaCharacterOwner->GetCharacterAttributes()->GetSpeed();
 			}
 		}
 	}
