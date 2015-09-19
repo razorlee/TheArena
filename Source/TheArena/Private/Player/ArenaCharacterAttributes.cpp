@@ -78,6 +78,19 @@ void UArenaCharacterAttributes::Regenerate(float DeltaSeconds)
 	{
 		CurrentStamina = 0;
 	}
+
+	if (CurrentShield > 0.0)
+	{
+		CurrentShield += StatsConfig.ShieldRegen * DeltaSeconds;
+		if (CurrentShield > GetMaxShields())
+		{
+			CurrentShield = this->GetMaxEnergy();
+		}
+	}
+	if (CurrentShield < 0.0)
+	{
+		CurrentShield = 0;
+	}
 }
 
 int32 UArenaCharacterAttributes::GetMaxHealth() const

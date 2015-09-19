@@ -51,10 +51,9 @@ void UArenaCharacterInventory::SwitchWeapon()
 
 void UArenaCharacterInventory::SwitchUtility()
 {
-
 	if (UtilitySelected == EUtilitySelected::Head)
 	{
-		
+		Owner->SetHeadUtility(NewUtility);
 	}
 	else if (UtilitySelected == EUtilitySelected::UpperBack)
 	{
@@ -62,15 +61,15 @@ void UArenaCharacterInventory::SwitchUtility()
 	}
 	else if (UtilitySelected == EUtilitySelected::LowerBack)
 	{
-
+		Owner->SetLowerBackUtility(NewUtility);
 	}
 	else if (UtilitySelected == EUtilitySelected::LeftWrist)
 	{
-
+		Owner->SetLeftWristUtility(NewUtility);
 	}
 	else if (UtilitySelected == EUtilitySelected::RightWrist)
 	{
-
+		Owner->SetRightWristUtility(NewUtility);
 	}
 	else if (UtilitySelected == EUtilitySelected::LeftWaist)
 	{
@@ -82,6 +81,34 @@ void UArenaCharacterInventory::SwitchUtility()
 	}
 }
 
+void UArenaCharacterInventory::SwitchArmor()
+{
+	if (ArmorSelected == EArmorSelected::Head)
+	{
+		Owner->SetHeadArmor(NewArmor);
+	}
+	else if (ArmorSelected == EArmorSelected::Chest)
+	{
+		Owner->SetChestArmor(NewArmor);
+	}
+	else if (ArmorSelected == EArmorSelected::Shoulder)
+	{
+		Owner->SetShoulderArmor(NewArmor);
+	}
+	else if (ArmorSelected == EArmorSelected::Hands)
+	{
+		Owner->SetHandArmor(NewArmor);
+	}
+	else if (ArmorSelected == EArmorSelected::Legs)
+	{
+		Owner->SetLegArmor(NewArmor);
+	}
+	else if (ArmorSelected == EArmorSelected::Feet)
+	{
+		Owner->SetFeetArmor(NewArmor);
+	}
+}
+
 TArray<TSubclassOf<class AArenaWeapon>> UArenaCharacterInventory::GetInventoryBP()
 {
 	return DefaultInventoryClasses;
@@ -90,6 +117,11 @@ TArray<TSubclassOf<class AArenaWeapon>> UArenaCharacterInventory::GetInventoryBP
 TArray<TSubclassOf<class AArenaUtility>> UArenaCharacterInventory::GetUtilitiesBP()
 {
 	return DefaultUtilityClasses;
+}
+
+TArray<TSubclassOf<class AArenaArmor>> UArenaCharacterInventory::GetArmorBP()
+{
+	return DefaultArmorClasses;
 }
 
 TArray<class AArenaWeapon*> UArenaCharacterInventory::GetInventory()
@@ -113,6 +145,15 @@ TSubclassOf<class AArenaUtility> UArenaCharacterInventory::GetNewUtility()
 void UArenaCharacterInventory::SetNewUtility(TSubclassOf<class AArenaUtility> Utility)
 {
 	NewUtility = Utility;
+}
+
+TSubclassOf<class AArenaArmor> UArenaCharacterInventory::GetNewArmor()
+{
+	return NewArmor;
+}
+void UArenaCharacterInventory::SetNewArmor(TSubclassOf<class AArenaArmor> Armor)
+{
+	NewArmor = Armor;
 }
 
 bool UArenaCharacterInventory::GetPrimarySelected()
@@ -140,4 +181,13 @@ EUtilitySelected::Type UArenaCharacterInventory::GetUtilitySelected()
 void UArenaCharacterInventory::SetUtilitySelected(EUtilitySelected::Type Selected)
 {
 	UtilitySelected = Selected;
+}
+
+EArmorSelected::Type UArenaCharacterInventory::GetArmorSelected()
+{
+	return ArmorSelected;
+}
+void UArenaCharacterInventory::SetArmorSelected(EArmorSelected::Type Selected)
+{
+	ArmorSelected = Selected;
 }

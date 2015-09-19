@@ -107,7 +107,7 @@ void AArenaPlayerCameraManager::HandleTargetingCamera()
 	TargetFOV = MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetZoomFOV();
 	if (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetHasScope())
 	{
-		TargetArm = -10.0f;
+		TargetArm = -30.0f;
 		TargetOffset = FVector(0.0f, 15.0f, 50.0f);
 	}
 	else

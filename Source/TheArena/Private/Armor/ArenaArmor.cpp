@@ -76,6 +76,29 @@ FName AArenaArmor::GetArmorName() const
 	return ArmorName;
 }
 
+EArmorType::Type AArenaArmor::GetArmorType()
+{
+	return ArmorType;
+}
+
+float AArenaArmor::GetProtection() const
+{
+	return ArmorStats.Protection;
+}
+void AArenaArmor::SetProtection(float Value)
+{
+	ArmorStats.Protection = Value;
+}
+
+float AArenaArmor::GetMotility() const
+{
+	return ArmorStats.Motility;
+}
+void AArenaArmor::SetMotility(float Value)
+{
+	ArmorStats.Motility = Value;
+}
+
 void AArenaArmor::Equip()
 {
 	FName AttachPoint;

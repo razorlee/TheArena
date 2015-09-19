@@ -51,7 +51,7 @@ struct FPlayerStats
 		ShieldRegen = 0.0f;
 		Protection = 0.0f;
 		Mobility = 0.0f;
-		Speed = 1.0f;
+		Speed = 0.0f;
 		Recovery = 0.0f;
 	}
 };

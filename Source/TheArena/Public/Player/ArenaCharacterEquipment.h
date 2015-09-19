@@ -85,13 +85,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void SetDrawCrosshair(bool Allow);
 
-////////////////////////////////////////// Armor Getter and Setter /////////////////////////////////////////////////////
-
-	UFUNCTION(BlueprintCallable, Category = Armor)
-	TSubclassOf<class AArenaArmor> GetHeadArmorBP();
-	UFUNCTION(BlueprintCallable, Category = Armor)
-	void SetHeadArmorBP(TSubclassOf<class AArenaArmor> Armor);
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Armor)

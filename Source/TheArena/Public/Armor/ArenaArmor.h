@@ -64,8 +64,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Defaults)
 	void SetMyPawn(AArenaCharacter* Pawn);
 
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	EArmorType::Type GetArmorType();
+
 	UFUNCTION(BlueprintCallable, Category = Config)
 	FName GetArmorName() const;
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetProtection() const;
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void SetProtection(float Value);
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	float GetMotility() const;
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void SetMotility(float Value);
 
 protected:
 
@@ -80,13 +93,13 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	TEnumAsByte<EArmorType::Type> ArmorType;
+
+	/** stats data */
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FArmorStats ArmorStats;
 	
 /////////////////////////////////////// Server ///////////////////////////////////////
 
 	UFUNCTION()
 	void OnRep_MyPawn();
-
-
-
-	
 };

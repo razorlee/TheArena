@@ -20,6 +20,20 @@ namespace EUtilitySelected
 	};
 }
 
+UENUM(BlueprintType)
+namespace EArmorSelected
+{
+	enum Type
+	{
+		Head		UMETA(DisplayName = "Head"),
+		Shoulder	UMETA(DisplayName = "Shoulder"),
+		Chest		UMETA(DisplayName = "Chest"),
+		Hands		UMETA(DisplayName = "Hands"),
+		Legs		UMETA(DisplayName = "Legs"),
+		Feet		UMETA(DisplayName = "Feet"),
+	};
+}
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEARENA_API UArenaCharacterInventory : public UActorComponent
 {
@@ -33,8 +47,7 @@ public:
 
 	void SpawnDefaultInventory();
 
-	//UFUNCTION(BlueprintCallable, Category = Weapon)
-	//void SwitchArmor();
+/////////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void SwitchWeapon();
@@ -42,14 +55,24 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SwitchUtility();
 
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SwitchArmor();
+
+/////////////////////////////////////////////////////////////////////////////
+
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	TArray<TSubclassOf<class AArenaWeapon>> GetInventoryBP();
 
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	TArray<TSubclassOf<class AArenaUtility>> GetUtilitiesBP();
 
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	TArray<TSubclassOf<class AArenaArmor>> GetArmorBP();
+
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	TArray<class AArenaWeapon*> GetInventory();
+
+////////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	TSubclassOf<class AArenaWeapon> GetNewWeapon();
@@ -60,6 +83,13 @@ public:
 	TSubclassOf<class AArenaUtility> GetNewUtility();
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetNewUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	TSubclassOf<class AArenaArmor> GetNewArmor();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetNewArmor(TSubclassOf<class AArenaArmor> Armor);
+
+//////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool GetPrimarySelected();
@@ -76,6 +106,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	void SetUtilitySelected(EUtilitySelected::Type Selected);
 
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	EArmorSelected::Type GetArmorSelected();
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void SetArmorSelected(EArmorSelected::Type Selected);
+
 protected:
 
 	UPROPERTY()
@@ -87,6 +122,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Inventory)
 	TArray<TSubclassOf<class AArenaUtility>> DefaultUtilityClasses;
 
+	UPROPERTY(EditAnywhere, Category = Inventory)
+	TArray<TSubclassOf<class AArenaArmor>> DefaultArmorClasses;
+
 	UPROPERTY()
 	TArray<class AArenaWeapon*> Inventory;
 
@@ -97,6 +135,9 @@ protected:
 	TSubclassOf<class AArenaUtility> NewUtility;
 
 	UPROPERTY()
+	TSubclassOf<class AArenaArmor> NewArmor;
+
+	UPROPERTY()
 	bool PrimarySelected;
 
 	UPROPERTY()
@@ -104,4 +145,7 @@ protected:
 
 	UPROPERTY()
 	TEnumAsByte<EUtilitySelected::Type> UtilitySelected;
+
+	UPROPERTY()
+	TEnumAsByte<EArmorSelected::Type> ArmorSelected;
 };

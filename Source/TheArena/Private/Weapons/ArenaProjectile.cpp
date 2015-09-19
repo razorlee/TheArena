@@ -106,13 +106,13 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 			if (Impact.BoneName.ToString() == critical)
 			{
 				Damage = (Damage * 2) * (IsAffectByVelocity ? (StartTime / StopTimer()) : 1.0f);
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
 				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, UDamageType::StaticClass());
 			}
 			else
 			{
 				Damage = (Damage) * (IsAffectByVelocity ? (StartTime / StopTimer()) : 1.0f);
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
 				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, UDamageType::StaticClass());
 			}
 		}

@@ -22,9 +22,10 @@ UArenaCharacterMovement::UArenaCharacterMovement(const FObjectInitializer& Objec
 
 float UArenaCharacterMovement::GetMaxSpeed() const
 {
-	float MaxSpeed = BaseMovementSpeed  * MovementSpeedModifier;
-
 	AArenaCharacter* ArenaCharacterOwner = Cast<AArenaCharacter>(PawnOwner);
+
+	float MaxSpeed = BaseMovementSpeed  * MovementSpeedModifier * ArenaCharacterOwner->GetCharacterAttributes()->GetSpeed();
+
 	if (ArenaCharacterOwner)
 	{
 		if (ArenaCharacterOwner->GetPlayerState()->GetPlayerState() == EPlayerState::Running)
@@ -43,6 +44,7 @@ float UArenaCharacterMovement::GetMaxSpeed() const
 			}
 		}
 	}
+
 	UpdateMIDs(MaxSpeed);
 	return MaxSpeed;
 }

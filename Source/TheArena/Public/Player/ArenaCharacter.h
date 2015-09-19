@@ -147,6 +147,8 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void SetName(const FString& NewName);
 
+	/////////////////////////////////////// Get and Set Weapons ///////////////////////////////////////
+
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	class AArenaWeapon* GetCurrentWeapon();
 	UFUNCTION(BlueprintCallable, Category = Weapons)
@@ -166,10 +168,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void HandleSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 
+/////////////////////////////////////// Get and Set Utilities ///////////////////////////////////////
+
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	class AArenaUtility* GetHeadUtility();
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void SetHeadUtility(TSubclassOf<class AArenaUtility> Utility);
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void HandleHeadUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	class AArenaUtility* GetUpperBackUtility();
@@ -182,16 +188,22 @@ public:
 	class AArenaUtility* GetLowerBackUtility();
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void SetLowerBackUtility(TSubclassOf<class AArenaUtility> Utility);
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void HandleLowerBackUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	class AArenaUtility* GetLeftWristUtility();
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void SetLeftWristUtility(TSubclassOf<class AArenaUtility> Utility);
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void HandleLeftWristUtility(TSubclassOf<class AArenaUtility> Utility);
 	
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	class AArenaUtility* GetRightWristUtility();
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void SetRightWristUtility(TSubclassOf<class AArenaUtility> Utility);
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void HandleRightWristUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	class AArenaUtility* GetLeftWaistUtility();
@@ -206,6 +218,50 @@ public:
 	void SetRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void HandleRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
+
+/////////////////////////////////////// Get and Set Utilities ///////////////////////////////////////
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	class AArenaArmor* GetHeadArmor();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetHeadArmor(TSubclassOf<class AArenaArmor> Armor);
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void HandleHeadArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	class AArenaArmor* GetChestArmor();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetChestArmor(TSubclassOf<class AArenaArmor> Armor);
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void HandleChestArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	class AArenaArmor* GetShoulderArmor();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetShoulderArmor(TSubclassOf<class AArenaArmor> Armor);
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void HandleShoulderArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	class AArenaArmor* GetHandArmor();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetHandArmor(TSubclassOf<class AArenaArmor> Armor);
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void HandleHandArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	class AArenaArmor* GetLegArmor();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetLegArmor(TSubclassOf<class AArenaArmor> Armor);
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void HandleLegArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	class AArenaArmor* GetFeetArmor();
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void SetFeetArmor(TSubclassOf<class AArenaArmor> Armor);
+	UFUNCTION(BlueprintCallable, Category = Armor)
+	void HandleFeetArmor(TSubclassOf<class AArenaArmor> Armor);
 
 ////////////////////////////////////////// Animation Controls //////////////////////////////////////////
 
@@ -224,8 +280,10 @@ public:
 	void AddWeapon(class AArenaWeapon* Weapon);
 	void RemoveWeapon(class AArenaWeapon* Weapon);
 
-	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack, class AArenaArmor* cHeadArmor);
+	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack);
 
+	void ApplyArmorStats();
+	
 	UFUNCTION(NetMultiCast, Reliable)
 	void ToggleCrouch();
 
@@ -501,7 +559,7 @@ protected:
 	void ServerSetName(const FString& NewName);
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerSpawnEquipment(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack, TSubclassOf<class AArenaArmor> HeadArmorBP);
+	void ServerSpawnEquipment(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerToggleCrouch();
@@ -522,7 +580,7 @@ protected:
 	void ServerSwapWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerInitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack, class AArenaArmor* cHeadArmor);
+	void ServerInitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
@@ -531,11 +589,42 @@ protected:
 	void ServerSetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 
 	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetHeadUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetLowerBackUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetLeftWristUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetRightWristUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetHeadArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetChestArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetShoulderArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetHandArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetLegArmor(TSubclassOf<class AArenaArmor> Armor);
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSetFeetArmor(TSubclassOf<class AArenaArmor> Armor);
+
 };
