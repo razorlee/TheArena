@@ -19,7 +19,7 @@ public:
 
 	/** explosion FX */
 	UPROPERTY(EditDefaultsOnly, Category = Effect)
-	UParticleSystem* ExplosionFX;
+	class UParticleSystem* ExplosionFX;
 
 	/** explosion light */
 	UPROPERTY(VisibleDefaultsOnly, Category = Effect)

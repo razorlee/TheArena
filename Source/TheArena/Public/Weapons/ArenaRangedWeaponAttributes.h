@@ -178,7 +178,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	bool HasScope;
 
-	UPROPERTY(EditDefaultsOnly, Category = Config, meta = (EditCondition = "HasScope", ClampMin = "10", ClampMax = "90", UIMin = "10", UIMax = "90"))
+	UPROPERTY(EditDefaultsOnly, Category = Config, meta = (EditCondition = "HasScope", ClampMin = "0.1", ClampMax = "90", UIMin = "10", UIMax = "90"))
 	float ZoomFOV;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)

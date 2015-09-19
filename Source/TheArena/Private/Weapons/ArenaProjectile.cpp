@@ -13,6 +13,7 @@ AArenaProjectile::AArenaProjectile(const class FObjectInitializer& PCIP)
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(COLLISION_PROJECTILEPEN, ECR_Ignore);
 	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
@@ -36,6 +37,11 @@ AArenaProjectile::AArenaProjectile(const class FObjectInitializer& PCIP)
 	bReplicates = true;
 	//bReplicateInstigator = true;
 	bReplicateMovement = true;
+
+	Damage = 0.0f;
+	IsExplosive = false;
+	ExplosionRadius = 0.0f;
+	IsAffectByVelocity = false;
 }
 
 void AArenaProjectile::PostInitializeComponents()
@@ -44,13 +50,7 @@ void AArenaProjectile::PostInitializeComponents()
 	MovementComp->OnProjectileStop.AddDynamic(this, &AArenaProjectile::OnImpact);
 	CollisionComp->MoveIgnoreActors.Add(Instigator);
 
-	AArenaRangedWeapon* OwnerWeapon = Cast<AArenaRangedWeapon>(GetOwner());
-	if (OwnerWeapon)
-	{
-		//OwnerWeapon->ApplyWeaponConfig(WeaponConfig);
-	}
-
-	SetLifeSpan(3.0f);
+	SetLifeSpan(6.0f);
 	MyController = GetInstigatorController();
 }
 
@@ -75,7 +75,7 @@ void AArenaProjectile::SetCollisionChannel(ECollisionChannel Value)
 
 void AArenaProjectile::OnImpact(const FHitResult& HitResult)
 {
-	if (Role == ROLE_Authority && !bExploded)
+	if (Role == ROLE_Authority && !bExploded && !MovementComp->bShouldBounce)
 	{
 		Explode(HitResult);
 		DisableAndDestroy();
@@ -91,30 +91,29 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 
 	// effects and damage origin shouldn't be placed inside mesh at impact point
 	const FVector NudgedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
-	if (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetIsExplosive() == true)
+	if (IsExplosive)
 	{
-		if (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() > 0 
-			&& MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetExplosionRadius() > 0
-			&& UDamageType::StaticClass())
+		if (Damage > 0 && ExplosionRadius > 0 && UDamageType::StaticClass())
 		{
-			UGameplayStatics::ApplyRadialDamage(this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage(), NudgedImpactLocation, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetExplosionRadius(), MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType(), TArray<AActor*>(), this, MyController.Get());
+			UGameplayStatics::ApplyRadialDamage(this, Damage, NudgedImpactLocation, ExplosionRadius, UDamageType::StaticClass(), TArray<AActor*>(), this, MyController.Get());
 		}
 	}
 	else
 	{
-		if (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() > 0 
-			&& UDamageType::StaticClass())
+		if (Damage > 0 && UDamageType::StaticClass())
 		{
 			FString critical = "head";
 			if (Impact.BoneName.ToString() == critical)
 			{
-				float Damage = (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage() * 2) * (MovementComp->MaxSpeed / MovementComp->InitialSpeed);
-				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
+				Damage = (Damage * 2) * IsAffectByVelocity ? (StartTime / StopTimer()) : 1.0f;
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, UDamageType::StaticClass());
 			}
 			else
 			{
-				float Damage = (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamage()) * (MovementComp->MaxSpeed / MovementComp->InitialSpeed);
-				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetDamageType());
+				Damage = (Damage)* IsAffectByVelocity ? (StartTime / StopTimer()) : 1.0f;
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%f Damage"), Damage));
+				UGameplayStatics::ApplyPointDamage(Impact.GetActor(), Damage, Impact.ImpactPoint, Impact, MyPawn->Controller, this, UDamageType::StaticClass());
 			}
 		}
 	}
@@ -157,7 +156,7 @@ FHitResult AArenaProjectile::ProjectileTrace(const FVector& StartTrace, const FV
 	TraceParams.bReturnPhysicalMaterial = true;
 
 	FHitResult Hit(ForceInit);
-	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, COLLISION_WEAPON, TraceParams);
+	GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, COLLISION_PROJECTILE, TraceParams);
 
 	return Hit;
 }
@@ -194,6 +193,37 @@ void AArenaProjectile::SetPawnOwner(class AArenaCharacter* NewOwner)
 void AArenaProjectile::SetHitResults(const FHitResult& Impact)
 {
 	HitResults = Impact;
+}
+
+void AArenaProjectile::SetDamage(float Value)
+{
+	Damage = Value;
+}
+
+void AArenaProjectile::SetIsExplosive(bool Value)
+{
+	IsExplosive = Value;
+}
+
+void AArenaProjectile::SetExplosionRadius(float Value)
+{
+	ExplosionRadius = Value;
+}
+
+void AArenaProjectile::SetIsAffectByVelocity(bool Value)
+{
+	IsAffectByVelocity = Value;
+}
+
+void AArenaProjectile::StartTimer()
+{
+	 StartTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+}
+
+float AArenaProjectile::StopTimer()
+{
+	StopTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+	return StopTime;
 }
 
 void AArenaProjectile::PostNetReceiveVelocity(const FVector& NewVelocity)

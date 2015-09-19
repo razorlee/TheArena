@@ -77,6 +77,14 @@ public:
 	void OnActivateBack();
 	/** player released stop back action */
 	void OnDeactivateBack();
+	/** player pressed start back action */
+	void OnActivateLeftWaist();
+	/** player released stop back action */
+	void OnDeactivateLeftWaist();
+	/** player pressed start back action */
+	void OnActivateRightWaist();
+	/** player released stop back action */
+	void OnDeactivateRightWaist();
 
 ////////////////////////////////////////// Character Defaults //////////////////////////////////////////
 
@@ -187,11 +195,15 @@ public:
 	class AArenaUtility* GetLeftWaistUtility();
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void SetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility);
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void HandleLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	class AArenaUtility* GetRightWaistUtility();
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void SetRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	void HandleRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 
 ////////////////////////////////////////// Animation Controls //////////////////////////////////////////
 

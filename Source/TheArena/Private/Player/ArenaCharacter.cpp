@@ -342,6 +342,12 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 
 	InputComponent->BindAction("Back", IE_Pressed, this, &AArenaCharacter::OnActivateBack);
 	InputComponent->BindAction("Back", IE_Released, this, &AArenaCharacter::OnDeactivateBack);
+
+	InputComponent->BindAction("LeftWaist", IE_Pressed, this, &AArenaCharacter::OnActivateLeftWaist);
+	InputComponent->BindAction("LeftWaist", IE_Released, this, &AArenaCharacter::OnDeactivateLeftWaist);
+
+	InputComponent->BindAction("RightWaist", IE_Pressed, this, &AArenaCharacter::OnActivateRightWaist);
+	InputComponent->BindAction("RightWaist", IE_Released, this, &AArenaCharacter::OnDeactivateRightWaist);
 }
 
 void AArenaCharacter::MoveForward(float Value)
@@ -675,6 +681,38 @@ void AArenaCharacter::OnDeactivateBack()
 	if (UpperBackUtility)
 	{
 		UpperBackUtility->Deactivate();
+	}
+}
+void AArenaCharacter::OnActivateLeftWaist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (ArenaCharacterCan::Waist(this, MyPC))
+	{
+		LeftWaistUtility->Activate();
+	}
+}
+void AArenaCharacter::OnDeactivateLeftWaist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (LeftWaistUtility)
+	{
+		LeftWaistUtility->Deactivate();
+	}
+}
+void AArenaCharacter::OnActivateRightWaist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (ArenaCharacterCan::Waist(this, MyPC))
+	{
+		RightWaistUtility->Activate();
+	}
+}
+void AArenaCharacter::OnDeactivateRightWaist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (RightWaistUtility)
+	{
+		RightWaistUtility->Deactivate();
 	}
 }
 
@@ -1311,6 +1349,22 @@ void AArenaCharacter::SetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utili
 		//ServerSetSecondaryWeapon(Weapon);
 	}
 }
+void AArenaCharacter::HandleLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility)
+{
+	AArenaUtility* TBD = LeftWaistUtility;
+	if (TBD)
+	{
+		TBD->UnEquip();
+		TBD->Destroy();
+	}
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+
+	LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(Utility, SpawnInfo);
+	LeftWaistUtility->SetMyPawn(this);
+
+}
 
 class AArenaUtility*AArenaCharacter::GetRightWaistUtility()
 {
@@ -1333,6 +1387,23 @@ void AArenaCharacter::SetRightWaistUtility(TSubclassOf<class AArenaUtility> Util
 		//ServerSetSecondaryWeapon(Weapon);
 	}
 }
+void AArenaCharacter::HandleRightWaistUtility(TSubclassOf<class AArenaUtility> Utility)
+{
+	AArenaUtility* TBD = RightWaistUtility;
+	if (TBD)
+	{
+		TBD->UnEquip();
+		TBD->Destroy();
+	}
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+
+	RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(Utility, SpawnInfo);
+	RightWaistUtility->SetMyPawn(this);
+
+}
+
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
 
@@ -1950,8 +2021,8 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AAre
 	//LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
 	//RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
 
-	//LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
-	//RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
+	LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
+	RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
 
 	InitializeWeapons(PrimaryWeapon, SecondaryWeapon, UpperBackUtility);
 }

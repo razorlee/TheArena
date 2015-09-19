@@ -27,23 +27,49 @@ class THEARENA_API AArenaProjectile : public AActor
 	virtual void PostInitializeComponents() override;
 
 	/** setup velocity */
+	UFUNCTION(BlueprintCallable, Category = Projectile)
+
 	void InitVelocity(FVector& ShootDirection);
 
 	/** setup collision */
+	UFUNCTION(BlueprintCallable, Category = Projectile)
+
 	void SetCollisionChannel(ECollisionChannel Value);
 
 	/** handle hit */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = Projectile)
 	void OnImpact(const FHitResult& HitResult);
 
-	UFUNCTION()
+	/** trigger explosion */
+	UFUNCTION(BlueprintCallable, Category = Projectile)
+	void Explode(const FHitResult& Impact);
+
+	UFUNCTION(BlueprintCallable, Category = Projectile)
 	void SetInitialSpeed(float Speed);
 
 	/** get pawn owner */
 	UFUNCTION(BlueprintCallable, Category = "Game|Weapon")
 	void SetPawnOwner(class AArenaCharacter* MyPawn);
 
+	UFUNCTION(BlueprintCallable, Category = Projectile)
 	void SetHitResults(const FHitResult& Impact);
+
+	UFUNCTION(BlueprintCallable, Category = Projectile)
+	void SetDamage(float Value);
+
+	UFUNCTION(BlueprintCallable, Category = Projectile)
+	void SetIsExplosive(bool Value);
+
+	UFUNCTION(BlueprintCallable, Category = Projectile)
+	void SetExplosionRadius(float Value);
+
+	UFUNCTION(BlueprintCallable, Category = Projectile)
+	void SetIsAffectByVelocity(bool Value);
+
+	UFUNCTION(BlueprintCallable, Category = Projectile)
+	void StartTimer();
+	UFUNCTION(BlueprintCallable, Category = Projectile)
+	float StopTimer();
 
 private:
 
@@ -59,9 +85,6 @@ private:
 	UParticleSystemComponent* ParticleComp;
 
 protected:
-
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	bool IsExplosive;
 
 	/** pawn owner */
 	UPROPERTY(Transient, Replicated)
@@ -84,12 +107,27 @@ protected:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_Exploded)
 	FProjectileHitInfo ExplodeNotify;
 
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	float Damage;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	bool IsExplosive;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	float ExplosionRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	bool IsAffectByVelocity;
+
+	UPROPERTY()
+	float StartTime;
+
+	UPROPERTY()
+	float StopTime;
+
 	/** [client] explosion happened */
 	UFUNCTION()
 	void OnRep_Exploded();
-
-	/** trigger explosion */
-	void Explode(const FHitResult& Impact);
 
 	/** spawn effects for impact */
 	void SpawnImpactEffects(const FHitResult& Impact);
