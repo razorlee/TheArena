@@ -115,7 +115,7 @@ void AArenaCover::BeginLeftOverlap(class AActor* OtherActor, class UPrimitiveCom
 {
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(OtherActor);
 	if (MyPawn 
-		&& CoverType != ECoverType::Right 
+		&& (CoverType == ECoverType::Left || CoverType == ECoverType::Both)
 		&& MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Covering 
 		&& !MyPawn->GetPlayerState()->GetIsNearRightEdge())
 	{
@@ -140,7 +140,7 @@ void AArenaCover::BeginRightOverlap(class AActor* OtherActor, class UPrimitiveCo
 {
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(OtherActor);
 	if (MyPawn 
-		&& CoverType != ECoverType::Left 
+		&& (CoverType == ECoverType::Right || CoverType == ECoverType::Both)
 		&& MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Covering 
 		&& !MyPawn->GetPlayerState()->GetIsNearLeftEdge())
 	{

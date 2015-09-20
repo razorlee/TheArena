@@ -280,8 +280,24 @@ public:
 	void AddWeapon(class AArenaWeapon* Weapon);
 	void RemoveWeapon(class AArenaWeapon* Weapon);
 
-	void InitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack);
+	void InitializeWeapons(
+	class AArenaWeapon* mainWeapon,
+	class AArenaWeapon* offWeapon,
+	class AArenaUtility* Head,
+	class AArenaUtility* UpperBack,
+	class AArenaUtility* LowerBack,
+	class AArenaUtility* LeftWaist,
+	class AArenaUtility* RightWaist,
+	class AArenaUtility* LeftWrist,
+	class AArenaUtility* RightWrist,
+	class AArenaArmor* HeadA,
+	class AArenaArmor* ShoulderA,
+	class AArenaArmor* ChestA,
+	class AArenaArmor* HandsA,
+	class AArenaArmor* LegsA,
+	class AArenaArmor* FeetA);
 
+	UFUNCTION(NetMulticast, Unreliable)
 	void ApplyArmorStats();
 	
 	UFUNCTION(NetMultiCast, Reliable)
@@ -469,6 +485,10 @@ protected:
 	/** Handle for efficient management of StopReload timer */
 	FTimerHandle TimerHandle_SwapWeapon;
 
+	FTimerHandle TimerHandle_Busy;
+
+	FTimerHandle TimerHandle_SetLocation;
+
 	FTimerHandle TimerHandle_StopPeaking;
 
 	FTimerHandle TimerHandle_Vault;
@@ -527,6 +547,9 @@ protected:
 ////////////////////////////////////////////// Server //////////////////////////////////////////////
 
 	UFUNCTION(reliable, server, WithValidation)
+	void ServerApplyArmorStats();
+
+	UFUNCTION(reliable, server, WithValidation)
 	void ServerEquipWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
@@ -559,7 +582,22 @@ protected:
 	void ServerSetName(const FString& NewName);
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerSpawnEquipment(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack);
+	void ServerSpawnEquipment(
+	TSubclassOf<class AArenaWeapon> MainWeapon, 
+	TSubclassOf<class AArenaWeapon> OffWeapon, 
+	TSubclassOf<class AArenaUtility> Head,
+	TSubclassOf<class AArenaUtility> UpperBack,
+	TSubclassOf<class AArenaUtility> LowerBack,
+	TSubclassOf<class AArenaUtility> LeftWaist,
+	TSubclassOf<class AArenaUtility> RightWaist,
+	TSubclassOf<class AArenaUtility> LeftWrist,
+	TSubclassOf<class AArenaUtility> RightWrist,
+	TSubclassOf<class AArenaArmor> HeadA,
+	TSubclassOf<class AArenaArmor> ShoulderA,
+	TSubclassOf<class AArenaArmor> ChestA,
+	TSubclassOf<class AArenaArmor> HandsA,
+	TSubclassOf<class AArenaArmor> LegsA,
+	TSubclassOf<class AArenaArmor> FeetA);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerToggleCrouch();
@@ -580,7 +618,22 @@ protected:
 	void ServerSwapWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerInitializeWeapons(class AArenaWeapon* mainWeapon, class AArenaWeapon* offWeapon, class AArenaUtility* UpperBack);
+	void ServerInitializeWeapons(
+	class AArenaWeapon* mainWeapon, 
+	class AArenaWeapon* offWeapon,
+	class AArenaUtility* Head,
+	class AArenaUtility* UpperBack,
+	class AArenaUtility* LowerBack,
+	class AArenaUtility* LeftWaist,
+	class AArenaUtility* RightWaist,
+	class AArenaUtility* LeftWrist,
+	class AArenaUtility* RightWrist,
+	class AArenaArmor* HeadA,
+	class AArenaArmor* ShoulderA, 
+	class AArenaArmor* ChestA, 
+	class AArenaArmor* HandsA, 
+	class AArenaArmor* LegsA, 
+	class AArenaArmor* FeetA);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);

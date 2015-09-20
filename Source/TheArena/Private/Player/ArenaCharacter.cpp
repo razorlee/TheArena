@@ -131,6 +131,18 @@ void AArenaCharacter::BeginPlay()
 	{
 		CurrentWeapon->Equip();
 	}
+	if (CharacterState->GetPlayerState() == EPlayerState::Crouching)
+	{
+		Crouch();
+	}
+	if (Role == ROLE_Authority)
+	{
+		ApplyArmorStats();
+	}
+	else
+	{
+		ServerApplyArmorStats();
+	}
 }
 
 void AArenaCharacter::SaveCharacter()
@@ -199,9 +211,24 @@ void AArenaCharacter::LoadPersistence()
 			CharacterEquipment->SetShoulderArmorBP(SaveGameInstance->ShoulderArmor);
 		}
 
-		ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP(), CharacterEquipment->GetUpperBackUtilityBP());
+		ServerSpawnEquipment(
+			CharacterEquipment->GetPrimaryWeaponBP(),
+			CharacterEquipment->GetSecondaryWeaponBP(),
+			CharacterEquipment->GetHeadUtilityBP(),
+			CharacterEquipment->GetUpperBackUtilityBP(),
+			CharacterEquipment->GetLowerBackUtilityBP(),
+			CharacterEquipment->GetLeftWaistUtilityBP(),
+			CharacterEquipment->GetRightWaistUtilityBP(),
+			CharacterEquipment->GetLeftWristUtilityBP(),
+			CharacterEquipment->GetRightWristUtilityBP(),
+			CharacterEquipment->GetHeadArmorBP(),
+			CharacterEquipment->GetShoulderArmorBP(),
+			CharacterEquipment->GetChestArmorBP(),
+			CharacterEquipment->GetHandsArmorBP(),
+			CharacterEquipment->GetLegsArmorBP(),
+			CharacterEquipment->GetFeetArmorBP()
+			);
 		SaveCharacter();
-
 	}
 	Spawned = true;
 }
@@ -741,7 +768,22 @@ void AArenaCharacter::OnDeactivateRightWaist()
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
-void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
+void AArenaCharacter::InitializeWeapons(
+class AArenaWeapon* mainWeapon,
+class AArenaWeapon* offWeapon,
+class AArenaUtility* Head,
+class AArenaUtility* UpperBack,
+class AArenaUtility* LowerBack,
+class AArenaUtility* LeftWaist,
+class AArenaUtility* RightWaist,
+class AArenaUtility* LeftWrist,
+class AArenaUtility* RightWrist,
+class AArenaArmor* HeadA,
+class AArenaArmor* ShoulderA,
+class AArenaArmor* ChestA,
+class AArenaArmor* HandsA,
+class AArenaArmor* LegsA,
+class AArenaArmor* FeetA)
 {
 	if (Role == ROLE_Authority)
 	{
@@ -814,15 +856,29 @@ void AArenaCharacter::InitializeWeapons(AArenaWeapon* mainWeapon, AArenaWeapon* 
 		{
 			ShoulderArmor->SetMyPawn(this);
 		}
-		ApplyArmorStats();
 	}
 	else
 	{
-		ServerInitializeWeapons(mainWeapon, offWeapon, UpperBack);
+		ServerInitializeWeapons(
+		mainWeapon,
+		offWeapon,
+		Head,
+		UpperBack,
+		LowerBack,
+		LeftWaist,
+		RightWaist,
+		LeftWrist,
+		RightWrist,
+		HeadA,
+		ShoulderA,
+		ChestA,
+		HandsA,
+		LegsA,
+		FeetA);
 	}
 }
 
-void AArenaCharacter::ApplyArmorStats()
+void AArenaCharacter::ApplyArmorStats_Implementation()
 {
 	CharacterAttributes->SetProtection(0.0);
 	CharacterAttributes->SetSpeed(0.0);
@@ -992,7 +1048,7 @@ void AArenaCharacter::StartPeaking_Implementation()
 	{
 		return;
 	}
-	GetWorldTimerManager().SetTimer(TimerHandle_StopPeaking, this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.40f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_Busy, this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.40f, false);
 }
 void AArenaCharacter::StopPeaking_Implementation()
 {
@@ -1022,8 +1078,8 @@ void AArenaCharacter::StopPeaking_Implementation()
 	{
 		return;
 	}
-	GetWorldTimerManager().SetTimer(TimerHandle_StopPeaking, this, &AArenaCharacter::SetLocation, ActionQueue * 0.4f, false);
-	GetWorldTimerManager().SetTimer(TimerHandle_StopPeaking, this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.4f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_SetLocation, this, &AArenaCharacter::SetLocation, ActionQueue * 0.4f, false);
+	GetWorldTimerManager().SetTimer(TimerHandle_Busy, this, &AArenaCharacter::ToggleBusy, ActionQueue * 0.4f, false);
 }
 
 void AArenaCharacter::ToggleCombat_Implementation()
@@ -1217,13 +1273,6 @@ AArenaWeapon* AArenaCharacter::GetPrimaryWeapon()
 }
 void AArenaCharacter::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
-	if (IsLocallyControlled() && Weapon)
-	{
-		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		//SaveGameInstance->PrimaryWeapon = Weapon;
-		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandlePrimaryWeapon(Weapon);
@@ -1236,6 +1285,7 @@ void AArenaCharacter::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 void AArenaCharacter::HandlePrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
 	CurrentWeapon = NULL;
+	CharacterEquipment->SetPrimaryWeaponBP(Weapon);
 	AArenaWeapon* TBD = PrimaryWeapon;
 	if (TBD)
 	{
@@ -1244,14 +1294,17 @@ void AArenaCharacter::HandlePrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon
 	}
 
 	FActorSpawnParameters SpawnInfo;
-	//SpawnInfo.SpawnCollisionHandlingOverride;
 	SpawnInfo.bNoCollisionFail = true;
 
 	PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(Weapon, SpawnInfo);
 	PrimaryWeapon->SetOwningPawn(this);
 	PrimaryWeapon->SetPrimary(true);
-
 	PrimaryWeapon->UnEquip();
+
+	if (IsLocallyControlled() && Weapon)
+	{
+		SaveCharacter();
+	}
 }
 
 AArenaWeapon* AArenaCharacter::GetSecondaryWeapon()
@@ -1260,13 +1313,6 @@ AArenaWeapon* AArenaCharacter::GetSecondaryWeapon()
 }
 void AArenaCharacter::SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
-	if (IsLocallyControlled() && Weapon)
-	{
-		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		//SaveGameInstance->SecondaryWeapon = Weapon;
-		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleSecondaryWeapon(Weapon);
@@ -1279,6 +1325,7 @@ void AArenaCharacter::SetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 void AArenaCharacter::HandleSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
 	CurrentWeapon = NULL;
+	CharacterEquipment->SetSecondaryWeaponBP(Weapon);
 	AArenaWeapon* TBD = SecondaryWeapon;
 	if (TBD)
 	{
@@ -1292,8 +1339,12 @@ void AArenaCharacter::HandleSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weap
 	SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(Weapon, SpawnInfo);
 	SecondaryWeapon->SetOwningPawn(this);
 	SecondaryWeapon->SetPrimary(false);
-
 	SecondaryWeapon->UnEquip();
+
+	if (IsLocallyControlled() && Weapon)
+	{
+		SaveCharacter();
+	}
 }
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
@@ -1304,10 +1355,6 @@ class AArenaUtility* AArenaCharacter::GetHeadUtility()
 }
 void AArenaCharacter::SetHeadUtility(TSubclassOf<class AArenaUtility> Utility)
 {
-	if (IsLocallyControlled() && Utility)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleHeadUtility(Utility);
@@ -1319,6 +1366,7 @@ void AArenaCharacter::SetHeadUtility(TSubclassOf<class AArenaUtility> Utility)
 }
 void AArenaCharacter::HandleHeadUtility(TSubclassOf<class AArenaUtility> Utility)
 {
+	CharacterEquipment->SetHeadUtilityBP(Utility);
 	AArenaUtility* TBD = HeadUtility;
 	if (TBD)
 	{
@@ -1332,6 +1380,10 @@ void AArenaCharacter::HandleHeadUtility(TSubclassOf<class AArenaUtility> Utility
 	HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(Utility, SpawnInfo);
 	HeadUtility->SetMyPawn(this);
 
+	if (IsLocallyControlled() && Utility)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaUtility* AArenaCharacter::GetUpperBackUtility()
@@ -1340,13 +1392,6 @@ class AArenaUtility* AArenaCharacter::GetUpperBackUtility()
 }
 void AArenaCharacter::SetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility)
 {
-	if (IsLocallyControlled() && Utility)
-	{
-		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		SaveCharacter();
-		//SaveGameInstance->UpperBackUtility = Utility;
-		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleUpperBackUtility(Utility);
@@ -1358,6 +1403,7 @@ void AArenaCharacter::SetUpperBackUtility(TSubclassOf<class AArenaUtility> Utili
 }
 void AArenaCharacter::HandleUpperBackUtility(TSubclassOf<class AArenaUtility> Utility)
 {
+	CharacterEquipment->SetUpperBackUtilityBP(Utility);
 	AArenaUtility* TBD = UpperBackUtility;
 	if (TBD)
 	{
@@ -1371,6 +1417,10 @@ void AArenaCharacter::HandleUpperBackUtility(TSubclassOf<class AArenaUtility> Ut
 	UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(Utility, SpawnInfo);
 	UpperBackUtility->SetMyPawn(this);
 
+	if (IsLocallyControlled() && Utility)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaUtility* AArenaCharacter::GetLowerBackUtility()
@@ -1379,10 +1429,6 @@ class AArenaUtility* AArenaCharacter::GetLowerBackUtility()
 }
 void AArenaCharacter::SetLowerBackUtility(TSubclassOf<class AArenaUtility> Utility)
 {
-	if (IsLocallyControlled() && Utility)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleLowerBackUtility(Utility);
@@ -1394,6 +1440,7 @@ void AArenaCharacter::SetLowerBackUtility(TSubclassOf<class AArenaUtility> Utili
 }
 void AArenaCharacter::HandleLowerBackUtility(TSubclassOf<class AArenaUtility> Utility)
 {
+	CharacterEquipment->SetLowerBackUtilityBP(Utility);
 	AArenaUtility* TBD = LowerBackUtility;
 	if (TBD)
 	{
@@ -1407,6 +1454,10 @@ void AArenaCharacter::HandleLowerBackUtility(TSubclassOf<class AArenaUtility> Ut
 	LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(Utility, SpawnInfo);
 	LowerBackUtility->SetMyPawn(this);
 
+	if (IsLocallyControlled() && Utility)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaUtility* AArenaCharacter::GetLeftWristUtility()
@@ -1415,10 +1466,6 @@ class AArenaUtility* AArenaCharacter::GetLeftWristUtility()
 }
 void AArenaCharacter::SetLeftWristUtility(TSubclassOf<class AArenaUtility> Utility)
 {
-	if (IsLocallyControlled() && Utility)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleLeftWristUtility(Utility);
@@ -1430,6 +1477,7 @@ void AArenaCharacter::SetLeftWristUtility(TSubclassOf<class AArenaUtility> Utili
 }
 void AArenaCharacter::HandleLeftWristUtility(TSubclassOf<class AArenaUtility> Utility)
 {
+	CharacterEquipment->SetLeftWristUtilityBP(Utility);
 	AArenaUtility* TBD = LeftWristUtility;
 	if (TBD)
 	{
@@ -1443,6 +1491,10 @@ void AArenaCharacter::HandleLeftWristUtility(TSubclassOf<class AArenaUtility> Ut
 	LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(Utility, SpawnInfo);
 	LeftWristUtility->SetMyPawn(this);
 
+	if (IsLocallyControlled() && Utility)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaUtility* AArenaCharacter::GetRightWristUtility()
@@ -1451,10 +1503,6 @@ class AArenaUtility* AArenaCharacter::GetRightWristUtility()
 }
 void AArenaCharacter::SetRightWristUtility(TSubclassOf<class AArenaUtility> Utility)
 {
-	if (IsLocallyControlled() && Utility)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleRightWristUtility(Utility);
@@ -1466,6 +1514,7 @@ void AArenaCharacter::SetRightWristUtility(TSubclassOf<class AArenaUtility> Util
 }
 void AArenaCharacter::HandleRightWristUtility(TSubclassOf<class AArenaUtility> Utility)
 {
+	CharacterEquipment->SetRightWristUtilityBP(Utility);
 	AArenaUtility* TBD = RightWristUtility;
 	if (TBD)
 	{
@@ -1479,6 +1528,10 @@ void AArenaCharacter::HandleRightWristUtility(TSubclassOf<class AArenaUtility> U
 	RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(Utility, SpawnInfo);
 	RightWristUtility->SetMyPawn(this);
 
+	if (IsLocallyControlled() && Utility)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaUtility* AArenaCharacter::GetLeftWaistUtility()
@@ -1487,13 +1540,6 @@ class AArenaUtility* AArenaCharacter::GetLeftWaistUtility()
 }
 void AArenaCharacter::SetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility)
 {
-	if (IsLocallyControlled() && Utility)
-	{
-		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		//SaveGameInstance->LeftWaistUtility = Utility;
-		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleLeftWaistUtility(Utility);
@@ -1505,6 +1551,7 @@ void AArenaCharacter::SetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utili
 }
 void AArenaCharacter::HandleLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility)
 {
+	CharacterEquipment->SetLeftWaistUtilityBP(Utility);
 	AArenaUtility* TBD = LeftWaistUtility;
 	if (TBD)
 	{
@@ -1518,6 +1565,10 @@ void AArenaCharacter::HandleLeftWaistUtility(TSubclassOf<class AArenaUtility> Ut
 	LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(Utility, SpawnInfo);
 	LeftWaistUtility->SetMyPawn(this);
 
+	if (IsLocallyControlled() && Utility)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaUtility* AArenaCharacter::GetRightWaistUtility()
@@ -1526,13 +1577,6 @@ class AArenaUtility* AArenaCharacter::GetRightWaistUtility()
 }
 void AArenaCharacter::SetRightWaistUtility(TSubclassOf<class AArenaUtility> Utility)
 {
-	if (IsLocallyControlled() && Utility)
-	{
-		//SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
-		//SaveGameInstance->RightWaistUtility = Utility;
-		//UGameplayStatics::SaveGameToSlot(SaveGameInstance, Name, SaveGameInstance->UserIndex);
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleRightWaistUtility(Utility);
@@ -1544,6 +1588,7 @@ void AArenaCharacter::SetRightWaistUtility(TSubclassOf<class AArenaUtility> Util
 }
 void AArenaCharacter::HandleRightWaistUtility(TSubclassOf<class AArenaUtility> Utility)
 {
+	CharacterEquipment->SetRightWaistUtilityBP(Utility);
 	AArenaUtility* TBD = RightWaistUtility;
 	if (TBD)
 	{
@@ -1557,6 +1602,10 @@ void AArenaCharacter::HandleRightWaistUtility(TSubclassOf<class AArenaUtility> U
 	RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(Utility, SpawnInfo);
 	RightWaistUtility->SetMyPawn(this);
 
+	if (IsLocallyControlled() && Utility)
+	{
+		SaveCharacter();
+	}
 }
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
@@ -1567,10 +1616,6 @@ class AArenaArmor* AArenaCharacter::GetHeadArmor()
 }
 void AArenaCharacter::SetHeadArmor(TSubclassOf<class AArenaArmor> Armor)
 {
-	if (IsLocallyControlled() && Armor)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleHeadArmor(Armor);
@@ -1582,6 +1627,7 @@ void AArenaCharacter::SetHeadArmor(TSubclassOf<class AArenaArmor> Armor)
 }
 void AArenaCharacter::HandleHeadArmor(TSubclassOf<class AArenaArmor> Armor)
 {
+	CharacterEquipment->SetHeadArmorBP(Armor);
 	AArenaArmor* TBD = HeadArmor;
 	if (TBD)
 	{
@@ -1595,6 +1641,11 @@ void AArenaCharacter::HandleHeadArmor(TSubclassOf<class AArenaArmor> Armor)
 	HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(Armor, SpawnInfo);
 	HeadArmor->SetMyPawn(this);
 	ApplyArmorStats();
+
+	if (IsLocallyControlled() && Armor)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaArmor* AArenaCharacter::GetChestArmor()
@@ -1603,10 +1654,6 @@ class AArenaArmor* AArenaCharacter::GetChestArmor()
 }
 void AArenaCharacter::SetChestArmor(TSubclassOf<class AArenaArmor> Armor)
 {
-	if (IsLocallyControlled() && Armor)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleChestArmor(Armor);
@@ -1618,6 +1665,7 @@ void AArenaCharacter::SetChestArmor(TSubclassOf<class AArenaArmor> Armor)
 }
 void AArenaCharacter::HandleChestArmor(TSubclassOf<class AArenaArmor> Armor)
 {
+	CharacterEquipment->SetChestArmorBP(Armor);
 	AArenaArmor* TBD = ChestArmor;
 	if (TBD)
 	{
@@ -1631,6 +1679,11 @@ void AArenaCharacter::HandleChestArmor(TSubclassOf<class AArenaArmor> Armor)
 	ChestArmor = GetWorld()->SpawnActor<AArenaArmor>(Armor, SpawnInfo);
 	ChestArmor->SetMyPawn(this);
 	ApplyArmorStats();
+
+	if (IsLocallyControlled() && Armor)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaArmor* AArenaCharacter::GetShoulderArmor()
@@ -1639,10 +1692,6 @@ class AArenaArmor* AArenaCharacter::GetShoulderArmor()
 }
 void AArenaCharacter::SetShoulderArmor(TSubclassOf<class AArenaArmor> Armor)
 {
-	if (IsLocallyControlled() && Armor)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleShoulderArmor(Armor);
@@ -1654,6 +1703,7 @@ void AArenaCharacter::SetShoulderArmor(TSubclassOf<class AArenaArmor> Armor)
 }
 void AArenaCharacter::HandleShoulderArmor(TSubclassOf<class AArenaArmor> Armor)
 {
+	CharacterEquipment->SetShoulderArmorBP(Armor);
 	AArenaArmor* TBD = ShoulderArmor;
 	if (TBD)
 	{
@@ -1667,6 +1717,11 @@ void AArenaCharacter::HandleShoulderArmor(TSubclassOf<class AArenaArmor> Armor)
 	ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(Armor, SpawnInfo);
 	ShoulderArmor->SetMyPawn(this);
 	ApplyArmorStats();
+
+	if (IsLocallyControlled() && Armor)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaArmor* AArenaCharacter::GetHandArmor()
@@ -1675,10 +1730,6 @@ class AArenaArmor* AArenaCharacter::GetHandArmor()
 }
 void AArenaCharacter::SetHandArmor(TSubclassOf<class AArenaArmor> Armor)
 {
-	if (IsLocallyControlled() && Armor)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleHandArmor(Armor);
@@ -1690,6 +1741,7 @@ void AArenaCharacter::SetHandArmor(TSubclassOf<class AArenaArmor> Armor)
 }
 void AArenaCharacter::HandleHandArmor(TSubclassOf<class AArenaArmor> Armor)
 {
+	CharacterEquipment->SetHandsArmorBP(Armor);
 	AArenaArmor* TBD = HandArmor;
 	if (TBD)
 	{
@@ -1703,6 +1755,11 @@ void AArenaCharacter::HandleHandArmor(TSubclassOf<class AArenaArmor> Armor)
 	HandArmor = GetWorld()->SpawnActor<AArenaArmor>(Armor, SpawnInfo);
 	HandArmor->SetMyPawn(this);
 	ApplyArmorStats();
+
+	if (IsLocallyControlled() && Armor)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaArmor* AArenaCharacter::GetLegArmor()
@@ -1711,10 +1768,6 @@ class AArenaArmor* AArenaCharacter::GetLegArmor()
 }
 void AArenaCharacter::SetLegArmor(TSubclassOf<class AArenaArmor> Armor)
 {
-	if (IsLocallyControlled() && Armor)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleLegArmor(Armor);
@@ -1726,6 +1779,7 @@ void AArenaCharacter::SetLegArmor(TSubclassOf<class AArenaArmor> Armor)
 }
 void AArenaCharacter::HandleLegArmor(TSubclassOf<class AArenaArmor> Armor)
 {
+	CharacterEquipment->SetLegsArmorBP(Armor);
 	AArenaArmor* TBD = LegArmor;
 	if (TBD)
 	{
@@ -1739,6 +1793,11 @@ void AArenaCharacter::HandleLegArmor(TSubclassOf<class AArenaArmor> Armor)
 	LegArmor = GetWorld()->SpawnActor<AArenaArmor>(Armor, SpawnInfo);
 	LegArmor->SetMyPawn(this);
 	ApplyArmorStats();
+
+	if (IsLocallyControlled() && Armor)
+	{
+		SaveCharacter();
+	}
 }
 
 class AArenaArmor* AArenaCharacter::GetFeetArmor()
@@ -1747,10 +1806,6 @@ class AArenaArmor* AArenaCharacter::GetFeetArmor()
 }
 void AArenaCharacter::SetFeetArmor(TSubclassOf<class AArenaArmor> Armor)
 {
-	if (IsLocallyControlled() && Armor)
-	{
-		SaveCharacter();
-	}
 	if (Role == ROLE_Authority)
 	{
 		HandleFeetArmor(Armor);
@@ -1762,6 +1817,7 @@ void AArenaCharacter::SetFeetArmor(TSubclassOf<class AArenaArmor> Armor)
 }
 void AArenaCharacter::HandleFeetArmor(TSubclassOf<class AArenaArmor> Armor)
 {
+	CharacterEquipment->SetFeetArmorBP(Armor);
 	AArenaArmor* TBD = FeetArmor;
 	if (TBD)
 	{
@@ -1775,6 +1831,11 @@ void AArenaCharacter::HandleFeetArmor(TSubclassOf<class AArenaArmor> Armor)
 	FeetArmor = GetWorld()->SpawnActor<AArenaArmor>(Armor, SpawnInfo);
 	FeetArmor->SetMyPawn(this);
 	ApplyArmorStats();
+
+	if (IsLocallyControlled() && Armor)
+	{
+		SaveCharacter();
+	}
 }
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
@@ -1792,7 +1853,6 @@ float AArenaCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damag
 	//Damage = Game ? Game->ModifyDamage(Damage, this, DamageEvent, EventInstigator, DamageCauser) : 0.f;
 
 	float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-	ActualDamage = ActualDamage * (1 - (CharacterAttributes->GetProtection() / 2000.0f)); //2000 is 100% protection
 	if (ActualDamage != 0.f)
 	{
 		if (CharacterAttributes->GetCurrentShields() > 0 && ActualDamage > 0)
@@ -1806,6 +1866,7 @@ float AArenaCharacter::TakeDamage(float Damage, struct FDamageEvent const& Damag
 		}
 		if (CharacterAttributes->GetCurrentShields() <= 0 || ActualDamage < 0)
 		{
+			ActualDamage = ActualDamage * (1 - (CharacterAttributes->GetProtection() / 2000.0f)); //2000 is 100% protection
 			CharacterAttributes->SetCurrentHealth(CharacterAttributes->GetCurrentHealth() - ActualDamage);
 			if (CharacterAttributes->GetCurrentHealth() <= 0)
 			{
@@ -2277,6 +2338,15 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 
 ////////////////////////////////////////////// Server //////////////////////////////////////////////
 
+bool AArenaCharacter::ServerApplyArmorStats_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerApplyArmorStats_Implementation()
+{
+	ApplyArmorStats();
+}
+
 bool AArenaCharacter::ServerEquipWeapon_Validate()
 {
 	return true;
@@ -2374,11 +2444,41 @@ void AArenaCharacter::ServerSetName_Implementation(const FString& NewName)
 	SetName(NewName);
 }
 
-bool AArenaCharacter::ServerSpawnEquipment_Validate(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility> UpperBack)
+bool AArenaCharacter::ServerSpawnEquipment_Validate(
+	TSubclassOf<class AArenaWeapon> MainWeapon,
+	TSubclassOf<class AArenaWeapon> OffWeapon,
+	TSubclassOf<class AArenaUtility> Head,
+	TSubclassOf<class AArenaUtility> UpperBack,
+	TSubclassOf<class AArenaUtility> LowerBack,
+	TSubclassOf<class AArenaUtility> LeftWaist,
+	TSubclassOf<class AArenaUtility> RightWaist,
+	TSubclassOf<class AArenaUtility> LeftWrist,
+	TSubclassOf<class AArenaUtility> RightWrist,
+	TSubclassOf<class AArenaArmor> HeadA,
+	TSubclassOf<class AArenaArmor> ShoulderA,
+	TSubclassOf<class AArenaArmor> ChestA,
+	TSubclassOf<class AArenaArmor> HandsA,
+	TSubclassOf<class AArenaArmor> LegsA,
+	TSubclassOf<class AArenaArmor> FeetA)
 {
 	return true;
 }
-void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AArenaWeapon> MainWeapon, TSubclassOf<class AArenaWeapon> OffWeapon, TSubclassOf<class AArenaUtility>  UpperBack)
+void AArenaCharacter::ServerSpawnEquipment_Implementation(
+	TSubclassOf<class AArenaWeapon> MainWeapon,
+	TSubclassOf<class AArenaWeapon> OffWeapon,
+	TSubclassOf<class AArenaUtility> Head,
+	TSubclassOf<class AArenaUtility> UpperBack,
+	TSubclassOf<class AArenaUtility> LowerBack,
+	TSubclassOf<class AArenaUtility> LeftWaist,
+	TSubclassOf<class AArenaUtility> RightWaist,
+	TSubclassOf<class AArenaUtility> LeftWrist,
+	TSubclassOf<class AArenaUtility> RightWrist,
+	TSubclassOf<class AArenaArmor> HeadA,
+	TSubclassOf<class AArenaArmor> ShoulderA,
+	TSubclassOf<class AArenaArmor> ChestA,
+	TSubclassOf<class AArenaArmor> HandsA,
+	TSubclassOf<class AArenaArmor> LegsA,
+	TSubclassOf<class AArenaArmor> FeetA)
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.bNoCollisionFail = true;
@@ -2395,67 +2495,79 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(TSubclassOf<class AAre
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+	if (Head)
+	{
+		HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
+	}
 	if (UpperBack)
 	{
 		UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(UpperBack, SpawnInfo);
 	}
-	if (CharacterEquipment->GetHeadUtilityBP())
-	{
-		HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
-	}
-	if (CharacterEquipment->GetUpperBackUtilityBP())
-	{
-		UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetUpperBackUtilityBP(), SpawnInfo);
-	}
-	if (CharacterEquipment->GetLowerBackUtilityBP())
+	if (LowerBack)
 	{
 		LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLowerBackUtilityBP(), SpawnInfo);
 	}
-	if (CharacterEquipment->GetLeftWristUtilityBP())
+	if (LeftWaist)
 	{
 		LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
 	}
-	if (CharacterEquipment->GetRightWristUtilityBP())
+	if (RightWaist)
 	{
 		RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
 	}
-	if (CharacterEquipment->GetLeftWaistUtilityBP())
+	if (LeftWrist)
 	{
 		LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
 	}
-	if (CharacterEquipment->GetRightWaistUtilityBP())
+	if (RightWrist)
 	{
 		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	if (CharacterEquipment->GetChestArmorBP())
+	if (ChestA)
 	{
 		ChestArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetChestArmorBP(), SpawnInfo);
 	}
-	if (CharacterEquipment->GetHandsArmorBP())
+	if (HandsA)
 	{
 		HandArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHandsArmorBP(), SpawnInfo);
 	}
-	if (CharacterEquipment->GetHeadArmorBP())
+	if (HeadA)
 	{
 		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHeadArmorBP(), SpawnInfo);
 	}
-	if (CharacterEquipment->GetFeetArmorBP())
+	if (FeetA)
 	{
 		FeetArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetFeetArmorBP(), SpawnInfo);
 	}
-	if (CharacterEquipment->GetLegsArmorBP())
+	if (LegsA)
 	{
 		LegArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetLegsArmorBP(), SpawnInfo);
 	}
-	if (CharacterEquipment->GetShoulderArmorBP())
+	if (ShoulderA)
 	{
 		ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetShoulderArmorBP(), SpawnInfo);
 	}
 
-	InitializeWeapons(PrimaryWeapon, SecondaryWeapon, UpperBackUtility);
+	InitializeWeapons(
+		PrimaryWeapon,
+		SecondaryWeapon,
+		HeadUtility,
+		UpperBackUtility,
+		LowerBackUtility,
+		LeftWaistUtility,
+		RightWaistUtility,
+		LeftWristUtility,
+		RightWristUtility,
+		HeadArmor,
+		ShoulderArmor,
+		ChestArmor,
+		HandArmor,
+		LegArmor,
+		FeetArmor);
 }
 
 bool AArenaCharacter::ServerToggleCrouch_Validate()
@@ -2512,13 +2624,58 @@ void AArenaCharacter::ServerSwapWeapon_Implementation()
 	SwapWeapon();
 }
 
-bool AArenaCharacter::ServerInitializeWeapons_Validate(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
+bool AArenaCharacter::ServerInitializeWeapons_Validate(
+class AArenaWeapon* mainWeapon,
+class AArenaWeapon* offWeapon,
+class AArenaUtility* Head,
+class AArenaUtility* UpperBack,
+class AArenaUtility* LowerBack,
+class AArenaUtility* LeftWaist,
+class AArenaUtility* RightWaist,
+class AArenaUtility* LeftWrist,
+class AArenaUtility* RightWrist,
+class AArenaArmor* HeadA,
+class AArenaArmor* ShoulderA,
+class AArenaArmor* ChestA,
+class AArenaArmor* HandsA,
+class AArenaArmor* LegsA,
+class AArenaArmor* FeetA)
 {
 	return true;
 }
-void AArenaCharacter::ServerInitializeWeapons_Implementation(AArenaWeapon* mainWeapon, AArenaWeapon* offWeapon, AArenaUtility* UpperBack)
+void AArenaCharacter::ServerInitializeWeapons_Implementation(
+class AArenaWeapon* mainWeapon,
+class AArenaWeapon* offWeapon,
+class AArenaUtility* Head,
+class AArenaUtility* UpperBack,
+class AArenaUtility* LowerBack,
+class AArenaUtility* LeftWaist,
+class AArenaUtility* RightWaist,
+class AArenaUtility* LeftWrist,
+class AArenaUtility* RightWrist,
+class AArenaArmor* HeadA,
+class AArenaArmor* ShoulderA,
+class AArenaArmor* ChestA,
+class AArenaArmor* HandsA,
+class AArenaArmor* LegsA,
+class AArenaArmor* FeetA)
 {
-	InitializeWeapons(mainWeapon, offWeapon, UpperBack);
+	InitializeWeapons(
+		mainWeapon,
+		offWeapon,
+		Head,
+		UpperBack,
+		LowerBack,
+		LeftWaist,
+		RightWaist,
+		LeftWrist,
+		RightWrist,
+		HeadA,
+		ShoulderA,
+		ChestA,
+		HandsA,
+		LegsA,
+		FeetA);
 }
 
 bool AArenaCharacter::ServerSetPrimaryWeapon_Validate(TSubclassOf<class AArenaWeapon> Weapon)

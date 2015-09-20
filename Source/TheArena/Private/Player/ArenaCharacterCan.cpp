@@ -141,7 +141,8 @@ bool ArenaCharacterCan::Jump(AArenaCharacter* character, AArenaPlayerController*
 		&& character->GetCharacterAttributes()->GetCurrentStamina() >= character->GetPlayerMovement()->CostConfig.JumpCost
 		&& !character->GetCharacterMovement()->IsFalling()
 		&& !character->GetCharacterMovement()->IsFlying()
-		&& !character->GetPlayerState()->GetIsNearCover())
+		&& !character->GetPlayerState()->GetCanVault()
+		&& !character->GetPlayerState()->GetCanClimb())
 	{
 		return true;
 	}
