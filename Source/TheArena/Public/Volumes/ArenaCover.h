@@ -12,7 +12,8 @@ namespace ECoverType
 	{
 		Both	UMETA(DisplayName = "Both"),
 		Right	UMETA(DisplayName = "Right Only"),
-		Left	UMETA(DisplayName = "Left Only")
+		Left	UMETA(DisplayName = "Left Only"),
+		Neither	UMETA(DisplayName = "Neither")
 	};
 }
 
