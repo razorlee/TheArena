@@ -464,8 +464,15 @@ void AArenaCharacter::OnStartJump()
 		UnCrouch();
 		OnStopRunning();
 		CharacterState->SetPlayerState(EPlayerState::Jumping);
-		CharacterAttributes->SetCurrentStamina(CharacterAttributes->GetCurrentStamina() - CharacterMovementComponent->CostConfig.JumpCost);
 		Jump();
+		if (Role == ROLE_Authority)
+		{
+			CharacterAttributes->SetCurrentStamina(CharacterAttributes->GetCurrentStamina() - CharacterMovementComponent->CostConfig.JumpCost);
+		}
+		else
+		{
+			ServerJump(this);
+		}
 	}
 }
 void AArenaCharacter::OnStopJump()
@@ -1045,6 +1052,12 @@ void AArenaCharacter::StartPeaking_Implementation()
 		CharacterMovementComponent->SetLocation(GetActorLocation());
 		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetLowRightAnimation(FString(TEXT("Start"))));
 	}
+	else if (CharacterState->GetCoverState() == ECoverState::LowMiddle)
+	{
+		//Busy = true;
+		CurrentWeapon->GetWeaponState()->SetCoverTargeting(true);
+		//CharacterMovementComponent->SetLocation(GetActorLocation());
+	}
 	else
 	{
 		return;
@@ -1074,6 +1087,10 @@ void AArenaCharacter::StopPeaking_Implementation()
 	{
 		Busy = true;
 		ActionQueue = PlayAnimMontage(CharacterMovementComponent->GetLowRightAnimation(FString(TEXT("End"))));
+	}
+	else if (CharacterState->GetCoverState() == ECoverState::LowMiddle)
+	{
+		CurrentWeapon->GetWeaponState()->SetCoverTargeting(false);
 	}
 	else
 	{
@@ -1134,7 +1151,7 @@ void AArenaCharacter::FinishEquipWeapon(class AArenaWeapon* Weapon)
 		Weapon->Equip();
 	}
 }
-
+	
 float AArenaCharacter::UnEquipWeapon()
 {
 	return FinishUnEquipWeapon(CurrentWeapon);
@@ -1160,6 +1177,7 @@ void AArenaCharacter::StartVault_Implementation()
 	OnStopFire();
 	CharacterState->SetPlayerState(EPlayerState::Vaulting);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	CharacterAttributes->SetCurrentStamina(CharacterAttributes->GetCurrentStamina() - CharacterMovementComponent->CostConfig.VaultCost);
 
 	float AnimDuration = PlayAnimMontage(CharacterMovementComponent->GetVaultAnimation());
 	if (AnimDuration <= 0.0f)
@@ -1181,6 +1199,7 @@ void AArenaCharacter::StartClimb_Implementation()
 	OnStopFire();
 	CharacterState->SetPlayerState(EPlayerState::Climbing);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	CharacterAttributes->SetCurrentStamina(CharacterAttributes->GetCurrentStamina() - CharacterMovementComponent->CostConfig.ClimbCost);
 
 	float AnimDuration = PlayAnimMontage(CharacterMovementComponent->GetClimbAnimation());
 	if (AnimDuration <= 0.0f)
@@ -2328,8 +2347,8 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	DOREPLIFETIME(AArenaCharacter, PrimaryWeapon);
 	DOREPLIFETIME(AArenaCharacter, SecondaryWeapon);
 
-	DOREPLIFETIME(AArenaCharacter, CharacterEquipment);
-	DOREPLIFETIME(AArenaCharacter, CharacterAttributes);
+	//DOREPLIFETIME(AArenaCharacter, CharacterEquipment);
+	//DOREPLIFETIME(AArenaCharacter, CharacterAttributes);
 
 	DOREPLIFETIME(AArenaCharacter, HeadUtility);
 	DOREPLIFETIME(AArenaCharacter, UpperBackUtility);
@@ -2382,7 +2401,7 @@ bool AArenaCharacter::ServerJump_Validate(class AArenaCharacter* client)
 }
 void AArenaCharacter::ServerJump_Implementation(class AArenaCharacter* client)
 {
-	//client->PlayerConfig.Stamina -= JumpCost;
+	CharacterAttributes->SetCurrentStamina(CharacterAttributes->GetCurrentStamina() - CharacterMovementComponent->CostConfig.JumpCost);
 }
 
 bool AArenaCharacter::ServerVault_Validate()
@@ -2521,19 +2540,19 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(
 	}
 	if (LeftWaist)
 	{
-		LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
+		 LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
 	}
 	if (RightWaist)
 	{
-		RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
+		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
 	}
 	if (LeftWrist)
 	{
-		LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
+		LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
 	}
 	if (RightWrist)
 	{
-		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
+		RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

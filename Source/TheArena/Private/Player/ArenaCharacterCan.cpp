@@ -7,7 +7,8 @@ bool ArenaCharacterCan::Turn(AArenaCharacter* character, AArenaPlayerController*
 {
 	if (controller
 		&& controller->IsGameInputAllowed()
-		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Vaulting)
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Vaulting
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Climbing)
 	{
 		return true;
 	}
@@ -176,6 +177,7 @@ bool ArenaCharacterCan::Vault(AArenaCharacter* character, AArenaPlayerController
 		&& !character->GetCharacterMovement()->IsFalling()
 		&& !character->GetCharacterMovement()->IsFlying()
 		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& character->GetCharacterAttributes()->GetCurrentStamina() >= character->GetPlayerMovement()->CostConfig.VaultCost
 		&& character->GetPlayerState()->GetIsNearCover()
 		//&& !character->GetPlayerState()->GetIsNearLeftEdge()
 		//&& !character->GetPlayerState()->GetIsNearRightEdge()
@@ -196,6 +198,7 @@ bool ArenaCharacterCan::Climb(AArenaCharacter* character, AArenaPlayerController
 		&& !character->GetCharacterMovement()->IsFalling()
 		&& !character->GetCharacterMovement()->IsFlying()
 		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& character->GetCharacterAttributes()->GetCurrentStamina() >= character->GetPlayerMovement()->CostConfig.ClimbCost
 		&& character->GetPlayerState()->GetIsNearCover()
 		//&& !character->GetPlayerState()->GetIsNearLeftEdge()
 		//&& !character->GetPlayerState()->GetIsNearRightEdge()

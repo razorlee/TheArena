@@ -60,7 +60,7 @@ void AArenaCover::Tick(float DeltaSeconds)
 			MyPawn->GetPlayerState()->SetCanVault(CanVaultOver);
 			HandleCoverState(MyPawn);
 
-			if (MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Covering)
+			if (MyPawn->GetPlayerState()->GetPlayerState() == EPlayerState::Covering && !MyPawn->GetCurrentWeapon()->GetWeaponState()->GetCoverTargeting())
 			{
 				FRotator NewRotation = MyPawn->GetActorRotation();
 				NewRotation.Yaw = Arrow->GetComponentRotation().Yaw;
