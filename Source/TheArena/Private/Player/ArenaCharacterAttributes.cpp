@@ -190,5 +190,9 @@ void UArenaCharacterAttributes::GetLifetimeReplicatedProps(TArray< FLifetimeProp
 	DOREPLIFETIME(UArenaCharacterAttributes, CurrentEnergy);
 	DOREPLIFETIME(UArenaCharacterAttributes, CurrentHealth);
 	DOREPLIFETIME(UArenaCharacterAttributes, CurrentStamina);
+	DOREPLIFETIME(UArenaCharacterAttributes, CurrentShield);
+
+	DOREPLIFETIME(UArenaCharacterAttributes, StatsConfig);
+	DOREPLIFETIME(UArenaCharacterAttributes, ResourcesConfig);
 }
 

@@ -135,14 +135,6 @@ void AArenaCharacter::BeginPlay()
 	{
 		Crouch();
 	}
-	if (Role == ROLE_Authority)
-	{
-		ApplyArmorStats();
-	}
-	else
-	{
-		ServerApplyArmorStats();
-	}
 }
 
 void AArenaCharacter::SaveCharacter()
@@ -229,6 +221,14 @@ void AArenaCharacter::LoadPersistence()
 			CharacterEquipment->GetFeetArmorBP()
 			);
 		SaveCharacter();
+		if (Role == ROLE_Authority)
+		{
+			ApplyArmorStats();
+		}
+		else
+		{
+			ServerApplyArmorStats();
+		}
 	}
 	Spawned = true;
 }
@@ -878,8 +878,9 @@ class AArenaArmor* FeetA)
 	}
 }
 
-void AArenaCharacter::ApplyArmorStats_Implementation()
+void AArenaCharacter::ApplyArmorStats()
 {
+	this;
 	CharacterAttributes->SetProtection(0.0);
 	CharacterAttributes->SetSpeed(0.0);
 
@@ -2327,6 +2328,9 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	DOREPLIFETIME(AArenaCharacter, PrimaryWeapon);
 	DOREPLIFETIME(AArenaCharacter, SecondaryWeapon);
 
+	DOREPLIFETIME(AArenaCharacter, CharacterEquipment);
+	DOREPLIFETIME(AArenaCharacter, CharacterAttributes);
+
 	DOREPLIFETIME(AArenaCharacter, HeadUtility);
 	DOREPLIFETIME(AArenaCharacter, UpperBackUtility);
 	DOREPLIFETIME(AArenaCharacter, LowerBackUtility);
@@ -2334,6 +2338,13 @@ void AArenaCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	DOREPLIFETIME(AArenaCharacter, RightWristUtility);
 	DOREPLIFETIME(AArenaCharacter, LeftWaistUtility);
 	DOREPLIFETIME(AArenaCharacter, RightWaistUtility);
+
+	DOREPLIFETIME(AArenaCharacter, HeadArmor);
+	DOREPLIFETIME(AArenaCharacter, ShoulderArmor);
+	DOREPLIFETIME(AArenaCharacter, ChestArmor);
+	DOREPLIFETIME(AArenaCharacter, HandArmor);
+	DOREPLIFETIME(AArenaCharacter, LegArmor);
+	DOREPLIFETIME(AArenaCharacter, FeetArmor);
 }
 
 ////////////////////////////////////////////// Server //////////////////////////////////////////////

@@ -297,7 +297,7 @@ public:
 	class AArenaArmor* LegsA,
 	class AArenaArmor* FeetA);
 
-	UFUNCTION(NetMulticast, Unreliable)
+	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void ApplyArmorStats();
 	
 	UFUNCTION(NetMultiCast, Reliable)
@@ -413,10 +413,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category = State)
 	class UArenaCharacterState* CharacterState;
 
-	UPROPERTY(EditAnywhere, Category = Attributes)
+	UPROPERTY(EditAnywhere, Replicated, Category = Attributes)
 	class UArenaCharacterAttributes* CharacterAttributes;
 
-	UPROPERTY(EditAnywhere, Category = Equipment)
+	UPROPERTY(EditAnywhere, Replicated, Category = Equipment)
 	class UArenaCharacterEquipment* CharacterEquipment;
 
 	UPROPERTY(EditAnywhere, Category = Inventory)

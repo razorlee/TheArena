@@ -198,11 +198,11 @@ private:
 	float CurrentStamina;
 
 	/** stats data */
-	UPROPERTY(EditDefaultsOnly, Category = Config)
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = Config)
 	FPlayerStats StatsConfig;
 
 	/** resource data */
-	UPROPERTY(EditDefaultsOnly, Category = Config)
+	UPROPERTY(EditDefaultsOnly, Replicated, Category = Config)
 	FPlayerResources ResourcesConfig;
 
 	/** Identifies if pawn is in its dying state */
