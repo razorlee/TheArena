@@ -90,7 +90,15 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 	}
 
 	// effects and damage origin shouldn't be placed inside mesh at impact point
-	const FVector NudgedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
+	FVector NudgedImpactLocation;
+	if (Impact.IsValidBlockingHit() && !MovementComp->bShouldBounce)
+	{
+		NudgedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 10.0f;
+	}
+	else
+	{
+		NudgedImpactLocation = this->GetActorLocation() + this->GetActorLocation().Normalize() * 10.0f;
+	}
 	if (IsExplosive)
 	{
 		if (Damage != 0 && ExplosionRadius > 0 && UDamageType::StaticClass())
@@ -125,7 +133,7 @@ void AArenaProjectile::Explode(const FHitResult& Impact)
 
 void AArenaProjectile::SpawnImpactEffects(const FHitResult& Impact)
 {
-	if (ImpactTemplate && Impact.bBlockingHit)
+	if (ImpactTemplate)// && Impact.bBlockingHit)
 	{
 		FHitResult UseImpact = Impact;
 		// trace again to find component lost during replication
@@ -138,9 +146,18 @@ void AArenaProjectile::SpawnImpactEffects(const FHitResult& Impact)
 		AArenaImpactEffect* EffectActor = GetWorld()->SpawnActorDeferred<AArenaImpactEffect>(ImpactTemplate, Impact.ImpactPoint, Impact.ImpactNormal.Rotation());
 		if (EffectActor)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Black, FString::Printf(TEXT("Material: %s"), UseImpact.PhysMaterial));
-			EffectActor->SurfaceHit = UseImpact;
-			UGameplayStatics::FinishSpawningActor(EffectActor, FTransform(Impact.ImpactNormal.Rotation(), Impact.ImpactPoint));
+			FVector NudgedImpactLocation;
+			if (Impact.IsValidBlockingHit() && !MovementComp->bShouldBounce)
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Black, FString::Printf(TEXT("Material: %s"), UseImpact.PhysMaterial));
+				EffectActor->SurfaceHit = UseImpact;
+				UGameplayStatics::FinishSpawningActor(EffectActor, FTransform(Impact.ImpactNormal.Rotation(), Impact.ImpactPoint));
+			}
+			else
+			{
+				UGameplayStatics::FinishSpawningActor(EffectActor, FTransform(this->GetActorLocation().Rotation(), this->GetActorLocation()));
+			}
+
 		}
 	}
 }

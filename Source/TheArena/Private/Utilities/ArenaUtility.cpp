@@ -149,6 +149,7 @@ void AArenaUtility::Activate()
 			ConsumeEnergy(ActivationCost);
 			PlayUtilityAnimation();
 		}
+		//Active = true;
 		ActivateBP();
 		// Do nothing here
 	}
@@ -162,6 +163,7 @@ void AArenaUtility::Deactivate()
 	if (Role == ROLE_Authority)
 	{
 		DeactivateBP();
+		//Active = false;
 		// Do nothing here
 	}
 	else
@@ -216,6 +218,7 @@ void AArenaUtility::ServerActivate_Implementation()
 		ConsumeEnergy(ActivationCost);
 		PlayUtilityAnimation();
 	}
+	//Active = true;
 	ActivateBP();
 }
 
@@ -226,4 +229,5 @@ bool AArenaUtility::ServerDeactivate_Validate()
 void AArenaUtility::ServerDeactivate_Implementation()
 {
 	DeactivateBP();
+	//Active = false;
 }

@@ -390,8 +390,8 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 	InputComponent->BindAction("Fire", IE_Pressed, this, &AArenaCharacter::OnStartFire);
 	InputComponent->BindAction("Fire", IE_Released, this, &AArenaCharacter::OnStopFire);
 
-	InputComponent->BindAction("Back", IE_Pressed, this, &AArenaCharacter::OnActivateBack);
-	InputComponent->BindAction("Back", IE_Released, this, &AArenaCharacter::OnDeactivateBack);
+	InputComponent->BindAction("UpperBack", IE_Pressed, this, &AArenaCharacter::OnActivateBack);
+	InputComponent->BindAction("UpperBack", IE_Released, this, &AArenaCharacter::OnDeactivateBack);
 
 	InputComponent->BindAction("LeftWaist", IE_Pressed, this, &AArenaCharacter::OnActivateLeftWaist);
 	InputComponent->BindAction("LeftWaist", IE_Released, this, &AArenaCharacter::OnDeactivateLeftWaist);
