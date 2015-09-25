@@ -831,10 +831,12 @@ class AArenaArmor* FeetA)
 		if (LeftWaistUtility)
 		{
 			LeftWaistUtility->SetMyPawn(this);
+			LeftWaistUtility->Equip();
 		}
 		if (RightWaistUtility)
 		{
 			RightWaistUtility->SetMyPawn(this);
+			RightWaistUtility->Equip();
 		}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -842,26 +844,32 @@ class AArenaArmor* FeetA)
 		if (ChestArmor)
 		{
 			ChestArmor->SetMyPawn(this);
+			ChestArmor->Equip();
 		}
 		if (HandArmor)
 		{
 			HandArmor->SetMyPawn(this);
+			HandArmor->Equip();
 		}
 		if (HeadArmor)
 		{
 			HeadArmor->SetMyPawn(this);
+			HeadArmor->Equip();
 		}
 		if (FeetArmor)
 		{
 			FeetArmor->SetMyPawn(this);
+			FeetArmor->Equip();
 		}
 		if (LegArmor)
 		{
 			LegArmor->SetMyPawn(this);
+			LegArmor->Equip();
 		}
 		if (ShoulderArmor)
 		{
 			ShoulderArmor->SetMyPawn(this);
+			ShoulderArmor->Equip();
 		}
 	}
 	else

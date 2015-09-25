@@ -19,7 +19,7 @@ AArenaArmor::AArenaArmor(const class FObjectInitializer& PCIP)
 	Mesh->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
 
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickGroup = TG_PrePhysics;
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
@@ -41,25 +41,6 @@ void AArenaArmor::Tick( float DeltaTime )
 }
 
 
-void AArenaArmor::OnRep_MyPawn()
-{
-	if (MyPawn)
-	{
-		SetMyPawn(MyPawn);
-	}
-	else
-	{
-		UnEquip();
-	}
-}
-
-
-void AArenaArmor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AArenaArmor, MyPawn);
-}
 
 class AArenaCharacter* AArenaArmor::GetMyPawn() const
 {
@@ -150,4 +131,23 @@ void AArenaArmor::UnEquip()
 	
 	Mesh->DetachFromParent();
 	Mesh->SetHiddenInGame(true);
+}
+
+void AArenaArmor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AArenaArmor, MyPawn);
+}
+
+void AArenaArmor::OnRep_MyPawn()
+{
+	if (MyPawn)
+	{
+		SetMyPawn(MyPawn);
+	}
+	else
+	{
+		UnEquip();
+	}
 }

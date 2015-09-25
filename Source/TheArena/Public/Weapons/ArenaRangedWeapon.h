@@ -102,6 +102,7 @@ protected:
 	bool IsRecoiling;
 
 	FTimerHandle BurstFire;
+	FTimerHandle Attack;
 
 	//FTimerHandle Melee_Timer;
 
