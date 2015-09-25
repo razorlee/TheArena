@@ -255,6 +255,21 @@ void UArenaCharacterEquipment::GetLifetimeReplicatedProps(TArray< FLifetimePrope
 	DOREPLIFETIME(UArenaCharacterEquipment, PrimaryWeaponBP);
 	DOREPLIFETIME(UArenaCharacterEquipment, SecondaryWeapon);
 	DOREPLIFETIME(UArenaCharacterEquipment, SecondaryWeaponBP);
+
+	DOREPLIFETIME(UArenaCharacterEquipment, HeadUtilityBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, UpperBackUtilityBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, LowerBackUtilityBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, LeftWristUtilityBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, RightWristUtilityBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, LeftWaistUtilityBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, RightWaistUtilityBP);
+
+	DOREPLIFETIME(UArenaCharacterEquipment, ChestArmorBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, FeetArmorBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, HandArmorBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, HeadArmorBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, LegArmorBP);
+	DOREPLIFETIME(UArenaCharacterEquipment, ShoulderArmorBP);
 }
 
 void UArenaCharacterEquipment::OnRep_PrimaryWeapon(AArenaWeapon* Weapon)

@@ -115,11 +115,11 @@ void AArenaRangedWeapon::OnBurstStarted()
 	{
 		if (WeaponAttributes->GetFireMode() == EFireMode::Burst)
 		{
-			GetWorldTimerManager().SetTimer(BurstFire, this, &AArenaRangedWeapon::HandleBurst, WeaponAttributes->LastFireTime + WeaponAttributes->GetAttackSpeed() - GameTime, false);
+			GetWorldTimerManager().SetTimer(Attack, this, &AArenaRangedWeapon::HandleBurst, WeaponAttributes->LastFireTime + WeaponAttributes->GetAttackSpeed() - GameTime, false);
 		}
 		else
 		{
-			GetWorldTimerManager().SetTimer(BurstFire, this, &AArenaRangedWeapon::HandleFiring, WeaponAttributes->LastFireTime + WeaponAttributes->GetAttackSpeed() - GameTime, false);
+			GetWorldTimerManager().SetTimer(Attack, this, &AArenaRangedWeapon::HandleFiring, WeaponAttributes->LastFireTime + WeaponAttributes->GetAttackSpeed() - GameTime, false);
 		}
 	}
 	else
@@ -153,7 +153,7 @@ void AArenaRangedWeapon::OnBurstFinished()
 	}
 	else
 	{
-		GetWorldTimerManager().ClearTimer(BurstFire);
+		GetWorldTimerManager().ClearTimer(Attack);
 		BurstCounter = 0;
 		StopAttackFX();
 	}
@@ -213,7 +213,7 @@ void AArenaRangedWeapon::HandleFiring()
 		
 		if (WeaponAttributes->GetFireMode() == EFireMode::Automatic && WeaponState->GetWeaponState() == EWeaponState::Firing)
 		{
-			GetWorldTimerManager().SetTimer(BurstFire, this, &AArenaRangedWeapon::HandleFiring, WeaponAttributes->GetAttackSpeed(), false);
+			GetWorldTimerManager().SetTimer(Attack, this, &AArenaRangedWeapon::HandleFiring, WeaponAttributes->GetAttackSpeed(), false); //tag
 		}
 		else if (WeaponAttributes->GetFireMode() == EFireMode::Burst && BurstCounter > 2)
 		{
@@ -221,7 +221,7 @@ void AArenaRangedWeapon::HandleFiring()
 		}
 		else
 		{
-			GetWorldTimerManager().SetTimer(BurstFire, this, &AArenaRangedWeapon::OnBurstFinished, 0.1f, false);
+			GetWorldTimerManager().SetTimer(Attack, this, &AArenaRangedWeapon::OnBurstFinished, 0.1f, false);
 		}
 	}
 	WeaponAttributes->LastFireTime = GetWorld()->GetTimeSeconds();
