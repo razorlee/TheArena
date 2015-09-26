@@ -1,6 +1,8 @@
 # TheArena
 Student project: The Arena TPS
 
+Video Footage: https://www.youtube.com/watch?v=lqDJvgbID_U
+
 ###Getting Started
 1. Clone Project
 2. Get Unreal Engine 4.8.3 (Does not work with 4.9+)
