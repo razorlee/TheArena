@@ -47,6 +47,7 @@ void AArenaPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("InGameMenu", IE_Pressed, this, &AArenaPlayerController::OnToggleInGameMenu);
 	InputComponent->BindAction("Inventory", IE_Pressed, this, &AArenaPlayerController::OnToggleInventory);
+	InputComponent->BindAction("Matchmaking", IE_Pressed, this, &AArenaPlayerController::OnToggleMatchmaking);
 
 	// voice chat
 	InputComponent->BindAction("PushToTalk", IE_Pressed, this, &APlayerController::StartTalking);
@@ -308,6 +309,42 @@ void AArenaPlayerController::OnToggleInventory()
 	return;
 }
 
+void AArenaPlayerController::OnToggleMatchmaking()
+{
+	if (OpenFriendsList == false && OpenMenu == false)
+	{
+		if (IsNearbyMatchmaking())
+		{
+			if (IsMatchmakingOpen())
+			{
+				SetMatchmaking(false);
+				bShowMouseCursor = false;
+				bEnableClickEvents = false;
+				bEnableMouseOverEvents = false;
+				return;
+			}
+			else
+			{
+				SetMatchmaking(true);
+				bShowMouseCursor = true;
+				bEnableClickEvents = true;
+				bEnableMouseOverEvents = true;
+				return;
+			}
+		}
+		SetMatchmaking(false);
+		bShowMouseCursor = false;
+		bEnableClickEvents = false;
+		bEnableMouseOverEvents = false;
+		return;
+	}
+	SetMatchmaking(false);
+	bShowMouseCursor = false;
+	bEnableClickEvents = false;
+	bEnableMouseOverEvents = false;
+	return;
+}
+
 ////////////////////////////////////////// Getters and Setters //////////////////////////////////////////
 
 FText AArenaPlayerController::GetInteractiveMessage()
@@ -401,6 +438,23 @@ void AArenaPlayerController::SetInventory(bool bEnable)
 	}
 }
 
+bool AArenaPlayerController::IsMatchmakingOpen() const
+{
+	return this->OpenMatchmaking;
+}
+void AArenaPlayerController::SetMatchmaking(bool bEnable)
+{
+	this->OpenMatchmaking = bEnable;
+	if (bEnable)
+	{
+		AArenaCharacter* Owner = Cast<AArenaCharacter>(GetPawnOrSpectator());
+		if (Owner->GetPlayerState()->GetCombatState() == ECombatState::Aggressive)
+		{
+			Owner->OnToggleCombat();
+		}
+	}
+}
+
 bool AArenaPlayerController::IsNearbyInventory() const
 {
 	return this->NearbyInventory;
@@ -408,6 +462,15 @@ bool AArenaPlayerController::IsNearbyInventory() const
 void AArenaPlayerController::SetNearbyInventory(bool bEnable)
 {
 	NearbyInventory = bEnable;
+}
+
+bool AArenaPlayerController::IsNearbyMatchmaking() const
+{
+	return this->NearbyMatchmaking;
+}
+void AArenaPlayerController::SetNearbyMatchmaking(bool bEnable)
+{
+	NearbyMatchmaking = bEnable;
 }
 
 bool AArenaPlayerController::IsHUDOpen() const

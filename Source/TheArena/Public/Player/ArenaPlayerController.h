@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	void OnToggleInventory();
 
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void OnToggleMatchmaking();
+
 	UFUNCTION(BlueprintCallable, Category = HUD)
 	FText GetInteractiveMessage();
 	UFUNCTION(BlueprintCallable, Category = HUD)
@@ -86,9 +89,19 @@ public:
 	void SetInventory(bool bEnable);
 
 	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsMatchmakingOpen() const;
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetMatchmaking(bool bEnable);
+
+	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool IsNearbyInventory() const;
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	void SetNearbyInventory(bool bEnable);
+
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	bool IsNearbyMatchmaking() const;
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetNearbyMatchmaking(bool bEnable);
 
 	UFUNCTION(BlueprintCallable, Category = Menu)
 	bool IsHUDOpen() const;
@@ -161,8 +174,15 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	uint8 OpenInventory : 1;
 
+	/** informs the HUD if the menu is open */
+	UPROPERTY(Transient, Replicated)
+	uint8 OpenMatchmaking : 1;
+
 	UPROPERTY(Transient, Replicated)
 	uint8 NearbyInventory : 1;
+
+	UPROPERTY(Transient, Replicated)
+	uint8 NearbyMatchmaking : 1;
 
 	/** informs the HUD if the menu is open */
 	UPROPERTY(Transient, Replicated)
