@@ -27,15 +27,24 @@ protected:
 
 	/** number of teams */
 	int32 NumTeams;
+	
+	/** round counter */
+	int32 Round;
 
 	/** best team */
 	int32 WinnerTeam;
 
+	/** team balance */
+	TArray<int32> TeamBalance;
+
 	/** pick team with least players in or random when it's equal */
-	int32 ChooseTeam(class AArenaPlayerState* ForPlayerState) const;
+	int32 ChooseTeam(class AArenaPlayerState* ForPlayerState);
 
 	/** check who won */
 	virtual void DetermineMatchWinner() override;
+
+	/** check if won */
+	virtual void CheckTeamElimination() override;
 
 	/** check if PlayerState is a winner */
 	virtual bool IsWinner(class AArenaPlayerState* PlayerState) const override;

@@ -2099,7 +2099,7 @@ void AArenaCharacter::SetRagdollPhysics()
 	}
 	else
 	{
-		SetLifeSpan(10.0f);
+		SetLifeSpan(900.0f);
 	}
 }
 

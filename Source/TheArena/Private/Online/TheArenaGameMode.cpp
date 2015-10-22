@@ -19,9 +19,10 @@ ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	//SpectatorClass = AArenaSpectatorPawn::StaticClass();
 	GameStateClass = AArenaGameState::StaticClass();
 
-	MinRespawnDelay = 5.0f;
+	MinRespawnDelay = 0.0f;
 
 	bAllowBots = false;
+	bTeamEliminated = false;
 	bUseSeamlessTravel = true;
 }
 
@@ -79,26 +80,7 @@ void ATheArenaGameMode::DefaultTimer()
 	if (MyGameState && MyGameState->RemainingTime > 0 && !MyGameState->bTimerPaused)
 	{
 		MyGameState->RemainingTime--;
-
-		int32 BestScore = MAX_uint32;
-		int32 BestTeam = -1;
-		int32 NumBestTeams = 1;
-		for (int32 i = 0; i < MyGameState->TeamScores.Num(); i++)
-		{
-			const int32 TeamScore = MyGameState->TeamScores[i];
-			if (BestScore < TeamScore)
-			{
-				BestScore = TeamScore;
-				BestTeam = i;
-				NumBestTeams = 1;
-			}
-			else if (BestScore == TeamScore)
-			{
-				NumBestTeams++;
-			}
-		}
-
-		if (MyGameState->RemainingTime <= 0 || BestScore >= RoundKillLimit)
+		if (MyGameState->RemainingTime <= 0 || bTeamEliminated == true)
 		{
 			if (GetMatchState() == MatchState::WaitingPostMatch)
 			{
@@ -251,6 +233,11 @@ void ATheArenaGameMode::DetermineMatchWinner()
 	// nothing to do here
 }
 
+void ATheArenaGameMode::CheckTeamElimination()
+{
+	// nothing to do here
+}
+
 bool ATheArenaGameMode::IsWinner(class AArenaPlayerState* PlayerState) const
 {
 	return false;
@@ -301,12 +288,12 @@ void ATheArenaGameMode::Killed(AController* Killer, AController* KilledPlayer, A
 		KillerPlayerState->ScoreKill(VictimPlayerState, KillScore);
 		KillerPlayerState->InformAboutKill(KillerPlayerState, DamageType, VictimPlayerState);
 	}
-
 	if (VictimPlayerState)
 	{
 		VictimPlayerState->ScoreDeath(KillerPlayerState, DeathScore);
 		VictimPlayerState->BroadcastDeath(KillerPlayerState, DamageType, VictimPlayerState);
 	}
+	CheckTeamElimination();
 }
 
 float ATheArenaGameMode::ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const

@@ -105,10 +105,15 @@ protected:
 	/** Handle for efficient management of DefaultTimer timer */
 	FTimerHandle TimerHandle_DefaultTimer;
 
+	bool bTeamEliminated;
+
 	bool bAllowBots;
 
 	/** check who won */
 	virtual void DetermineMatchWinner();
+
+	/** check who won */
+	virtual void CheckTeamElimination();
 
 	/** check if PlayerState is a winner */
 	virtual bool IsWinner(class AArenaPlayerState* PlayerState) const;
