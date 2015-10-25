@@ -6,7 +6,6 @@ AArena_TeamDeathMatch::AArena_TeamDeathMatch(const class FObjectInitializer& Obj
 	: Super(ObjectInitializer)
 {
 	NumTeams = 2;
-	Round = 0;
 	bDelayedStart = true;
 }
 
@@ -27,7 +26,7 @@ void AArena_TeamDeathMatch::InitGameState()
 	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
 	if (MyGameState)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Starting Round: %d"), Round));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Starting Round: %d"), MyGameState->RoundNumber));
 		MyGameState->NumTeams = NumTeams;
 	}
 }
@@ -63,7 +62,8 @@ int32 AArena_TeamDeathMatch::ChooseTeam(AArenaPlayerState* ForPlayerState)
 
 void AArena_TeamDeathMatch::DetermineMatchWinner()
 {
-	AArenaGameState const* const MyGameState = Cast<AArenaGameState>(GameState);
+	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
+	//AArenaGameState const* const MyGameState = Cast<AArenaGameState>(GameState);
 	int32 BestScore = MAX_uint32;
 	int32 BestTeam = -1;
 	int32 NumBestTeams = 1;
@@ -81,48 +81,59 @@ void AArena_TeamDeathMatch::DetermineMatchWinner()
 	WinnerTeam = (NumBestTeams == 1) ? BestTeam : NumTeams;
 
 	CheckTeamElimination();
-	Round++;
+	MyGameState->RoundNumber++;
 }
 
 void AArena_TeamDeathMatch::CheckTeamElimination()
 {
 	int32 TeamOneDead = 0;
 	int32 TeamTwoDead = 0;
-	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	if (GameState->PlayerArray.Num() > 0)
 	{
-		AArenaPlayerState const* const TestPlayerState = Cast<AArenaPlayerState>(GameState->PlayerArray[i]);
-		if (TestPlayerState->GetTeamNum() == 0)
+		for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
 		{
-			AArenaCharacter *Pawn = Cast<AArenaCharacter>(TestPlayerState->GetOwner());
-			if (Pawn->GetCharacterAttributes()->bIsDying)//null pointer right here, is the character already destroyed?
+			//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team: 0, Player: %d"), i));
+
+			AArenaPlayerState* const TestPlayerState = Cast<AArenaPlayerState>(GameState->PlayerArray[i]);
+			if (TestPlayerState->GetTeamNum() == 0)
 			{
-				TeamOneDead++;
+				AArenaCharacter* Pawn = Cast<AArenaCharacter>(TestPlayerState->MyPawn);
+				if (Pawn->GetCharacterAttributes()->bIsDying)
+				{
+					TeamOneDead++;
+				}
+			}
+			if (TeamOneDead == TeamBalance[0])
+			{
+				WinnerTeam = 1;
+				bTeamEliminated = true;
+				return;
 			}
 		}
-		if (TeamOneDead == TeamBalance[0])
+		for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
 		{
-			WinnerTeam = 1;
-			bTeamEliminated = true;
-			return;
+			//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team: 1, Player: %d"), i));
+
+			AArenaPlayerState* const TestPlayerState = Cast<AArenaPlayerState>(GameState->PlayerArray[i]);
+			if (TestPlayerState->GetTeamNum() == 1)
+			{
+				AArenaCharacter* Pawn = Cast<AArenaCharacter>(TestPlayerState->MyPawn);
+				if (Pawn->GetCharacterAttributes()->bIsDying)
+				{
+					TeamTwoDead++;
+				}
+			}
+			if (TeamOneDead == TeamBalance[1])
+			{
+				WinnerTeam = 0;
+				bTeamEliminated = true;
+				return;
+			}
 		}
 	}
-	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	else
 	{
-		AArenaPlayerState const* const TestPlayerState = Cast<AArenaPlayerState>(GameState->PlayerArray[i]);
-		if (TestPlayerState->GetTeamNum() == 1)
-		{
-			AArenaCharacter *Pawn = Cast<AArenaCharacter>(TestPlayerState->GetOwner());
-			if (Pawn->GetCharacterAttributes()->bIsDying)
-			{
-				TeamTwoDead++;
-			}
-		}
-		if (TeamOneDead == TeamBalance[1])
-		{
-			WinnerTeam = 0;
-			bTeamEliminated = true;
-			return;
-		}
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Player Array is Empty")));
 	}
 }
 

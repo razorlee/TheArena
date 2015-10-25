@@ -73,7 +73,7 @@ void ATheArenaGameMode::DefaultTimer()
 		{
 			StartMatch();
 		}
-		return;
+		//return;
 	}
 
 	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
@@ -84,15 +84,6 @@ void ATheArenaGameMode::DefaultTimer()
 		{
 			if (GetMatchState() == MatchState::WaitingPostMatch)
 			{
-				for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
-				{
-					AArenaPlayerController* PlayerController = Cast<AArenaPlayerController>(*It);
-
-					if (PlayerController && MyGameState)
-					{
-						PlayerController->SetMatchOver(false);
-					}
-				}
 				RestartGame();
 			}
 			else if (GetMatchState() == MatchState::InProgress)
@@ -166,7 +157,10 @@ void ATheArenaGameMode::FinishMatch()
 	if (IsMatchInProgress())
 	{
 		EndMatch();
-		DetermineMatchWinner();
+		if (Role == ROLE_Authority)
+		{
+			DetermineMatchWinner();
+		}
 
 		// notify players
 		for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
@@ -186,6 +180,7 @@ void ATheArenaGameMode::FinishMatch()
 		}
 
 		// set up to restart the match
+		bTeamEliminated = false;
 		MyGameState->RemainingTime = TimeBetweenMatches;
 	}
 }
