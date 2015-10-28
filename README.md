@@ -1,7 +1,8 @@
 # TheArena
 
-[![Join the chat at https://gitter.im/Jeff-Stapleton/TheArena](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Jeff-Stapleton/TheArena?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Student project: The Arena TPS
+
+[![Join the chat at https://gitter.im/Jeff-Stapleton/TheArena](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Jeff-Stapleton/TheArena?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Video Footage: https://www.youtube.com/watch?v=lqDJvgbID_U
 
