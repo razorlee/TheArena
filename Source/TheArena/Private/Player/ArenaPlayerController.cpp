@@ -135,8 +135,7 @@ bool AArenaPlayerController::FindDeathCameraSpot(FVector& CameraLocation, FRotat
 			return true;
 		}
 	}
-
-	return false;
+	return true;
 }
 
 void AArenaPlayerController::ClientSendRoundEndEvent_Implementation(bool bIsWinner, int32 ExpendedTimeInSeconds)
@@ -197,6 +196,11 @@ void AArenaPlayerController::ClientSendRoundEndEvent_Implementation(bool bIsWinn
 void AArenaPlayerController::SimulateInputKey(FKey Key, bool bPressed)
 {
 	InputKey(Key, bPressed ? IE_Pressed : IE_Released, 1, false);
+}
+
+void AArenaPlayerController::EnterSpectatorMode()
+{
+	Reset();
 }
 
 void AArenaPlayerController::OnKill()
@@ -775,7 +779,12 @@ TArray< class APlayerState* > AArenaPlayerController::GetPlayerArray()
 	return Empty;
 }
 
+void AArenaPlayerController::Reset()
+{
+	Super::Reset();
 
+	PlayerState->bOnlySpectator = true;
+}
 
 
 

@@ -7,6 +7,7 @@ AArena_TeamDeathMatch::AArena_TeamDeathMatch(const class FObjectInitializer& Obj
 {
 	NumTeams = 2;
 	bDelayedStart = true;
+	TeamBalance.AddZeroed(NumTeams);
 }
 
 void AArena_TeamDeathMatch::PostLogin(APlayerController* NewPlayer)
@@ -38,24 +39,24 @@ bool AArena_TeamDeathMatch::CanDealDamage(class AArenaPlayerState* DamageInstiga
 
 int32 AArena_TeamDeathMatch::ChooseTeam(AArenaPlayerState* ForPlayerState)
 {
-	TeamBalance.AddZeroed(NumTeams);
-
 	// get current team balance
-	for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	/*for (int32 i = 0; i < GameState->PlayerArray.Num(); i++)
 	{
 		AArenaPlayerState const* const TestPlayerState = Cast<AArenaPlayerState>(GameState->PlayerArray[i]);
 		if (TestPlayerState && TestPlayerState != ForPlayerState && TeamBalance.IsValidIndex(TestPlayerState->GetTeamNum()))
 		{
 			TeamBalance[TestPlayerState->GetTeamNum()]++;
 		}
-	}
+	}*/
 
 	if (TeamBalance[0] <= TeamBalance[1])
 	{
+		TeamBalance[0]++;
 		return 0;
 	}
 	else
 	{
+		TeamBalance[1]++;
 		return 1;
 	}
 }
@@ -103,7 +104,8 @@ void AArena_TeamDeathMatch::CheckTeamElimination()
 					TeamOneDead++;
 				}
 			}
-			if (TeamOneDead == TeamBalance[0])
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team 0 Dead: %d, Team 0 Total: %d"), TeamOneDead, TeamBalance[0]));
+			if (TeamOneDead >= TeamBalance[0])
 			{
 				WinnerTeam = 1;
 				bTeamEliminated = true;
@@ -123,7 +125,8 @@ void AArena_TeamDeathMatch::CheckTeamElimination()
 					TeamTwoDead++;
 				}
 			}
-			if (TeamOneDead == TeamBalance[1])
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team 1 Dead: %d, Team 1 Total: %d"), TeamTwoDead, TeamBalance[1]));
+			if (TeamTwoDead >= TeamBalance[1])
 			{
 				WinnerTeam = 0;
 				bTeamEliminated = true;

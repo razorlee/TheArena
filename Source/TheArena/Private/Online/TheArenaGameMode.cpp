@@ -6,17 +6,17 @@ ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnOb(TEXT("/Game/Blueprints/Pawns/BP_ArenaCharacter"));
-	DefaultPawnClass = PlayerPawnOb.Class;
-
+	static ConstructorHelpers::FClassFinder<ASpectatorPawn> SpectatorPawnOb(TEXT("/Game/Blueprints/Pawns/BP_ArenaSpectator"));
+	static ConstructorHelpers::FClassFinder<AHUD> ArenaHUD(TEXT("/Game/UI/HUD/Blueprints/Arena_HUD"));
+	
 	//static ConstructorHelpers::FClassFinder<APawn> BotPawnOb(TEXT("/Game/Blueprints/Pawns/ArenaAI"));
 	//BotPawnClass = BotPawnOb.Class;
 
-	static ConstructorHelpers::FClassFinder<AHUD> ArenaHUD(TEXT("/Game/UI/HUD/Blueprints/Arena_HUD"));
+	DefaultPawnClass = PlayerPawnOb.Class;
 	HUDClass = ArenaHUD.Class;
-
 	PlayerControllerClass = AArenaPlayerController::StaticClass();
 	PlayerStateClass = AArenaPlayerState::StaticClass();
-	//SpectatorClass = AArenaSpectatorPawn::StaticClass();
+	SpectatorClass = SpectatorPawnOb.Class;
 	GameStateClass = AArenaGameState::StaticClass();
 
 	MinRespawnDelay = 0.0f;
@@ -432,5 +432,7 @@ bool ATheArenaGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AControl
 
 void ATheArenaGameMode::RestartGame()
 {
-	Super::RestartGame();
+	//Super::RestartGame();
+
+	GetWorld()->ServerTravel("/Game/Maps/TheArenaPrototype3", true, true);
 }

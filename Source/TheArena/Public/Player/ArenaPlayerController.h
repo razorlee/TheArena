@@ -144,6 +144,9 @@ public:
 
 	virtual void InitInputSystem() override;
 
+	/** become a spectator */
+	void EnterSpectatorMode();
+
 	void OnKill();
 
 	/** Cleans up any resources necessary to return to main menu.  Does not modify GameInstance state. */
@@ -279,6 +282,8 @@ protected:
 
 	// For tracking whether or not to send the end event
 	bool bHasSentStartEvents;
+
+	void Reset() override;
 
 };
 

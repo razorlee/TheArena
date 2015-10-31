@@ -65,7 +65,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	CameraBoom->TargetArmLength = 150.0f;
 	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f); 
 	CameraBoom->bUsePawnControlRotation = true;
-	
+
 	// Create a follow camera
 	FollowCamera = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("FollowCamera"));
 	FollowCamera->AttachTo(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
@@ -1966,12 +1966,13 @@ bool AArenaCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, 
 	Killer = GetDamageInstigator(Killer, *DamageType);
 
 	AController* const KilledPlayer = (Controller != NULL) ? Controller : Cast<AController>(GetOwner());
-	GetWorld()->GetAuthGameMode<ATheArenaGameMode>()->Killed(Killer, KilledPlayer, this, DamageType);
+	
 
 	NetUpdateFrequency = GetDefault<AArenaCharacter>()->NetUpdateFrequency;
 	GetCharacterMovement()->ForceReplicationUpdate();
 
 	OnDeath(KillingDamage, DamageEvent, Killer ? Killer->GetPawn() : NULL, DamageCauser);
+	GetWorld()->GetAuthGameMode<ATheArenaGameMode>()->Killed(Killer, KilledPlayer, this, DamageType);
 	return true;
 }
 
@@ -1992,7 +1993,7 @@ void AArenaCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Da
 		ReplicateHit(KillingDamage, DamageEvent, PawnInstigator, DamageCauser, true);
 
 		// play the force feedback effect on the client player controller
-		APlayerController* PC = Cast<APlayerController>(Controller);
+		AArenaPlayerController* PC = Cast<AArenaPlayerController>(Controller);
 		if (PC && DamageEvent.DamageTypeClass)
 		{
 			UArenaDamageType *DamageType = Cast<UArenaDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
@@ -2001,6 +2002,7 @@ void AArenaCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Da
 				PC->ClientPlayForceFeedback(DamageType->KilledForceFeedback, false, "Damage");
 			}
 		}
+		PC->EnterSpectatorMode();
 	}
 
 	// cannot use IsLocallyControlled here, because even local client's controller may be NULL here
@@ -2153,6 +2155,20 @@ void AArenaCharacter::DestroyInventory()
 	}
 
 	AArenaUtility* Utility = UpperBackUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = LeftWaistUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = RightWaistUtility;
 	if (Utility)
 	{
 		Utility->UnEquip();

@@ -34,6 +34,7 @@
 #include "Public/Player/ArenaPlayerController.h"
 #include "Public/Player/ArenaPlayerController_Menu.h"
 #include "Public/Player/ArenaLocalPlayer.h"
+#include "Public/Player/ArenaSpectator.h"
 #include "Public/Player/ArenaSaveGame.h"
 #include "Public/Player/ArenaCharacterCan.h"
 #include "Public/Props/ArenaEquipmentLocker.h"
