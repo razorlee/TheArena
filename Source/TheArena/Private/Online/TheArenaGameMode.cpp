@@ -24,6 +24,7 @@ ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	bAllowBots = false;
 	bTeamEliminated = false;
 	bUseSeamlessTravel = true;
+	InactivePlayerStateLifeSpan = 1.0f;
 }
 
 FString ATheArenaGameMode::GetBotsCountOptionName()
@@ -432,7 +433,5 @@ bool ATheArenaGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AControl
 
 void ATheArenaGameMode::RestartGame()
 {
-	//Super::RestartGame();
-
-	GetWorld()->ServerTravel("/Game/Maps/TheArenaPrototype3", true, true);
+	Super::RestartGame();
 }
