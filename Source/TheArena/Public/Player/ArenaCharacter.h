@@ -79,14 +79,22 @@ public:
 	void OnActivateBack();
 	/** player released stop back action */
 	void OnDeactivateBack();
-	/** player pressed start back action */
+	/** player pressed start waist action */
 	void OnActivateLeftWaist();
-	/** player released stop back action */
+	/** player released stop waist action */
 	void OnDeactivateLeftWaist();
-	/** player pressed start back action */
+	/** player pressed start waist action */
 	void OnActivateRightWaist();
-	/** player released stop back action */
+	/** player released stop waist action */
 	void OnDeactivateRightWaist();
+	/** player pressed start wrist action */
+	void OnActivateLeftWrist();
+	/** player released stop wrist action */
+	void OnDeactivateLeftWrist();
+	/** player pressed start wrist action */
+	void OnActivateRightWrist();
+	/** player released stop wrist action */
+	void OnDeactivateRightWrist();
 
 ////////////////////////////////////////// Character Defaults //////////////////////////////////////////
 

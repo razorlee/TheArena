@@ -398,6 +398,12 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 
 	InputComponent->BindAction("RightWaist", IE_Pressed, this, &AArenaCharacter::OnActivateRightWaist);
 	InputComponent->BindAction("RightWaist", IE_Released, this, &AArenaCharacter::OnDeactivateRightWaist);
+
+	InputComponent->BindAction("LeftWrist", IE_Pressed, this, &AArenaCharacter::OnActivateLeftWrist);
+	InputComponent->BindAction("LeftWrist", IE_Released, this, &AArenaCharacter::OnDeactivateLeftWrist);
+
+	InputComponent->BindAction("RightWrist", IE_Pressed, this, &AArenaCharacter::OnActivateRightWrist);
+	InputComponent->BindAction("RightWrist", IE_Released, this, &AArenaCharacter::OnDeactivateRightWrist);
 }
 
 void AArenaCharacter::MoveForward(float Value)
@@ -770,6 +776,38 @@ void AArenaCharacter::OnDeactivateRightWaist()
 	if (RightWaistUtility)
 	{
 		RightWaistUtility->Deactivate();
+	}
+}
+void AArenaCharacter::OnActivateLeftWrist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (ArenaCharacterCan::Wrist(LeftWristUtility, this, MyPC))
+	{
+		LeftWristUtility->Activate();
+	}
+}
+void AArenaCharacter::OnDeactivateLeftWrist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (LeftWristUtility)
+	{
+		LeftWristUtility->Deactivate();
+	}
+}
+void AArenaCharacter::OnActivateRightWrist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (ArenaCharacterCan::Wrist(RightWristUtility, this, MyPC))
+	{
+		RightWristUtility->Activate();
+	}
+}
+void AArenaCharacter::OnDeactivateRightWrist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (RightWristUtility)
+	{
+		RightWristUtility->Deactivate();
 	}
 }
 
