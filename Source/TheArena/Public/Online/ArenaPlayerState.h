@@ -31,7 +31,11 @@ class THEARENA_API AArenaPlayerState : public APlayerState
 	*
 	* @param	NewTeamNumber	Team we want to be on.
 	*/
+	UFUNCTION()
 	void SetTeamNum(int32 NewTeamNumber);
+
+	UFUNCTION(Exec)
+	void ChangeTeam();
 
 	/** player killed someone */
 	void ScoreKill(AArenaPlayerState* Victim, int32 Points);

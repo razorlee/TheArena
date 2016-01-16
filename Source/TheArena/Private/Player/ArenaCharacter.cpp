@@ -72,6 +72,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	//FollowCamera->scale
 
+	TargetHost = FString::Printf(TEXT("http://www.appspot.com"));
 	Busy = false;
 	Spawned = false;
 	ReadySpawned = false;
@@ -85,8 +86,9 @@ void AArenaCharacter::PostInitializeComponents()
 	CharacterState->SetMyPawn(this);
 	CharacterEquipment->SetMyPawn(this);
 
-	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.25f, false);
+	Http = &FHttpModule::Get();
 
+	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.25f, false);
 	//LoadPersistence();
 	if (IsRunningGame() || IsRunningDedicatedServer())
 	{
@@ -178,6 +180,14 @@ void AArenaCharacter::LoadPersistence()
 	//{
 	//	ServerSetName(Name);
 	//}
+	TSharedRef < IHttpRequest > Request = Http->CreateRequest();
+	Request->SetVerb("POST");
+	//Request->SetURL(TargetHost + CurrentRequest.TheDest);
+	//Request->SetContentAsString(CurrentRequest.TheData);
+	Request->SetHeader("User-Agent", "SagittariusLinkClient/1.0");
+	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
+
+	//Request->OnProcessRequestComplete().BindUObject(this, &USagittariusLinkClient::OnResponseReceived);
 
 	if (IsLocallyControlled())
 	{
@@ -255,6 +265,7 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 	if (MyPlayerState)
 	{
 		MyPlayerState->MyPawn = this;
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team Number: %d"), MyPlayerState->GetTeamNum()));
 	}
 }
 

@@ -189,7 +189,7 @@ void AArenaProjectile::DisableAndDestroy()
 	MovementComp->StopMovementImmediately();
 
 	// give clients some time to show explosion
-	SetLifeSpan(2.0f);
+	//SetLifeSpan(2.0f);
 }
 
 ///////////////////////////////////////////// Setting Essentials /////////////////////////////////////////////

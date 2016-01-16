@@ -20,6 +20,7 @@ public class TheArena : ModuleRules
 		        "CoreUObject",
 		        "Engine",
                 "InputCore",
+                "HTTP",
 		        "OnlineSubsystem",
                 "OnlineSubsystemNull",
 		        "OnlineSubsystemUtils",
@@ -36,7 +37,8 @@ public class TheArena : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(
             new string[] { 
-                "OnlineSubsystem" 
+                "OnlineSubsystem",
+                "HTTP" 
             }
         );
 

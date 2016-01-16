@@ -5,6 +5,7 @@
 #include "ArenaCharacterState.h"
 #include "ArenaDamageType.h"
 #include "GameFramework/Character.h"
+#include "Http.h"
 #include "ArenaCharacter.generated.h"
 
 UCLASS(Abstract)
@@ -415,6 +416,10 @@ protected:
 
 	UPROPERTY(Replicated)
 	FString Name;
+
+	FHttpModule* Http;
+
+	FString TargetHost;
 
 ////////////////////////////////////////// Private Properties //////////////////////////////////////////
 
