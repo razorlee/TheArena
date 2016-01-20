@@ -38,6 +38,8 @@ public class TheArena : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[] { 
                 "OnlineSubsystem",
+                "JsonUtilities",
+                "Json",
                 "HTTP" 
             }
         );

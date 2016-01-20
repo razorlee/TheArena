@@ -4,6 +4,7 @@
 
 #include <string>
 #include "Blueprint/UserWidget.h"
+#include "Http.h"
 #include "ArenaLogIn.generated.h"
 
 /**
@@ -16,7 +17,9 @@ class THEARENA_API UArenaLogIn : public UUserWidget
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = "Authenticate")
-	void Authenticate();
+	void Authenticate(FString userName, FString password);
+
+	FHttpModule* Http;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Authenticate")
 	FString _userName;
