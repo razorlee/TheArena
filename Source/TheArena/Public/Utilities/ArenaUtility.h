@@ -52,6 +52,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Config)
 	FName GetUtilityName() const;
 
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	FString GetDescription();
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void SetDescription(FString Value);
+
 	UFUNCTION(BlueprintCallable, Category = Config)
 	float GetActivationCost() const;
 	UFUNCTION(BlueprintCallable, Category = Config)
@@ -93,6 +98,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FName UtilityName;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FString UtilityDescription;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	TEnumAsByte<EUtilityType::Type> UtilityType;

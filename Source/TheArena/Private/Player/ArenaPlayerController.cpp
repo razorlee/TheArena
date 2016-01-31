@@ -242,6 +242,31 @@ void AArenaPlayerController::OnKill()
 	}
 }
 
+void AArenaPlayerController::ChangeTeam()
+{
+	if (Role == ROLE_Authority)
+	{
+		FinishChangeTeam(this);
+		//World->RestartPlayer(this);
+	}
+	else
+	{
+		ServerChangeTeam(this);
+	}
+}
+void AArenaPlayerController::FinishChangeTeam_Implementation(class AArenaPlayerController* PC)
+{
+	AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PC->PlayerState);
+	if (CharacterState)
+	{
+		CharacterState->ChangeTeam();
+		if (Role == ROLE_Authority)
+		{
+			GetWorld()->GetAuthGameMode()->RestartPlayer(PC);
+		}
+	}
+}
+
 ///////////////////////////////////////////////// INPUT /////////////////////////////////////////////////
 
 void AArenaPlayerController::OnToggleInGameMenu()
@@ -286,31 +311,23 @@ void AArenaPlayerController::OnToggleInventory()
 			if (IsInventoryOpen())
 			{
 				SetInventory(false);
+				bAllowGameActions = true;
+
 				bShowMouseCursor = false;
 				bEnableClickEvents = false;
 				bEnableMouseOverEvents = false;
-				return;
 			}
 			else
 			{
 				SetInventory(true);
+				bAllowGameActions = false;
+
 				bShowMouseCursor = true;
 				bEnableClickEvents = true;
 				bEnableMouseOverEvents = true;
-				return;
 			}
 		}
-		SetInventory(false);
-		bShowMouseCursor = false;
-		bEnableClickEvents = false;
-		bEnableMouseOverEvents = false;
-		return;
 	}
-	SetInventory(false);
-	bShowMouseCursor = false;
-	bEnableClickEvents = false;
-	bEnableMouseOverEvents = false;
-	return;
 }
 
 void AArenaPlayerController::OnToggleMatchmaking()
@@ -336,17 +353,7 @@ void AArenaPlayerController::OnToggleMatchmaking()
 				return;
 			}
 		}
-		SetMatchmaking(false);
-		bShowMouseCursor = false;
-		bEnableClickEvents = false;
-		bEnableMouseOverEvents = false;
-		return;
 	}
-	SetMatchmaking(false);
-	bShowMouseCursor = false;
-	bEnableClickEvents = false;
-	bEnableMouseOverEvents = false;
-	return;
 }
 
 ////////////////////////////////////////// Getters and Setters //////////////////////////////////////////
@@ -402,7 +409,7 @@ bool AArenaPlayerController::IsMenuOpen() const
 }
 void AArenaPlayerController::SetMenu(bool bEnable)
 {
-	this->OpenMenu = bEnable;
+	OpenMenu = bEnable;
 	if (!OpenMenu && !OpenSettings && !OpenFriendsList)
 	{
 		bAllowGameActions = true;
@@ -422,7 +429,7 @@ bool AArenaPlayerController::IsFriendsListOpen() const
 }
 void AArenaPlayerController::SetFriendsList(bool bEnable)
 {
-	this->OpenFriendsList = bEnable;
+	OpenFriendsList = bEnable;
 }
 
 bool AArenaPlayerController::IsInventoryOpen() const
@@ -431,7 +438,7 @@ bool AArenaPlayerController::IsInventoryOpen() const
 }
 void AArenaPlayerController::SetInventory(bool bEnable)
 {
-	this->OpenInventory = bEnable;
+	OpenInventory = bEnable;
 	if (bEnable)
 	{
 		AArenaCharacter* Owner = Cast<AArenaCharacter>(GetPawnOrSpectator());
@@ -448,7 +455,7 @@ bool AArenaPlayerController::IsMatchmakingOpen() const
 }
 void AArenaPlayerController::SetMatchmaking(bool bEnable)
 {
-	this->OpenMatchmaking = bEnable;
+	OpenMatchmaking = bEnable;
 	if (bEnable)
 	{
 		AArenaCharacter* Owner = Cast<AArenaCharacter>(GetPawnOrSpectator());
@@ -492,7 +499,7 @@ bool AArenaPlayerController::IsSettingsOpen() const
 }
 void AArenaPlayerController::SetSettings(bool bEnable)
 {
-	this->OpenSettings = bEnable;
+	OpenSettings = bEnable;
 	if (!OpenSettings)
 	{
 		bAllowGameActions = true;
@@ -786,5 +793,13 @@ void AArenaPlayerController::Reset()
 	PlayerState->bOnlySpectator = true;
 }
 
+bool AArenaPlayerController::ServerChangeTeam_Validate(class AArenaPlayerController* PC)
+{
+	return true;
+}
+void AArenaPlayerController::ServerChangeTeam_Implementation(class AArenaPlayerController* PC)
+{
+	FinishChangeTeam(PC);
+}
 
 

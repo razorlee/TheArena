@@ -265,7 +265,7 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 	if (MyPlayerState)
 	{
 		MyPlayerState->MyPawn = this;
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team Number: %d"), MyPlayerState->GetTeamNum()));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team Number: %d"), MyPlayerState->GetTeamNum()));
 	}
 }
 
@@ -794,7 +794,14 @@ void AArenaCharacter::OnActivateLeftWrist()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (ArenaCharacterCan::Wrist(LeftWristUtility, this, MyPC))
 	{
-		LeftWristUtility->Activate();
+		if (LeftWristUtility->GetActivationType() == EActivationType::Activate)
+		{
+			OnStartTargeting();
+		}
+		else
+		{
+			LeftWristUtility->Activate();
+		}
 	}
 }
 void AArenaCharacter::OnDeactivateLeftWrist()
@@ -802,7 +809,16 @@ void AArenaCharacter::OnDeactivateLeftWrist()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (LeftWristUtility)
 	{
-		LeftWristUtility->Deactivate();
+		if (LeftWristUtility->GetActivationType() == EActivationType::Activate && ArenaCharacterCan::Wrist(LeftWristUtility, this, MyPC))
+		{
+			LeftWristUtility->Activate();
+			OnStopTargeting();
+			LeftWristUtility->Deactivate();
+		}
+		else
+		{
+			LeftWristUtility->Deactivate();
+		}
 	}
 }
 void AArenaCharacter::OnActivateRightWrist()
@@ -810,7 +826,14 @@ void AArenaCharacter::OnActivateRightWrist()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (ArenaCharacterCan::Wrist(RightWristUtility, this, MyPC))
 	{
-		RightWristUtility->Activate();
+		if (RightWristUtility->GetActivationType() == EActivationType::Activate)
+		{
+			OnStartTargeting();
+		}
+		else
+		{
+			RightWristUtility->Activate();
+		}
 	}
 }
 void AArenaCharacter::OnDeactivateRightWrist()
@@ -818,7 +841,16 @@ void AArenaCharacter::OnDeactivateRightWrist()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (RightWristUtility)
 	{
-		RightWristUtility->Deactivate();
+		if (RightWristUtility->GetActivationType() == EActivationType::Activate && ArenaCharacterCan::Wrist(RightWristUtility, this, MyPC))
+		{
+			RightWristUtility->Activate();
+			OnStopTargeting();
+			RightWristUtility->Deactivate();
+		}
+		else
+		{
+			RightWristUtility->Deactivate();
+		}
 	}
 }
 
@@ -2008,6 +2040,12 @@ bool AArenaCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, 
 		return false;
 	}
 
+	AArenaPlayerController* PC = Cast<AArenaPlayerController>(Controller);
+	PC->SetMenu(false);
+	PC->SetFriendsList(false);
+	PC->SetSettings(false);
+	PC->SetInventory(false);
+
 	CharacterAttributes->SetCurrentHealth(FMath::Min(0.0f, CharacterAttributes->GetCurrentHealth()));
 
 	// if this is an environmental death then refer to the previous killer so that they receive credit (knocked into lava pits, etc)
@@ -2037,12 +2075,12 @@ void AArenaCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Da
 	//Spawned = false;
 	CharacterAttributes->bIsDying = true;
 
+	AArenaPlayerController* PC = Cast<AArenaPlayerController>(Controller);
 	if (Role == ROLE_Authority)
 	{
 		ReplicateHit(KillingDamage, DamageEvent, PawnInstigator, DamageCauser, true);
 
 		// play the force feedback effect on the client player controller
-		AArenaPlayerController* PC = Cast<AArenaPlayerController>(Controller);
 		if (PC && DamageEvent.DamageTypeClass)
 		{
 			UArenaDamageType *DamageType = Cast<UArenaDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
@@ -2601,7 +2639,7 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(
 
 	if (Head)
 	{
-		HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
+		HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(Head, SpawnInfo);
 	}
 	if (UpperBack)
 	{
@@ -2609,50 +2647,50 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(
 	}
 	if (LowerBack)
 	{
-		LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLowerBackUtilityBP(), SpawnInfo);
+		LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(LowerBack, SpawnInfo);
 	}
 	if (LeftWaist)
 	{
-		 LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
+		 LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(LeftWaist, SpawnInfo);
 	}
 	if (RightWaist)
 	{
-		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
+		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(RightWaist, SpawnInfo);
 	}
 	if (LeftWrist)
 	{
-		LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
+		LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(LeftWrist, SpawnInfo);
 	}
 	if (RightWrist)
 	{
-		RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
+		RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(RightWrist, SpawnInfo);
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if (ChestA)
 	{
-		ChestArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetChestArmorBP(), SpawnInfo);
+		ChestArmor = GetWorld()->SpawnActor<AArenaArmor>(ChestA, SpawnInfo);
 	}
 	if (HandsA)
 	{
-		HandArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHandsArmorBP(), SpawnInfo);
+		HandArmor = GetWorld()->SpawnActor<AArenaArmor>(HandsA, SpawnInfo);
 	}
 	if (HeadA)
 	{
-		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHeadArmorBP(), SpawnInfo);
+		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(HeadA, SpawnInfo);
 	}
 	if (FeetA)
 	{
-		FeetArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetFeetArmorBP(), SpawnInfo);
+		FeetArmor = GetWorld()->SpawnActor<AArenaArmor>(FeetA, SpawnInfo);
 	}
 	if (LegsA)
 	{
-		LegArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetLegsArmorBP(), SpawnInfo);
+		LegArmor = GetWorld()->SpawnActor<AArenaArmor>(LegsA, SpawnInfo);
 	}
 	if (ShoulderA)
 	{
-		ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetShoulderArmorBP(), SpawnInfo);
+		ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(ShoulderA, SpawnInfo);
 	}
 
 	InitializeWeapons(

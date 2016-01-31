@@ -71,6 +71,11 @@ public:
 	FName GetArmorName() const;
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
+	FString GetDescription();
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void SetDescription(FString Value);
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
 	float GetProtection() const;
 	UFUNCTION(BlueprintCallable, Category = Stats)
 	void SetProtection(float Value);
@@ -87,6 +92,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Mesh)
 	UStaticMeshComponent* Mesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FString ArmorDescription;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FName ArmorName;

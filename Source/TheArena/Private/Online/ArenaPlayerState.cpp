@@ -45,24 +45,21 @@ void AArenaPlayerState::SetTeamNum(int32 NewTeamNumber)
 {
 	TeamNumber = NewTeamNumber;
 
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Setting Team Number")));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Setting Team Number")));
 
 	UpdateTeamColors();
 }
 
 void AArenaPlayerState::ChangeTeam()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Black, FString::Printf(TEXT("Setting Team Number")));
-	AArenaPlayerController* OwnerController = Cast<AArenaPlayerController>(GetOwner());
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Setting Team Number")));
 	if (TeamNumber == 0)
 	{
 		TeamNumber = 1;
-		OwnerController->ServerRestartPlayer();
 	}
 	else
 	{
 		TeamNumber = 0;
-		OwnerController->ServerRestartPlayer();
 	}
 }
 

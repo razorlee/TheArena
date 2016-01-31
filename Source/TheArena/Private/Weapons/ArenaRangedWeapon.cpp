@@ -148,6 +148,7 @@ void AArenaRangedWeapon::OnBurstFinished()
 		{
 			GetWorldTimerManager().ClearTimer(BurstFire);
 			BurstCounter = 0;
+			StopAttackFX();
 		}
 		StopAttackFX();
 	}

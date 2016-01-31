@@ -24,7 +24,7 @@ ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	bAllowBots = false;
 	bTeamEliminated = false;
 	bUseSeamlessTravel = true;
-	InactivePlayerStateLifeSpan = 1.0f;
+	InactivePlayerStateLifeSpan = 30.0f;
 }
 
 FString ATheArenaGameMode::GetBotsCountOptionName()
