@@ -47,6 +47,11 @@ public:
 
 	virtual void ClientGameEnded_Implementation(class AActor* EndGameFocus, bool bIsWinner);
 
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void ChangeTeam();
+	UFUNCTION(NetMultiCast, Reliable)
+	void FinishChangeTeam(class AArenaPlayerController* PC);
+
 	void OnToggleInGameMenu();
 
 	UFUNCTION(BlueprintCallable, Category = Menu)
@@ -284,6 +289,9 @@ protected:
 	bool bHasSentStartEvents;
 
 	void Reset() override;
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerChangeTeam(class AArenaPlayerController* PC);
 
 };
 

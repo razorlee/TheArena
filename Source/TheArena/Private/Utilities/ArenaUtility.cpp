@@ -70,6 +70,15 @@ FName AArenaUtility::GetUtilityName() const
 	return UtilityName;
 }
 
+FString AArenaUtility::GetDescription()
+{
+	return UtilityDescription;
+}
+void AArenaUtility::SetDescription(FString Value)
+{
+	UtilityDescription = Value;
+}
+
 float AArenaUtility::GetActivationCost() const
 {
 	return ActivationCost;
