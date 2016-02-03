@@ -89,6 +89,11 @@ public:
 	UArenaRangedWeaponAttributes();
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
+	FString GetDescription();
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void SetDescription(FString Value);
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
 	int32 GetDamage();
 	UFUNCTION(BlueprintCallable, Category = Stats)
 	void SetDamage(int32 Value);
@@ -162,6 +167,9 @@ public:
 	TSubclassOf<UDamageType> GetDamageType();
 
 private:
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FString WeaponDescription;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FWeaponStats WeaponAttributes;

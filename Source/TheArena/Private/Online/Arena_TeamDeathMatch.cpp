@@ -27,7 +27,7 @@ void AArena_TeamDeathMatch::InitGameState()
 	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
 	if (MyGameState)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Starting Round: %d"), MyGameState->RoundNumber));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Starting Round: %d"), MyGameState->RoundNumber));
 		MyGameState->NumTeams = NumTeams;
 	}
 }
@@ -104,7 +104,7 @@ void AArena_TeamDeathMatch::CheckTeamElimination()
 					TeamOneDead++;
 				}
 			}
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team 0 Dead: %d, Team 0 Total: %d"), TeamOneDead, TeamBalance[0]));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team 0 Dead: %d, Team 0 Total: %d"), TeamOneDead, TeamBalance[0]));
 			if (TeamOneDead >= TeamBalance[0])
 			{
 				WinnerTeam = 1;
@@ -125,7 +125,7 @@ void AArena_TeamDeathMatch::CheckTeamElimination()
 					TeamTwoDead++;
 				}
 			}
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team 1 Dead: %d, Team 1 Total: %d"), TeamTwoDead, TeamBalance[1]));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Team 1 Dead: %d, Team 1 Total: %d"), TeamTwoDead, TeamBalance[1]));
 			if (TeamTwoDead >= TeamBalance[1])
 			{
 				WinnerTeam = 0;
@@ -136,7 +136,7 @@ void AArena_TeamDeathMatch::CheckTeamElimination()
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Player Array is Empty")));
+		//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Player Array is Empty")));
 	}
 }
 

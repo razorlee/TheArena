@@ -15,7 +15,7 @@ AArenaSpectator::AArenaSpectator(const FObjectInitializer& ObjectInitializer)
 void AArenaSpectator::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Spectating")));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Spectating")));
 
 	OriginalController = this->Controller;
 }

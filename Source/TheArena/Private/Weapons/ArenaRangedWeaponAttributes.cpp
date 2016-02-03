@@ -29,6 +29,15 @@ void UArenaRangedWeaponAttributes::InitializeComponent()
 	LastFireTime = 0;
 }
 
+FString UArenaRangedWeaponAttributes::GetDescription()
+{
+	return WeaponDescription;
+}
+void UArenaRangedWeaponAttributes::SetDescription(FString Value)
+{
+	WeaponDescription = Value;
+}
+
 int32 UArenaRangedWeaponAttributes::GetDamage()
 {
 	return WeaponAttributes.Damage;
