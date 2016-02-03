@@ -15,7 +15,7 @@ class AArenaCharacter : public ACharacter
 
 public:
 
-	//AArenaCharacter(const class FObjectInitializer& PCIP);
+	AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP);
 
 	/** spawn inventory, setup initial variables */
 	virtual void PostInitializeComponents() override;
@@ -584,7 +584,7 @@ protected:
 	void ServerSetName(const FString& NewName);
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerSpawnEquipment();
+	void ServerSpawnEquipment(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerToggleCrouch();
