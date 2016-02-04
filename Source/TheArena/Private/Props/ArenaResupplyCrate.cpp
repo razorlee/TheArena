@@ -24,11 +24,14 @@ void AArenaResupplyCrate::OnInteract_Implementation(AArenaCharacter* Player, flo
 
 	Super::OnInteract_Implementation(Player, InPlayRate);
 
+
 	// Add ammo to player's primary and secondary gun
 	if (Player)
 	{
 		Player->GetPrimaryWeapon()->GetWeaponAttributes()->TotalAmmo += AmmoResupply;
 		Player->GetSecondaryWeapon()->GetWeaponAttributes()->TotalAmmo += AmmoResupply;
+
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Ammo Added")));
 	}
 	
 }

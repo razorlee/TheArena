@@ -14,6 +14,9 @@ AArenaInteractiveObject::AArenaInteractiveObject()
 	RootComponent = Mesh;
 
 	InteractText = FText::FromString(FString("Interact"));
+
+	// Defaults to active
+	bActive = true;
 }
 
 // Called when the game starts or when spawned
@@ -41,11 +44,10 @@ void AArenaInteractiveObject::OnInteract_Implementation(AArenaCharacter* Player,
 	if (Player && UseAnim)
 	{
 		float Duration = Player->PlayAnimMontage(UseAnim, InPlayRate);
-	}
 
-	// Log debug message
-	FString interactDebugString = GetName();
-	UE_LOG(LogClass, Log, TEXT("You have interacted with %s"), *interactDebugString);
+		// Debug Message
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Playing animation %d"), Duration));
+	}
 }
 
 void AArenaInteractiveObject::OnView_Implementation(AArenaCharacter* Player)
@@ -63,10 +65,6 @@ void AArenaInteractiveObject::OnView_Implementation(AArenaCharacter* Player)
 		PlayerController->SetInteractiveMessage(InteractText);
 	}
 	*/
-
-	// Log debug message
-	FString interactDebugString = GetName();
-	UE_LOG(LogClass, Log, TEXT("You have viewed %s"), *interactDebugString);
 }
 
 void AArenaInteractiveObject::OnLeave_Implementation(AArenaCharacter* Player)
@@ -79,10 +77,6 @@ void AArenaInteractiveObject::OnLeave_Implementation(AArenaCharacter* Player)
 		PlayerController->SetInteractiveMessage(FText());
 	}
 	*/
-
-	// Log debug message
-	FString interactDebugString = GetName();
-	UE_LOG(LogClass, Log, TEXT("You have stopped viewing %s"), *interactDebugString);
 }
 
 

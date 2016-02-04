@@ -94,12 +94,17 @@ void AArenaPlayerController::Tick(float DeltaSeconds)
 				Viewed->OnView(MyPawn);
 
 				// Set Interactive Text
-				SetInteractiveMessage(Viewed->GetInteractText());
+				if (Viewed->IsActive())
+				{
+					SetInteractiveMessage(Viewed->GetInteractText());
+				}
+				else
+				{
+					SetInteractiveMessage(FText::FromString(FString("Disabled")));
+				}
 
-
-				// Log debug message
-				FString interactDebugString = Viewed->GetName();
-				UE_LOG(LogClass, Log, TEXT("Started viewing %s"), &interactDebugString);
+				// debug message
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Started viewing")));
 
 				CurrentViewedObject = Viewed;
 			}
@@ -113,9 +118,8 @@ void AArenaPlayerController::Tick(float DeltaSeconds)
 				// Clear Interactive Text
 				SetInteractiveMessage(FText());
 
-				// Log debug message
-				FString interactDebugString = CurrentViewedObject->GetName();
-				UE_LOG(LogClass, Log, TEXT("Stopped viewing %s"), &interactDebugString);
+				// debug message
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Stopped viewing")));
 
 				CurrentViewedObject = NULL;
 			}
@@ -452,7 +456,14 @@ void AArenaPlayerController::OnToggleMatchmaking()
 
 void AArenaPlayerController::OnInteract()
 {
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+	if (MyPawn && CurrentViewedObject)
+	{
+		CurrentViewedObject->OnInteract(MyPawn);
 
+		// Debug Message
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Interacted")));
+	}
 }
 
 ////////////////////////////////////////// Getters and Setters //////////////////////////////////////////
