@@ -56,11 +56,13 @@ void AArenaInteractiveObject::OnView_Implementation(AArenaCharacter* Player)
 	}
 
 	// Show interact message
+	/*
 	AArenaPlayerController* PlayerController = Cast<AArenaPlayerController>(Player->GetController());
 	if (PlayerController)
 	{
 		PlayerController->SetInteractiveMessage(InteractText);
 	}
+	*/
 
 	// Log debug message
 	FString interactDebugString = GetName();
@@ -70,11 +72,13 @@ void AArenaInteractiveObject::OnView_Implementation(AArenaCharacter* Player)
 void AArenaInteractiveObject::OnLeave_Implementation(AArenaCharacter* Player)
 {
 	// Hide interact message
+	/*
 	AArenaPlayerController* PlayerController = Cast<AArenaPlayerController>(Player->GetController());
 	if (PlayerController)
 	{
 		PlayerController->SetInteractiveMessage(FText());
 	}
+	*/
 
 	// Log debug message
 	FString interactDebugString = GetName();

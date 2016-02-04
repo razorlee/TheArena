@@ -36,6 +36,9 @@ AArenaPlayerController::AArenaPlayerController(const class FObjectInitializer& P
 	LastDeathLocation = FVector::ZeroVector;
 	OpenMenu = false;
 
+	// Interact Distance default
+	InteractDistance = 200.f;
+
 	ServerSayString = TEXT("Say");
 	ArenaFriendUpdateTimer = 0.0f;
 	bHasSentStartEvents = false;
@@ -48,6 +51,7 @@ void AArenaPlayerController::SetupInputComponent()
 	InputComponent->BindAction("InGameMenu", IE_Pressed, this, &AArenaPlayerController::OnToggleInGameMenu);
 	InputComponent->BindAction("Inventory", IE_Pressed, this, &AArenaPlayerController::OnToggleInventory);
 	InputComponent->BindAction("Matchmaking", IE_Pressed, this, &AArenaPlayerController::OnToggleMatchmaking);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AArenaPlayerController::OnInteract);
 
 	// voice chat
 	InputComponent->BindAction("PushToTalk", IE_Pressed, this, &APlayerController::StartTalking);
@@ -64,6 +68,59 @@ void AArenaPlayerController::PostInitializeComponents()
 void AArenaPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AArenaPlayerController::Tick(float DeltaSeconds)
+{
+	
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+	if (MyPawn)
+	{
+		// Do a ray trace to see if we're looking at any Interactable Objects
+		FHitResult Trace(ForceInit);
+		FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+		bool Hit = InteractTrace(&Trace, &TraceParams);
+
+		AArenaInteractiveObject* Viewed = Cast<AArenaInteractiveObject>(Trace.GetActor());
+		if (Viewed)
+		{
+			if (Viewed != CurrentViewedObject)
+			{
+				if (CurrentViewedObject)
+				{
+					CurrentViewedObject->OnLeave(MyPawn);
+				}
+
+				Viewed->OnView(MyPawn);
+
+				// Set Interactive Text
+				SetInteractiveMessage(Viewed->GetInteractText());
+
+
+				// Log debug message
+				FString interactDebugString = Viewed->GetName();
+				UE_LOG(LogClass, Log, TEXT("Started viewing %s"), &interactDebugString);
+
+				CurrentViewedObject = Viewed;
+			}
+		}
+		else
+		{
+			if (CurrentViewedObject)
+			{
+				CurrentViewedObject->OnLeave(MyPawn);
+
+				// Clear Interactive Text
+				SetInteractiveMessage(FText());
+
+				// Log debug message
+				FString interactDebugString = CurrentViewedObject->GetName();
+				UE_LOG(LogClass, Log, TEXT("Stopped viewing %s"), &interactDebugString);
+
+				CurrentViewedObject = NULL;
+			}
+		}
+	}
 }
 
 void AArenaPlayerController::UnFreeze()
@@ -267,6 +324,43 @@ void AArenaPlayerController::FinishChangeTeam_Implementation(class AArenaPlayerC
 	}
 }
 
+bool AArenaPlayerController::InteractTrace(FHitResult* RV_Hit, FCollisionQueryParams* RV_TraceParams)
+{
+	if (!IsLocalPlayerController())
+	{
+		return false;
+	}
+
+	// get the camera transform
+	FVector CameraLoc;
+	FRotator CameraRot;
+	GetActorEyesViewPoint(CameraLoc, CameraRot);
+
+	FVector Start = CameraLoc;
+	FVector End = CameraLoc + (CameraRot.Vector() * InteractDistance);
+
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+
+	RV_TraceParams->bTraceComplex = true;
+	RV_TraceParams->bTraceAsyncScene = true;
+	RV_TraceParams->bReturnPhysicalMaterial = true;
+	if (MyPawn)
+	{
+		RV_TraceParams->AddIgnoredActor(MyPawn);
+	}
+
+	//  do the line trace
+	bool DidTrace = GetWorld()->LineTraceSingleByChannel(
+		*RV_Hit,        //result
+		Start,        //start
+		End,        //end
+		ECC_Visibility,    //collision channel
+		*RV_TraceParams
+		);
+
+	return DidTrace;
+}
+
 ///////////////////////////////////////////////// INPUT /////////////////////////////////////////////////
 
 void AArenaPlayerController::OnToggleInGameMenu()
@@ -354,6 +448,11 @@ void AArenaPlayerController::OnToggleMatchmaking()
 			}
 		}
 	}
+}
+
+void AArenaPlayerController::OnInteract()
+{
+
 }
 
 ////////////////////////////////////////// Getters and Setters //////////////////////////////////////////
