@@ -15,24 +15,23 @@ AArenaResupplyCrate::AArenaResupplyCrate()
 	DelayLength = 20.f;
 }
 
-void AArenaResupplyCrate::OnInteract_Implementation(AArenaCharacter* Player, float InPlayRate)
+void AArenaResupplyCrate::OnInteractEnd_Implementation()
 {
 	// Can only interact if active
 	if (!IsActive()) {
 		return;
 	}
 
-	Super::OnInteract_Implementation(Player, InPlayRate);
-
-
 	// Add ammo to player's primary and secondary gun
-	if (Player)
+	if (InteractedPlayer)
 	{
-		Player->GetPrimaryWeapon()->GetWeaponAttributes()->TotalAmmo += AmmoResupply;
-		Player->GetSecondaryWeapon()->GetWeaponAttributes()->TotalAmmo += AmmoResupply;
+		InteractedPlayer->GetPrimaryWeapon()->GetWeaponAttributes()->TotalAmmo += AmmoResupply;
+		InteractedPlayer->GetSecondaryWeapon()->GetWeaponAttributes()->TotalAmmo += AmmoResupply;
 
 		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Ammo Added")));
 	}
+
+	Super::OnInteractEnd_Implementation();
 	
 }
 

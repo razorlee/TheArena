@@ -25,6 +25,11 @@ public:
 	void OnInteract(AArenaCharacter* Player, float InPlayRate = 1.f);
 	virtual void OnInteract_Implementation(AArenaCharacter* Player, float InPlayRate = 1.f);
 
+	// Event called when player finishes interacting with object
+	UFUNCTION(BlueprintNativeEvent, Category = "Interactable")
+	void OnInteractEnd();
+	virtual void OnInteractEnd_Implementation();
+
 	// Event called when player looks at interactable object
 	UFUNCTION(BlueprintNativeEvent, Category = "Interactable")
 	void OnView(AArenaCharacter* Player);
@@ -72,4 +77,7 @@ protected:
 	// Interact Animation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interactable", meta = (BlueprintProtected = "true"))
 	UAnimMontage* InteractAnimation;
+
+	FTimerHandle InteractTimer;
+	AArenaCharacter* InteractedPlayer;
 };

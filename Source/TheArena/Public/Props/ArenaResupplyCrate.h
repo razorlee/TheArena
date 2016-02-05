@@ -18,8 +18,8 @@ public:
 	// Constructor to set defaults
 	AArenaResupplyCrate();
 
-	// Override on interact event
-	void OnInteract_Implementation(AArenaCharacter* Player, float InPlayRate = 1.f) override;
+	// Override on interact end event to add ammo to player
+	void OnInteractEnd_Implementation() override;
 	
 	////////////// Getters & Setters /////////////////
 

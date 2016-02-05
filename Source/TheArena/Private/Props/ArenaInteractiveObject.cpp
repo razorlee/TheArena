@@ -43,10 +43,30 @@ void AArenaInteractiveObject::OnInteract_Implementation(AArenaCharacter* Player,
 	UAnimMontage* UseAnim = InteractAnimation;
 	if (Player && UseAnim)
 	{
+		// Play Animation and set timer for animation finish
 		float Duration = Player->PlayAnimMontage(UseAnim, InPlayRate);
+		GetWorldTimerManager().SetTimer(InteractTimer, this, &AArenaInteractiveObject::OnInteractEnd, Duration, false);
+
+		// Set Player state to Interacting
+		Player->GetPlayerState()->SetPlayerState(EPlayerState::Interacting);
+		InteractedPlayer = Player;
 
 		// Debug Message
-		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Playing animation %d"), Duration));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Playing animation %f"), Duration));
+	}
+	else if (Player)
+	{
+		InteractedPlayer = Player;
+		OnInteractEnd();
+	}
+}
+
+void AArenaInteractiveObject::OnInteractEnd_Implementation()
+{
+	if (InteractedPlayer)
+	{
+		InteractedPlayer->GetPlayerState()->SetPlayerState(EPlayerState::Default);
+		InteractedPlayer = NULL;
 	}
 }
 
