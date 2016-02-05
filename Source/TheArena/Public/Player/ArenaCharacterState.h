@@ -17,6 +17,7 @@ namespace EPlayerState
 		Covering,
 		Vaulting,
 		Climbing,
+		Interacting,
 		Default
 	};
 }
