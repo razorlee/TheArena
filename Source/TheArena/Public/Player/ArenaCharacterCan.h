@@ -40,6 +40,9 @@ public:
 	/*Checks if the player can climb up obsticals*/
 	static bool Climb(AArenaCharacter* character, AArenaPlayerController* controller);
 
+	/*Checks if the player can interact*/
+	static bool Interact(AArenaCharacter* character, AArenaPlayerController* controller);
+
 	/*Checks if the player can equip a weapon*/
 	static bool Equip(AArenaCharacter* character, AArenaPlayerController* controller);
 
