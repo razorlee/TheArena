@@ -289,6 +289,7 @@ public:
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
+	void SpawnEquipment();
 	void LoadPersistence();
 	void AddWeapon(class AArenaWeapon* Weapon);
 	void RemoveWeapon(class AArenaWeapon* Weapon);

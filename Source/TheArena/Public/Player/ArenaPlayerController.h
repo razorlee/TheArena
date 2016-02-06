@@ -47,7 +47,7 @@ public:
 
 	virtual void ClientGameEnded_Implementation(class AActor* EndGameFocus, bool bIsWinner);
 
-	UFUNCTION(BlueprintCallable, Category = Menu)
+	UFUNCTION(exec)
 	void ChangeTeam();
 	UFUNCTION(NetMultiCast, Reliable)
 	void FinishChangeTeam(class AArenaPlayerController* PC);

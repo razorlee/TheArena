@@ -34,7 +34,6 @@ class THEARENA_API AArenaPlayerState : public APlayerState
 	UFUNCTION()
 	void SetTeamNum(int32 NewTeamNumber);
 
-	UFUNCTION(Exec)
 	void ChangeTeam();
 
 	/** player killed someone */

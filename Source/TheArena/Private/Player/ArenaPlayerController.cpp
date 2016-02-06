@@ -244,7 +244,13 @@ void AArenaPlayerController::OnKill()
 
 void AArenaPlayerController::ChangeTeam()
 {
-	if (Role == ROLE_Authority)
+	AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PlayerState);
+	if (CharacterState)
+	{
+		CharacterState->ChangeTeam();
+		GetWorld()->GetAuthGameMode()->RestartPlayer(this);
+	}
+	/*if (Role == ROLE_Authority)
 	{
 		FinishChangeTeam(this);
 		//World->RestartPlayer(this);
@@ -252,7 +258,7 @@ void AArenaPlayerController::ChangeTeam()
 	else
 	{
 		ServerChangeTeam(this);
-	}
+	}*/
 }
 void AArenaPlayerController::FinishChangeTeam_Implementation(class AArenaPlayerController* PC)
 {
