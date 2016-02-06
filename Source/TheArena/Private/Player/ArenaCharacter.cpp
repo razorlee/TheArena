@@ -164,18 +164,6 @@ void AArenaCharacter::LoadPersistence()
 	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
 	Request->OnProcessRequestComplete().BindUObject(this, &AArenaCharacter::OnResponseReceived);
 	Request->ProcessRequest();
-
-	if (IsLocallyControlled())
-	{
-		if (Role == ROLE_Authority)
-		{
-			ApplyArmorStats();
-		}
-		else
-		{
-			ServerApplyArmorStats();
-		}
-	}
 }
 
 void AArenaCharacter::SpawnEquipment()
@@ -234,6 +222,7 @@ void AArenaCharacter::OnResponseReceived(FHttpRequestPtr Request, FHttpResponseP
 		if (Response.IsValid())
 		{
 			SpawnEquipment();
+			ApplyArmorStats();
 		}
 		else
 		{
@@ -910,39 +899,32 @@ void AArenaCharacter::InitializeWeapons()
 
 void AArenaCharacter::ApplyArmorStats()
 {
-	this;
-	CharacterAttributes->SetProtection(0.0);
-	CharacterAttributes->SetSpeed(0.0);
-
-	if (ChestArmor)
+	if (Role == ROLE_Authority)
 	{
+		CharacterAttributes->SetProtection(0.0);
+		CharacterAttributes->SetSpeed(0.0);
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + ChestArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + ChestArmor->GetMotility());
-	}
-	if (HandArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + HandArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + HandArmor->GetMotility());
-	}
-	if (HeadArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + HeadArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + HeadArmor->GetMotility());
-	}
-	if (FeetArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + FeetArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + FeetArmor->GetMotility());
-	}
-	if (LegArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + LegArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + LegArmor->GetMotility());
-	}
-	if (ShoulderArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + ShoulderArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + ShoulderArmor->GetMotility());
+	}
+	else
+	{
+		ServerApplyArmorStats();
 	}
 }
 
