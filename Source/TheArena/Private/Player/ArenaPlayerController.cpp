@@ -1,5 +1,6 @@
 #include "TheArena.h"
 #include "OnlineAchievementsInterface.h"
+#include "ArenaCharacterCan.h"
 
 #define  ACH_FRAG_SOMEONE	TEXT("ACH_FRAG_SOMEONE")
 #define  ACH_SOME_KILLS		TEXT("ACH_SOME_KILLS")
@@ -74,7 +75,7 @@ void AArenaPlayerController::Tick(float DeltaSeconds)
 {
 	
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
-	if (MyPawn)
+	if (MyPawn && ArenaCharacterCan::Interact(MyPawn, this))
 	{
 		// Do a ray trace to see if we're looking at any Interactable Objects
 		FHitResult Trace(ForceInit);
@@ -457,7 +458,7 @@ void AArenaPlayerController::OnToggleMatchmaking()
 void AArenaPlayerController::OnInteract()
 {
 	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
-	if (MyPawn && CurrentViewedObject)
+	if (MyPawn && CurrentViewedObject && ArenaCharacterCan::Interact(MyPawn, this))
 	{
 		CurrentViewedObject->OnInteract(MyPawn);
 

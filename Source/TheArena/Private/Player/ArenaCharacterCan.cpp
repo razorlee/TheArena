@@ -225,7 +225,8 @@ bool ArenaCharacterCan::Climb(AArenaCharacter* character, AArenaPlayerController
 bool ArenaCharacterCan::Interact(AArenaCharacter* character, AArenaPlayerController* controller)
 {
 	if (controller
-		&& controller->IsGameInputAllowed())
+		&& controller->IsGameInputAllowed()
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting)
 	{
 		return true;
 	}
