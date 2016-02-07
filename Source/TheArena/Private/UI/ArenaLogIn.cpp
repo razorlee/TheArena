@@ -18,7 +18,7 @@ void UArenaLogIn::Authenticate(FString userName, FString password)
 
 	TSharedRef < IHttpRequest > Request = Http->CreateRequest();
 	Request->SetVerb("POST");
-	Request->SetURL("192.168.1.13:5000/login");
+	Request->SetURL("192.168.0.43:5000/login");
 	Request->SetHeader("User-Agent", "TheArenaClient/1.0");
 	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
 	Request->SetContentAsString("username=" + userName + "&password=" + password);

@@ -248,7 +248,8 @@ void AArenaPlayerController::ChangeTeam()
 	if (CharacterState)
 	{
 		CharacterState->ChangeTeam();
-		GetWorld()->GetAuthGameMode()->RestartPlayer(this);
+		//Suicide();
+		ServerChangeTeam(this);
 	}
 	/*if (Role == ROLE_Authority)
 	{
@@ -805,7 +806,8 @@ bool AArenaPlayerController::ServerChangeTeam_Validate(class AArenaPlayerControl
 }
 void AArenaPlayerController::ServerChangeTeam_Implementation(class AArenaPlayerController* PC)
 {
-	FinishChangeTeam(PC);
+	//FinishChangeTeam(PC);
+	GetWorld()->GetAuthGameMode()->RestartPlayer(PC);
 }
 
 

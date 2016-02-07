@@ -85,8 +85,9 @@ void AArenaCharacter::PostInitializeComponents()
 	CharacterEquipment->SetMyPawn(this);
 	CharacterState->Reset(); //test without this
 
-	LoadPersistence();
-
+	//LoadPersistence();
+	SpawnEquipment();
+	ApplyArmorStats();
 	UpdatePawnMeshes();
 
 	// create material instance for setting team colors (3rd person view)
@@ -159,9 +160,10 @@ void AArenaCharacter::LoadPersistence()
 
 	TSharedRef < IHttpRequest > Request = Http->CreateRequest();
 	Request->SetVerb("POST");
-	Request->SetURL(TargetHost);
-	Request->SetContentAsString("Poop");
+	Request->SetURL("192.168.0.43:5000/login");
+	Request->SetHeader("User-Agent", "TheArenaClient/1.0");
 	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
+	Request->SetContentAsString("username=&password=");
 	Request->OnProcessRequestComplete().BindUObject(this, &AArenaCharacter::OnResponseReceived);
 	Request->ProcessRequest();
 }
@@ -2507,7 +2509,7 @@ bool AArenaCharacter::ServerSpawnEquipment_Validate()
 }
 void AArenaCharacter::ServerSpawnEquipment_Implementation()
 {
-	
+	SpawnEquipment();
 }
 
 bool AArenaCharacter::ServerToggleCrouch_Validate()
