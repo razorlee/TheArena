@@ -14,6 +14,8 @@ AArenaPlayerCameraManager::AArenaPlayerCameraManager(const FObjectInitializer& O
 	TargetArm = 250.0f;
 	TargetOffset = FVector(0.0f, 0.0f, 0.0f);
 
+	CurShoulder = RIGHT_SHOULDER;
+
 	bAlwaysApplyModifiers = true;
 }
 
@@ -54,6 +56,18 @@ void AArenaPlayerCameraManager::UpdateCurrents(float DeltaTime)
 
 ////////////////////////////////////////// Camera States //////////////////////////////////////////
 
+void AArenaPlayerCameraManager::ToggleShoulder()
+{
+	if (CurShoulder == RIGHT_SHOULDER)
+	{
+		CurShoulder = LEFT_SHOULDER;
+	}
+	else
+	{
+		CurShoulder = RIGHT_SHOULDER;
+	}
+}
+
 void AArenaPlayerCameraManager::HandlePassiveCamera()
 {
 	MyPawn->bUseControllerRotationYaw = false;
@@ -83,7 +97,7 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 			MyPawn->bUseControllerRotationYaw = false;
 			TargetFOV = NormalFOV;
 			TargetArm = 150.0f;
-			TargetOffset = FVector(0.0f, 50.0f, 50.0f);
+			TargetOffset = FVector(0.0f, CurShoulder * 50.0f, 50.0f);
 		}
 		else if (TargetingState == ETargetingState::Targeting)
 		{
@@ -97,7 +111,7 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 		{
 			TargetFOV = NormalFOV;
 			TargetArm = 150.0f;
-			TargetOffset = FVector(0.0f, 50.0f, 50.0f);
+			TargetOffset = FVector(0.0f, CurShoulder * 50.0f, 50.0f);
 		}
 	}
 }
@@ -108,12 +122,12 @@ void AArenaPlayerCameraManager::HandleTargetingCamera()
 	if (MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetHasScope())
 	{
 		TargetArm = -30.0f;
-		TargetOffset = FVector(0.0f, 15.0f, 50.0f);
+		TargetOffset = FVector(0.0f, CurShoulder * 15.0f, 50.0f);
 	}
 	else
 	{
 		TargetArm = 50.0f;
-		TargetOffset = FVector(0.0f, 50.0f, 50.0f);
+		TargetOffset = FVector(0.0f, CurShoulder * 50.0f, 50.0f);
 	}
 }
 
@@ -121,7 +135,7 @@ void AArenaPlayerCameraManager::HandleRunningCamera()
 {
 	TargetFOV = NormalFOV;
 	TargetArm = 175.0f;
-	TargetOffset = FVector(0.0f, 50.0f, 0.0f);
+	TargetOffset = FVector(0.0f, CurShoulder * 50.0f, 0.0f);
 }
 
 void AArenaPlayerCameraManager::HandleCoverCamera()

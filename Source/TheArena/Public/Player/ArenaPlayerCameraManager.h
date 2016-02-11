@@ -5,6 +5,9 @@
 #include "Weapons/ArenaRangedWeaponState.h"
 #include "ArenaPlayerCameraManager.generated.h"
 
+#define LEFT_SHOULDER -1
+#define RIGHT_SHOULDER 1
+
 UCLASS()
 class THEARENA_API AArenaPlayerCameraManager : public APlayerCameraManager
 {
@@ -17,6 +20,8 @@ public:
 	virtual void UpdateCamera(float DeltaTime) override;
 
 	void UpdateCurrents(float DeltaTime);
+
+	void ToggleShoulder();
 
 	void HandlePassiveCamera();
 
@@ -69,6 +74,7 @@ private:
 	UPROPERTY()
 	FVector TargetOffset;
 
-
+	UPROPERTY()
+	float CurShoulder;
 
 };

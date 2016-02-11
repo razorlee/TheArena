@@ -52,6 +52,9 @@ public:
 	/*Checks if the player can aim a weapon*/
 	static bool Target(AArenaCharacter* character, AArenaPlayerController* controller);
 
+	/*Checks if the player switch shoulders*/
+	static bool SwitchShoulder(AArenaCharacter* character, AArenaPlayerController* controller);
+
 	/*Checks if the player can aim a weapon*/
 	static bool Peak(AArenaCharacter* character, AArenaPlayerController* controller);
 

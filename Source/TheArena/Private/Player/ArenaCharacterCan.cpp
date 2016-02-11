@@ -282,6 +282,22 @@ bool ArenaCharacterCan::Target(AArenaCharacter* character, AArenaPlayerControlle
 	}
 }
 
+bool ArenaCharacterCan::SwitchShoulder(AArenaCharacter* character, AArenaPlayerController* controller)
+{
+	if (controller
+		&& controller->IsGameInputAllowed()
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Covering
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 bool ArenaCharacterCan::Peak(AArenaCharacter* character, AArenaPlayerController* controller)
 {
 	if (controller
