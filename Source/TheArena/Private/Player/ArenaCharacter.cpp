@@ -157,13 +157,14 @@ void AArenaCharacter::LoadPersistence()
 	{
 		Name = MyPlayerState->PlayerName;
 	}
-
+	UArenaGameInstance* GameInstance = Cast<UArenaGameInstance>(GetWorld()->GetGameInstance());
 	TSharedRef < IHttpRequest > Request = Http->CreateRequest();
 	Request->SetVerb("POST");
-	Request->SetURL("192.168.0.43:5000/login");
+	Request->SetURL("localhost:5000/loadout");
 	Request->SetHeader("User-Agent", "TheArenaClient/1.0");
 	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
-	Request->SetContentAsString("username=&password=");
+	Request->SetHeader("Session", GameInstance->GetSessionID());
+	//Request->SetContentAsString("username=&password=");
 	Request->OnProcessRequestComplete().BindUObject(this, &AArenaCharacter::OnResponseReceived);
 	Request->ProcessRequest();
 }
@@ -223,6 +224,7 @@ void AArenaCharacter::OnResponseReceived(FHttpRequestPtr Request, FHttpResponseP
 	{
 		if (Response.IsValid())
 		{
+			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
 			SpawnEquipment();
 			ApplyArmorStats();
 		}

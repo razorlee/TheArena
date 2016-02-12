@@ -247,9 +247,20 @@ void AArenaPlayerController::ChangeTeam()
 	AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PlayerState);
 	if (CharacterState)
 	{
-		CharacterState->ChangeTeam();
-		//Suicide();
-		ServerChangeTeam(this);
+		if (Role == ROLE_Authority)
+		{
+			AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+			CharacterState->ChangeTeam();
+			//FinishChangeTeam(CharacterState2);
+			MyPawn->Destroyed();
+			MyPawn->Destroy();
+			ChangeState(NAME_Inactive);
+			ServerRestartPlayer();
+		}
+		else
+		{
+			ServerChangeTeam();
+		}
 	}
 	/*if (Role == ROLE_Authority)
 	{
@@ -261,16 +272,11 @@ void AArenaPlayerController::ChangeTeam()
 		ServerChangeTeam(this);
 	}*/
 }
-void AArenaPlayerController::FinishChangeTeam_Implementation(class AArenaPlayerController* PC)
+void AArenaPlayerController::FinishChangeTeam_Implementation(AArenaPlayerState* CharacterState)
 {
-	AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PC->PlayerState);
 	if (CharacterState)
 	{
 		CharacterState->ChangeTeam();
-		if (Role == ROLE_Authority)
-		{
-			GetWorld()->GetAuthGameMode()->RestartPlayer(PC);
-		}
 	}
 }
 
@@ -800,14 +806,13 @@ void AArenaPlayerController::Reset()
 	PlayerState->bOnlySpectator = true;
 }
 
-bool AArenaPlayerController::ServerChangeTeam_Validate(class AArenaPlayerController* PC)
+bool AArenaPlayerController::ServerChangeTeam_Validate()
 {
 	return true;
 }
-void AArenaPlayerController::ServerChangeTeam_Implementation(class AArenaPlayerController* PC)
+void AArenaPlayerController::ServerChangeTeam_Implementation()
 {
-	//FinishChangeTeam(PC);
-	GetWorld()->GetAuthGameMode()->RestartPlayer(PC);
+	ChangeTeam();
 }
 
 

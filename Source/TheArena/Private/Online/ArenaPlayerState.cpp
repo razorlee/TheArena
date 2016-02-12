@@ -11,6 +11,7 @@ AArenaPlayerState::AArenaPlayerState(const FObjectInitializer& ObjectInitializer
 	NumBulletsFired = 0;
 	NumRocketsFired = 0;
 	bQuitter = false;
+	bActorSeamlessTraveled = true;
 }
 
 void AArenaPlayerState::Reset()
@@ -50,7 +51,7 @@ void AArenaPlayerState::SetTeamNum(int32 NewTeamNumber)
 	UpdateTeamColors();
 }
 
-void AArenaPlayerState::ChangeTeam()
+void AArenaPlayerState::ChangeTeam_Implementation()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Setting Team Number")));
 	if (TeamNumber == 0)
@@ -63,7 +64,7 @@ void AArenaPlayerState::ChangeTeam()
 	}
 }
 
-void AArenaPlayerState::OnRep_TeamColor()
+void AArenaPlayerState::OnRep_TeamColor(int32 Number)
 {
 	UpdateTeamColors();
 }

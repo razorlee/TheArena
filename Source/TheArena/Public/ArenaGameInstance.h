@@ -138,6 +138,11 @@ public:
 	/** Show approved dialogs for various privileges failures */
 	void DisplayOnlinePrivilegeFailureDialogs(const FUniqueNetId& UserId, EUserPrivileges::Type Privilege, uint32 PrivilegeResults);
 
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	FString GetSessionID();
+	UFUNCTION(BlueprintCallable, Category = Menu)
+	void SetSessionID(FString NewSessionID);
+
 private:
 
 	UPROPERTY(config)
@@ -148,6 +153,9 @@ private:
 
 	FName CurrentState;
 	FName PendingState;
+
+	UPROPERTY()
+	FString SessionID;
 
 	FArenaPendingMessage PendingMessage;
 

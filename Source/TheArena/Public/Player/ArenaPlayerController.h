@@ -50,7 +50,7 @@ public:
 	UFUNCTION(exec)
 	void ChangeTeam();
 	UFUNCTION(NetMultiCast, Reliable)
-	void FinishChangeTeam(class AArenaPlayerController* PC);
+	void FinishChangeTeam(AArenaPlayerState* CharacterState);
 
 	void OnToggleInGameMenu();
 
@@ -291,7 +291,7 @@ protected:
 	void Reset() override;
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerChangeTeam(class AArenaPlayerController* PC);
+	void ServerChangeTeam();
 
 };
 

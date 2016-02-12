@@ -434,4 +434,9 @@ bool ATheArenaGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AControl
 void ATheArenaGameMode::RestartGame()
 {
 	Super::RestartGame();
+
+	if (Role == ROLE_Authority)
+	{
+		GetWorld()->Exec(GetWorld(), TEXT("ServerTravel TheArenaPrototype3"));
+	}
 }
