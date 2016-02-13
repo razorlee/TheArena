@@ -1,5 +1,6 @@
 #include "TheArena.h"
 #include "OnlineAchievementsInterface.h"
+#include "ArenaCharacterCan.h"
 
 #define  ACH_FRAG_SOMEONE	TEXT("ACH_FRAG_SOMEONE")
 #define  ACH_SOME_KILLS		TEXT("ACH_SOME_KILLS")
@@ -36,6 +37,9 @@ AArenaPlayerController::AArenaPlayerController(const class FObjectInitializer& P
 	LastDeathLocation = FVector::ZeroVector;
 	OpenMenu = false;
 
+	// Interact Distance default
+	InteractDistance = 200.f;
+
 	ServerSayString = TEXT("Say");
 	ArenaFriendUpdateTimer = 0.0f;
 	bHasSentStartEvents = false;
@@ -48,6 +52,7 @@ void AArenaPlayerController::SetupInputComponent()
 	InputComponent->BindAction("InGameMenu", IE_Pressed, this, &AArenaPlayerController::OnToggleInGameMenu);
 	InputComponent->BindAction("Inventory", IE_Pressed, this, &AArenaPlayerController::OnToggleInventory);
 	InputComponent->BindAction("Matchmaking", IE_Pressed, this, &AArenaPlayerController::OnToggleMatchmaking);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AArenaPlayerController::OnInteract);
 
 	// voice chat
 	InputComponent->BindAction("PushToTalk", IE_Pressed, this, &APlayerController::StartTalking);
@@ -64,6 +69,63 @@ void AArenaPlayerController::PostInitializeComponents()
 void AArenaPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AArenaPlayerController::Tick(float DeltaSeconds)
+{
+	
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+	if (MyPawn && ArenaCharacterCan::Interact(MyPawn, this))
+	{
+		// Do a ray trace to see if we're looking at any Interactable Objects
+		FHitResult Trace(ForceInit);
+		FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+		bool Hit = InteractTrace(&Trace, &TraceParams);
+
+		AArenaInteractiveObject* Viewed = Cast<AArenaInteractiveObject>(Trace.GetActor());
+		if (Viewed)
+		{
+			if (Viewed != CurrentViewedObject)
+			{
+				if (CurrentViewedObject)
+				{
+					CurrentViewedObject->OnLeave(MyPawn);
+				}
+
+				Viewed->OnView(MyPawn);
+
+				// Set Interactive Text
+				if (Viewed->IsActive())
+				{
+					SetInteractiveMessage(Viewed->GetInteractText());
+				}
+				else
+				{
+					SetInteractiveMessage(FText::FromString(FString("Disabled")));
+				}
+
+				// debug message
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Started viewing")));
+
+				CurrentViewedObject = Viewed;
+			}
+		}
+		else
+		{
+			if (CurrentViewedObject)
+			{
+				CurrentViewedObject->OnLeave(MyPawn);
+
+				// Clear Interactive Text
+				SetInteractiveMessage(FText());
+
+				// debug message
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Stopped viewing")));
+
+				CurrentViewedObject = NULL;
+			}
+		}
+	}
 }
 
 void AArenaPlayerController::UnFreeze()
@@ -280,6 +342,43 @@ void AArenaPlayerController::FinishChangeTeam_Implementation(AArenaPlayerState* 
 	}
 }
 
+bool AArenaPlayerController::InteractTrace(FHitResult* RV_Hit, FCollisionQueryParams* RV_TraceParams)
+{
+	if (!IsLocalPlayerController())
+	{
+		return false;
+	}
+
+	// get the camera transform
+	FVector CameraLoc;
+	FRotator CameraRot;
+	GetActorEyesViewPoint(CameraLoc, CameraRot);
+
+	FVector Start = CameraLoc;
+	FVector End = CameraLoc + (CameraRot.Vector() * InteractDistance);
+
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+
+	RV_TraceParams->bTraceComplex = true;
+	RV_TraceParams->bTraceAsyncScene = true;
+	RV_TraceParams->bReturnPhysicalMaterial = true;
+	if (MyPawn)
+	{
+		RV_TraceParams->AddIgnoredActor(MyPawn);
+	}
+
+	//  do the line trace
+	bool DidTrace = GetWorld()->LineTraceSingleByChannel(
+		*RV_Hit,        //result
+		Start,        //start
+		End,        //end
+		ECC_Visibility,    //collision channel
+		*RV_TraceParams
+		);
+
+	return DidTrace;
+}
+
 ///////////////////////////////////////////////// INPUT /////////////////////////////////////////////////
 
 void AArenaPlayerController::OnToggleInGameMenu()
@@ -366,6 +465,18 @@ void AArenaPlayerController::OnToggleMatchmaking()
 				return;
 			}
 		}
+	}
+}
+
+void AArenaPlayerController::OnInteract()
+{
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+	if (MyPawn && CurrentViewedObject && ArenaCharacterCan::Interact(MyPawn, this))
+	{
+		CurrentViewedObject->OnInteract(MyPawn);
+
+		// Debug Message
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Interacted")));
 	}
 }
 

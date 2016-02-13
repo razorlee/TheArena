@@ -382,6 +382,8 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 
 	InputComponent->BindAction("SwapWeapon", IE_Pressed, this, &AArenaCharacter::OnSwapWeapon);
 
+	InputComponent->BindAction("SwitchShoulder", IE_Pressed, this, &AArenaCharacter::OnSwitchShoulder);
+
 	InputComponent->BindAction("Reload", IE_Pressed, this, &AArenaCharacter::OnReload);
 
 	InputComponent->BindAction("Melee", IE_Pressed, this, &AArenaCharacter::OnMelee);
@@ -682,6 +684,15 @@ void AArenaCharacter::OnSwapWeapon()
 		{
 			ServerSwapWeapon();
 		}
+	}
+}
+void AArenaCharacter::OnSwitchShoulder()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	AArenaPlayerCameraManager* Camera = Cast<AArenaPlayerCameraManager>(MyPC->PlayerCameraManager);
+	if (ArenaCharacterCan::SwitchShoulder(this, MyPC) && Camera)
+	{
+		Camera->ToggleShoulder();
 	}
 }
 void AArenaCharacter::OnReload()

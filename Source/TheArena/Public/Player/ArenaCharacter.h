@@ -70,6 +70,8 @@ public:
 	void OnToggleCombat();
 	/** player pressed prev weapon action */
 	void OnSwapWeapon();
+	/** player pressed prev weapon action */
+	void OnSwitchShoulder();
 	/** player pressed reload action */
 	void OnReload();
 	/** player pressed melee action */
