@@ -19,11 +19,12 @@ ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	SpectatorClass = SpectatorPawnOb.Class;
 	GameStateClass = AArenaGameState::StaticClass();
 
-	MinRespawnDelay = 0.0f;
+	MinRespawnDelay = 15.0f;
 
 	bAllowBots = false;
 	bTeamEliminated = false;
 	bUseSeamlessTravel = true;
+	bStartPlayersAsSpectators = false;
 	InactivePlayerStateLifeSpan = 30.0f;
 }
 
@@ -289,7 +290,7 @@ void ATheArenaGameMode::Killed(AController* Killer, AController* KilledPlayer, A
 		VictimPlayerState->ScoreDeath(KillerPlayerState, DeathScore);
 		VictimPlayerState->BroadcastDeath(KillerPlayerState, DamageType, VictimPlayerState);
 	}
-	CheckTeamElimination();
+	//CheckTeamElimination();
 }
 
 float ATheArenaGameMode::ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const
@@ -434,9 +435,4 @@ bool ATheArenaGameMode::IsSpawnpointPreferred(APlayerStart* SpawnPoint, AControl
 void ATheArenaGameMode::RestartGame()
 {
 	Super::RestartGame();
-
-	if (Role == ROLE_Authority)
-	{
-		GetWorld()->Exec(GetWorld(), TEXT("ServerTravel TheArenaPrototype3"));
-	}
 }

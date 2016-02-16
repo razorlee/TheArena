@@ -53,7 +53,7 @@ void AArenaPlayerState::SetTeamNum(int32 NewTeamNumber)
 
 void AArenaPlayerState::ChangeTeam_Implementation()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Setting Team Number")));
+	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT("Setting Team Number")));
 	if (TeamNumber == 0)
 	{
 		TeamNumber = 1;

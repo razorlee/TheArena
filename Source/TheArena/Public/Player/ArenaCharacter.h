@@ -109,7 +109,7 @@ public:
 
 	/** cleanup inventory */
 	virtual void Destroyed() override;
-
+	
 	/** update mesh for first person view */
 	virtual void PawnClientRestart() override;
 
@@ -587,7 +587,22 @@ protected:
 	void ServerSetName(const FString& NewName);
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerSpawnEquipment();
+		void ServerSpawnEquipment(
+			TSubclassOf<class AArenaWeapon> MainWeapon,
+			TSubclassOf<class AArenaWeapon> OffWeapon,
+			TSubclassOf<class AArenaUtility> Head,
+			TSubclassOf<class AArenaUtility> UpperBack,
+			TSubclassOf<class AArenaUtility> LowerBack,
+			TSubclassOf<class AArenaUtility> LeftWaist,
+			TSubclassOf<class AArenaUtility> RightWaist,
+			TSubclassOf<class AArenaUtility> LeftWrist,
+			TSubclassOf<class AArenaUtility> RightWrist,
+			TSubclassOf<class AArenaArmor> HeadA,
+			TSubclassOf<class AArenaArmor> ShoulderA,
+			TSubclassOf<class AArenaArmor> ChestA,
+			TSubclassOf<class AArenaArmor> HandsA,
+			TSubclassOf<class AArenaArmor> LegsA,
+			TSubclassOf<class AArenaArmor> FeetA);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerToggleCrouch();

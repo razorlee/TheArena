@@ -914,7 +914,7 @@ void AArenaPlayerController::Reset()
 {
 	Super::Reset();
 
-	PlayerState->bOnlySpectator = true;
+	//PlayerState->bOnlySpectator = true;
 }
 
 bool AArenaPlayerController::ServerChangeTeam_Validate()

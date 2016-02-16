@@ -83,11 +83,24 @@ void AArenaCharacter::PostInitializeComponents()
 
 	CharacterState->SetMyPawn(this);
 	CharacterEquipment->SetMyPawn(this);
-	CharacterState->Reset(); //test without this
 
+	Http = &FHttpModule::Get();
+
+	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.25f, false);
 	//LoadPersistence();
-	SpawnEquipment();
-	ApplyArmorStats();
+	if (IsRunningGame() || IsRunningDedicatedServer())
+	{
+		ReadySpawned = true;
+		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.5f, false);
+	}
+	else
+	{
+		ReadySpawned = true;
+		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.5f, false);
+		//ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP(), CharacterEquipment->GetUpperBackUtilityBP());
+	}
+
+	CharacterState->Reset();
 	UpdatePawnMeshes();
 
 	// create material instance for setting team colors (3rd person view)
@@ -157,65 +170,81 @@ void AArenaCharacter::LoadPersistence()
 	{
 		Name = MyPlayerState->PlayerName;
 	}
-	UArenaGameInstance* GameInstance = Cast<UArenaGameInstance>(GetWorld()->GetGameInstance());
+
+	//if (Role == ROLE_Authority)
+	//{
+	//	SetName(Name);
+	//}
+	//else
+	//{
+	//	ServerSetName(Name);
+	//}
 	TSharedRef < IHttpRequest > Request = Http->CreateRequest();
 	Request->SetVerb("POST");
-	Request->SetURL("localhost:5000/loadout");
-	Request->SetHeader("User-Agent", "TheArenaClient/1.0");
+	//Request->SetURL(TargetHost + CurrentRequest.TheDest);
+	//Request->SetContentAsString(CurrentRequest.TheData);
+	Request->SetHeader("User-Agent", "SagittariusLinkClient/1.0");
 	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
-	Request->SetHeader("Session", GameInstance->GetSessionID());
-	//Request->SetContentAsString("username=&password=");
-	Request->OnProcessRequestComplete().BindUObject(this, &AArenaCharacter::OnResponseReceived);
-	Request->ProcessRequest();
+
+	//Request->OnProcessRequestComplete().BindUObject(this, &USagittariusLinkClient::OnResponseReceived);
+
+	if (IsLocallyControlled())
+	{
+		SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::LoadGameFromSlot(Name, SaveGameInstance->UserIndex));
+		if (SaveGameInstance)
+		{
+			CharacterEquipment->SetPrimaryWeaponBP(SaveGameInstance->PrimaryWeapon);
+			CharacterEquipment->SetSecondaryWeaponBP(SaveGameInstance->SecondaryWeapon);
+
+			CharacterEquipment->SetHeadUtilityBP(SaveGameInstance->HeadUtility);
+			CharacterEquipment->SetUpperBackUtilityBP(SaveGameInstance->UpperBackUtility);
+			CharacterEquipment->SetLowerBackUtilityBP(SaveGameInstance->LowerBackUtility);
+			CharacterEquipment->SetLeftWristUtilityBP(SaveGameInstance->LeftWristUtility);
+			CharacterEquipment->SetRightWristUtilityBP(SaveGameInstance->RightWristUtility);
+			CharacterEquipment->SetLeftWaistUtilityBP(SaveGameInstance->LeftWaistUtility);
+			CharacterEquipment->SetRightWaistUtilityBP(SaveGameInstance->RightWaistUtility);
+
+			CharacterEquipment->SetChestArmorBP(SaveGameInstance->ChestArmor);
+			CharacterEquipment->SetHandsArmorBP(SaveGameInstance->HandArmor);
+			CharacterEquipment->SetHeadArmorBP(SaveGameInstance->HeadArmor);
+			CharacterEquipment->SetFeetArmorBP(SaveGameInstance->FeetArmor);
+			CharacterEquipment->SetLegsArmorBP(SaveGameInstance->LegArmor);
+			CharacterEquipment->SetShoulderArmorBP(SaveGameInstance->ShoulderArmor);
+		}
+
+		ServerSpawnEquipment(
+			CharacterEquipment->GetPrimaryWeaponBP(),
+			CharacterEquipment->GetSecondaryWeaponBP(),
+			CharacterEquipment->GetHeadUtilityBP(),
+			CharacterEquipment->GetUpperBackUtilityBP(),
+			CharacterEquipment->GetLowerBackUtilityBP(),
+			CharacterEquipment->GetLeftWaistUtilityBP(),
+			CharacterEquipment->GetRightWaistUtilityBP(),
+			CharacterEquipment->GetLeftWristUtilityBP(),
+			CharacterEquipment->GetRightWristUtilityBP(),
+			CharacterEquipment->GetHeadArmorBP(),
+			CharacterEquipment->GetShoulderArmorBP(),
+			CharacterEquipment->GetChestArmorBP(),
+			CharacterEquipment->GetHandsArmorBP(),
+			CharacterEquipment->GetLegsArmorBP(),
+			CharacterEquipment->GetFeetArmorBP()
+			);
+		SaveCharacter();
+		if (Role == ROLE_Authority)
+		{
+			ApplyArmorStats();
+		}
+		else
+		{
+			ServerApplyArmorStats();
+		}
+	}
+	Spawned = true;
 }
 
 void AArenaCharacter::SpawnEquipment()
 {
-	if (Role == ROLE_Authority)
-	{
-		//FString ResponseBody = Response->GetContentAsString();
-
-		//TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
-		//TSharedRef< TJsonReader<> > JsonReader = TJsonReaderFactory<>::Create(ResponseBody);
-
-		//if (FJsonSerializer::Deserialize(JsonReader, JsonObject) && JsonObject.IsValid())
-		//{
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.bNoCollisionFail = true;
-
-		////////////////////////////////////////////////// WEAPONS //////////////////////////////////////////////////
-
-		//JsonObject->GetStringField(TEXT("Main Weapon"));
-		PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(CharacterEquipment->GetPrimaryWeaponBP(), SpawnInfo);
-		PrimaryWeapon->SetPrimary(true);
-		//JsonObject->GetStringField(TEXT("Secondary Weapon"));
-		SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(CharacterEquipment->GetSecondaryWeaponBP(), SpawnInfo);
-
-		///////////////////////////////////////////////// UTILITIES /////////////////////////////////////////////////
-
-		HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
-		UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetUpperBackUtilityBP(), SpawnInfo);
-		LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLowerBackUtilityBP(), SpawnInfo);
-		LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
-		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
-		LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
-		RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
-
-		////////////////////////////////////////////////////// ARMOR //////////////////////////////////////////////////////
-
-		ChestArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetChestArmorBP(), SpawnInfo);
-		HandArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHandsArmorBP(), SpawnInfo);
-		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHeadArmorBP(), SpawnInfo);
-		FeetArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetFeetArmorBP(), SpawnInfo);
-		LegArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetLegsArmorBP(), SpawnInfo);
-		ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetShoulderArmorBP(), SpawnInfo);
-
-		InitializeWeapons();
-	}
-	else
-	{
-		ServerSpawnEquipment();
-	}
+	LoadPersistence();
 }
 
 void AArenaCharacter::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
@@ -245,17 +274,24 @@ void AArenaCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC)
+	if (!Spawned && ReadySpawned)
 	{
-		CharacterAttributes->Regenerate(DeltaSeconds);
-		CharacterMovementComponent->ManageState(DeltaSeconds);
+		LoadPersistence();
 	}
-
-	AArenaPlayerState* MyPlayerState = Cast<AArenaPlayerState>(PlayerState); //test without this
-	if (MyPlayerState)
+	else if (Spawned)
 	{
-		MyPlayerState->MyPawn = this;
+		AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+		if (MyPC)
+		{
+			CharacterAttributes->Regenerate(DeltaSeconds);
+			CharacterMovementComponent->ManageState(DeltaSeconds);
+		}
+
+		AArenaPlayerState* MyPlayerState = Cast<AArenaPlayerState>(PlayerState); //test without this
+		if (MyPlayerState)
+		{
+			MyPlayerState->MyPawn = this;
+		}
 	}
 }
 
@@ -2516,13 +2552,115 @@ void AArenaCharacter::ServerSetName_Implementation(const FString& NewName)
 	SetName(NewName);
 }
 
-bool AArenaCharacter::ServerSpawnEquipment_Validate()
+bool AArenaCharacter::ServerSpawnEquipment_Validate(
+	TSubclassOf<class AArenaWeapon> MainWeapon,
+	TSubclassOf<class AArenaWeapon> OffWeapon,
+	TSubclassOf<class AArenaUtility> Head,
+	TSubclassOf<class AArenaUtility> UpperBack,
+	TSubclassOf<class AArenaUtility> LowerBack,
+	TSubclassOf<class AArenaUtility> LeftWaist,
+	TSubclassOf<class AArenaUtility> RightWaist,
+	TSubclassOf<class AArenaUtility> LeftWrist,
+	TSubclassOf<class AArenaUtility> RightWrist,
+	TSubclassOf<class AArenaArmor> HeadA,
+	TSubclassOf<class AArenaArmor> ShoulderA,
+	TSubclassOf<class AArenaArmor> ChestA,
+	TSubclassOf<class AArenaArmor> HandsA,
+	TSubclassOf<class AArenaArmor> LegsA,
+	TSubclassOf<class AArenaArmor> FeetA)
 {
 	return true;
 }
-void AArenaCharacter::ServerSpawnEquipment_Implementation()
+void AArenaCharacter::ServerSpawnEquipment_Implementation(
+	TSubclassOf<class AArenaWeapon> MainWeapon,
+	TSubclassOf<class AArenaWeapon> OffWeapon,
+	TSubclassOf<class AArenaUtility> Head,
+	TSubclassOf<class AArenaUtility> UpperBack,
+	TSubclassOf<class AArenaUtility> LowerBack,
+	TSubclassOf<class AArenaUtility> LeftWaist,
+	TSubclassOf<class AArenaUtility> RightWaist,
+	TSubclassOf<class AArenaUtility> LeftWrist,
+	TSubclassOf<class AArenaUtility> RightWrist,
+	TSubclassOf<class AArenaArmor> HeadA,
+	TSubclassOf<class AArenaArmor> ShoulderA,
+	TSubclassOf<class AArenaArmor> ChestA,
+	TSubclassOf<class AArenaArmor> HandsA,
+	TSubclassOf<class AArenaArmor> LegsA,
+	TSubclassOf<class AArenaArmor> FeetA)
 {
-	SpawnEquipment();
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.bNoCollisionFail = true;
+
+	if (MainWeapon)
+	{
+		PrimaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(MainWeapon, SpawnInfo);
+		PrimaryWeapon->SetPrimary(true);
+	}
+	if (OffWeapon)
+	{
+		SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(OffWeapon, SpawnInfo);
+	}
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	if (Head)
+	{
+		HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(Head, SpawnInfo);
+	}
+	if (UpperBack)
+	{
+		UpperBackUtility = GetWorld()->SpawnActor<AArenaUtility>(UpperBack, SpawnInfo);
+	}
+	if (LowerBack)
+	{
+		LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(LowerBack, SpawnInfo);
+	}
+	if (LeftWaist)
+	{
+		LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(LeftWaist, SpawnInfo);
+	}
+	if (RightWaist)
+	{
+		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(RightWaist, SpawnInfo);
+	}
+	if (LeftWrist)
+	{
+		LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(LeftWrist, SpawnInfo);
+	}
+	if (RightWrist)
+	{
+		RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(RightWrist, SpawnInfo);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	if (ChestA)
+	{
+		ChestArmor = GetWorld()->SpawnActor<AArenaArmor>(ChestA, SpawnInfo);
+	}
+	if (HandsA)
+	{
+		HandArmor = GetWorld()->SpawnActor<AArenaArmor>(HandsA, SpawnInfo);
+	}
+	if (HeadA)
+	{
+		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(HeadA, SpawnInfo);
+	}
+	if (FeetA)
+	{
+		FeetArmor = GetWorld()->SpawnActor<AArenaArmor>(FeetA, SpawnInfo);
+	}
+	if (LegsA)
+	{
+		LegArmor = GetWorld()->SpawnActor<AArenaArmor>(LegsA, SpawnInfo);
+	}
+	if (ShoulderA)
+	{
+		ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(ShoulderA, SpawnInfo);
+	}
+
+	InitializeWeapons();
 }
 
 bool AArenaCharacter::ServerToggleCrouch_Validate()

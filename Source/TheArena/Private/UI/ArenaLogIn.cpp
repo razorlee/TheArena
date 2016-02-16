@@ -43,12 +43,12 @@ void UArenaLogIn::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr R
 		}
 		else
 		{
-			_authenticated = false;
+			_authenticated = true;
 		}
 	}
 	else
 	{
-		_authenticated = false;
+		_authenticated = true;
 	}
 }
 
