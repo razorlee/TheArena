@@ -72,6 +72,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	//FollowCamera->scale
 
+	Http = &FHttpModule::Get();
 	TargetHost = FString::Printf(TEXT("http://www.appspot.com"));
 	Busy = false;
 	Spawned = false;
@@ -86,23 +87,11 @@ void AArenaCharacter::PostInitializeComponents()
 	CharacterState->SetMyPawn(this);
 	CharacterEquipment->SetMyPawn(this);
 
-	Http = &FHttpModule::Get();
+	
+	//Get JSON
+	//Get it to the server to spawn
 
-	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.25f, false);
-	//LoadPersistence();
-	if (IsRunningGame() || IsRunningDedicatedServer())
-	{
-		ReadySpawned = true;
-		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.5f, false);
-	}
-	else
-	{
-		ReadySpawned = true;
-		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.5f, false);
-		//ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP(), CharacterEquipment->GetUpperBackUtilityBP());
-	}
-
-	CharacterState->Reset();
+	//CharacterState->Reset();
 	UpdatePawnMeshes();
 
 	// create material instance for setting team colors (3rd person view)
