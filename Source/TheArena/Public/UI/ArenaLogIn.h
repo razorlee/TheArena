@@ -19,6 +19,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Authenticate")
 	void Authenticate(FString userName, FString password);
 
+	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
 	FHttpModule* Http;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Authenticate")

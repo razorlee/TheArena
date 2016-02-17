@@ -3,6 +3,7 @@
 #include "Online.h"
 #include "Online/ArenaOnlineGameSettings.h"
 #include "GameFramework/PlayerController.h"
+#include "ArenaInteractiveObject.h"
 #include "ArenaPlayerController.generated.h"
 
 UCLASS(config=game)
@@ -47,10 +48,10 @@ public:
 
 	virtual void ClientGameEnded_Implementation(class AActor* EndGameFocus, bool bIsWinner);
 
-	UFUNCTION(BlueprintCallable, Category = Menu)
+	UFUNCTION(exec)
 	void ChangeTeam();
 	UFUNCTION(NetMultiCast, Reliable)
-	void FinishChangeTeam(class AArenaPlayerController* PC);
+	void FinishChangeTeam(AArenaPlayerState* CharacterState);
 
 	void OnToggleInGameMenu();
 
@@ -64,6 +65,10 @@ public:
 	FText GetInteractiveMessage();
 	UFUNCTION(BlueprintCallable, Category = HUD)
 	void SetInteractiveMessage(FText Message);
+
+	/** Interact Handler */
+	UFUNCTION(BlueprintCallable, Category = Interactable)
+	void OnInteract();
 
 	bool HasGodMode() const;
 	UFUNCTION(exec)
@@ -239,6 +244,9 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	// Called every frame
+	virtual void Tick(float DeltaSeconds) override;
+
 	//End AActor interface
 
 	//Begin AController interface
@@ -291,7 +299,21 @@ protected:
 	void Reset() override;
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerChangeTeam(class AArenaPlayerController* PC);
+	void ServerChangeTeam();
+
+	/** Perform a trace for Interactable Objects 
+	*
+	* @param RV_Hit HitResult object to store results of raycast in
+	* @param RV_TraceParams Parameters for Ray cast
+	*/
+	bool InteractTrace(FHitResult* RV_Hit, FCollisionQueryParams* RV_TraceParams);
+
+	/** Distance at which the player can interact with objects */
+	UPROPERTY(VisibleAnywhere, Category = Interactable)
+	float InteractDistance;
+
+	/** Currently Viewed interactive object */
+	AArenaInteractiveObject* CurrentViewedObject;
 
 };
 

@@ -40,7 +40,8 @@ void AArenaSpectator::LookUpAtRate(float Val)
 
 void AArenaSpectator::OnNextCamera()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Next")));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Next")));
+	
 	AArenaGameState* const GameState = GetWorld() != NULL ? GetWorld()->GetGameState<AArenaGameState>() : NULL;
 	if (ensure(GameState != nullptr))
 	{
@@ -67,7 +68,7 @@ void AArenaSpectator::OnNextCamera()
 
 void AArenaSpectator::OnPreviousCamera()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Previous")));
+	//GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Previous")));
 	AArenaGameState* const GameState = GetWorld() != NULL ? GetWorld()->GetGameState<AArenaGameState>() : NULL;
 	if (ensure(GameState != nullptr))
 	{

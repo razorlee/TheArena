@@ -15,6 +15,8 @@ class AArenaCharacter : public ACharacter
 
 public:
 
+	//AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP);
+
 	/** spawn inventory, setup initial variables */
 	virtual void PostInitializeComponents() override;
 
@@ -22,6 +24,8 @@ public:
 	virtual void BeginPlay() override;
 
 	void SaveCharacter();
+
+	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 ////////////////////////////////////////// Input handlers //////////////////////////////////////////
 
@@ -66,6 +70,8 @@ public:
 	void OnToggleCombat();
 	/** player pressed prev weapon action */
 	void OnSwapWeapon();
+	/** player pressed prev weapon action */
+	void OnSwitchShoulder();
 	/** player pressed reload action */
 	void OnReload();
 	/** player pressed melee action */
@@ -103,7 +109,7 @@ public:
 
 	/** cleanup inventory */
 	virtual void Destroyed() override;
-
+	
 	/** update mesh for first person view */
 	virtual void PawnClientRestart() override;
 
@@ -285,26 +291,12 @@ public:
 
 ////////////////////////////////////////// Action Functions //////////////////////////////////////////
 
+	void SpawnEquipment();
 	void LoadPersistence();
 	void AddWeapon(class AArenaWeapon* Weapon);
 	void RemoveWeapon(class AArenaWeapon* Weapon);
 
-	void InitializeWeapons(
-	class AArenaWeapon* mainWeapon,
-	class AArenaWeapon* offWeapon,
-	class AArenaUtility* Head,
-	class AArenaUtility* UpperBack,
-	class AArenaUtility* LowerBack,
-	class AArenaUtility* LeftWaist,
-	class AArenaUtility* RightWaist,
-	class AArenaUtility* LeftWrist,
-	class AArenaUtility* RightWrist,
-	class AArenaArmor* HeadA,
-	class AArenaArmor* ShoulderA,
-	class AArenaArmor* ChestA,
-	class AArenaArmor* HandsA,
-	class AArenaArmor* LegsA,
-	class AArenaArmor* FeetA);
+	void InitializeWeapons();
 
 	UFUNCTION(BlueprintCallable, Category = Weapons)
 	void ApplyArmorStats();
@@ -595,22 +587,22 @@ protected:
 	void ServerSetName(const FString& NewName);
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerSpawnEquipment(
-	TSubclassOf<class AArenaWeapon> MainWeapon, 
-	TSubclassOf<class AArenaWeapon> OffWeapon, 
-	TSubclassOf<class AArenaUtility> Head,
-	TSubclassOf<class AArenaUtility> UpperBack,
-	TSubclassOf<class AArenaUtility> LowerBack,
-	TSubclassOf<class AArenaUtility> LeftWaist,
-	TSubclassOf<class AArenaUtility> RightWaist,
-	TSubclassOf<class AArenaUtility> LeftWrist,
-	TSubclassOf<class AArenaUtility> RightWrist,
-	TSubclassOf<class AArenaArmor> HeadA,
-	TSubclassOf<class AArenaArmor> ShoulderA,
-	TSubclassOf<class AArenaArmor> ChestA,
-	TSubclassOf<class AArenaArmor> HandsA,
-	TSubclassOf<class AArenaArmor> LegsA,
-	TSubclassOf<class AArenaArmor> FeetA);
+		void ServerSpawnEquipment(
+			TSubclassOf<class AArenaWeapon> MainWeapon,
+			TSubclassOf<class AArenaWeapon> OffWeapon,
+			TSubclassOf<class AArenaUtility> Head,
+			TSubclassOf<class AArenaUtility> UpperBack,
+			TSubclassOf<class AArenaUtility> LowerBack,
+			TSubclassOf<class AArenaUtility> LeftWaist,
+			TSubclassOf<class AArenaUtility> RightWaist,
+			TSubclassOf<class AArenaUtility> LeftWrist,
+			TSubclassOf<class AArenaUtility> RightWrist,
+			TSubclassOf<class AArenaArmor> HeadA,
+			TSubclassOf<class AArenaArmor> ShoulderA,
+			TSubclassOf<class AArenaArmor> ChestA,
+			TSubclassOf<class AArenaArmor> HandsA,
+			TSubclassOf<class AArenaArmor> LegsA,
+			TSubclassOf<class AArenaArmor> FeetA);
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerToggleCrouch();
@@ -631,22 +623,7 @@ protected:
 	void ServerSwapWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
-	void ServerInitializeWeapons(
-	class AArenaWeapon* mainWeapon, 
-	class AArenaWeapon* offWeapon,
-	class AArenaUtility* Head,
-	class AArenaUtility* UpperBack,
-	class AArenaUtility* LowerBack,
-	class AArenaUtility* LeftWaist,
-	class AArenaUtility* RightWaist,
-	class AArenaUtility* LeftWrist,
-	class AArenaUtility* RightWrist,
-	class AArenaArmor* HeadA,
-	class AArenaArmor* ShoulderA, 
-	class AArenaArmor* ChestA, 
-	class AArenaArmor* HandsA, 
-	class AArenaArmor* LegsA, 
-	class AArenaArmor* FeetA);
+	void ServerInitializeWeapons();
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerSetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);

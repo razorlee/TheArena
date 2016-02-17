@@ -34,7 +34,7 @@ class THEARENA_API AArenaPlayerState : public APlayerState
 	UFUNCTION()
 	void SetTeamNum(int32 NewTeamNumber);
 
-	UFUNCTION(Exec)
+	UFUNCTION(NetMultiCast, Reliable)
 	void ChangeTeam();
 
 	/** player killed someone */
@@ -77,7 +77,7 @@ class THEARENA_API AArenaPlayerState : public APlayerState
 
 	/** replicate team colors. Updated the players mesh colors appropriately */
 	UFUNCTION()
-	void OnRep_TeamColor();
+	void OnRep_TeamColor(int32 Number);
 
 	//We don't need stats about amount of ammo fired to be server authenticated, so just increment these with local functions
 	void AddBulletsFired(int32 NumBullets);
@@ -97,7 +97,7 @@ protected:
 	void UpdateTeamColors();
 
 	/** team number */
-	UPROPERTY(BlueprintReadOnly, Transient, ReplicatedUsing = OnRep_TeamColor)
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
 	int32 TeamNumber;
 
 	/** number of kills */
