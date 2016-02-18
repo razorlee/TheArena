@@ -29,6 +29,52 @@ namespace EActivationType
 	};
 }
 
+
+USTRUCT()
+struct FUtilityStats
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	TEnumAsByte<EUtilityType::Type> UtilityType;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	TEnumAsByte<EActivationType::Type> ActivationType;
+
+	/*The cost to initially activate the ability*/
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Config)
+	float ActivationCost;
+
+	/*The cost to sustain channeled or toggled ability per second*/
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Config)
+	float ContinuationCost;
+
+	/** The damage dealt to player before defense mitigation */
+	UPROPERTY(EditDefaultsOnly, Category = Stats/*, meta = (ClampMin = "1", ClampMax = "1000", UIMin = "1", UIMax = "1000")*/)
+	int32 Damage;
+
+	/** The velocity of the projectile in Unreal Units */
+	UPROPERTY(EditDefaultsOnly, Category = Stats/*, meta = (ClampMin = "5000", ClampMax = "45000", UIMin = "5000", UIMax = "45000")*/)
+	float Velocity;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	bool IsExplosive;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config, meta = (EditCondition = "IsExplosive"))
+	int32 ExplosionRadius;
+
+	/** defaults */
+	FUtilityStats()
+	{
+		Damage = 100;
+		Velocity = 37600.0f;
+		ActivationCost = 0.0f;
+		ContinuationCost = 0.0f;
+		IsExplosive = true;
+		ExplosionRadius = 1000.0f;
+	}
+};
+
 UCLASS()
 class THEARENA_API AArenaUtility : public AActor
 {
@@ -79,6 +125,11 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Utility)
 	void DeactivateBP();
 
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void FireProjectile();
+	FHitResult GetAdjustedAim();
+	FVector GetSocketLocation();
+
 	UFUNCTION(BlueprintCallable, Category = Defaults)
 	void ConsumeEnergy(float Cost, float DeltaSeconds = 1);
 
@@ -103,22 +154,17 @@ protected:
 	FString UtilityDescription;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
-	TEnumAsByte<EUtilityType::Type> UtilityType;
+	FUtilityStats UtilityStats;
 
-	UPROPERTY(EditDefaultsOnly, Category = Config)
-	TEnumAsByte<EActivationType::Type> ActivationType;
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class AArenaProjectile> ProjectileClass;
+
+	UPROPERTY(BlueprintReadWrite, Category = Config)
+	TEnumAsByte< ECollisionChannel > Channel;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* UtilityAnim;
 
-	/*The cost to initially activate the ability*/
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Config)
-	float ActivationCost;
-
-	/*The cost to sustain channeled or toggled ability per second*/
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Config)
-	float ContinuationCost;
-	
 /////////////////////////////////////// Server ///////////////////////////////////////
 
 	UFUNCTION()
@@ -129,5 +175,10 @@ protected:
 
 	UFUNCTION(Reliable, Server, WithValidation)
 	void ServerActivate();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerSpawnProjectile(FVector Origin, FVector ShootDir, FHitResult Hit);
+
+	void Test(FVector Origin, FVector ShootDir, FHitResult Hit);
 
 };

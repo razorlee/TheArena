@@ -31,7 +31,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-	
+
 	//Mesh = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("PawnMesh"));
 	GetMesh()->AttachParent = GetCapsuleComponent();
 	GetMesh()->bOnlyOwnerSee = false;
@@ -60,14 +60,14 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	CameraBoom = PCIP.CreateDefaultSubobject<USpringArmComponent>(this, TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
 	CameraBoom->TargetArmLength = 150.0f;
-	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f); 
+	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
 	CameraBoom->bUsePawnControlRotation = true;
 
 	// Create a follow camera
 	FollowCamera = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("FollowCamera"));
 	FollowCamera->AttachTo(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	//FollowCamera->scale
+												   //FollowCamera->scale
 
 	Http = &FHttpModule::Get();
 	TargetHost = FString::Printf(TEXT("http://www.appspot.com"));
@@ -84,11 +84,23 @@ void AArenaCharacter::PostInitializeComponents()
 	CharacterState->SetMyPawn(this);
 	CharacterEquipment->SetMyPawn(this);
 
-	
-	//Get JSON
-	//Get it to the server to spawn
+	Http = &FHttpModule::Get();
 
-	//CharacterState->Reset();
+	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.25f, false);
+	//LoadPersistence();
+	if (IsRunningGame() || IsRunningDedicatedServer())
+	{
+		ReadySpawned = true;
+		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.5f, false);
+	}
+	else
+	{
+		ReadySpawned = true;
+		//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.5f, false);
+		//ServerSpawnEquipment(CharacterEquipment->GetPrimaryWeaponBP(), CharacterEquipment->GetSecondaryWeaponBP(), CharacterEquipment->GetUpperBackUtilityBP());
+	}
+
+	CharacterState->Reset();
 	UpdatePawnMeshes();
 
 	// create material instance for setting team colors (3rd person view)
@@ -359,9 +371,9 @@ void AArenaCharacter::SetLocation_Implementation()
 {
 	if (CharacterState->GetPlayerState() == EPlayerState::Covering
 		&& (CharacterState->GetCoverState() == ECoverState::HighLeft
-		|| CharacterState->GetCoverState() == ECoverState::HighRight
-		|| CharacterState->GetCoverState() == ECoverState::LowLeft
-		|| CharacterState->GetCoverState() == ECoverState::LowRight))
+			|| CharacterState->GetCoverState() == ECoverState::HighRight
+			|| CharacterState->GetCoverState() == ECoverState::LowLeft
+			|| CharacterState->GetCoverState() == ECoverState::LowRight))
 	{
 		SetActorLocation(CharacterMovementComponent->GetLocation());
 		CurrentWeapon->GetWeaponState()->SetCoverTargeting(false);
@@ -686,7 +698,7 @@ void AArenaCharacter::OnToggleCombat()
 	if (ArenaCharacterCan::ToggleCombat(this, MyPC))
 	{
 		if (Role == ROLE_Authority)
-		{	
+		{
 			ToggleCombat();
 		}
 		else
@@ -891,7 +903,7 @@ void AArenaCharacter::InitializeWeapons()
 		SecondaryWeapon->SetOwningPawn(this);;
 		SecondaryWeapon->FinishUnEquip();
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////
 
 		HeadUtility->SetMyPawn(this);
 
@@ -910,7 +922,7 @@ void AArenaCharacter::InitializeWeapons()
 		RightWaistUtility->SetMyPawn(this);
 		RightWaistUtility->Equip();
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////////////////////
 
 		ChestArmor->SetMyPawn(this);
 		ChestArmor->Equip();
@@ -1195,7 +1207,7 @@ void AArenaCharacter::FinishEquipWeapon(class AArenaWeapon* Weapon)
 		Weapon->Equip();
 	}
 }
-	
+
 float AArenaCharacter::UnEquipWeapon()
 {
 	return FinishUnEquipWeapon(CurrentWeapon);
@@ -2008,7 +2020,7 @@ bool AArenaCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, 
 	Killer = GetDamageInstigator(Killer, *DamageType);
 
 	AController* const KilledPlayer = (Controller != NULL) ? Controller : Cast<AController>(GetOwner());
-	
+
 
 	NetUpdateFrequency = GetDefault<AArenaCharacter>()->NetUpdateFrequency;
 	GetCharacterMovement()->ForceReplicationUpdate();
@@ -2221,38 +2233,34 @@ void AArenaCharacter::DestroyInventory()
 
 /*void AArenaCharacter::AttackTrace()
 {
-	//Overlapping actors for each box spawned will be stored here
-	TArray<struct FOverlapResult> OutOverlaps;
-	//The initial rotation of our box is the same as our character rotation
-	FQuat Rotation = Instigator->GetTransform().GetRotation();
-	FVector Start = Instigator->GetTransform().GetLocation() + Rotation.Rotator().Vector() * 100.0f;
-
-	FCollisionShape CollisionHitShape;
-	FCollisionQueryParams CollisionParams;
-	//We do not want to store the instigator character in the array, so ignore it's collision
-	CollisionParams.AddIgnoredActor(Instigator);
-
-	//Set the channels that will respond to the collision
-	FCollisionObjectQueryParams CollisionObjectTypes;
-	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
-	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
-	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-
-	//Create the box and get the overlapping actors
-	CollisionHitShape = FCollisionShape::MakeBox(FVector(60.0f, 60.0f, 0.5f));
-	GetWorld()->OverlapMulti(OutOverlaps, Start, Rotation, CollisionHitShape, CollisionParams, CollisionObjectTypes);
-
-	//Process all hit actors
-	for (int i = 0; i < OutOverlaps.Num(); ++i)
-	{
-		//We process each actor only once per Attack execution
-		if (OutOverlaps[i].GetActor() && !HitActors.Contains(OutOverlaps[i].GetActor()))
-		{
-			//Process the actor to deal damage
-			CurrentWeapon->Melee(OutOverlaps[i].GetActor(), HitActors);
-			ServerMeleeAttack(CurrentWeapon, OutOverlaps[i].GetActor(), HitActors);
-		}
-	}
+//Overlapping actors for each box spawned will be stored here
+TArray<struct FOverlapResult> OutOverlaps;
+//The initial rotation of our box is the same as our character rotation
+FQuat Rotation = Instigator->GetTransform().GetRotation();
+FVector Start = Instigator->GetTransform().GetLocation() + Rotation.Rotator().Vector() * 100.0f;
+FCollisionShape CollisionHitShape;
+FCollisionQueryParams CollisionParams;
+//We do not want to store the instigator character in the array, so ignore it's collision
+CollisionParams.AddIgnoredActor(Instigator);
+//Set the channels that will respond to the collision
+FCollisionObjectQueryParams CollisionObjectTypes;
+CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
+CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+//Create the box and get the overlapping actors
+CollisionHitShape = FCollisionShape::MakeBox(FVector(60.0f, 60.0f, 0.5f));
+GetWorld()->OverlapMulti(OutOverlaps, Start, Rotation, CollisionHitShape, CollisionParams, CollisionObjectTypes);
+//Process all hit actors
+for (int i = 0; i < OutOverlaps.Num(); ++i)
+{
+//We process each actor only once per Attack execution
+if (OutOverlaps[i].GetActor() && !HitActors.Contains(OutOverlaps[i].GetActor()))
+{
+//Process the actor to deal damage
+CurrentWeapon->Melee(OutOverlaps[i].GetActor(), HitActors);
+ServerMeleeAttack(CurrentWeapon, OutOverlaps[i].GetActor(), HitActors);
+}
+}
 }*/
 
 ////////////////////////////////////////// Animation Controls //////////////////////////////////////////
