@@ -25,6 +25,7 @@ AArenaUtility::AArenaUtility(const class FObjectInitializer& PCIP)
 	bNetUseOwnerRelevancy = true;
 
 	Active = false;
+	Targetable = false;
 }
 
 void AArenaUtility::Destroyed()
@@ -147,6 +148,21 @@ EUtilityType::Type AArenaUtility::GetUtilityType()
 EActivationType::Type AArenaUtility::GetActivationType()
 {
 	return ActivationType;
+}
+
+EUtilityState::Type AArenaUtility::GetUtilityState()
+{
+	return UtilityState;
+}
+
+void AArenaUtility::SetUtilityState(EUtilityState::Type NewState)
+{
+	UtilityState = NewState;
+}
+
+bool AArenaUtility::GetTargetable()
+{
+	return Targetable;
 }
 
 void AArenaUtility::Activate()

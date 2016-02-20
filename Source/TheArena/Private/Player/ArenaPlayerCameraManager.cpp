@@ -83,7 +83,7 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 
 	if (MyPawn->GetCurrentWeapon())
 	{
-		ETargetingState::Type TargetingState = MyPawn->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
+		//ETargetingState::Type TargetingState = MyPawn->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
 
 		Speed = 5.0f * MyPawn->GetCurrentWeapon()->GetWeaponAttributes()->GetMotility();
 		MyPawn->bUseControllerRotationYaw = true;
@@ -99,7 +99,7 @@ void AArenaPlayerCameraManager::HandleAggressiveCamera()
 			TargetArm = 150.0f;
 			TargetOffset = FVector(0.0f, CurShoulder * 50.0f, 50.0f);
 		}
-		else if (TargetingState == ETargetingState::Targeting)
+		else if (MyPawn->GetTargeting())
 		{
 			HandleTargetingCamera();
 		}
@@ -156,37 +156,34 @@ void AArenaPlayerCameraManager::HandleCoverCamera()
 
 void AArenaPlayerCameraManager::HandleLowCoverCamera(ECoverState::Type CoverState)
 {
-	ETargetingState::Type TargetingState = MyPawn->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
-
+	
 	if (MyPawn->GetPlayerMovement()->GetDirection() == FName(TEXT("Left")))
 	{
-		HandleFaceLeftCamera("Low", TargetingState, CoverState);
+		HandleFaceLeftCamera("Low", CoverState);
 	}
 	else if (MyPawn->GetPlayerMovement()->GetDirection() == FName(TEXT("Right")))
 	{
-		HandleFaceRightCamera("Low", TargetingState, CoverState);
+		HandleFaceRightCamera("Low", CoverState);
 	}
 }
 
 void AArenaPlayerCameraManager::HandleHighCoverCamera(ECoverState::Type CoverState)
 {
-	ETargetingState::Type TargetingState = MyPawn->GetCurrentWeapon()->GetWeaponState()->GetTargetingState();
-
 	if (MyPawn->GetPlayerMovement()->GetDirection() == FName(TEXT("Left")))
 	{
-		HandleFaceLeftCamera("High", TargetingState, CoverState);
+		HandleFaceLeftCamera("High", CoverState);
 	}
 	else if (MyPawn->GetPlayerMovement()->GetDirection() == FName(TEXT("Right")))
 	{
-		HandleFaceRightCamera("High", TargetingState, CoverState);
+		HandleFaceRightCamera("High", CoverState);
 	}
 }
 
-void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingState::Type TargetingState, ECoverState::Type CoverState)
+void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ECoverState::Type CoverState)
 {
 	if (State == "High")
 	{
-		if (TargetingState == ETargetingState::Targeting)
+		if (MyPawn->GetTargeting())
 		{
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::HighLeft)
@@ -206,7 +203,7 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 	}
 	else if (State == "Low")
 	{
-		if (TargetingState == ETargetingState::Targeting)
+		if (MyPawn->GetTargeting())
 		{
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::LowLeft)
@@ -232,11 +229,11 @@ void AArenaPlayerCameraManager::HandleFaceLeftCamera(FString State, ETargetingSt
 	}
 }
 
-void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingState::Type TargetingState, ECoverState::Type CoverState)
+void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ECoverState::Type CoverState)
 {
 	if (State == "High")
 	{
-		if (TargetingState == ETargetingState::Targeting)
+		if (MyPawn->GetTargeting())
 		{
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::HighRight)
@@ -256,7 +253,7 @@ void AArenaPlayerCameraManager::HandleFaceRightCamera(FString State, ETargetingS
 	}
 	else if (State == "Low")
 	{
-		if (TargetingState == ETargetingState::Targeting)
+		if (MyPawn->GetTargeting())
 		{
 			MyPawn->bUseControllerRotationYaw = true;
 			if (CoverState == ECoverState::LowRight)

@@ -102,6 +102,10 @@ public:
 	void OnActivateRightWrist();
 	/** player released stop wrist action */
 	void OnDeactivateRightWrist();
+	/** player activated a targeting utility */
+	void OnUtilityStartTarget(AArenaUtility* Utility);
+	/** player stopped a targeting utility */
+	void OnUtilityStopTarget();
 
 ////////////////////////////////////////// Character Defaults //////////////////////////////////////////
 
@@ -161,6 +165,12 @@ public:
 	FString GetName() const;
 	UFUNCTION(NetMulticast, Unreliable)
 	void SetName(const FString& NewName);
+
+	UFUNCTION()
+	bool GetTargeting();
+
+	UFUNCTION()
+	bool GetUtilityTargeting();
 
 	/////////////////////////////////////// Get and Set Weapons ///////////////////////////////////////
 
@@ -233,6 +243,9 @@ public:
 	void SetRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 	void HandleRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
+
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetCurrentUtility();
 
 /////////////////////////////////////// Get and Set Utilities ///////////////////////////////////////
 
@@ -317,6 +330,11 @@ public:
 	void StartTargeting();
 	UFUNCTION(NetMultiCast, Reliable)
 	void StopTargeting();
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void StartUtilityTarget();
+	UFUNCTION(NetMultiCast, Reliable)
+	void StopUtilityTarget();
 
 	UFUNCTION(NetMultiCast, Reliable)
 	void StartPeaking();
@@ -465,6 +483,9 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	class AArenaUtility* RightWaistUtility;
 
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* CurrentUtility;
+
 ////////////////////////////////////////// Armor //////////////////////////////////////////
 
 	UPROPERTY(Transient, Replicated)
@@ -574,6 +595,12 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopTargeting();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartUtilityTarget();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopUtilityTarget();
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStartPeaking();
