@@ -391,6 +391,10 @@ void AArenaPlayerController::OnToggleInGameMenu()
 	{
 		SetFriendsList(false);
 	}
+	if (OpenInventory == true)
+	{
+		SetInventory(false);
+	}
 	if (OpenMenu == true)
 	{
 		SetMenu(false);

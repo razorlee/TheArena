@@ -500,11 +500,11 @@ protected:
 
 	/** Identifies if pawn is in its dying state */
 	UPROPERTY(Transient, Replicated)
-		uint32 Busy : 1;
+	uint32 Busy : 1;
 
 	/** Identifies if pawn is in its dying state */
 	UPROPERTY(Transient, Replicated)
-		float ActionQueue;
+	float ActionQueue;
 
 	/** Replicate where this pawn was last hit and damaged */
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_LastTakeHitInfo)
@@ -515,22 +515,22 @@ protected:
 
 	/** material instances for setting team color in mesh (3rd person view) */
 	UPROPERTY(BlueprintReadWrite, Transient, Category = Mesh)
-		TArray<UMaterialInstanceDynamic*> MeshMIDs;
+	TArray<UMaterialInstanceDynamic*> MeshMIDs;
 
 	/** effect played on respawn */
 	UPROPERTY(EditDefaultsOnly, Category = Aesthetics)
-		UParticleSystem* RespawnFX;
+	UParticleSystem* RespawnFX;
 
 	/** sound played on death, local player only */
 	UPROPERTY(EditDefaultsOnly, Category = Aesthetics)
-		USoundCue* DeathSound;
+	USoundCue* DeathSound;
 	/** sound played on respawn */
 	UPROPERTY(EditDefaultsOnly, Category = Aesthetics)
-		USoundCue* RespawnSound;
+	USoundCue* RespawnSound;
 
 	/** sound played when targeting state changes */
 	UPROPERTY(EditDefaultsOnly, Category = Aesthetics)
-		USoundBase* TargetingSound;
+	USoundBase* TargetingSound;
 
 	//////////////////////////////////////////// Replication ////////////////////////////////////////////
 
@@ -542,132 +542,132 @@ protected:
 	virtual void OnRep_PlayerState() override;
 
 	UFUNCTION()
-		void OnRep_LastTakeHitInfo();
+	void OnRep_LastTakeHitInfo();
 
 	UFUNCTION()
-		void OnRep_PrimaryWeapon();
+	void OnRep_PrimaryWeapon();
 	UFUNCTION()
-		void OnRep_SecondaryWeapon();
+	void OnRep_SecondaryWeapon();
 
 	////////////////////////////////////////////// Server //////////////////////////////////////////////
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerApplyArmorStats();
+	void ServerApplyArmorStats();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerEquipWeapon();
+	void ServerEquipWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerUnEquipWeapon();
+	void ServerUnEquipWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerJump(class AArenaCharacter* client);
+	void ServerJump(class AArenaCharacter* client);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerVault();
+	void ServerVault();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerClimb();
+	void ServerClimb();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerStartTargeting();
+	void ServerStartTargeting();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerStopTargeting();
+	void ServerStopTargeting();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerStartPeaking();
+	void ServerStartPeaking();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerStopPeaking();
+	void ServerStopPeaking();
 
 	/////////////////////////////////////////////////////////////////////////
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetName(const FString& NewName);
+	void ServerSetName(const FString& NewName);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSpawnEquipment(
-			TSubclassOf<class AArenaWeapon> MainWeapon,
-			TSubclassOf<class AArenaWeapon> OffWeapon,
-			TSubclassOf<class AArenaUtility> Head,
-			TSubclassOf<class AArenaUtility> UpperBack,
-			TSubclassOf<class AArenaUtility> LowerBack,
-			TSubclassOf<class AArenaUtility> LeftWaist,
-			TSubclassOf<class AArenaUtility> RightWaist,
-			TSubclassOf<class AArenaUtility> LeftWrist,
-			TSubclassOf<class AArenaUtility> RightWrist,
-			TSubclassOf<class AArenaArmor> HeadA,
-			TSubclassOf<class AArenaArmor> ShoulderA,
-			TSubclassOf<class AArenaArmor> ChestA,
-			TSubclassOf<class AArenaArmor> HandsA,
-			TSubclassOf<class AArenaArmor> LegsA,
-			TSubclassOf<class AArenaArmor> FeetA);
+	void ServerSpawnEquipment(
+		TSubclassOf<class AArenaWeapon> MainWeapon,
+		TSubclassOf<class AArenaWeapon> OffWeapon,
+		TSubclassOf<class AArenaUtility> Head,
+		TSubclassOf<class AArenaUtility> UpperBack,
+		TSubclassOf<class AArenaUtility> LowerBack,
+		TSubclassOf<class AArenaUtility> LeftWaist,
+		TSubclassOf<class AArenaUtility> RightWaist,
+		TSubclassOf<class AArenaUtility> LeftWrist,
+		TSubclassOf<class AArenaUtility> RightWrist,
+		TSubclassOf<class AArenaArmor> HeadA,
+		TSubclassOf<class AArenaArmor> ShoulderA,
+		TSubclassOf<class AArenaArmor> ChestA,
+		TSubclassOf<class AArenaArmor> HandsA,
+		TSubclassOf<class AArenaArmor> LegsA,
+		TSubclassOf<class AArenaArmor> FeetA);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerToggleCrouch();
+	void ServerToggleCrouch();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerToggleCover();
+	void ServerToggleCover();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerExitCover();
+	void ServerExitCover();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerRunning(bool IsRunning);
+	void ServerRunning(bool IsRunning);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerEnterCombat();
+	void ServerEnterCombat();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSwapWeapon();
+	void ServerSwapWeapon();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerInitializeWeapons();
+	void ServerInitializeWeapons();
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+	void ServerSetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
+	void ServerSetSecondaryWeapon(TSubclassOf<class AArenaWeapon> Weapon);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetHeadUtility(TSubclassOf<class AArenaUtility> Utility);
+	void ServerSetHeadUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
+	void ServerSetUpperBackUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetLowerBackUtility(TSubclassOf<class AArenaUtility> Utility);
+	void ServerSetLowerBackUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetLeftWristUtility(TSubclassOf<class AArenaUtility> Utility);
+	void ServerSetLeftWristUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetRightWristUtility(TSubclassOf<class AArenaUtility> Utility);
+	void ServerSetRightWristUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility);
+	void ServerSetLeftWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
+	void ServerSetRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetHeadArmor(TSubclassOf<class AArenaArmor> Armor);
+	void ServerSetHeadArmor(TSubclassOf<class AArenaArmor> Armor);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetChestArmor(TSubclassOf<class AArenaArmor> Armor);
+	void ServerSetChestArmor(TSubclassOf<class AArenaArmor> Armor);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetShoulderArmor(TSubclassOf<class AArenaArmor> Armor);
+	void ServerSetShoulderArmor(TSubclassOf<class AArenaArmor> Armor);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetHandArmor(TSubclassOf<class AArenaArmor> Armor);
+	void ServerSetHandArmor(TSubclassOf<class AArenaArmor> Armor);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetLegArmor(TSubclassOf<class AArenaArmor> Armor);
+	void ServerSetLegArmor(TSubclassOf<class AArenaArmor> Armor);
 
 	UFUNCTION(reliable, server, WithValidation)
-		void ServerSetFeetArmor(TSubclassOf<class AArenaArmor> Armor);
+	void ServerSetFeetArmor(TSubclassOf<class AArenaArmor> Armor);
 
 };

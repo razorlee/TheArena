@@ -194,9 +194,16 @@ void AArenaUtility::FireProjectile()
 	FVector ShootDir = Hit.ImpactPoint;
 	FVector Origin = GetSocketLocation();
 
+	const int32 RandomSeed = FMath::Rand();
+	FRandomStream WeaponRandomStream(RandomSeed);
+	const float CurrentSpread = 0.0f;
+	const float ConeHalfAngle = FMath::DegreesToRadians(CurrentSpread * 0.5f);
+
+	ShootDir = WeaponRandomStream.VRandCone((ShootDir - Origin).GetSafeNormal(), ConeHalfAngle, ConeHalfAngle);
+
 	//SpawnTrailEffect(Hit.ImpactPoint); may not need this for utilities
-	//ServerSpawnProjectile(Origin, ShootDir, Hit);
-	Test(Origin, ShootDir, Hit);
+	ServerSpawnProjectile(Origin, ShootDir, Hit);
+	//Test(Origin, ShootDir, Hit);
 
 }
 
@@ -213,7 +220,7 @@ FHitResult AArenaUtility::GetAdjustedAim()
 
 		static FName CameraFireTag = FName(TEXT("CameraTrace"));
 
-		GetWorld()->DebugDrawTraceTag = CameraFireTag;
+		//GetWorld()->DebugDrawTraceTag = CameraFireTag;
 
 		FCollisionQueryParams TraceParams(CameraFireTag, true, PlayerController);
 		TraceParams.bTraceAsyncScene = true;
@@ -229,7 +236,7 @@ FHitResult AArenaUtility::GetAdjustedAim()
 
 FVector AArenaUtility::GetSocketLocation()
 {
-	USkeletalMeshComponent* UseMesh = GetMyPawn()->GetMesh();
+	USkeletalMeshComponent* UseMesh = GetMyPawn()->GetPawnMesh();
 	return UseMesh->GetSocketLocation("UtilityProjectile");
 }
 

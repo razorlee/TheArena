@@ -1349,13 +1349,16 @@ AArenaWeapon* AArenaCharacter::GetPrimaryWeapon()
 }
 void AArenaCharacter::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
-	if (Role == ROLE_Authority)
+	if (Weapon)
 	{
-		HandlePrimaryWeapon(Weapon);
-	}
-	else
-	{
-		ServerSetPrimaryWeapon(Weapon);
+		if (Role == ROLE_Authority)
+		{
+			HandlePrimaryWeapon(Weapon);
+		}
+		else
+		{
+			ServerSetPrimaryWeapon(Weapon);
+		}
 	}
 }
 void AArenaCharacter::HandlePrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
