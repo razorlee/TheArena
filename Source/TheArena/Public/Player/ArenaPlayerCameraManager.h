@@ -37,9 +37,9 @@ public:
 
 	void HandleHighCoverCamera(ECoverState::Type CoverState);
 
-	void HandleFaceLeftCamera(FString State, ETargetingState::Type TargetingState, ECoverState::Type CoverState);
+	void HandleFaceLeftCamera(FString State, ECoverState::Type CoverState);
 
-	void HandleFaceRightCamera(FString State, ETargetingState::Type TargetingState, ECoverState::Type CoverState);
+	void HandleFaceRightCamera(FString State, ECoverState::Type CoverState);
 
 ////////////////////////////////////////////////// Getter and Setters //////////////////////////////////////////////////
 

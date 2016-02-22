@@ -831,9 +831,13 @@ void AArenaCharacter::OnActivateLeftWrist()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (ArenaCharacterCan::Wrist(LeftWristUtility, this, MyPC))
 	{
-		if (LeftWristUtility->GetActivationType() == EActivationType::Activate)
+		if (LeftWristUtility->GetActivationType() == EActivationType::Activate && LeftWristUtility->GetTargetable())
 		{
-			OnStartTargeting();
+			OnUtilityStartTarget(LeftWristUtility);
+
+			if (GetPlayerState()->GetPlayerState() == EPlayerState::Covering) {
+				OnStartPeaking();
+			}
 		}
 		else
 		{
@@ -846,11 +850,14 @@ void AArenaCharacter::OnDeactivateLeftWrist()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (LeftWristUtility)
 	{
-		if (LeftWristUtility->GetActivationType() == EActivationType::Activate && ArenaCharacterCan::Wrist(LeftWristUtility, this, MyPC))
+		if (LeftWristUtility->GetActivationType() == EActivationType::Activate && ArenaCharacterCan::Wrist(LeftWristUtility, this, MyPC) && CurrentUtility)
 		{
-			LeftWristUtility->Activate();
-			OnStopTargeting();
-			LeftWristUtility->Deactivate();
+			OnUtilityStopTarget();
+
+			if (GetPlayerState()->GetPlayerState() == EPlayerState::Covering) {
+				OnStopPeaking();
+				//GetWorldTimerManager().SetTimer(FTimerHandle(), this, &AArenaCharacter::OnStopPeaking, 0.5f, false);
+			}
 		}
 		else
 		{
@@ -863,9 +870,13 @@ void AArenaCharacter::OnActivateRightWrist()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (ArenaCharacterCan::Wrist(RightWristUtility, this, MyPC))
 	{
-		if (RightWristUtility->GetActivationType() == EActivationType::Activate)
+		if (RightWristUtility->GetActivationType() == EActivationType::Activate && RightWristUtility->GetTargetable())
 		{
-			OnStartTargeting();
+			OnUtilityStartTarget(RightWristUtility);
+
+			if (GetPlayerState()->GetPlayerState() == EPlayerState::Covering) {
+				OnStartPeaking();
+			}
 		}
 		else
 		{
@@ -878,16 +889,42 @@ void AArenaCharacter::OnDeactivateRightWrist()
 	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
 	if (RightWristUtility)
 	{
-		if (RightWristUtility->GetActivationType() == EActivationType::Activate && ArenaCharacterCan::Wrist(RightWristUtility, this, MyPC))
+		if (RightWristUtility->GetActivationType() == EActivationType::Activate && ArenaCharacterCan::Wrist(RightWristUtility, this, MyPC) && CurrentUtility)
 		{
-			RightWristUtility->Activate();
-			OnStopTargeting();
-			RightWristUtility->Deactivate();
+			OnUtilityStopTarget();
+
+			if (GetPlayerState()->GetPlayerState() == EPlayerState::Covering) {
+				OnStopPeaking();
+			}
 		}
 		else
 		{
 			RightWristUtility->Deactivate();
 		}
+	}
+}
+void AArenaCharacter::OnUtilityStartTarget(AArenaUtility* Utility)
+{
+	CurrentUtility = Utility;
+	if (Role == ROLE_Authority)
+	{
+		StartUtilityTarget();
+	}
+	else
+	{
+		ServerStartUtilityTarget();
+	}
+}
+
+void AArenaCharacter::OnUtilityStopTarget()
+{
+	if (Role == ROLE_Authority)
+	{
+		StopUtilityTarget();
+	}
+	else
+	{
+		ServerStopUtilityTarget();
 	}
 }
 
@@ -1075,6 +1112,20 @@ void AArenaCharacter::StopTargeting_Implementation()
 	{
 
 	}
+}
+
+void AArenaCharacter::StartUtilityTarget_Implementation()
+{
+	CurrentUtility->SetUtilityState(EUtilityState::Targeting);
+}
+void AArenaCharacter::StopUtilityTarget_Implementation()
+{
+	CurrentUtility->Activate();
+
+	CurrentUtility->SetUtilityState(EUtilityState::Default);
+
+	CurrentUtility->Deactivate();
+	CurrentUtility = NULL;
 }
 
 void AArenaCharacter::StartPeaking_Implementation()
@@ -1316,6 +1367,18 @@ FString AArenaCharacter::GetName() const
 void AArenaCharacter::SetName_Implementation(const FString& NewName)
 {
 	Name = NewName;
+}
+
+bool AArenaCharacter::GetTargeting() {
+	if (CurrentWeapon->GetWeaponState()->GetTargetingState() == ETargetingState::Targeting) {
+		return true;
+	}
+
+	return (CurrentUtility && CurrentUtility->GetUtilityState() == EUtilityState::Targeting);
+}
+
+bool AArenaCharacter::GetUtilityTargeting() {
+	return (CurrentUtility && CurrentUtility->GetUtilityState() == EUtilityState::Targeting);
 }
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
@@ -1685,6 +1748,11 @@ void AArenaCharacter::HandleRightWaistUtility(TSubclassOf<class AArenaUtility> U
 	{
 		SaveCharacter();
 	}
+}
+
+class AArenaUtility* AArenaCharacter::GetCurrentUtility()
+{
+	return CurrentUtility;
 }
 
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
@@ -2582,6 +2650,24 @@ bool AArenaCharacter::ServerStopTargeting_Validate()
 	return true;
 }
 void AArenaCharacter::ServerStopTargeting_Implementation()
+{
+	StopTargeting();
+}
+
+bool AArenaCharacter::ServerStartUtilityTarget_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerStartUtilityTarget_Implementation()
+{
+	StartTargeting();
+}
+
+bool AArenaCharacter::ServerStopUtilityTarget_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerStopUtilityTarget_Implementation()
 {
 	StopTargeting();
 }

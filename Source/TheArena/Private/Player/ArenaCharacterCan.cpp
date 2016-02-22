@@ -112,7 +112,8 @@ bool ArenaCharacterCan::Run(AArenaCharacter* character, AArenaPlayerController* 
 		&& !character->GetVelocity().IsZero()
 		&& character->GetCharacterAttributes()->GetCurrentStamina() > 200
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& !character->GetUtilityTargeting())
 	{
 		return true;
 	}
@@ -210,6 +211,7 @@ bool ArenaCharacterCan::Climb(AArenaCharacter* character, AArenaPlayerController
 		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
 		&& character->GetCharacterAttributes()->GetCurrentStamina() >= character->GetPlayerMovement()->CostConfig.ClimbCost
 		&& character->GetPlayerState()->GetIsNearCover()
+		&& !character->GetUtilityTargeting()
 		//&& !character->GetPlayerState()->GetIsNearLeftEdge()
 		//&& !character->GetPlayerState()->GetIsNearRightEdge()
 		&& character->GetPlayerState()->GetCanClimb())
@@ -226,7 +228,8 @@ bool ArenaCharacterCan::Interact(AArenaCharacter* character, AArenaPlayerControl
 {
 	if (controller
 		&& controller->IsGameInputAllowed()
-		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting)
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
+		&& !character->GetUtilityTargeting())
 	{
 		return true;
 	}
@@ -256,6 +259,7 @@ bool ArenaCharacterCan::Swap(AArenaCharacter* character, AArenaPlayerController*
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
 		&& character->GetPlayerState()->GetCombatState() == ECombatState::Aggressive
 		&& character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() != EWeaponState::Equipping
+		&& !character->GetUtilityTargeting()
 		&& character->GetCurrentWeapon() != NULL)
 	{
 		return true;
@@ -272,7 +276,8 @@ bool ArenaCharacterCan::Target(AArenaCharacter* character, AArenaPlayerControlle
 		&& controller->IsGameInputAllowed()
 		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Running
-		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting)
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
+		&& !character->GetUtilityTargeting())
 	{
 		return true;
 	}
@@ -361,7 +366,8 @@ bool ArenaCharacterCan::Fire(AArenaCharacter* character, AArenaPlayerController*
 		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Running
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Vaulting
-		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting)
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
+		&& !character->GetUtilityTargeting())
 	{
 		if (character->GetPlayerState()->GetPlayerState() == EPlayerState::Covering)
 		{
@@ -404,7 +410,8 @@ bool ArenaCharacterCan::Back(AArenaCharacter* character, AArenaPlayerController*
 		&& controller->IsGameInputAllowed()
 		&& character->GetUpperBackUtility()
 		&& character->GetPlayerState()->GetCombatState() == ECombatState::Aggressive
-		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting)
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
+		&& !character->GetUtilityTargeting())
 	{
 		if (!character->GetUpperBackUtility()->Active)
 		{
@@ -464,7 +471,8 @@ bool ArenaCharacterCan::Waist(AArenaUtility* utility, AArenaCharacter* character
 		&& controller->IsGameInputAllowed()
 		&& character->GetUpperBackUtility()
 		&& character->GetPlayerState()->GetCombatState() == ECombatState::Aggressive
-		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting)
+		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
+		&& !character->GetUtilityTargeting())
 	{
 		if (!utility->Active)
 		{
@@ -494,6 +502,7 @@ bool ArenaCharacterCan::Reload(AArenaCharacter* character, AArenaPlayerControlle
 		&& controller->IsGameInputAllowed()
 		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
+		&& !character->GetUtilityTargeting()
 		&& (character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() == EWeaponState::Idle
 		|| character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() == EWeaponState::Default
 		|| character->GetCurrentWeapon()->GetWeaponState()->GetWeaponState() == EWeaponState::Firing))
@@ -513,7 +522,8 @@ bool ArenaCharacterCan::Melee(AArenaCharacter* character, AArenaPlayerController
 		&& !character->GetCharacterMovement()->IsFlying()
 		&& !character->GetCharacterMovement()->IsFalling()
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& !character->GetUtilityTargeting())
 	{
 		return true;
 	}

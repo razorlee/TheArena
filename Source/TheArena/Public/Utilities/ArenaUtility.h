@@ -117,6 +117,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Utility)
 	EActivationType::Type GetActivationType();
 
+	UFUNCTION(BlueprintPure, Category = Utility)
+	EUtilityState::Type GetUtilityState();
+
+	UFUNCTION(BlueprintCallable, Category = Utility)
+	void SetUtilityState(EUtilityState::Type NewState);
+
+	UFUNCTION(BlueprintPure, Category = Utility)
+	bool GetTargetable();
+
 	virtual void Activate();
 	UFUNCTION(BlueprintImplementableEvent, Category = Utility)
 	void ActivateBP();
@@ -161,6 +170,12 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, Category = Config)
 	TEnumAsByte< ECollisionChannel > Channel;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	bool Targetable;
+
+	UPROPERTY(VisibleAnywhere, Category = State)
+	TEnumAsByte<EUtilityState::Type> UtilityState;
 
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage* UtilityAnim;

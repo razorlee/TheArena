@@ -102,6 +102,10 @@ public:
 	void OnActivateRightWrist();
 	/** player released stop wrist action */
 	void OnDeactivateRightWrist();
+	/** player activated a targeting utility */
+	void OnUtilityStartTarget(AArenaUtility* Utility);
+	/** player stopped a targeting utility */
+	void OnUtilityStopTarget();
 
 	////////////////////////////////////////// Character Defaults //////////////////////////////////////////
 
@@ -161,6 +165,12 @@ public:
 		FString GetName() const;
 	UFUNCTION(NetMulticast, Unreliable)
 		void SetName(const FString& NewName);
+
+	UFUNCTION()
+	bool GetTargeting();
+
+	UFUNCTION()
+	bool GetUtilityTargeting();
 
 	/////////////////////////////////////// Get and Set Weapons ///////////////////////////////////////
 
@@ -574,6 +584,12 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopTargeting();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStartUtilityTarget();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerStopUtilityTarget();
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStartPeaking();
