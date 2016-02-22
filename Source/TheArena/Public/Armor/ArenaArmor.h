@@ -56,6 +56,8 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	virtual void Destroyed() override;
+
 	void Equip();
 	void UnEquip();
 

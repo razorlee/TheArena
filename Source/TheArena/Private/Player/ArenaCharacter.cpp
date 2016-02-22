@@ -2158,7 +2158,7 @@ void AArenaCharacter::SetRagdollPhysics()
 	}
 	else
 	{
-		SetLifeSpan(900.0f);
+		SetLifeSpan(15.0f);
 	}
 }
 
@@ -2211,7 +2211,21 @@ void AArenaCharacter::DestroyInventory()
 		Weapon->Destroy();
 	}
 
-	AArenaUtility* Utility = UpperBackUtility;
+	AArenaUtility* Utility = HeadUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = UpperBackUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = LowerBackUtility;
 	if (Utility)
 	{
 		Utility->UnEquip();
@@ -2232,6 +2246,61 @@ void AArenaCharacter::DestroyInventory()
 		Utility->Destroy();
 	}
 
+	Utility = LeftWristUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = RightWristUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	AArenaArmor* Armor = HeadArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = ShoulderArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = ChestArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = HandArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = LegArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = FeetArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
 }
 
 /*void AArenaCharacter::AttackTrace()

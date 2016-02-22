@@ -40,6 +40,11 @@ void AArenaArmor::Tick( float DeltaTime )
 
 }
 
+void AArenaArmor::Destroyed()
+{
+	Super::Destroyed();
+}
+
 class AArenaCharacter* AArenaArmor::GetMyPawn() const
 {
 	return MyPawn;

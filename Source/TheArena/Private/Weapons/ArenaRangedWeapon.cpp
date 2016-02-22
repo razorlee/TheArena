@@ -126,7 +126,7 @@ void AArenaRangedWeapon::OnBurstStarted()
 	{
 		if (WeaponAttributes->GetFireMode() == EFireMode::Burst)
 		{
-			GetWorldTimerManager().SetTimer(BurstFire, this, &AArenaRangedWeapon::HandleBurst, 0.05f, true);
+			GetWorldTimerManager().SetTimer(Attack, this, &AArenaRangedWeapon::HandleBurst, 0.05f, false);
 		}
 		else
 		{
@@ -147,8 +147,11 @@ void AArenaRangedWeapon::OnBurstFinished()
 		if (BurstCounter > 2)
 		{
 			GetWorldTimerManager().ClearTimer(BurstFire);
+			for (int i = 0; i < BurstCounter; i++)
+			{
+				StopAttackFX();
+			}
 			BurstCounter = 0;
-			StopAttackFX();
 		}
 		StopAttackFX();
 	}
@@ -167,18 +170,25 @@ void AArenaRangedWeapon::HandleFiring()
 {
 	if (ArenaWeaponCan::Fire(MyPawn, this))
 	{
-		IsRecoiling = true;
-		WeaponState->SetWeaponState(EWeaponState::Firing);
-
-		if (GetNetMode() != NM_DedicatedServer)
+		if (Role < ROLE_Authority)
 		{
-			PlayAttackFX();
+			ServerHandleFiring();
 		}
-		if (MyPawn && MyPawn->IsLocallyControlled())
+		else
 		{
-			FireWeapon();
-			WeaponAttributes->CurrentClip--;
-			BurstCounter++;
+			IsRecoiling = true;
+			WeaponState->SetWeaponState(EWeaponState::Firing);
+
+			if (GetNetMode() != NM_DedicatedServer)
+			{
+				PlayAttackFX();
+			}
+			if (MyPawn && MyPawn->IsLocallyControlled())
+			{
+				FireWeapon();
+				WeaponAttributes->CurrentClip--;
+				BurstCounter++;
+			}
 		}
 	}
 	else if (MyPawn && MyPawn->IsLocallyControlled())
@@ -197,10 +207,7 @@ void AArenaRangedWeapon::HandleFiring()
 
 	if (MyPawn && MyPawn->IsLocallyControlled())
 	{
-		if (Role < ROLE_Authority)
-		{
-			ServerHandleFiring();
-		}
+
 
 		// reload if possible
 		if (WeaponAttributes->CurrentClip <= 0 && ArenaWeaponCan::Reload(MyPawn, this))
