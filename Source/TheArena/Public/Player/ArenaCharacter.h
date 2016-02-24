@@ -106,6 +106,8 @@ public:
 	void OnUtilityStartTarget(AArenaUtility* Utility);
 	/** player stopped a targeting utility */
 	void OnUtilityStopTarget();
+	/** player canceled an action */
+	void OnCancelAction();
 
 	////////////////////////////////////////// Character Defaults //////////////////////////////////////////
 
@@ -244,6 +246,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 		void HandleRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetCurrentUtility();
+
 	/////////////////////////////////////// Get and Set Utilities ///////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Armor)
@@ -329,6 +334,11 @@ public:
 		void StopTargeting();
 
 	UFUNCTION(NetMultiCast, Reliable)
+		void StartUtilityTarget();
+	UFUNCTION(NetMultiCast, Reliable)
+		void StopUtilityTarget();
+
+	UFUNCTION(NetMultiCast, Reliable)
 		void StartPeaking();
 	UFUNCTION(NetMultiCast, Reliable)
 		void StopPeaking();
@@ -354,6 +364,9 @@ public:
 		void StartClimb();
 	UFUNCTION(NetMultiCast, Reliable)
 		void StopClimb();
+
+	UFUNCTION(NetMultiCast, Reliable)
+	void CancelAction();
 
 	////////////////////////////////////////// Damage & Death //////////////////////////////////////////
 
@@ -474,6 +487,9 @@ protected:
 
 	UPROPERTY(Transient, Replicated)
 	class AArenaUtility* RightWaistUtility;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* CurrentUtility;
 
 	////////////////////////////////////////// Armor //////////////////////////////////////////
 
@@ -596,6 +612,9 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopPeaking();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerCancelAction();
 
 	/////////////////////////////////////////////////////////////////////////
 

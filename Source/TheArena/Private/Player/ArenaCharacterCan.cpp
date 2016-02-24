@@ -132,7 +132,8 @@ bool ArenaCharacterCan::Crouch(AArenaCharacter* character, AArenaPlayerControlle
 		&& !character->GetCharacterMovement()->IsFlying()
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Jumping
 		&& character->GetPlayerState()->GetPlayerState() != EPlayerState::Interacting
-		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive)
+		&& character->GetPlayerState()->GetCombatState() != ECombatState::Passive
+		&& !character->GetUtilityTargeting())
 	{
 		return true;
 	}
