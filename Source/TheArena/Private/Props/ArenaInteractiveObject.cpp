@@ -13,6 +13,8 @@ AArenaInteractiveObject::AArenaInteractiveObject()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
 
+	bActive = true;
+
 	InteractText = FText::FromString(FString("Interact"));
 }
 
