@@ -106,6 +106,8 @@ public:
 	void OnUtilityStartTarget(AArenaUtility* Utility);
 	/** player stopped a targeting utility */
 	void OnUtilityStopTarget();
+	/** player canceled an action */
+	void OnCancelAction();
 
 	////////////////////////////////////////// Character Defaults //////////////////////////////////////////
 
@@ -355,6 +357,9 @@ public:
 	UFUNCTION(NetMultiCast, Reliable)
 		void StopClimb();
 
+	UFUNCTION(NetMultiCast, Reliable)
+	void CancelAction();
+
 	////////////////////////////////////////// Damage & Death //////////////////////////////////////////
 
 	/** Take damage, handle death */
@@ -596,6 +601,9 @@ protected:
 
 	UFUNCTION(reliable, server, WithValidation)
 	void ServerStopPeaking();
+
+	UFUNCTION(reliable, server, WithValidation)
+	void ServerCancelAction();
 
 	/////////////////////////////////////////////////////////////////////////
 

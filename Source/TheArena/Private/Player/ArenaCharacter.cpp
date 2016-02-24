@@ -443,6 +443,8 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 
 	InputComponent->BindAction("RightWrist", IE_Pressed, this, &AArenaCharacter::OnActivateRightWrist);
 	InputComponent->BindAction("RightWrist", IE_Released, this, &AArenaCharacter::OnDeactivateRightWrist);
+
+	InputComponent->BindAction("CancelAction", IE_Pressed, this, &AArenaCharacter::OnCancelAction);
 }
 
 void AArenaCharacter::MoveForward(float Value)
@@ -915,7 +917,6 @@ void AArenaCharacter::OnUtilityStartTarget(AArenaUtility* Utility)
 		ServerStartUtilityTarget();
 	}
 }
-
 void AArenaCharacter::OnUtilityStopTarget()
 {
 	if (Role == ROLE_Authority)
@@ -925,6 +926,17 @@ void AArenaCharacter::OnUtilityStopTarget()
 	else
 	{
 		ServerStopUtilityTarget();
+	}
+}
+void AArenaCharacter::OnCancelAction()
+{
+	if (Role == ROLE_Authority)
+	{
+		CancelAction();
+	}
+	else
+	{
+		ServerCancelAction();
 	}
 }
 
@@ -1321,6 +1333,16 @@ void AArenaCharacter::StopClimb_Implementation()
 	CharacterState->SetPlayerState(EPlayerState::Default);
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 	StopAnimMontage(CharacterMovementComponent->GetClimbAnimation());
+}
+
+void AArenaCharacter::CancelAction_Implementation()
+{
+	if (GetUtilityTargeting())
+	{
+		CurrentUtility->SetUtilityState(EUtilityState::Default);
+		CurrentUtility = NULL;
+		return;
+	}
 }
 
 ////////////////////////////////////////// Character Components //////////////////////////////////////////
@@ -2670,6 +2692,15 @@ bool AArenaCharacter::ServerStopUtilityTarget_Validate()
 void AArenaCharacter::ServerStopUtilityTarget_Implementation()
 {
 	StopTargeting();
+}
+
+bool AArenaCharacter::ServerCancelAction_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerCancelAction_Implementation()
+{
+	CancelAction();
 }
 
 bool AArenaCharacter::ServerStartPeaking_Validate()
