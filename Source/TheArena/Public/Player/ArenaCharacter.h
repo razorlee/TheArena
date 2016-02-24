@@ -246,6 +246,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Utilities)
 		void HandleRightWaistUtility(TSubclassOf<class AArenaUtility> Utility);
 
+	UFUNCTION(BlueprintCallable, Category = Utilities)
+	class AArenaUtility* GetCurrentUtility();
+
 	/////////////////////////////////////// Get and Set Utilities ///////////////////////////////////////
 
 	UFUNCTION(BlueprintCallable, Category = Armor)
@@ -329,6 +332,11 @@ public:
 		void StartTargeting();
 	UFUNCTION(NetMultiCast, Reliable)
 		void StopTargeting();
+
+	UFUNCTION(NetMultiCast, Reliable)
+		void StartUtilityTarget();
+	UFUNCTION(NetMultiCast, Reliable)
+		void StopUtilityTarget();
 
 	UFUNCTION(NetMultiCast, Reliable)
 		void StartPeaking();
@@ -479,6 +487,9 @@ protected:
 
 	UPROPERTY(Transient, Replicated)
 	class AArenaUtility* RightWaistUtility;
+
+	UPROPERTY(Transient, Replicated)
+	class AArenaUtility* CurrentUtility;
 
 	////////////////////////////////////////// Armor //////////////////////////////////////////
 

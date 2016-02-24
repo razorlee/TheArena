@@ -29,6 +29,15 @@ namespace EActivationType
 	};
 }
 
+UENUM()
+namespace EUtilityState
+{
+	enum Type
+	{
+		Targeting,
+		Default
+	};
+}
 
 USTRUCT()
 struct FUtilityStats
