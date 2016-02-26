@@ -15,5 +15,10 @@ class THEARENA_API AArenaPlayerController_Menu : public APlayerController
 	
 	/** After game is initialized */
 	virtual void PostInitializeComponents() override;
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameMode)
+	int32 ActiveWidget = 0;
 	
 };

@@ -22,7 +22,7 @@ void AArenaMatchmakingTerminal::OnInteract_Implementation(AArenaCharacter* Playe
 		AArenaPlayerController* PC = Cast<AArenaPlayerController>(Player->GetController());
 		if (PC)
 		{
-			//PC->OnToggleInventory();
+			PC->OnToggleMatchmaking();
 		}
 	}
 
@@ -38,7 +38,7 @@ void AArenaMatchmakingTerminal::OnView_Implementation(AArenaCharacter* Player)
 	Super::OnView_Implementation(Player);
 	AArenaPlayerController* PC = Cast<AArenaPlayerController>(Player->GetController());
 	{
-		//PC->SetNearbyInventory(true);
+		PC->SetNearbyMatchmaking(true);
 	}
 }
 
@@ -47,7 +47,7 @@ void AArenaMatchmakingTerminal::OnLeave_Implementation(AArenaCharacter* Player)
 	Super::OnLeave_Implementation(Player);
 	AArenaPlayerController* PC = Cast<AArenaPlayerController>(Player->GetController());
 	{
-		//PC->SetNearbyInventory(false);
+		PC->SetNearbyMatchmaking(false);
 	}
 }
 
