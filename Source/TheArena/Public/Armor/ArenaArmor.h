@@ -56,6 +56,8 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	virtual void Destroyed() override;
+
 	void Equip();
 	void UnEquip();
 
@@ -69,6 +71,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Config)
 	FName GetArmorName() const;
+
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	FString GetDescription();
+	UFUNCTION(BlueprintCallable, Category = Stats)
+	void SetDescription(FString Value);
 
 	UFUNCTION(BlueprintCallable, Category = Stats)
 	float GetProtection() const;
@@ -87,6 +94,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = Mesh)
 	UStaticMeshComponent* Mesh;
+
+	UPROPERTY(EditDefaultsOnly, Category = Config)
+	FString ArmorDescription;
 
 	UPROPERTY(EditDefaultsOnly, Category = Config)
 	FName ArmorName;

@@ -112,9 +112,6 @@ protected:
 	/** check who won */
 	virtual void DetermineMatchWinner();
 
-	/** check who won */
-	virtual void CheckTeamElimination();
-
 	/** check if PlayerState is a winner */
 	virtual bool IsWinner(class AArenaPlayerState* PlayerState) const;
 
@@ -132,6 +129,10 @@ public:
 	/** finish current match and lock players */
 	UFUNCTION(exec)
 	void FinishMatch();
+
+	/** check who won */
+	UFUNCTION(BlueprintCallable, Category = Match)
+	virtual void CheckTeamElimination();
 
 	/*Finishes the match and bumps everyone to main menu.*/
 	void RequestFinishAndExitToMainMenu();

@@ -20,6 +20,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
 	int32 NumTeams;
 
+	/** number of teams in current game */
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
+	int32 RoundNumber;
+
 	/** accumulated score per team */
 	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
 	TArray<int32> TeamScores;

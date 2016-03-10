@@ -8,6 +8,7 @@ AArenaGameState::AArenaGameState(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	NumTeams = 0;
+	RoundNumber = 0;
 	RemainingTime = 0;
 	bTimerPaused = false;
 }
@@ -17,6 +18,7 @@ void AArenaGameState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AArenaGameState, NumTeams);
+	DOREPLIFETIME(AArenaGameState, RoundNumber);
 	DOREPLIFETIME(AArenaGameState, RemainingTime);
 	DOREPLIFETIME(AArenaGameState, bTimerPaused);
 	DOREPLIFETIME(AArenaGameState, TeamScores);
@@ -70,14 +72,13 @@ void AArenaGameState::RequestFinishAndExitToMainMenu()
 		if (GI)
 		{
 			GI->RemoveSplitScreenPlayers();
-		}
+		}*/
 
 		APlayerController* const PrimaryPC = GetGameInstance()->GetFirstLocalPlayerController();
 		if (PrimaryPC)
 		{
 			check(PrimaryPC->GetNetMode() == ENetMode::NM_Client);
 			PrimaryPC->ClientReturnToMainMenu(TEXT("Return to Main Menu requested by game state"));
-		}*/
+		}
 	}
-
 }

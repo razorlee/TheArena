@@ -24,7 +24,9 @@ AArenaUtility::AArenaUtility(const class FObjectInitializer& PCIP)
 	bReplicates = true;
 	bNetUseOwnerRelevancy = true;
 
+	Channel = COLLISION_PROJECTILE;
 	Active = false;
+	Targetable = false;
 }
 
 void AArenaUtility::Destroyed()
@@ -44,9 +46,9 @@ void AArenaUtility::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Active && (ActivationType == EActivationType::Toggle || ActivationType == EActivationType::Channel))
+	if (Active && (UtilityStats.ActivationType == EActivationType::Toggle || UtilityStats.ActivationType == EActivationType::Channel))
 	{
-		ConsumeEnergy(ContinuationCost, DeltaTime);
+		ConsumeEnergy(UtilityStats.ContinuationCost, DeltaTime);
 		if (MyPawn->GetCharacterAttributes()->GetCurrentEnergy() <= 0.0f)
 		{
 			Deactivate();
@@ -61,6 +63,7 @@ class AArenaCharacter* AArenaUtility::GetMyPawn() const
 }
 void AArenaUtility::SetMyPawn(AArenaCharacter* Pawn)
 {
+	Instigator = Pawn;
 	MyPawn = Pawn;
 	SetOwner(Pawn);
 }
@@ -70,35 +73,44 @@ FName AArenaUtility::GetUtilityName() const
 	return UtilityName;
 }
 
+FString AArenaUtility::GetDescription()
+{
+	return UtilityDescription;
+}
+void AArenaUtility::SetDescription(FString Value)
+{
+	UtilityDescription = Value;
+}
+
 float AArenaUtility::GetActivationCost() const
 {
-	return ActivationCost;
+	return UtilityStats.ActivationCost;
 }
 void AArenaUtility::SetActivationCost(float Value)
 {
-	ActivationCost = Value;
+	UtilityStats.ActivationCost = Value;
 }
 
 void AArenaUtility::Equip()
 {
 	FName AttachPoint;
-	if (UtilityType == EUtilityType::Head)
+	if (UtilityStats.UtilityType == EUtilityType::Head)
 	{
 		//AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainHeavyAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffHeavyAttachPoint();
 	}
-	else if (UtilityType == EUtilityType::UpperBack)
+	else if (UtilityStats.UtilityType == EUtilityType::UpperBack)
 	{
 		AttachPoint = FName(TEXT("UpperBackUtility"));
 	}
-	else if (UtilityType == EUtilityType::LowerBack)
+	else if (UtilityStats.UtilityType == EUtilityType::LowerBack)
 	{
 		//AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainWeaponAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffWeaponAttachPoint();
 	}
-	else if (UtilityType == EUtilityType::Wrist)
+	else if (UtilityStats.UtilityType == EUtilityType::Wrist)
 	{
 		//AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainWeaponAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffWeaponAttachPoint();
 	}
-	else if (UtilityType == EUtilityType::Waist)
+	else if (UtilityStats.UtilityType == EUtilityType::Waist)
 	{
 		//AttachPoint = IsPrimary() ? MyPawn->GetCharacterEquipment()->GetMainWeaponAttachPoint() : MyPawn->GetCharacterEquipment()->GetOffWeaponAttachPoint();
 	}
@@ -132,12 +144,27 @@ void AArenaUtility::UnEquip()
 
 EUtilityType::Type AArenaUtility::GetUtilityType()
 {
-	return UtilityType;
+	return UtilityStats.UtilityType;
 }
 
 EActivationType::Type AArenaUtility::GetActivationType()
 {
-	return ActivationType;
+	return UtilityStats.ActivationType;
+}
+
+EUtilityState::Type AArenaUtility::GetUtilityState()
+{
+	return UtilityState;
+}
+
+void AArenaUtility::SetUtilityState(EUtilityState::Type NewState)
+{
+	UtilityState = NewState;
+}
+
+bool AArenaUtility::GetTargetable()
+{
+	return Targetable;
 }
 
 void AArenaUtility::Activate()
@@ -146,7 +173,7 @@ void AArenaUtility::Activate()
 	{
 		if (!Active)
 		{
-			ConsumeEnergy(ActivationCost);
+			ConsumeEnergy(UtilityStats.ActivationCost);
 			PlayUtilityAnimation();
 		}
 		//Active = true;
@@ -175,6 +202,58 @@ void AArenaUtility::Deactivate()
 void AArenaUtility::ConsumeEnergy(float DeltaSeconds, float Cost)
 {
 	MyPawn->GetCharacterAttributes()->SetCurrentEnergy(MyPawn->GetCharacterAttributes()->GetCurrentEnergy() - (Cost * DeltaSeconds));
+}
+
+void AArenaUtility::FireProjectile()
+{
+	FHitResult Hit = GetAdjustedAim();
+	FVector ShootDir = Hit.ImpactPoint;
+	FVector Origin = GetSocketLocation();
+
+	const int32 RandomSeed = FMath::Rand();
+	FRandomStream WeaponRandomStream(RandomSeed);
+	const float CurrentSpread = 0.0f;
+	const float ConeHalfAngle = FMath::DegreesToRadians(CurrentSpread * 0.5f);
+
+	ShootDir = WeaponRandomStream.VRandCone((ShootDir - Origin).GetSafeNormal(), ConeHalfAngle, ConeHalfAngle);
+
+	//SpawnTrailEffect(Hit.ImpactPoint); may not need this for utilities
+	ServerSpawnProjectile(Origin, ShootDir, Hit);
+	//Test(Origin, ShootDir, Hit);
+
+}
+
+FHitResult AArenaUtility::GetAdjustedAim()
+{
+	AArenaPlayerController* const PlayerController = Instigator ? Cast<AArenaPlayerController>(Instigator->Controller) : NULL;
+	FHitResult Hit(ForceInit);
+	// If we have a player controller use it for the aim
+	if (PlayerController)
+	{
+		UCameraComponent* Camera = GetMyPawn()->FollowCamera;
+		FVector StartTrace = Camera->GetComponentLocation();
+		FVector EndTrace = StartTrace + (Camera->GetForwardVector() * 100000.0f);
+
+		static FName CameraFireTag = FName(TEXT("CameraTrace"));
+
+		//GetWorld()->DebugDrawTraceTag = CameraFireTag;
+
+		FCollisionQueryParams TraceParams(CameraFireTag, true, PlayerController);
+		TraceParams.bTraceAsyncScene = true;
+		TraceParams.bReturnPhysicalMaterial = true;
+
+
+		GetWorld()->LineTraceSingle(Hit, StartTrace, EndTrace, Channel, TraceParams);
+
+		return Hit;// .ImpactPoint;//Camera->GetForwardVector();
+	}
+	return Hit;
+}
+
+FVector AArenaUtility::GetSocketLocation()
+{
+	USkeletalMeshComponent* UseMesh = GetMyPawn()->GetPawnMesh();
+	return UseMesh->GetSocketLocation("UtilityProjectile");
 }
 
 void AArenaUtility::PlayUtilityAnimation_Implementation()
@@ -215,7 +294,7 @@ void AArenaUtility::ServerActivate_Implementation()
 {
 	if (!Active)
 	{
-		ConsumeEnergy(ActivationCost);
+		ConsumeEnergy(UtilityStats.ActivationCost);
 		PlayUtilityAnimation();
 	}
 	//Active = true;
@@ -230,4 +309,104 @@ void AArenaUtility::ServerDeactivate_Implementation()
 {
 	DeactivateBP();
 	//Active = false;
+}
+
+bool AArenaUtility::ServerSpawnProjectile_Validate(FVector Origin, FVector ShootDir, FHitResult Hit)
+{
+	return true;
+}
+void AArenaUtility::ServerSpawnProjectile_Implementation(FVector Origin, FVector ShootDir, FHitResult Hit)
+{
+	if (Hit.bBlockingHit)
+	{
+		FTransform SpawnTM(ShootDir.Rotation(), Origin);
+		AArenaProjectile* Projectile = Cast<AArenaProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileClass, SpawnTM));
+		if (Projectile)
+		{
+			Projectile->SetPawnOwner(MyPawn);
+			Projectile->Instigator = Instigator;
+			Projectile->SetOwner(this);
+			Projectile->SetInitialSpeed(UtilityStats.Velocity);
+			Projectile->SetCollisionChannel(Channel);
+			Projectile->InitVelocity(ShootDir);
+			Projectile->SetDamage(UtilityStats.Damage);
+			Projectile->SetIsExplosive(UtilityStats.IsExplosive);
+			Projectile->SetExplosionRadius(UtilityStats.ExplosionRadius);
+			Projectile->SetIsAffectByVelocity(true);
+			Projectile->SetHitResults(Hit);
+
+			UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
+			Projectile->StartTimer();
+		}
+	}
+	else
+	{
+		ShootDir = MyPawn->FollowCamera->GetForwardVector();
+		FTransform SpawnTM(ShootDir.Rotation(), Origin); //new function
+		AArenaProjectile* Projectile = Cast<AArenaProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileClass, SpawnTM));
+		if (Projectile)
+		{
+			Projectile->SetPawnOwner(MyPawn);
+			Projectile->Instigator = Instigator;
+			Projectile->SetOwner(this);
+			Projectile->SetInitialSpeed(UtilityStats.Velocity);
+			Projectile->SetCollisionChannel(Channel);
+			Projectile->InitVelocity(ShootDir);
+			Projectile->SetDamage(UtilityStats.Damage);
+			Projectile->SetIsExplosive(UtilityStats.IsExplosive);
+			Projectile->SetExplosionRadius(UtilityStats.ExplosionRadius);
+			Projectile->SetIsAffectByVelocity(true);
+
+			UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
+			Projectile->StartTimer();
+		}
+	}
+}
+
+void AArenaUtility::Test(FVector Origin, FVector ShootDir, FHitResult Hit)
+{
+	if (Hit.bBlockingHit)
+	{
+		FTransform SpawnTM(ShootDir.Rotation(), Origin);
+		AArenaProjectile* Projectile = Cast<AArenaProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileClass, SpawnTM));
+		if (Projectile)
+		{
+			Projectile->SetPawnOwner(MyPawn);
+			Projectile->Instigator = Instigator;
+			Projectile->SetOwner(this);
+			Projectile->SetInitialSpeed(UtilityStats.Velocity);
+			Projectile->SetCollisionChannel(Channel);
+			Projectile->InitVelocity(ShootDir);
+			Projectile->SetDamage(UtilityStats.Damage);
+			Projectile->SetIsExplosive(UtilityStats.IsExplosive);
+			Projectile->SetExplosionRadius(UtilityStats.ExplosionRadius);
+			Projectile->SetIsAffectByVelocity(true);
+			Projectile->SetHitResults(Hit);
+
+			UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
+			Projectile->StartTimer();
+		}
+	}
+	else
+	{
+		ShootDir = MyPawn->FollowCamera->GetForwardVector();
+		FTransform SpawnTM(ShootDir.Rotation(), Origin); //new function
+		AArenaProjectile* Projectile = Cast<AArenaProjectile>(UGameplayStatics::BeginSpawningActorFromClass(this, ProjectileClass, SpawnTM));
+		if (Projectile)
+		{
+			Projectile->SetPawnOwner(MyPawn);
+			Projectile->Instigator = Instigator;
+			Projectile->SetOwner(this);
+			Projectile->SetInitialSpeed(UtilityStats.Velocity);
+			Projectile->SetCollisionChannel(Channel);
+			Projectile->InitVelocity(ShootDir);
+			Projectile->SetDamage(UtilityStats.Damage);
+			Projectile->SetIsExplosive(UtilityStats.IsExplosive);
+			Projectile->SetExplosionRadius(UtilityStats.ExplosionRadius);
+			Projectile->SetIsAffectByVelocity(true);
+
+			UGameplayStatics::FinishSpawningActor(Projectile, SpawnTM);
+			Projectile->StartTimer();
+		}
+	}
 }

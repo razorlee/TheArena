@@ -1,5 +1,6 @@
 #include "TheArena.h"
 #include "OnlineAchievementsInterface.h"
+#include "ArenaCharacterCan.h"
 
 #define  ACH_FRAG_SOMEONE	TEXT("ACH_FRAG_SOMEONE")
 #define  ACH_SOME_KILLS		TEXT("ACH_SOME_KILLS")
@@ -36,6 +37,9 @@ AArenaPlayerController::AArenaPlayerController(const class FObjectInitializer& P
 	LastDeathLocation = FVector::ZeroVector;
 	OpenMenu = false;
 
+	// Interact Distance default
+	InteractDistance = 200.f;
+
 	ServerSayString = TEXT("Say");
 	ArenaFriendUpdateTimer = 0.0f;
 	bHasSentStartEvents = false;
@@ -48,6 +52,7 @@ void AArenaPlayerController::SetupInputComponent()
 	InputComponent->BindAction("InGameMenu", IE_Pressed, this, &AArenaPlayerController::OnToggleInGameMenu);
 	InputComponent->BindAction("Inventory", IE_Pressed, this, &AArenaPlayerController::OnToggleInventory);
 	InputComponent->BindAction("Matchmaking", IE_Pressed, this, &AArenaPlayerController::OnToggleMatchmaking);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AArenaPlayerController::OnInteract);
 
 	// voice chat
 	InputComponent->BindAction("PushToTalk", IE_Pressed, this, &APlayerController::StartTalking);
@@ -64,6 +69,63 @@ void AArenaPlayerController::PostInitializeComponents()
 void AArenaPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AArenaPlayerController::Tick(float DeltaSeconds)
+{
+	
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+	if (MyPawn && ArenaCharacterCan::Interact(MyPawn, this))
+	{
+		// Do a ray trace to see if we're looking at any Interactable Objects
+		FHitResult Trace(ForceInit);
+		FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+		bool Hit = InteractTrace(&Trace, &TraceParams);
+
+		AArenaInteractiveObject* Viewed = Cast<AArenaInteractiveObject>(Trace.GetActor());
+		if (Viewed)
+		{
+			if (Viewed != CurrentViewedObject)
+			{
+				if (CurrentViewedObject)
+				{
+					CurrentViewedObject->OnLeave(MyPawn);
+				}
+
+				Viewed->OnView(MyPawn);
+
+				// Set Interactive Text
+				if (Viewed->IsActive())
+				{
+					SetInteractiveMessage(Viewed->GetInteractText());
+				}
+				else
+				{
+					SetInteractiveMessage(FText::FromString(FString("Disabled")));
+				}
+
+				// debug message
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Started viewing")));
+
+				CurrentViewedObject = Viewed;
+			}
+		}
+		else
+		{
+			if (CurrentViewedObject)
+			{
+				CurrentViewedObject->OnLeave(MyPawn);
+
+				// Clear Interactive Text
+				SetInteractiveMessage(FText());
+
+				// debug message
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Stopped viewing")));
+
+				CurrentViewedObject = NULL;
+			}
+		}
+	}
 }
 
 void AArenaPlayerController::UnFreeze()
@@ -135,8 +197,7 @@ bool AArenaPlayerController::FindDeathCameraSpot(FVector& CameraLocation, FRotat
 			return true;
 		}
 	}
-
-	return false;
+	return true;
 }
 
 void AArenaPlayerController::ClientSendRoundEndEvent_Implementation(bool bIsWinner, int32 ExpendedTimeInSeconds)
@@ -199,6 +260,11 @@ void AArenaPlayerController::SimulateInputKey(FKey Key, bool bPressed)
 	InputKey(Key, bPressed ? IE_Pressed : IE_Released, 1, false);
 }
 
+void AArenaPlayerController::EnterSpectatorMode()
+{
+	Reset();
+}
+
 void AArenaPlayerController::OnKill()
 {
 	const auto Events = Online::GetEventsInterface();
@@ -238,6 +304,81 @@ void AArenaPlayerController::OnKill()
 	}
 }
 
+void AArenaPlayerController::ChangeTeam()
+{
+	AArenaPlayerState* CharacterState = Cast<AArenaPlayerState>(PlayerState);
+	if (CharacterState)
+	{
+		if (Role == ROLE_Authority)
+		{
+			AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+			CharacterState->ChangeTeam();
+			//FinishChangeTeam(CharacterState2);
+			MyPawn->Destroyed();
+			MyPawn->Destroy();
+			ChangeState(NAME_Inactive);
+			ServerRestartPlayer();
+		}
+		else
+		{
+			ServerChangeTeam();
+		}
+	}
+	/*if (Role == ROLE_Authority)
+	{
+		FinishChangeTeam(this);
+		//World->RestartPlayer(this);
+	}
+	else
+	{
+		ServerChangeTeam(this);
+	}*/
+}
+void AArenaPlayerController::FinishChangeTeam_Implementation(AArenaPlayerState* CharacterState)
+{
+	if (CharacterState)
+	{
+		CharacterState->ChangeTeam();
+	}
+}
+
+bool AArenaPlayerController::InteractTrace(FHitResult* RV_Hit, FCollisionQueryParams* RV_TraceParams)
+{
+	if (!IsLocalPlayerController())
+	{
+		return false;
+	}
+
+	// get the camera transform
+	FVector CameraLoc;
+	FRotator CameraRot;
+	GetActorEyesViewPoint(CameraLoc, CameraRot);
+
+	FVector Start = CameraLoc;
+	FVector End = CameraLoc + (CameraRot.Vector() * InteractDistance);
+
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+
+	RV_TraceParams->bTraceComplex = true;
+	RV_TraceParams->bTraceAsyncScene = true;
+	RV_TraceParams->bReturnPhysicalMaterial = true;
+	if (MyPawn)
+	{
+		RV_TraceParams->AddIgnoredActor(MyPawn);
+	}
+
+	//  do the line trace
+	bool DidTrace = GetWorld()->LineTraceSingleByChannel(
+		*RV_Hit,        //result
+		Start,        //start
+		End,        //end
+		ECC_Visibility,    //collision channel
+		*RV_TraceParams
+		);
+
+	return DidTrace;
+}
+
 ///////////////////////////////////////////////// INPUT /////////////////////////////////////////////////
 
 void AArenaPlayerController::OnToggleInGameMenu()
@@ -249,6 +390,10 @@ void AArenaPlayerController::OnToggleInGameMenu()
 	if (OpenFriendsList == true)
 	{
 		SetFriendsList(false);
+	}
+	if (OpenInventory == true)
+	{
+		SetInventory(false);
 	}
 	if (OpenMenu == true)
 	{
@@ -282,31 +427,23 @@ void AArenaPlayerController::OnToggleInventory()
 			if (IsInventoryOpen())
 			{
 				SetInventory(false);
+				bAllowGameActions = true;
+
 				bShowMouseCursor = false;
 				bEnableClickEvents = false;
 				bEnableMouseOverEvents = false;
-				return;
 			}
 			else
 			{
 				SetInventory(true);
+				bAllowGameActions = false;
+
 				bShowMouseCursor = true;
 				bEnableClickEvents = true;
 				bEnableMouseOverEvents = true;
-				return;
 			}
 		}
-		SetInventory(false);
-		bShowMouseCursor = false;
-		bEnableClickEvents = false;
-		bEnableMouseOverEvents = false;
-		return;
 	}
-	SetInventory(false);
-	bShowMouseCursor = false;
-	bEnableClickEvents = false;
-	bEnableMouseOverEvents = false;
-	return;
 }
 
 void AArenaPlayerController::OnToggleMatchmaking()
@@ -332,17 +469,19 @@ void AArenaPlayerController::OnToggleMatchmaking()
 				return;
 			}
 		}
-		SetMatchmaking(false);
-		bShowMouseCursor = false;
-		bEnableClickEvents = false;
-		bEnableMouseOverEvents = false;
-		return;
 	}
-	SetMatchmaking(false);
-	bShowMouseCursor = false;
-	bEnableClickEvents = false;
-	bEnableMouseOverEvents = false;
-	return;
+}
+
+void AArenaPlayerController::OnInteract()
+{
+	AArenaCharacter* MyPawn = Cast<AArenaCharacter>(GetPawn());
+	if (MyPawn && CurrentViewedObject && ArenaCharacterCan::Interact(MyPawn, this))
+	{
+		CurrentViewedObject->OnInteract(MyPawn);
+
+		// Debug Message
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Interacted")));
+	}
 }
 
 ////////////////////////////////////////// Getters and Setters //////////////////////////////////////////
@@ -398,7 +537,7 @@ bool AArenaPlayerController::IsMenuOpen() const
 }
 void AArenaPlayerController::SetMenu(bool bEnable)
 {
-	this->OpenMenu = bEnable;
+	OpenMenu = bEnable;
 	if (!OpenMenu && !OpenSettings && !OpenFriendsList)
 	{
 		bAllowGameActions = true;
@@ -418,7 +557,7 @@ bool AArenaPlayerController::IsFriendsListOpen() const
 }
 void AArenaPlayerController::SetFriendsList(bool bEnable)
 {
-	this->OpenFriendsList = bEnable;
+	OpenFriendsList = bEnable;
 }
 
 bool AArenaPlayerController::IsInventoryOpen() const
@@ -427,7 +566,7 @@ bool AArenaPlayerController::IsInventoryOpen() const
 }
 void AArenaPlayerController::SetInventory(bool bEnable)
 {
-	this->OpenInventory = bEnable;
+	OpenInventory = bEnable;
 	if (bEnable)
 	{
 		AArenaCharacter* Owner = Cast<AArenaCharacter>(GetPawnOrSpectator());
@@ -444,7 +583,7 @@ bool AArenaPlayerController::IsMatchmakingOpen() const
 }
 void AArenaPlayerController::SetMatchmaking(bool bEnable)
 {
-	this->OpenMatchmaking = bEnable;
+	OpenMatchmaking = bEnable;
 	if (bEnable)
 	{
 		AArenaCharacter* Owner = Cast<AArenaCharacter>(GetPawnOrSpectator());
@@ -488,7 +627,7 @@ bool AArenaPlayerController::IsSettingsOpen() const
 }
 void AArenaPlayerController::SetSettings(bool bEnable)
 {
-	this->OpenSettings = bEnable;
+	OpenSettings = bEnable;
 	if (!OpenSettings)
 	{
 		bAllowGameActions = true;
@@ -775,7 +914,20 @@ TArray< class APlayerState* > AArenaPlayerController::GetPlayerArray()
 	return Empty;
 }
 
+void AArenaPlayerController::Reset()
+{
+	Super::Reset();
 
+	//PlayerState->bOnlySpectator = true;
+}
 
+bool AArenaPlayerController::ServerChangeTeam_Validate()
+{
+	return true;
+}
+void AArenaPlayerController::ServerChangeTeam_Implementation()
+{
+	ChangeTeam();
+}
 
 

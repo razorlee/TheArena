@@ -6,24 +6,26 @@ ATheArenaGameMode::ATheArenaGameMode(const class FObjectInitializer& PCIP)
 	: Super(PCIP)
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnOb(TEXT("/Game/Blueprints/Pawns/BP_ArenaCharacter"));
-	DefaultPawnClass = PlayerPawnOb.Class;
-
+	static ConstructorHelpers::FClassFinder<ASpectatorPawn> SpectatorPawnOb(TEXT("/Game/Blueprints/Pawns/BP_ArenaSpectator"));
+	static ConstructorHelpers::FClassFinder<AHUD> ArenaHUD(TEXT("/Game/UI/HUD/Blueprints/Arena_HUD"));
+	
 	//static ConstructorHelpers::FClassFinder<APawn> BotPawnOb(TEXT("/Game/Blueprints/Pawns/ArenaAI"));
 	//BotPawnClass = BotPawnOb.Class;
 
-	static ConstructorHelpers::FClassFinder<AHUD> ArenaHUD(TEXT("/Game/UI/HUD/Blueprints/Arena_HUD"));
+	DefaultPawnClass = PlayerPawnOb.Class;
 	HUDClass = ArenaHUD.Class;
-
 	PlayerControllerClass = AArenaPlayerController::StaticClass();
 	PlayerStateClass = AArenaPlayerState::StaticClass();
-	//SpectatorClass = AArenaSpectatorPawn::StaticClass();
+	SpectatorClass = SpectatorPawnOb.Class;
 	GameStateClass = AArenaGameState::StaticClass();
 
-	MinRespawnDelay = 0.0f;
+	MinRespawnDelay = 15.0f;
 
 	bAllowBots = false;
 	bTeamEliminated = false;
 	bUseSeamlessTravel = true;
+	bStartPlayersAsSpectators = false;
+	InactivePlayerStateLifeSpan = 30.0f;
 }
 
 FString ATheArenaGameMode::GetBotsCountOptionName()
@@ -73,7 +75,7 @@ void ATheArenaGameMode::DefaultTimer()
 		{
 			StartMatch();
 		}
-		return;
+		//return;
 	}
 
 	AArenaGameState* const MyGameState = Cast<AArenaGameState>(GameState);
@@ -84,15 +86,6 @@ void ATheArenaGameMode::DefaultTimer()
 		{
 			if (GetMatchState() == MatchState::WaitingPostMatch)
 			{
-				for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
-				{
-					AArenaPlayerController* PlayerController = Cast<AArenaPlayerController>(*It);
-
-					if (PlayerController && MyGameState)
-					{
-						PlayerController->SetMatchOver(false);
-					}
-				}
 				RestartGame();
 			}
 			else if (GetMatchState() == MatchState::InProgress)
@@ -166,7 +159,10 @@ void ATheArenaGameMode::FinishMatch()
 	if (IsMatchInProgress())
 	{
 		EndMatch();
-		DetermineMatchWinner();
+		if (Role == ROLE_Authority)
+		{
+			DetermineMatchWinner();
+		}
 
 		// notify players
 		for (FConstControllerIterator It = GetWorld()->GetControllerIterator(); It; ++It)
@@ -186,6 +182,7 @@ void ATheArenaGameMode::FinishMatch()
 		}
 
 		// set up to restart the match
+		bTeamEliminated = false;
 		MyGameState->RemainingTime = TimeBetweenMatches;
 	}
 }
@@ -293,7 +290,7 @@ void ATheArenaGameMode::Killed(AController* Killer, AController* KilledPlayer, A
 		VictimPlayerState->ScoreDeath(KillerPlayerState, DeathScore);
 		VictimPlayerState->BroadcastDeath(KillerPlayerState, DamageType, VictimPlayerState);
 	}
-	CheckTeamElimination();
+	//CheckTeamElimination();
 }
 
 float ATheArenaGameMode::ModifyDamage(float Damage, AActor* DamagedActor, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const

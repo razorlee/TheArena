@@ -1734,6 +1734,15 @@ void UArenaGameInstance::DisplayOnlinePrivilegeFailureDialogs(const FUniqueNetId
 	}*/
 }
 
+FString UArenaGameInstance::GetSessionID()
+{
+	return SessionID;
+}
+void UArenaGameInstance::SetSessionID(FString NewSessionID)
+{
+	SessionID = NewSessionID;
+}
+
 void UArenaGameInstance::OnRegisterLocalPlayerComplete(const FUniqueNetId& PlayerId, EOnJoinSessionCompleteResult::Type Result)
 {
 	FinishSessionCreation(Result);

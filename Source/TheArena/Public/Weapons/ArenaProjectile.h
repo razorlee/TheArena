@@ -87,7 +87,7 @@ private:
 protected:
 
 	/** pawn owner */
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
 	class AArenaCharacter* MyPawn;
 
 	FHitResult HitResults;

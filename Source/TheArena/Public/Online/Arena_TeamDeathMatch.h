@@ -22,6 +22,10 @@ class THEARENA_API AArena_TeamDeathMatch : public ATheArenaGameMode
 
 	/** can players damage each other? */
 	virtual bool CanDealDamage(class AArenaPlayerState* DamageInstigator, class AArenaPlayerState* DamagedPlayer) const override;
+
+	/** check if won */
+	UFUNCTION(BlueprintCallable, Category = Match)
+	virtual void CheckTeamElimination() override;
 	
 protected:
 
@@ -42,9 +46,6 @@ protected:
 
 	/** check who won */
 	virtual void DetermineMatchWinner() override;
-
-	/** check if won */
-	virtual void CheckTeamElimination() override;
 
 	/** check if PlayerState is a winner */
 	virtual bool IsWinner(class AArenaPlayerState* PlayerState) const override;

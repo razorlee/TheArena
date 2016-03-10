@@ -40,7 +40,10 @@ void AArenaArmor::Tick( float DeltaTime )
 
 }
 
-
+void AArenaArmor::Destroyed()
+{
+	Super::Destroyed();
+}
 
 class AArenaCharacter* AArenaArmor::GetMyPawn() const
 {
@@ -50,6 +53,15 @@ void AArenaArmor::SetMyPawn(AArenaCharacter* Pawn)
 {
 	MyPawn = Pawn;
 	SetOwner(Pawn);
+}
+
+FString AArenaArmor::GetDescription()
+{
+	return ArmorDescription;
+}
+void AArenaArmor::SetDescription(FString Value)
+{
+	ArmorDescription = Value;
 }
 
 FName AArenaArmor::GetArmorName() const

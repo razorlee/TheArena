@@ -2,9 +2,6 @@
 
 #include "TheArena.h"
 
-//////////////////////////////////////////////////////////////////////////
-// AArenaCharacter
-
 AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	: Super(PCIP.SetDefaultSubobjectClass<UArenaCharacterMovement>(ACharacter::CharacterMovementComponentName))
 {
@@ -34,7 +31,7 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-	
+
 	//Mesh = PCIP.CreateDefaultSubobject<USkeletalMeshComponent>(this, TEXT("PawnMesh"));
 	GetMesh()->AttachParent = GetCapsuleComponent();
 	GetMesh()->bOnlyOwnerSee = false;
@@ -63,15 +60,17 @@ AArenaCharacter::AArenaCharacter(const class FObjectInitializer& PCIP)
 	CameraBoom = PCIP.CreateDefaultSubobject<USpringArmComponent>(this, TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
 	CameraBoom->TargetArmLength = 150.0f;
-	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f); 
+	CameraBoom->SocketOffset = FVector(0.0f, 50.0f, 50.0f);
 	CameraBoom->bUsePawnControlRotation = true;
-	
+
 	// Create a follow camera
 	FollowCamera = PCIP.CreateDefaultSubobject<UCameraComponent>(this, TEXT("FollowCamera"));
 	FollowCamera->AttachTo(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	//FollowCamera->scale
+												   //FollowCamera->scale
 
+	Http = &FHttpModule::Get();
+	TargetHost = FString::Printf(TEXT("http://www.appspot.com"));
 	Busy = false;
 	Spawned = false;
 	ReadySpawned = false;
@@ -85,8 +84,9 @@ void AArenaCharacter::PostInitializeComponents()
 	CharacterState->SetMyPawn(this);
 	CharacterEquipment->SetMyPawn(this);
 
-	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.25f, false);
+	Http = &FHttpModule::Get();
 
+	//GetWorldTimerManager().SetTimer(this, &AArenaCharacter::LoadPersistence, 0.25f, false);
 	//LoadPersistence();
 	if (IsRunningGame() || IsRunningDedicatedServer())
 	{
@@ -139,6 +139,7 @@ void AArenaCharacter::BeginPlay()
 
 void AArenaCharacter::SaveCharacter()
 {
+	// this will be a function that sends an updated JSON object to server
 	SaveGameInstance = Cast<UArenaSaveGame>(UGameplayStatics::CreateSaveGameObject(UArenaSaveGame::StaticClass()));
 
 	SaveGameInstance->PrimaryWeapon = CharacterEquipment->GetPrimaryWeaponBP();
@@ -178,6 +179,14 @@ void AArenaCharacter::LoadPersistence()
 	//{
 	//	ServerSetName(Name);
 	//}
+	TSharedRef < IHttpRequest > Request = Http->CreateRequest();
+	Request->SetVerb("POST");
+	//Request->SetURL(TargetHost + CurrentRequest.TheDest);
+	//Request->SetContentAsString(CurrentRequest.TheData);
+	Request->SetHeader("User-Agent", "SagittariusLinkClient/1.0");
+	Request->SetHeader("Content-Type", "application/x-www-form-urlencoded");
+
+	//Request->OnProcessRequestComplete().BindUObject(this, &USagittariusLinkClient::OnResponseReceived);
 
 	if (IsLocallyControlled())
 	{
@@ -233,28 +242,56 @@ void AArenaCharacter::LoadPersistence()
 	Spawned = true;
 }
 
+void AArenaCharacter::SpawnEquipment()
+{
+	LoadPersistence();
+}
+
+void AArenaCharacter::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		if (Response.IsValid())
+		{
+			TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject());
+			SpawnEquipment();
+			ApplyArmorStats();
+		}
+		else
+		{
+
+		}
+	}
+	else
+	{
+
+	}
+}
+
 ////////////////////////////////////////// Character Defaults //////////////////////////////////////////
 
 void AArenaCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
-	if (MyPC)
-	{
-		CharacterAttributes->Regenerate(DeltaSeconds);
-		CharacterMovementComponent->ManageState(DeltaSeconds);
-	}
-
 	if (!Spawned && ReadySpawned)
 	{
 		LoadPersistence();
 	}
-
-	AArenaPlayerState* MyPlayerState = Cast<AArenaPlayerState>(PlayerState);
-	if (MyPlayerState)
+	else if (Spawned)
 	{
-		MyPlayerState->MyPawn = this;
+		AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+		if (MyPC)
+		{
+			CharacterAttributes->Regenerate(DeltaSeconds);
+			CharacterMovementComponent->ManageState(DeltaSeconds);
+		}
+
+		AArenaPlayerState* MyPlayerState = Cast<AArenaPlayerState>(PlayerState); //test without this
+		if (MyPlayerState)
+		{
+			MyPlayerState->MyPawn = this;
+		}
 	}
 }
 
@@ -334,9 +371,9 @@ void AArenaCharacter::SetLocation_Implementation()
 {
 	if (CharacterState->GetPlayerState() == EPlayerState::Covering
 		&& (CharacterState->GetCoverState() == ECoverState::HighLeft
-		|| CharacterState->GetCoverState() == ECoverState::HighRight
-		|| CharacterState->GetCoverState() == ECoverState::LowLeft
-		|| CharacterState->GetCoverState() == ECoverState::LowRight))
+			|| CharacterState->GetCoverState() == ECoverState::HighRight
+			|| CharacterState->GetCoverState() == ECoverState::LowLeft
+			|| CharacterState->GetCoverState() == ECoverState::LowRight))
 	{
 		SetActorLocation(CharacterMovementComponent->GetLocation());
 		CurrentWeapon->GetWeaponState()->SetCoverTargeting(false);
@@ -381,6 +418,8 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 
 	InputComponent->BindAction("SwapWeapon", IE_Pressed, this, &AArenaCharacter::OnSwapWeapon);
 
+	InputComponent->BindAction("SwitchShoulder", IE_Pressed, this, &AArenaCharacter::OnSwitchShoulder);
+
 	InputComponent->BindAction("Reload", IE_Pressed, this, &AArenaCharacter::OnReload);
 
 	InputComponent->BindAction("Melee", IE_Pressed, this, &AArenaCharacter::OnMelee);
@@ -398,6 +437,14 @@ void AArenaCharacter::SetupPlayerInputComponent(class UInputComponent* InputComp
 
 	InputComponent->BindAction("RightWaist", IE_Pressed, this, &AArenaCharacter::OnActivateRightWaist);
 	InputComponent->BindAction("RightWaist", IE_Released, this, &AArenaCharacter::OnDeactivateRightWaist);
+
+	InputComponent->BindAction("LeftWrist", IE_Pressed, this, &AArenaCharacter::OnActivateLeftWrist);
+	InputComponent->BindAction("LeftWrist", IE_Released, this, &AArenaCharacter::OnDeactivateLeftWrist);
+
+	InputComponent->BindAction("RightWrist", IE_Pressed, this, &AArenaCharacter::OnActivateRightWrist);
+	InputComponent->BindAction("RightWrist", IE_Released, this, &AArenaCharacter::OnDeactivateRightWrist);
+
+	InputComponent->BindAction("CancelAction", IE_Pressed, this, &AArenaCharacter::OnCancelAction);
 }
 
 void AArenaCharacter::MoveForward(float Value)
@@ -653,7 +700,7 @@ void AArenaCharacter::OnToggleCombat()
 	if (ArenaCharacterCan::ToggleCombat(this, MyPC))
 	{
 		if (Role == ROLE_Authority)
-		{	
+		{
 			ToggleCombat();
 		}
 		else
@@ -675,6 +722,15 @@ void AArenaCharacter::OnSwapWeapon()
 		{
 			ServerSwapWeapon();
 		}
+	}
+}
+void AArenaCharacter::OnSwitchShoulder()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	AArenaPlayerCameraManager* Camera = Cast<AArenaPlayerCameraManager>(MyPC->PlayerCameraManager);
+	if (ArenaCharacterCan::SwitchShoulder(this, MyPC) && Camera)
+	{
+		Camera->ToggleShoulder();
 	}
 }
 void AArenaCharacter::OnReload()
@@ -772,162 +828,203 @@ void AArenaCharacter::OnDeactivateRightWaist()
 		RightWaistUtility->Deactivate();
 	}
 }
-
-////////////////////////////////////////// Action Functions //////////////////////////////////////////
-
-void AArenaCharacter::InitializeWeapons(
-class AArenaWeapon* mainWeapon,
-class AArenaWeapon* offWeapon,
-class AArenaUtility* Head,
-class AArenaUtility* UpperBack,
-class AArenaUtility* LowerBack,
-class AArenaUtility* LeftWaist,
-class AArenaUtility* RightWaist,
-class AArenaUtility* LeftWrist,
-class AArenaUtility* RightWrist,
-class AArenaArmor* HeadA,
-class AArenaArmor* ShoulderA,
-class AArenaArmor* ChestA,
-class AArenaArmor* HandsA,
-class AArenaArmor* LegsA,
-class AArenaArmor* FeetA)
+void AArenaCharacter::OnActivateLeftWrist()
 {
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (ArenaCharacterCan::Wrist(LeftWristUtility, this, MyPC))
+	{
+		if (LeftWristUtility->GetActivationType() == EActivationType::Activate && LeftWristUtility->GetTargetable())
+		{
+			OnUtilityStartTarget(LeftWristUtility);
+
+			if (GetPlayerState()->GetPlayerState() == EPlayerState::Covering) {
+				OnStartPeaking();
+			}
+		}
+		else
+		{
+			LeftWristUtility->Activate();
+		}
+	}
+}
+void AArenaCharacter::OnDeactivateLeftWrist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (LeftWristUtility)
+	{
+		if (LeftWristUtility->GetActivationType() == EActivationType::Activate && ArenaCharacterCan::Wrist(LeftWristUtility, this, MyPC) && CurrentUtility)
+		{
+			OnUtilityStopTarget();
+
+			if (GetPlayerState()->GetPlayerState() == EPlayerState::Covering) {
+				OnStopPeaking();
+				//GetWorldTimerManager().SetTimer(FTimerHandle(), this, &AArenaCharacter::OnStopPeaking, 0.5f, false);
+			}
+		}
+		else
+		{
+			LeftWristUtility->Deactivate();
+		}
+	}
+}
+void AArenaCharacter::OnActivateRightWrist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (ArenaCharacterCan::Wrist(RightWristUtility, this, MyPC))
+	{
+		if (RightWristUtility->GetActivationType() == EActivationType::Activate && RightWristUtility->GetTargetable())
+		{
+			OnUtilityStartTarget(RightWristUtility);
+
+			if (GetPlayerState()->GetPlayerState() == EPlayerState::Covering) {
+				OnStartPeaking();
+			}
+		}
+		else
+		{
+			RightWristUtility->Activate();
+		}
+	}
+}
+void AArenaCharacter::OnDeactivateRightWrist()
+{
+	AArenaPlayerController* MyPC = Cast<AArenaPlayerController>(Controller);
+	if (RightWristUtility)
+	{
+		if (RightWristUtility->GetActivationType() == EActivationType::Activate && ArenaCharacterCan::Wrist(RightWristUtility, this, MyPC) && CurrentUtility)
+		{
+			OnUtilityStopTarget();
+
+			if (GetPlayerState()->GetPlayerState() == EPlayerState::Covering) {
+				OnStopPeaking();
+			}
+		}
+		else
+		{
+			RightWristUtility->Deactivate();
+		}
+	}
+}
+void AArenaCharacter::OnUtilityStartTarget(AArenaUtility* Utility)
+{
+	CurrentUtility = Utility;
 	if (Role == ROLE_Authority)
 	{
-		if (PrimaryWeapon)
-		{
-			PrimaryWeapon->SetOwningPawn(this);
-			PrimaryWeapon->FinishUnEquip();
-		}
-		if (SecondaryWeapon)
-		{
-			SecondaryWeapon->SetOwningPawn(this);;
-			SecondaryWeapon->FinishUnEquip();
-		}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-		if (HeadUtility)
-		{
-			HeadUtility->SetMyPawn(this);
-		}
-		if (UpperBackUtility)
-		{
-			UpperBackUtility->SetMyPawn(this);
-			UpperBackUtility->Equip();
-		}
-		if (LowerBackUtility)
-		{
-			LowerBackUtility->SetMyPawn(this);
-		}
-		if (LeftWristUtility)
-		{
-			LeftWristUtility->SetMyPawn(this);
-		}
-		if (RightWristUtility)
-		{
-			RightWristUtility->SetMyPawn(this);
-		}
-		if (LeftWaistUtility)
-		{
-			LeftWaistUtility->SetMyPawn(this);
-			LeftWaistUtility->Equip();
-		}
-		if (RightWaistUtility)
-		{
-			RightWaistUtility->SetMyPawn(this);
-			RightWaistUtility->Equip();
-		}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-
-		if (ChestArmor)
-		{
-			ChestArmor->SetMyPawn(this);
-			ChestArmor->Equip();
-		}
-		if (HandArmor)
-		{
-			HandArmor->SetMyPawn(this);
-			HandArmor->Equip();
-		}
-		if (HeadArmor)
-		{
-			HeadArmor->SetMyPawn(this);
-			HeadArmor->Equip();
-		}
-		if (FeetArmor)
-		{
-			FeetArmor->SetMyPawn(this);
-			FeetArmor->Equip();
-		}
-		if (LegArmor)
-		{
-			LegArmor->SetMyPawn(this);
-			LegArmor->Equip();
-		}
-		if (ShoulderArmor)
-		{
-			ShoulderArmor->SetMyPawn(this);
-			ShoulderArmor->Equip();
-		}
+		StartUtilityTarget();
 	}
 	else
 	{
-		ServerInitializeWeapons(
-		mainWeapon,
-		offWeapon,
-		Head,
-		UpperBack,
-		LowerBack,
-		LeftWaist,
-		RightWaist,
-		LeftWrist,
-		RightWrist,
-		HeadA,
-		ShoulderA,
-		ChestA,
-		HandsA,
-		LegsA,
-		FeetA);
+		ServerStartUtilityTarget();
+	}
+}
+void AArenaCharacter::OnUtilityStopTarget()
+{
+	if (Role == ROLE_Authority)
+	{
+		StopUtilityTarget();
+	}
+	else
+	{
+		ServerStopUtilityTarget();
+	}
+}
+void AArenaCharacter::OnCancelAction()
+{
+	if (Role == ROLE_Authority)
+	{
+		CancelAction();
+	}
+	else
+	{
+		ServerCancelAction();
+	}
+}
+
+////////////////////////////////////////// Action Functions //////////////////////////////////////////
+
+void AArenaCharacter::InitializeWeapons()
+{
+	if (Role == ROLE_Authority)
+	{
+		PrimaryWeapon->SetOwningPawn(this);
+		PrimaryWeapon->FinishUnEquip();
+
+		SecondaryWeapon->SetOwningPawn(this);;
+		SecondaryWeapon->FinishUnEquip();
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+
+		HeadUtility->SetMyPawn(this);
+
+		UpperBackUtility->SetMyPawn(this);
+		UpperBackUtility->Equip();
+
+		LowerBackUtility->SetMyPawn(this);
+
+		LeftWristUtility->SetMyPawn(this);
+
+		RightWristUtility->SetMyPawn(this);
+
+		LeftWaistUtility->SetMyPawn(this);
+		LeftWaistUtility->Equip();
+
+		RightWaistUtility->SetMyPawn(this);
+		RightWaistUtility->Equip();
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+
+		ChestArmor->SetMyPawn(this);
+		ChestArmor->Equip();
+
+		HandArmor->SetMyPawn(this);
+		HandArmor->Equip();
+
+		HeadArmor->SetMyPawn(this);
+		HeadArmor->Equip();
+
+		FeetArmor->SetMyPawn(this);
+		FeetArmor->Equip();
+
+		LegArmor->SetMyPawn(this);
+		LegArmor->Equip();
+
+		ShoulderArmor->SetMyPawn(this);
+		ShoulderArmor->Equip();
+	}
+	else
+	{
+		ServerInitializeWeapons();
 	}
 }
 
 void AArenaCharacter::ApplyArmorStats()
 {
-	this;
-	CharacterAttributes->SetProtection(0.0);
-	CharacterAttributes->SetSpeed(0.0);
-
-	if (ChestArmor)
+	if (Role == ROLE_Authority)
 	{
+		CharacterAttributes->SetProtection(0.0);
+		CharacterAttributes->SetSpeed(0.0);
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + ChestArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + ChestArmor->GetMotility());
-	}
-	if (HandArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + HandArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + HandArmor->GetMotility());
-	}
-	if (HeadArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + HeadArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + HeadArmor->GetMotility());
-	}
-	if (FeetArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + FeetArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + FeetArmor->GetMotility());
-	}
-	if (LegArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + LegArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + LegArmor->GetMotility());
-	}
-	if (ShoulderArmor)
-	{
+
 		CharacterAttributes->SetProtection(CharacterAttributes->GetProtection() + ShoulderArmor->GetProtection());
 		CharacterAttributes->SetSpeed(CharacterAttributes->GetSpeed() + ShoulderArmor->GetMotility());
+	}
+	else
+	{
+		ServerApplyArmorStats();
 	}
 }
 
@@ -1027,6 +1124,20 @@ void AArenaCharacter::StopTargeting_Implementation()
 	{
 
 	}
+}
+
+void AArenaCharacter::StartUtilityTarget_Implementation()
+{
+	CurrentUtility->SetUtilityState(EUtilityState::Targeting);
+}
+void AArenaCharacter::StopUtilityTarget_Implementation()
+{
+	CurrentUtility->Activate();
+
+	CurrentUtility->SetUtilityState(EUtilityState::Default);
+
+	CurrentUtility->Deactivate();
+	CurrentUtility = NULL;
 }
 
 void AArenaCharacter::StartPeaking_Implementation()
@@ -1159,7 +1270,7 @@ void AArenaCharacter::FinishEquipWeapon(class AArenaWeapon* Weapon)
 		Weapon->Equip();
 	}
 }
-	
+
 float AArenaCharacter::UnEquipWeapon()
 {
 	return FinishUnEquipWeapon(CurrentWeapon);
@@ -1224,6 +1335,16 @@ void AArenaCharacter::StopClimb_Implementation()
 	StopAnimMontage(CharacterMovementComponent->GetClimbAnimation());
 }
 
+void AArenaCharacter::CancelAction_Implementation()
+{
+	if (GetUtilityTargeting())
+	{
+		CurrentUtility->SetUtilityState(EUtilityState::Default);
+		CurrentUtility = NULL;
+		return;
+	}
+}
+
 ////////////////////////////////////////// Character Components //////////////////////////////////////////
 
 USkeletalMeshComponent* AArenaCharacter::GetPawnMesh() const
@@ -1270,6 +1391,18 @@ void AArenaCharacter::SetName_Implementation(const FString& NewName)
 	Name = NewName;
 }
 
+bool AArenaCharacter::GetTargeting() {
+	if (CurrentWeapon->GetWeaponState()->GetTargetingState() == ETargetingState::Targeting) {
+		return true;
+	}
+
+	return (CurrentUtility && CurrentUtility->GetUtilityState() == EUtilityState::Targeting);
+}
+
+bool AArenaCharacter::GetUtilityTargeting() {
+	return (CurrentUtility && CurrentUtility->GetUtilityState() == EUtilityState::Targeting);
+}
+
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
 
 AArenaWeapon* AArenaCharacter::GetCurrentWeapon()
@@ -1301,13 +1434,16 @@ AArenaWeapon* AArenaCharacter::GetPrimaryWeapon()
 }
 void AArenaCharacter::SetPrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
 {
-	if (Role == ROLE_Authority)
+	if (Weapon)
 	{
-		HandlePrimaryWeapon(Weapon);
-	}
-	else
-	{
-		ServerSetPrimaryWeapon(Weapon);
+		if (Role == ROLE_Authority)
+		{
+			HandlePrimaryWeapon(Weapon);
+		}
+		else
+		{
+			ServerSetPrimaryWeapon(Weapon);
+		}
 	}
 }
 void AArenaCharacter::HandlePrimaryWeapon(TSubclassOf<class AArenaWeapon> Weapon)
@@ -1636,6 +1772,11 @@ void AArenaCharacter::HandleRightWaistUtility(TSubclassOf<class AArenaUtility> U
 	}
 }
 
+class AArenaUtility* AArenaCharacter::GetCurrentUtility()
+{
+	return CurrentUtility;
+}
+
 ////////////////////////////////////////// Damage & Death //////////////////////////////////////////
 
 class AArenaArmor* AArenaCharacter::GetHeadArmor()
@@ -1959,6 +2100,12 @@ bool AArenaCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, 
 		return false;
 	}
 
+	AArenaPlayerController* PC = Cast<AArenaPlayerController>(Controller);
+	PC->SetMenu(false);
+	PC->SetFriendsList(false);
+	PC->SetSettings(false);
+	PC->SetInventory(false);
+
 	CharacterAttributes->SetCurrentHealth(FMath::Min(0.0f, CharacterAttributes->GetCurrentHealth()));
 
 	// if this is an environmental death then refer to the previous killer so that they receive credit (knocked into lava pits, etc)
@@ -1966,12 +2113,13 @@ bool AArenaCharacter::Die(float KillingDamage, FDamageEvent const& DamageEvent, 
 	Killer = GetDamageInstigator(Killer, *DamageType);
 
 	AController* const KilledPlayer = (Controller != NULL) ? Controller : Cast<AController>(GetOwner());
-	GetWorld()->GetAuthGameMode<ATheArenaGameMode>()->Killed(Killer, KilledPlayer, this, DamageType);
+
 
 	NetUpdateFrequency = GetDefault<AArenaCharacter>()->NetUpdateFrequency;
 	GetCharacterMovement()->ForceReplicationUpdate();
 
 	OnDeath(KillingDamage, DamageEvent, Killer ? Killer->GetPawn() : NULL, DamageCauser);
+	GetWorld()->GetAuthGameMode<ATheArenaGameMode>()->Killed(Killer, KilledPlayer, this, DamageType);
 	return true;
 }
 
@@ -1987,12 +2135,12 @@ void AArenaCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Da
 	//Spawned = false;
 	CharacterAttributes->bIsDying = true;
 
+	AArenaPlayerController* PC = Cast<AArenaPlayerController>(Controller);
 	if (Role == ROLE_Authority)
 	{
 		ReplicateHit(KillingDamage, DamageEvent, PawnInstigator, DamageCauser, true);
 
 		// play the force feedback effect on the client player controller
-		APlayerController* PC = Cast<APlayerController>(Controller);
 		if (PC && DamageEvent.DamageTypeClass)
 		{
 			UArenaDamageType *DamageType = Cast<UArenaDamageType>(DamageEvent.DamageTypeClass->GetDefaultObject());
@@ -2001,6 +2149,7 @@ void AArenaCharacter::OnDeath(float KillingDamage, struct FDamageEvent const& Da
 				PC->ClientPlayForceFeedback(DamageType->KilledForceFeedback, false, "Damage");
 			}
 		}
+		PC->EnterSpectatorMode();
 	}
 
 	// cannot use IsLocallyControlled here, because even local client's controller may be NULL here
@@ -2099,7 +2248,7 @@ void AArenaCharacter::SetRagdollPhysics()
 	}
 	else
 	{
-		SetLifeSpan(900.0f);
+		SetLifeSpan(15.0f);
 	}
 }
 
@@ -2152,49 +2301,128 @@ void AArenaCharacter::DestroyInventory()
 		Weapon->Destroy();
 	}
 
-	AArenaUtility* Utility = UpperBackUtility;
+	AArenaUtility* Utility = HeadUtility;
 	if (Utility)
 	{
 		Utility->UnEquip();
 		Utility->Destroy();
 	}
 
+	Utility = UpperBackUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = LowerBackUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = LeftWaistUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = RightWaistUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = LeftWristUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	Utility = RightWristUtility;
+	if (Utility)
+	{
+		Utility->UnEquip();
+		Utility->Destroy();
+	}
+
+	AArenaArmor* Armor = HeadArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = ShoulderArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = ChestArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = HandArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = LegArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
+
+	Armor = FeetArmor;
+	if (Armor)
+	{
+		Armor->UnEquip();
+		Armor->Destroy();
+	}
 }
 
 /*void AArenaCharacter::AttackTrace()
 {
-	//Overlapping actors for each box spawned will be stored here
-	TArray<struct FOverlapResult> OutOverlaps;
-	//The initial rotation of our box is the same as our character rotation
-	FQuat Rotation = Instigator->GetTransform().GetRotation();
-	FVector Start = Instigator->GetTransform().GetLocation() + Rotation.Rotator().Vector() * 100.0f;
-
-	FCollisionShape CollisionHitShape;
-	FCollisionQueryParams CollisionParams;
-	//We do not want to store the instigator character in the array, so ignore it's collision
-	CollisionParams.AddIgnoredActor(Instigator);
-
-	//Set the channels that will respond to the collision
-	FCollisionObjectQueryParams CollisionObjectTypes;
-	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
-	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
-	CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-
-	//Create the box and get the overlapping actors
-	CollisionHitShape = FCollisionShape::MakeBox(FVector(60.0f, 60.0f, 0.5f));
-	GetWorld()->OverlapMulti(OutOverlaps, Start, Rotation, CollisionHitShape, CollisionParams, CollisionObjectTypes);
-
-	//Process all hit actors
-	for (int i = 0; i < OutOverlaps.Num(); ++i)
-	{
-		//We process each actor only once per Attack execution
-		if (OutOverlaps[i].GetActor() && !HitActors.Contains(OutOverlaps[i].GetActor()))
-		{
-			//Process the actor to deal damage
-			CurrentWeapon->Melee(OutOverlaps[i].GetActor(), HitActors);
-			ServerMeleeAttack(CurrentWeapon, OutOverlaps[i].GetActor(), HitActors);
-		}
-	}
+//Overlapping actors for each box spawned will be stored here
+TArray<struct FOverlapResult> OutOverlaps;
+//The initial rotation of our box is the same as our character rotation
+FQuat Rotation = Instigator->GetTransform().GetRotation();
+FVector Start = Instigator->GetTransform().GetLocation() + Rotation.Rotator().Vector() * 100.0f;
+FCollisionShape CollisionHitShape;
+FCollisionQueryParams CollisionParams;
+//We do not want to store the instigator character in the array, so ignore it's collision
+CollisionParams.AddIgnoredActor(Instigator);
+//Set the channels that will respond to the collision
+FCollisionObjectQueryParams CollisionObjectTypes;
+CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_PhysicsBody);
+CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_Pawn);
+CollisionObjectTypes.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+//Create the box and get the overlapping actors
+CollisionHitShape = FCollisionShape::MakeBox(FVector(60.0f, 60.0f, 0.5f));
+GetWorld()->OverlapMulti(OutOverlaps, Start, Rotation, CollisionHitShape, CollisionParams, CollisionObjectTypes);
+//Process all hit actors
+for (int i = 0; i < OutOverlaps.Num(); ++i)
+{
+//We process each actor only once per Attack execution
+if (OutOverlaps[i].GetActor() && !HitActors.Contains(OutOverlaps[i].GetActor()))
+{
+//Process the actor to deal damage
+CurrentWeapon->Melee(OutOverlaps[i].GetActor(), HitActors);
+ServerMeleeAttack(CurrentWeapon, OutOverlaps[i].GetActor(), HitActors);
+}
+}
 }*/
 
 ////////////////////////////////////////// Animation Controls //////////////////////////////////////////
@@ -2448,6 +2676,33 @@ void AArenaCharacter::ServerStopTargeting_Implementation()
 	StopTargeting();
 }
 
+bool AArenaCharacter::ServerStartUtilityTarget_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerStartUtilityTarget_Implementation()
+{
+	StartTargeting();
+}
+
+bool AArenaCharacter::ServerStopUtilityTarget_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerStopUtilityTarget_Implementation()
+{
+	StopTargeting();
+}
+
+bool AArenaCharacter::ServerCancelAction_Validate()
+{
+	return true;
+}
+void AArenaCharacter::ServerCancelAction_Implementation()
+{
+	CancelAction();
+}
+
 bool AArenaCharacter::ServerStartPeaking_Validate()
 {
 	return true;
@@ -2531,12 +2786,12 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(
 		SecondaryWeapon = GetWorld()->SpawnActor<AArenaWeapon>(OffWeapon, SpawnInfo);
 	}
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	if (Head)
 	{
-		HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetHeadUtilityBP(), SpawnInfo);
+		HeadUtility = GetWorld()->SpawnActor<AArenaUtility>(Head, SpawnInfo);
 	}
 	if (UpperBack)
 	{
@@ -2544,68 +2799,53 @@ void AArenaCharacter::ServerSpawnEquipment_Implementation(
 	}
 	if (LowerBack)
 	{
-		LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLowerBackUtilityBP(), SpawnInfo);
+		LowerBackUtility = GetWorld()->SpawnActor<AArenaUtility>(LowerBack, SpawnInfo);
 	}
 	if (LeftWaist)
 	{
-		 LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWaistUtilityBP(), SpawnInfo);
+		LeftWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(LeftWaist, SpawnInfo);
 	}
 	if (RightWaist)
 	{
-		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWaistUtilityBP(), SpawnInfo);
+		RightWaistUtility = GetWorld()->SpawnActor<AArenaUtility>(RightWaist, SpawnInfo);
 	}
 	if (LeftWrist)
 	{
-		LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetLeftWristUtilityBP(), SpawnInfo);
+		LeftWristUtility = GetWorld()->SpawnActor<AArenaUtility>(LeftWrist, SpawnInfo);
 	}
 	if (RightWrist)
 	{
-		RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(CharacterEquipment->GetRightWristUtilityBP(), SpawnInfo);
+		RightWristUtility = GetWorld()->SpawnActor<AArenaUtility>(RightWrist, SpawnInfo);
 	}
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	if (ChestA)
 	{
-		ChestArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetChestArmorBP(), SpawnInfo);
+		ChestArmor = GetWorld()->SpawnActor<AArenaArmor>(ChestA, SpawnInfo);
 	}
 	if (HandsA)
 	{
-		HandArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHandsArmorBP(), SpawnInfo);
+		HandArmor = GetWorld()->SpawnActor<AArenaArmor>(HandsA, SpawnInfo);
 	}
 	if (HeadA)
 	{
-		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetHeadArmorBP(), SpawnInfo);
+		HeadArmor = GetWorld()->SpawnActor<AArenaArmor>(HeadA, SpawnInfo);
 	}
 	if (FeetA)
 	{
-		FeetArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetFeetArmorBP(), SpawnInfo);
+		FeetArmor = GetWorld()->SpawnActor<AArenaArmor>(FeetA, SpawnInfo);
 	}
 	if (LegsA)
 	{
-		LegArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetLegsArmorBP(), SpawnInfo);
+		LegArmor = GetWorld()->SpawnActor<AArenaArmor>(LegsA, SpawnInfo);
 	}
 	if (ShoulderA)
 	{
-		ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(CharacterEquipment->GetShoulderArmorBP(), SpawnInfo);
+		ShoulderArmor = GetWorld()->SpawnActor<AArenaArmor>(ShoulderA, SpawnInfo);
 	}
 
-	InitializeWeapons(
-		PrimaryWeapon,
-		SecondaryWeapon,
-		HeadUtility,
-		UpperBackUtility,
-		LowerBackUtility,
-		LeftWaistUtility,
-		RightWaistUtility,
-		LeftWristUtility,
-		RightWristUtility,
-		HeadArmor,
-		ShoulderArmor,
-		ChestArmor,
-		HandArmor,
-		LegArmor,
-		FeetArmor);
+	InitializeWeapons();
 }
 
 bool AArenaCharacter::ServerToggleCrouch_Validate()
@@ -2662,58 +2902,13 @@ void AArenaCharacter::ServerSwapWeapon_Implementation()
 	SwapWeapon();
 }
 
-bool AArenaCharacter::ServerInitializeWeapons_Validate(
-class AArenaWeapon* mainWeapon,
-class AArenaWeapon* offWeapon,
-class AArenaUtility* Head,
-class AArenaUtility* UpperBack,
-class AArenaUtility* LowerBack,
-class AArenaUtility* LeftWaist,
-class AArenaUtility* RightWaist,
-class AArenaUtility* LeftWrist,
-class AArenaUtility* RightWrist,
-class AArenaArmor* HeadA,
-class AArenaArmor* ShoulderA,
-class AArenaArmor* ChestA,
-class AArenaArmor* HandsA,
-class AArenaArmor* LegsA,
-class AArenaArmor* FeetA)
+bool AArenaCharacter::ServerInitializeWeapons_Validate()
 {
 	return true;
 }
-void AArenaCharacter::ServerInitializeWeapons_Implementation(
-class AArenaWeapon* mainWeapon,
-class AArenaWeapon* offWeapon,
-class AArenaUtility* Head,
-class AArenaUtility* UpperBack,
-class AArenaUtility* LowerBack,
-class AArenaUtility* LeftWaist,
-class AArenaUtility* RightWaist,
-class AArenaUtility* LeftWrist,
-class AArenaUtility* RightWrist,
-class AArenaArmor* HeadA,
-class AArenaArmor* ShoulderA,
-class AArenaArmor* ChestA,
-class AArenaArmor* HandsA,
-class AArenaArmor* LegsA,
-class AArenaArmor* FeetA)
+void AArenaCharacter::ServerInitializeWeapons_Implementation()
 {
-	InitializeWeapons(
-		mainWeapon,
-		offWeapon,
-		Head,
-		UpperBack,
-		LowerBack,
-		LeftWaist,
-		RightWaist,
-		LeftWrist,
-		RightWrist,
-		HeadA,
-		ShoulderA,
-		ChestA,
-		HandsA,
-		LegsA,
-		FeetA);
+	InitializeWeapons();
 }
 
 bool AArenaCharacter::ServerSetPrimaryWeapon_Validate(TSubclassOf<class AArenaWeapon> Weapon)
