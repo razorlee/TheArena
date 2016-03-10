@@ -18,10 +18,28 @@ public:
 
 	FHttpModule* Http;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Authenticate")
-	FString _userName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Authenticate")
-	FString _password;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	FString Region;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	FString FirstName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	FString LastName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	FString Email;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	FString Password;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	FString ConfirmPassword;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	FString SecurityQuestion;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	FString SecurityAnswer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	int32 Age;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	bool NewsLetter;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Account")
+	bool Agreement;
 	
 	
 };
